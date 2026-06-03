@@ -1,7 +1,12 @@
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../core/storage/auth_storage.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/rider_avatar.dart';
+import '../providers/avatar_service.dart';
 import '../providers/rider_profile_service.dart';
 
 class RiderEditProfileScreen extends StatefulWidget {
@@ -20,7 +25,10 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
   String? _experienceLevel;
   String  _language = 'es';
   bool _loading = false;
+  bool _uploadingAvatar = false;
   String? _error;
+  String? _avatarUrl;
+  File? _localAvatar;
 
   final _levels = ['novato', 'intermedio', 'experto'];
 
@@ -41,6 +49,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     _provinceController = TextEditingController(text: widget.profile['province'] ?? '');
     _experienceLevel    = widget.profile['experience_level'] ?? 'novato';
     _language           = widget.profile['language'] ?? 'es';
+    _avatarUrl          = widget.profile['avatar_url'];
   }
 
   @override
@@ -49,6 +58,61 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     _bioController.dispose();
     _provinceController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: source, imageQuality: 80, maxWidth: 800);
+    if (picked == null) return;
+
+    final file = File(picked.path);
+    setState(() { _uploadingAvatar = true; _localAvatar = file; });
+
+    final result = await AvatarService.uploadAvatar(file);
+    if (!mounted) return;
+    setState(() => _uploadingAvatar = false);
+
+    if (result['error'] != null) {
+      setState(() => _error = result['error']);
+    } else {
+      setState(() => _avatarUrl = result['avatar_url']);
+    }
+  }
+
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppColors.orange),
+              title: const Text('Hacer foto', style: TextStyle(color: AppColors.white)),
+              onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.camera); },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppColors.cyan),
+              title: const Text('Elegir de galería', style: TextStyle(color: AppColors.white)),
+              onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.gallery); },
+            ),
+            if (_avatarUrl != null)
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: AppColors.error),
+                title: const Text('Eliminar foto', style: TextStyle(color: AppColors.error)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  setState(() { _avatarUrl = null; _localAvatar = null; });
+                },
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _save() async {
@@ -70,10 +134,11 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       return;
     }
 
-    // Cambiar idioma en la app
+    // Guardar idioma localmente y cambiar en la app
+    await AuthStorage.saveLanguage(_language);
     await context.setLocale(Locale(_language));
     if (!mounted) return;
-    context.go('/rider/profile');
+    context.pop();
   }
 
   @override
@@ -85,7 +150,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-          onPressed: () => context.go('/rider/profile'),
+          onPressed: () => context.pop(),
         ),
         title: Text(
           'profile.edit_title'.tr(),
@@ -113,33 +178,54 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
           children: [
             // Avatar
             Center(
-              child: Stack(
-                children: [
-                  Container(
-                    width: 90, height: 90,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.surface,
-                      border: Border.all(color: AppColors.orange, width: 2),
+              child: GestureDetector(
+                onTap: _showImageSourceDialog,
+                child: Stack(
+                  children: [
+                    _uploadingAvatar
+                        ? Container(
+                            width: 90, height: 90,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.surface,
+                              border: Border.all(color: AppColors.orange, width: 2),
+                            ),
+                            child: const Center(child: CircularProgressIndicator(color: AppColors.orange, strokeWidth: 2)),
+                          )
+                        : _localAvatar != null
+                            ? Container(
+                                width: 90, height: 90,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.orange, width: 2),
+                                  image: DecorationImage(
+                                    image: FileImage(_localAvatar!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              )
+                            : RiderAvatar(
+                                avatarUrl: _avatarUrl,
+                                level: _experienceLevel ?? 'novato',
+                                size: 90,
+                              ),
+                    Positioned(
+                      bottom: 0, right: 0,
+                      child: Container(
+                        width: 28, height: 28,
+                        decoration: const BoxDecoration(color: AppColors.orange, shape: BoxShape.circle),
+                        child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                      ),
                     ),
-                    child: const Icon(Icons.person, color: AppColors.grey, size: 48),
-                  ),
-                  Positioned(
-                    bottom: 0, right: 0,
-                    child: Container(
-                      width: 28, height: 28,
-                      decoration: const BoxDecoration(color: AppColors.orange, shape: BoxShape.circle),
-                      child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
             const SizedBox(height: 32),
 
             // Nickname
-            Text('motos.alias'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+            const Text('Nickname', style: TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             TextFormField(
               controller: _nicknameController,

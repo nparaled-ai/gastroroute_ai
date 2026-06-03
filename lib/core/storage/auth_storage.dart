@@ -7,6 +7,7 @@ class AuthStorage {
   static const _keyRole       = 'active_role';
   static const _keyUserId     = 'user_id';
   static const _keyEmail      = 'email';
+  static const _keyLanguage   = 'language';
 
   // Token
   static Future<void> saveToken(String token) async =>
@@ -35,6 +36,12 @@ class AuthStorage {
     await _storage.write(key: _keyEmail,  value: email);
     await _storage.write(key: _keyRole,   value: role);
   }
+
+  static Future<void> saveLanguage(String lang) async =>
+      await _storage.write(key: _keyLanguage, value: lang);
+
+  static Future<String?> getLanguage() async =>
+      await _storage.read(key: _keyLanguage);
 
   // Limpiar todo al logout
   static Future<void> clear() async => await _storage.deleteAll();

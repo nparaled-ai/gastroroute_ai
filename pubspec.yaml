@@ -58,6 +58,9 @@ dependencies:
   # Multiidioma
   easy_localization: ^3.0.7
 
+  # Selector de imagen
+  image_picker: ^1.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

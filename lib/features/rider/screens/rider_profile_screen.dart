@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/rider_avatar.dart';
 import '../providers/rider_profile_service.dart';
 
 class RiderProfileScreen extends StatefulWidget {
@@ -88,20 +89,23 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
           Center(
             child: Column(
               children: [
-                Container(
-                  width: 90, height: 90,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.surface,
-                    border: Border.all(color: AppColors.orange, width: 2),
-                  ),
-                  child: const Icon(Icons.person, color: AppColors.grey, size: 48),
+                RiderAvatar(
+                  avatarUrl: profile['avatar_url'],
+                  level: profile['experience_level'] ?? 'novato',
+                  size: 90,
                 ),
                 const SizedBox(height: 12),
                 Text(profile['nickname'] ?? '',
                     style: const TextStyle(color: AppColors.white, fontSize: 22, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 4),
-                _LevelBadge(level: profile['experience_level'] ?? 'novato'),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _LevelBadge(level: profile['experience_level'] ?? 'novato'),
+                    const SizedBox(width: 8),
+                    _LanguageFlag(language: profile['language'] ?? 'es'),
+                  ],
+                ),
               ],
             ),
           ),
@@ -202,6 +206,35 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
             ...motos.map((moto) => _MotoCard(moto: moto)),
         ],
       ),
+    );
+  }
+}
+
+class _LanguageFlag extends StatelessWidget {
+  final String language;
+  const _LanguageFlag({required this.language});
+
+  String get _flag {
+    switch (language) {
+      case 'en': return '🇬🇧';
+      case 'fr': return '🇫🇷';
+      case 'de': return '🇩🇪';
+      case 'it': return '🇮🇹';
+      case 'pt': return '🇵🇹';
+      default:   return '🇪🇸';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.greyDark),
+      ),
+      child: Text(_flag, style: const TextStyle(fontSize: 14)),
     );
   }
 }

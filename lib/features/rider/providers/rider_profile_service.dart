@@ -18,9 +18,12 @@ class RiderProfileService {
       final response = await ApiClient.dio.put('/rider/profile', data: data);
       return {'profile': response.data};
     } on DioException catch (e) {
-      return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
-      };
+      final errors = e.response?.data['errors'];
+      if (errors != null) {
+        final firstError = (errors as Map).values.first[0];
+        return {'error': firstError};
+      }
+      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
     }
   }
 
