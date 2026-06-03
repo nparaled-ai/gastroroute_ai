@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/api/auth_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/rider_profile_service.dart';
 
@@ -24,16 +24,12 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
 
   Future<void> _loadProfile() async {
     setState(() { _loading = true; _error = null; });
-
     final result = await RiderProfileService.getProfile();
-
     if (!mounted) return;
-
     if (result['error'] != null) {
       setState(() { _loading = false; _error = result['error']; });
       return;
     }
-
     setState(() { _loading = false; _profile = result['profile']; });
   }
 
@@ -48,15 +44,14 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.go('/rider/home'),
         ),
-        title: const Text(
-          'Mi Perfil',
-          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700),
-        ),
+        title: Text('profile.title'.tr(),
+            style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined, color: AppColors.orange),
-            onPressed: _profile == null ? null : () {
-              context.go('/rider/edit-profile', extra: _profile);
+            onPressed: _profile == null ? null : () async {
+              await context.push('/rider/edit-profile', extra: _profile);
+              _loadProfile();
             },
           ),
         ],
@@ -72,10 +67,7 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                       const SizedBox(height: 16),
                       Text(_error!, style: const TextStyle(color: AppColors.grey)),
                       const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadProfile,
-                        child: const Text('Reintentar'),
-                      ),
+                      ElevatedButton(onPressed: _loadProfile, child: Text('common.retry'.tr())),
                     ],
                   ),
                 )
@@ -97,8 +89,7 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
             child: Column(
               children: [
                 Container(
-                  width: 90,
-                  height: 90,
+                  width: 90, height: 90,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.surface,
@@ -107,14 +98,8 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                   child: const Icon(Icons.person, color: AppColors.grey, size: 48),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  profile['nickname'] ?? '',
-                  style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                Text(profile['nickname'] ?? '',
+                    style: const TextStyle(color: AppColors.white, fontSize: 22, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 4),
                 _LevelBadge(level: profile['experience_level'] ?? 'novato'),
               ],
@@ -126,11 +111,11 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
           // Stats
           Row(
             children: [
-              _StatCard(label: 'Km totales',  value: '${profile['total_km'] ?? 0}'),
+              _StatCard(label: 'profile.stats_km'.tr(),     value: '${profile['total_km'] ?? 0}'),
               const SizedBox(width: 12),
-              _StatCard(label: 'Rutas',       value: '${profile['routes_completed'] ?? 0}'),
+              _StatCard(label: 'profile.stats_routes'.tr(), value: '${profile['routes_completed'] ?? 0}'),
               const SizedBox(width: 12),
-              _StatCard(label: 'Comidas',     value: '${profile['lunches_completed'] ?? 0}'),
+              _StatCard(label: 'profile.stats_lunches'.tr(), value: '${profile['lunches_completed'] ?? 0}'),
             ],
           ),
 
@@ -138,7 +123,7 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
 
           // Bio
           if (profile['bio'] != null && profile['bio'].toString().isNotEmpty) ...[
-            _SectionTitle('Sobre mí'),
+            _SectionTitle('profile.about_me'.tr()),
             const SizedBox(height: 8),
             Container(
               width: double.infinity,
@@ -148,17 +133,14 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.greyDark),
               ),
-              child: Text(
-                profile['bio'],
-                style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5),
-              ),
+              child: Text(profile['bio'], style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
             ),
             const SizedBox(height: 24),
           ],
 
           // Ubicación
           if (profile['province'] != null) ...[
-            _SectionTitle('Ubicación'),
+            _SectionTitle('profile.location'.tr()),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(16),
@@ -171,10 +153,8 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                 children: [
                   const Icon(Icons.location_on_outlined, color: AppColors.orange, size: 20),
                   const SizedBox(width: 8),
-                  Text(
-                    '${profile['province']}, ${profile['country'] ?? 'ES'}',
-                    style: const TextStyle(color: AppColors.white, fontSize: 14),
-                  ),
+                  Text('${profile['province']}, ${profile['country'] ?? 'ES'}',
+                      style: const TextStyle(color: AppColors.white, fontSize: 14)),
                 ],
               ),
             ),
@@ -185,13 +165,11 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _SectionTitle('Mis Motos'),
+              _SectionTitle('profile.my_motos'.tr()),
               GestureDetector(
                 onTap: () => context.go('/rider/motos'),
-                child: const Text(
-                  'Gestionar',
-                  style: TextStyle(color: AppColors.orange, fontSize: 13, fontWeight: FontWeight.w600),
-                ),
+                child: Text('profile.manage_motos'.tr(),
+                    style: const TextStyle(color: AppColors.orange, fontSize: 13, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -210,17 +188,12 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                 children: [
                   const Icon(Icons.two_wheeler, color: AppColors.grey, size: 40),
                   const SizedBox(height: 8),
-                  const Text(
-                    'No tienes motos añadidas',
-                    style: TextStyle(color: AppColors.grey),
-                  ),
+                  Text('profile.no_motos'.tr(), style: const TextStyle(color: AppColors.grey)),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: () => context.go('/rider/motos'),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(160, 44),
-                    ),
-                    child: const Text('AÑADIR MOTO'),
+                    style: ElevatedButton.styleFrom(minimumSize: const Size(160, 44)),
+                    child: Text('profile.add_moto'.tr()),
                   ),
                 ],
               ),
@@ -245,6 +218,14 @@ class _LevelBadge extends StatelessWidget {
     }
   }
 
+  String _label(BuildContext context) {
+    switch (level) {
+      case 'experto':    return 'profile.level_expert'.tr();
+      case 'intermedio': return 'profile.level_intermediate'.tr();
+      default:           return 'profile.level_novice'.tr();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -254,10 +235,8 @@ class _LevelBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _color.withOpacity(0.4)),
       ),
-      child: Text(
-        level.toUpperCase(),
-        style: TextStyle(color: _color, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1),
-      ),
+      child: Text(_label(context),
+          style: TextStyle(color: _color, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
     );
   }
 }
@@ -279,19 +258,9 @@ class _StatCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(
-              value,
-              style: const TextStyle(
-                color: AppColors.orange,
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            Text(value, style: const TextStyle(color: AppColors.orange, fontSize: 22, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(color: AppColors.grey, fontSize: 11),
-            ),
+            Text(label, style: const TextStyle(color: AppColors.grey, fontSize: 11)),
           ],
         ),
       ),
@@ -305,14 +274,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: AppColors.white,
-        fontSize: 16,
-        fontWeight: FontWeight.w700,
-      ),
-    );
+    return Text(text, style: const TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700));
   }
 }
 
@@ -328,19 +290,13 @@ class _MotoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: moto['is_primary'] == true ? AppColors.orange : AppColors.greyDark,
-        ),
+        border: Border.all(color: moto['is_primary'] == true ? AppColors.orange : AppColors.greyDark),
       ),
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.orange.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
-            ),
+            width: 48, height: 48,
+            decoration: BoxDecoration(color: AppColors.orange.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
             child: const Icon(Icons.two_wheeler, color: AppColors.orange, size: 26),
           ),
           const SizedBox(width: 14),
@@ -350,14 +306,8 @@ class _MotoCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      moto['alias'] ?? '${moto['brand']} ${moto['model']}',
-                      style: const TextStyle(
-                        color: AppColors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    Text(moto['alias'] ?? '${moto['brand']} ${moto['model']}',
+                        style: const TextStyle(color: AppColors.white, fontSize: 15, fontWeight: FontWeight.w700)),
                     if (moto['is_primary'] == true) ...[
                       const SizedBox(width: 8),
                       Container(
@@ -366,19 +316,15 @@ class _MotoCard extends StatelessWidget {
                           color: AppColors.orange.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Text(
-                          'Principal',
-                          style: TextStyle(color: AppColors.orange, fontSize: 10, fontWeight: FontWeight.w700),
-                        ),
+                        child: Text('motos.primary'.tr(),
+                            style: const TextStyle(color: AppColors.orange, fontSize: 10, fontWeight: FontWeight.w700)),
                       ),
                     ],
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '${moto['brand'] ?? ''} ${moto['model'] ?? ''} · ${moto['year'] ?? ''} · ${moto['engine_cc'] ?? ''}cc',
-                  style: const TextStyle(color: AppColors.grey, fontSize: 12),
-                ),
+                Text('${moto['brand'] ?? ''} ${moto['model'] ?? ''} · ${moto['year'] ?? ''} · ${moto['engine_cc'] ?? ''}cc',
+                    style: const TextStyle(color: AppColors.grey, fontSize: 12)),
               ],
             ),
           ),

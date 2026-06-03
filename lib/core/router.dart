@@ -10,6 +10,8 @@ import '../features/rider/screens/rider_profile_screen.dart';
 import '../features/rider/screens/rider_edit_profile_screen.dart';
 import '../features/rider/screens/rider_motos_screen.dart';
 import '../features/rider/screens/rider_moto_form_screen.dart';
+import '../features/rider/screens/route_generator_screen.dart';
+import '../features/rider/screens/route_result_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/splash',
@@ -65,6 +67,17 @@ final router = GoRouter(
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
         return RiderMotoFormScreen(moto: extra);
+      },
+    ),
+    GoRoute(
+      path: '/rider/route-generator',
+      builder: (context, state) => const RouteGeneratorScreen(),
+    ),
+    GoRoute(
+      path: '/rider/route-result',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return RouteResultScreen(result: extra);
       },
     ),
   ],

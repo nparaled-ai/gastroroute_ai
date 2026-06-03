@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/auth_service.dart';
@@ -12,20 +13,6 @@ class RiderHomeScreen extends StatefulWidget {
 }
 
 class _RiderHomeScreenState extends State<RiderHomeScreen> {
-  String? _nickname;
-  String? _email;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUser();
-  }
-
-  Future<void> _loadUser() async {
-    final email = await AuthStorage.getToken();
-    setState(() => _email = email);
-  }
-
   Future<void> _logout() async {
     await AuthService.logout();
     if (!mounted) return;
@@ -66,45 +53,33 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-
-            // Bienvenida
-            const Text(
-              '¡Bienvenido, motero!',
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            Text('home.welcome'.tr(),
+                style: const TextStyle(color: AppColors.white, fontSize: 24, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
-            const Text(
-              'Tu aventura comienza aquí',
-              style: TextStyle(color: AppColors.grey, fontSize: 14),
-            ),
-
+            Text('home.subtitle'.tr(),
+                style: const TextStyle(color: AppColors.grey, fontSize: 14)),
             const SizedBox(height: 32),
 
-            // Cards de acceso rápido
             _QuickAccessCard(
               icon: Icons.person_outlined,
-              title: 'Mi Perfil',
-              desc: 'Edita tu perfil y tus motos',
+              title: 'home.my_profile'.tr(),
+              desc: 'home.my_profile_desc'.tr(),
               color: AppColors.orange,
               onTap: () => context.go('/rider/profile'),
             ),
             const SizedBox(height: 16),
             _QuickAccessCard(
               icon: Icons.map_outlined,
-              title: 'Rutas',
-              desc: 'Próximamente',
+              title: 'home.planner'.tr(),
+              desc: 'home.planner_desc'.tr(),
               color: AppColors.cyan,
-              onTap: () {},
+              onTap: () => context.go('/rider/route-generator'),
             ),
             const SizedBox(height: 16),
             _QuickAccessCard(
               icon: Icons.restaurant_outlined,
-              title: 'Gastronomía',
-              desc: 'Próximamente',
+              title: 'home.gastronomy'.tr(),
+              desc: 'home.gastronomy_desc'.tr(),
               color: AppColors.gold,
               onTap: () {},
             ),
@@ -144,8 +119,7 @@ class _QuickAccessCard extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 52,
-              height: 52,
+              width: 52, height: 52,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
@@ -157,22 +131,9 @@ class _QuickAccessCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: AppColors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  Text(title, style: const TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 4),
-                  Text(
-                    desc,
-                    style: const TextStyle(
-                      color: AppColors.grey,
-                      fontSize: 13,
-                    ),
-                  ),
+                  Text(desc, style: const TextStyle(color: AppColors.grey, fontSize: 13)),
                 ],
               ),
             ),

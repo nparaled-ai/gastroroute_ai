@@ -52,6 +52,12 @@ dependencies:
   # Iconos
   cupertino_icons: ^1.0.6
 
+  # URL launcher
+  url_launcher: ^6.2.6
+
+  # Multiidioma
+  easy_localization: ^3.0.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -75,6 +81,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/translations/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

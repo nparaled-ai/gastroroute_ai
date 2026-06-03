@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/auth_service.dart';
@@ -13,8 +14,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController    = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _loading    = false;
-  bool _obscure    = true;
+  bool _loading = false;
+  bool _obscure = true;
   String? _error;
 
   @override
@@ -67,16 +68,11 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 60),
 
-              // Logo + nombre
+              // Logo
               Center(
                 child: Column(
                   children: [
-                    Image.asset(
-                      'assets/images/logo.png',
-                      width: 120,
-                      height: 120,
-                      fit: BoxFit.contain,
-                    ),
+                    Image.asset('assets/images/logo.png', width: 120, height: 120, fit: BoxFit.contain),
                     const SizedBox(height: 16),
                     RichText(
                       text: const TextSpan(
@@ -94,43 +90,32 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 48),
 
-              // Título
-              const Text(
-                'Bienvenido de vuelta',
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              Text('auth.welcome_back'.tr(),
+                  style: const TextStyle(color: AppColors.white, fontSize: 24, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
-              const Text(
-                'Inicia sesión para continuar',
-                style: TextStyle(color: AppColors.grey, fontSize: 14),
-              ),
+              Text('auth.login_subtitle'.tr(),
+                  style: const TextStyle(color: AppColors.grey, fontSize: 14)),
 
               const SizedBox(height: 32),
 
-              // Email
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 style: const TextStyle(color: AppColors.white),
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined, color: AppColors.grey),
+                decoration: InputDecoration(
+                  labelText: 'auth.email'.tr(),
+                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.grey),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // Password
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
                 style: const TextStyle(color: AppColors.white),
                 decoration: InputDecoration(
-                  labelText: 'Contraseña',
+                  labelText: 'auth.password'.tr(),
                   prefixIcon: const Icon(Icons.lock_outlined, color: AppColors.grey),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -142,7 +127,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              // Error
               if (_error != null) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -156,12 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Icon(Icons.error_outline, color: AppColors.error, size: 18),
                       const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(color: AppColors.error, fontSize: 13),
-                        ),
-                      ),
+                      Expanded(child: Text(_error!, style: const TextStyle(color: AppColors.error, fontSize: 13))),
                     ],
                   ),
                 ),
@@ -169,42 +148,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 32),
 
-              // Botón login
               ElevatedButton(
                 onPressed: _loading ? null : _login,
                 child: _loading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text('INICIAR SESIÓN'),
+                    ? const SizedBox(width: 20, height: 20,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : Text('auth.login_button'.tr()),
               ),
 
               const SizedBox(height: 24),
 
-              // Registro
               Center(
                 child: GestureDetector(
                   onTap: () => context.go('/register'),
                   child: RichText(
-                    text: const TextSpan(
-                      style: TextStyle(fontSize: 14),
+                    text: TextSpan(
+                      style: const TextStyle(fontSize: 14),
                       children: [
-                        TextSpan(
-                          text: '¿No tienes cuenta? ',
-                          style: TextStyle(color: AppColors.grey),
-                        ),
-                        TextSpan(
-                          text: 'Regístrate',
-                          style: TextStyle(
-                            color: AppColors.orange,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        TextSpan(text: 'auth.no_account'.tr(),
+                            style: const TextStyle(color: AppColors.grey)),
+                        const TextSpan(text: ' '),
+                        TextSpan(text: 'auth.register_link'.tr(),
+                            style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700)),
                       ],
                     ),
                   ),

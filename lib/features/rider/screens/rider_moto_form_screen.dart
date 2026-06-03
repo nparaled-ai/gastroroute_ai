@@ -1,11 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/rider_profile_service.dart';
 
 class RiderMotoFormScreen extends StatefulWidget {
-  final Map<String, dynamic>? moto; // null = nueva moto
-
+  final Map<String, dynamic>? moto;
   const RiderMotoFormScreen({super.key, this.moto});
 
   @override
@@ -18,6 +18,8 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
   late TextEditingController _modelController;
   late TextEditingController _yearController;
   late TextEditingController _engineController;
+  late TextEditingController _fuelCapacityController;
+  late TextEditingController _consumptionController;
   String? _motoType;
   bool _loading = false;
   String? _error;
@@ -40,12 +42,14 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
   void initState() {
     super.initState();
     final m = widget.moto;
-    _aliasController  = TextEditingController(text: m?['alias'] ?? '');
-    _brandController  = TextEditingController(text: m?['brand'] ?? '');
-    _modelController  = TextEditingController(text: m?['model'] ?? '');
-    _yearController   = TextEditingController(text: m?['year']?.toString() ?? '');
-    _engineController = TextEditingController(text: m?['engine_cc']?.toString() ?? '');
-    _motoType         = m?['moto_type'];
+    _aliasController        = TextEditingController(text: m?['alias'] ?? '');
+    _brandController        = TextEditingController(text: m?['brand'] ?? '');
+    _modelController        = TextEditingController(text: m?['model'] ?? '');
+    _yearController         = TextEditingController(text: m?['year']?.toString() ?? '');
+    _engineController       = TextEditingController(text: m?['engine_cc']?.toString() ?? '');
+    _fuelCapacityController = TextEditingController(text: m?['fuel_capacity']?.toString() ?? '');
+    _consumptionController  = TextEditingController(text: m?['consumption_per_100km']?.toString() ?? '');
+    _motoType               = m?['moto_type'];
   }
 
   @override
@@ -55,19 +59,36 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
     _modelController.dispose();
     _yearController.dispose();
     _engineController.dispose();
+    _fuelCapacityController.dispose();
+    _consumptionController.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
+    if (_aliasController.text.trim().isEmpty) {
+      setState(() => _error = 'motos.alias_required'.tr());
+      return;
+    }
+    if (_brandController.text.trim().isEmpty) {
+      setState(() => _error = 'motos.brand_required'.tr());
+      return;
+    }
+    if (_motoType == null) {
+      setState(() => _error = 'motos.type_required'.tr());
+      return;
+    }
+
     setState(() { _loading = true; _error = null; });
 
     final data = {
-      'alias':     _aliasController.text.trim(),
-      'brand':     _brandController.text.trim(),
-      'model':     _modelController.text.trim(),
-      'year':      int.tryParse(_yearController.text.trim()),
-      'engine_cc': int.tryParse(_engineController.text.trim()),
-      'moto_type': _motoType,
+      'alias':                 _aliasController.text.trim(),
+      'brand':                 _brandController.text.trim(),
+      'model':                 _modelController.text.trim(),
+      'year':                  int.tryParse(_yearController.text.trim()),
+      'engine_cc':             int.tryParse(_engineController.text.trim()),
+      'moto_type':             _motoType,
+      'fuel_capacity':         double.tryParse(_fuelCapacityController.text.trim()),
+      'consumption_per_100km': double.tryParse(_consumptionController.text.trim()),
     };
 
     Map<String, dynamic> result;
@@ -84,7 +105,6 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
       setState(() => _error = result['error']);
       return;
     }
-
     context.pop();
   }
 
@@ -99,19 +119,14 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.pop(),
         ),
-        title: Text(
-          _isEditing ? 'Editar Moto' : 'Nueva Moto',
-          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700),
-        ),
+        title: Text(_isEditing ? 'motos.edit_title'.tr() : 'motos.add_title'.tr(),
+            style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
         actions: [
           TextButton(
             onPressed: _loading ? null : _save,
             child: _loading
-                ? const SizedBox(
-                    width: 18, height: 18,
-                    child: CircularProgressIndicator(color: AppColors.orange, strokeWidth: 2),
-                  )
-                : const Text('Guardar', style: TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700)),
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: AppColors.orange, strokeWidth: 2))
+                : Text('common.save'.tr(), style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -120,30 +135,27 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _field('Alias', _aliasController, hint: 'Ej: Mi Triumph'),
+            _field('motos.alias'.tr(), _aliasController, hint: 'motos.alias_hint'.tr()),
             const SizedBox(height: 16),
+
             // Marca con autocompletado
-            const Text('Marca', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            Text('motos.brand'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             Autocomplete<String>(
               initialValue: TextEditingValue(text: _brandController.text),
               optionsBuilder: (textEditingValue) {
                 if (textEditingValue.text.isEmpty) return _brands;
-                return _brands.where((b) =>
-                  b.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                return _brands.where((b) => b.toLowerCase().contains(textEditingValue.text.toLowerCase()));
               },
               onSelected: (val) => setState(() => _brandController.text = val),
               fieldViewBuilder: (context, controller, focusNode, onSubmitted) {
-                // Sincronizar con _brandController
                 controller.text = _brandController.text;
                 controller.addListener(() => _brandController.text = controller.text);
                 return TextFormField(
                   controller: controller,
                   focusNode: focusNode,
                   style: const TextStyle(color: AppColors.white),
-                  decoration: const InputDecoration(
-                    hintText: 'Escribe o selecciona marca',
-                  ),
+                  decoration: InputDecoration(hintText: 'motos.brand_hint'.tr()),
                 );
               },
               optionsViewBuilder: (context, onSelected, options) {
@@ -172,18 +184,28 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
                 );
               },
             ),
+
             const SizedBox(height: 16),
-            _field('Modelo', _modelController, hint: 'Ej: Tiger 900'),
+            _field('motos.model'.tr(), _modelController, hint: 'motos.model_hint'.tr()),
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _field('Año', _yearController, hint: '2022', keyboard: TextInputType.number)),
+                Expanded(child: _field('motos.year'.tr(), _yearController, hint: '2022', keyboard: TextInputType.number)),
                 const SizedBox(width: 16),
-                Expanded(child: _field('Cilindrada (cc)', _engineController, hint: '888', keyboard: TextInputType.number)),
+                Expanded(child: _field('motos.cc'.tr(), _engineController, hint: '888', keyboard: TextInputType.number)),
               ],
             ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(child: _field('motos.tank'.tr(), _fuelCapacityController, hint: '20', keyboard: TextInputType.number)),
+                const SizedBox(width: 16),
+                Expanded(child: _field('motos.consumption'.tr(), _consumptionController, hint: '5.5', keyboard: const TextInputType.numberWithOptions(decimal: true))),
+              ],
+            ),
+
             const SizedBox(height: 20),
-            const Text('Tipo de moto', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            Text('motos.type'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -198,19 +220,11 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
                     decoration: BoxDecoration(
                       color: isSelected ? AppColors.orange.withOpacity(0.15) : AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isSelected ? AppColors.orange : AppColors.greyDark,
-                        width: isSelected ? 2 : 1,
-                      ),
+                      border: Border.all(color: isSelected ? AppColors.orange : AppColors.greyDark, width: isSelected ? 2 : 1),
                     ),
-                    child: Text(
-                      type[0].toUpperCase() + type.substring(1),
-                      style: TextStyle(
-                        color: isSelected ? AppColors.orange : AppColors.grey,
-                        fontSize: 13,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal,
-                      ),
-                    ),
+                    child: Text(type[0].toUpperCase() + type.substring(1),
+                        style: TextStyle(color: isSelected ? AppColors.orange : AppColors.grey,
+                            fontSize: 13, fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal)),
                   ),
                 );
               }).toList(),

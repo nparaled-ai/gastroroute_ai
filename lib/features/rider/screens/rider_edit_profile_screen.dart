@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -17,10 +18,20 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
   late TextEditingController _bioController;
   late TextEditingController _provinceController;
   String? _experienceLevel;
+  String  _language = 'es';
   bool _loading = false;
   String? _error;
 
   final _levels = ['novato', 'intermedio', 'experto'];
+
+  final _languages = [
+    {'code': 'es', 'flag': '🇪🇸', 'name': 'Español'},
+    {'code': 'en', 'flag': '🇬🇧', 'name': 'English'},
+    {'code': 'fr', 'flag': '🇫🇷', 'name': 'Français'},
+    {'code': 'de', 'flag': '🇩🇪', 'name': 'Deutsch'},
+    {'code': 'it', 'flag': '🇮🇹', 'name': 'Italiano'},
+    {'code': 'pt', 'flag': '🇵🇹', 'name': 'Português'},
+  ];
 
   @override
   void initState() {
@@ -29,6 +40,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     _bioController      = TextEditingController(text: widget.profile['bio'] ?? '');
     _provinceController = TextEditingController(text: widget.profile['province'] ?? '');
     _experienceLevel    = widget.profile['experience_level'] ?? 'novato';
+    _language           = widget.profile['language'] ?? 'es';
   }
 
   @override
@@ -47,6 +59,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       'bio':              _bioController.text.trim(),
       'province':         _provinceController.text.trim(),
       'experience_level': _experienceLevel,
+      'language':         _language,
     });
 
     if (!mounted) return;
@@ -57,6 +70,9 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       return;
     }
 
+    // Cambiar idioma en la app
+    await context.setLocale(Locale(_language));
+    if (!mounted) return;
     context.go('/rider/profile');
   }
 
@@ -71,22 +87,21 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.go('/rider/profile'),
         ),
-        title: const Text(
-          'Editar Perfil',
-          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700),
+        title: Text(
+          'profile.edit_title'.tr(),
+          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700),
         ),
         actions: [
           TextButton(
             onPressed: _loading ? null : _save,
             child: _loading
                 ? const SizedBox(
-                    width: 18,
-                    height: 18,
+                    width: 18, height: 18,
                     child: CircularProgressIndicator(color: AppColors.orange, strokeWidth: 2),
                   )
-                : const Text(
-                    'Guardar',
-                    style: TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700),
+                : Text(
+                    'common.save'.tr(),
+                    style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700),
                   ),
           ),
         ],
@@ -96,13 +111,12 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Avatar placeholder
+            // Avatar
             Center(
               child: Stack(
                 children: [
                   Container(
-                    width: 90,
-                    height: 90,
+                    width: 90, height: 90,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.surface,
@@ -111,15 +125,10 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                     child: const Icon(Icons.person, color: AppColors.grey, size: 48),
                   ),
                   Positioned(
-                    bottom: 0,
-                    right: 0,
+                    bottom: 0, right: 0,
                     child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: const BoxDecoration(
-                        color: AppColors.orange,
-                        shape: BoxShape.circle,
-                      ),
+                      width: 28, height: 28,
+                      decoration: const BoxDecoration(color: AppColors.orange, shape: BoxShape.circle),
                       child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),
                     ),
                   ),
@@ -130,7 +139,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
             const SizedBox(height: 32),
 
             // Nickname
-            const Text('Nickname', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            Text('motos.alias'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             TextFormField(
               controller: _nicknameController,
@@ -150,16 +159,16 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
               style: const TextStyle(color: AppColors.white),
               maxLines: 3,
               maxLength: 500,
-              decoration: const InputDecoration(
-                hintText: 'Cuéntanos algo sobre ti...',
-                counterStyle: TextStyle(color: AppColors.grey),
+              decoration: InputDecoration(
+                hintText: 'profile.about_me'.tr(),
+                counterStyle: const TextStyle(color: AppColors.grey),
               ),
             ),
 
             const SizedBox(height: 20),
 
             // Provincia
-            const Text('Provincia', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            Text('profile.location'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             TextFormField(
               controller: _provinceController,
@@ -172,7 +181,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
             const SizedBox(height: 20),
 
             // Nivel de experiencia
-            const Text('Nivel de experiencia', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            const Text('Nivel', style: TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             Row(
               children: _levels.map((level) {
@@ -193,10 +202,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                       decoration: BoxDecoration(
                         color: isSelected ? color.withOpacity(0.15) : AppColors.surface,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isSelected ? color : AppColors.greyDark,
-                          width: isSelected ? 2 : 1,
-                        ),
+                        border: Border.all(color: isSelected ? color : AppColors.greyDark, width: isSelected ? 2 : 1),
                       ),
                       child: Text(
                         level[0].toUpperCase() + level.substring(1),
@@ -207,6 +213,49 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                           fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal,
                         ),
                       ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Idioma
+            Text('profile.language'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _languages.map((lang) {
+                final isSelected = _language == lang['code'];
+                return GestureDetector(
+                  onTap: () => setState(() => _language = lang['code']!),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.orange.withOpacity(0.15) : AppColors.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected ? AppColors.orange : AppColors.greyDark,
+                        width: isSelected ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(lang['flag']!, style: const TextStyle(fontSize: 16)),
+                        const SizedBox(width: 6),
+                        Text(
+                          lang['name']!,
+                          style: TextStyle(
+                            color: isSelected ? AppColors.orange : AppColors.grey,
+                            fontSize: 12,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -227,12 +276,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                   children: [
                     const Icon(Icons.error_outline, color: AppColors.error, size: 18),
                     const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        _error!,
-                        style: const TextStyle(color: AppColors.error, fontSize: 13),
-                      ),
-                    ),
+                    Expanded(child: Text(_error!, style: const TextStyle(color: AppColors.error, fontSize: 13))),
                   ],
                 ),
               ),

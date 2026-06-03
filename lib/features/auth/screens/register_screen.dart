@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/auth_service.dart';
@@ -58,17 +59,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-
-              // Back
               IconButton(
                 onPressed: () => context.go('/login'),
                 icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
                 padding: EdgeInsets.zero,
               ),
-
               const SizedBox(height: 20),
 
-              // Logo
               Center(
                 child: Column(
                   children: [
@@ -90,58 +87,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               const SizedBox(height: 32),
 
-              // Título
-              const Text(
-                'Únete a la comunidad',
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              Text('auth.join_community'.tr(),
+                  style: const TextStyle(color: AppColors.white, fontSize: 24, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
-              const Text(
-                'Crea tu perfil motero',
-                style: TextStyle(color: AppColors.grey, fontSize: 14),
-              ),
+              Text('auth.register_subtitle'.tr(),
+                  style: const TextStyle(color: AppColors.grey, fontSize: 14)),
 
               const SizedBox(height: 32),
 
-              // Nickname
               TextFormField(
                 controller: _nicknameController,
                 style: const TextStyle(color: AppColors.white),
-                decoration: const InputDecoration(
-                  labelText: 'Nickname',
-                  prefixIcon: Icon(Icons.person_outlined, color: AppColors.grey),
-                  hintText: 'Tu nombre en la comunidad',
+                decoration: InputDecoration(
+                  labelText: 'auth.nickname'.tr(),
+                  prefixIcon: const Icon(Icons.person_outlined, color: AppColors.grey),
+                  hintText: 'auth.nickname_hint'.tr(),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // Email
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 style: const TextStyle(color: AppColors.white),
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email_outlined, color: AppColors.grey),
+                decoration: InputDecoration(
+                  labelText: 'auth.email'.tr(),
+                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.grey),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // Password
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
                 style: const TextStyle(color: AppColors.white),
                 decoration: InputDecoration(
-                  labelText: 'Contraseña',
+                  labelText: 'auth.password'.tr(),
                   prefixIcon: const Icon(Icons.lock_outlined, color: AppColors.grey),
-                  hintText: 'Mínimo 8 caracteres',
+                  hintText: 'auth.min_chars'.tr(),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
@@ -152,7 +137,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
 
-              // Error
               if (_error != null) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -166,18 +150,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       const Icon(Icons.error_outline, color: AppColors.error, size: 18),
                       const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(color: AppColors.error, fontSize: 13),
-                        ),
-                      ),
+                      Expanded(child: Text(_error!, style: const TextStyle(color: AppColors.error, fontSize: 13))),
                     ],
                   ),
                 ),
               ],
 
-              // Success
               if (_success != null) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -191,22 +169,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       const Icon(Icons.check_circle_outline, color: Colors.green, size: 18),
                       const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _success!,
-                          style: const TextStyle(color: Colors.green, fontSize: 13),
-                        ),
-                      ),
+                      Expanded(child: Text(_success!, style: const TextStyle(color: Colors.green, fontSize: 13))),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => context.go('/login'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
-                  child: const Text('IR AL LOGIN'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  child: Text('auth.login_link'.tr().toUpperCase()),
                 ),
               ],
 
@@ -215,15 +186,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ElevatedButton(
                   onPressed: _loading ? null : _register,
                   child: _loading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text('CREAR CUENTA'),
+                      ? const SizedBox(width: 20, height: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : Text('auth.create_account'.tr()),
                 ),
               ],
 
@@ -233,20 +198,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: GestureDetector(
                   onTap: () => context.go('/login'),
                   child: RichText(
-                    text: const TextSpan(
-                      style: TextStyle(fontSize: 14),
+                    text: TextSpan(
+                      style: const TextStyle(fontSize: 14),
                       children: [
-                        TextSpan(
-                          text: '¿Ya tienes cuenta? ',
-                          style: TextStyle(color: AppColors.grey),
-                        ),
-                        TextSpan(
-                          text: 'Inicia sesión',
-                          style: TextStyle(
-                            color: AppColors.orange,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        TextSpan(text: 'auth.already_account'.tr(),
+                            style: const TextStyle(color: AppColors.grey)),
+                        const TextSpan(text: ' '),
+                        TextSpan(text: 'auth.login_link'.tr(),
+                            style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700)),
                       ],
                     ),
                   ),
