@@ -1,0 +1,221 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/api/auth_service.dart';
+import '../../../core/theme/app_theme.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailController    = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _loading    = false;
+  bool _obscure    = true;
+  String? _error;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    setState(() { _loading = true; _error = null; });
+
+    final result = await AuthService.login(
+      email:    _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    if (!mounted) return;
+    setState(() => _loading = false);
+
+    if (result['error'] != null) {
+      setState(() => _error = result['error']);
+      return;
+    }
+
+    if (result['select_role'] == true) {
+      context.go('/select-role', extra: {
+        'user_id':  result['user_id'],
+        'roles':    result['roles'],
+        'password': _passwordController.text,
+      });
+      return;
+    }
+
+    if (result['success'] == true) {
+      final role = result['role'];
+      if (role == 'rider') context.go('/rider/home');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 60),
+
+              // Logo + nombre
+              Center(
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 16),
+                    RichText(
+                      text: const TextSpan(
+                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
+                        children: [
+                          TextSpan(text: 'GAS', style: TextStyle(color: AppColors.orange)),
+                          TextSpan(text: 'troroute', style: TextStyle(color: AppColors.white)),
+                          TextSpan(text: 'AI', style: TextStyle(color: AppColors.cyan)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 48),
+
+              // Título
+              const Text(
+                'Bienvenido de vuelta',
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Inicia sesión para continuar',
+                style: TextStyle(color: AppColors.grey, fontSize: 14),
+              ),
+
+              const SizedBox(height: 32),
+
+              // Email
+              TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                style: const TextStyle(color: AppColors.white),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: Icon(Icons.email_outlined, color: AppColors.grey),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Password
+              TextFormField(
+                controller: _passwordController,
+                obscureText: _obscure,
+                style: const TextStyle(color: AppColors.white),
+                decoration: InputDecoration(
+                  labelText: 'Contraseña',
+                  prefixIcon: const Icon(Icons.lock_outlined, color: AppColors.grey),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      color: AppColors.grey,
+                    ),
+                    onPressed: () => setState(() => _obscure = !_obscure),
+                  ),
+                ),
+              ),
+
+              // Error
+              if (_error != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline, color: AppColors.error, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _error!,
+                          style: const TextStyle(color: AppColors.error, fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 32),
+
+              // Botón login
+              ElevatedButton(
+                onPressed: _loading ? null : _login,
+                child: _loading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text('INICIAR SESIÓN'),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Registro
+              Center(
+                child: GestureDetector(
+                  onTap: () => context.go('/register'),
+                  child: RichText(
+                    text: const TextSpan(
+                      style: TextStyle(fontSize: 14),
+                      children: [
+                        TextSpan(
+                          text: '¿No tienes cuenta? ',
+                          style: TextStyle(color: AppColors.grey),
+                        ),
+                        TextSpan(
+                          text: 'Regístrate',
+                          style: TextStyle(
+                            color: AppColors.orange,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 32),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
