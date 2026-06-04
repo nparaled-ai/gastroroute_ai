@@ -105,7 +105,7 @@
     "origin": "Ponto de partida",
     "origin_hint": "Cidade ou endereço de partida",
     "departure_date": "Data de partida",
-    "departure_time_optional": "Hora de partida (opcional)",
+    "departure_time_optional": "Hora de partida",
     "departure_time_hint": "Ex: 09:00",
     "ai_calculates": "— a IA calculará as chegadas",
     "route_type": "Tipo de rota",
@@ -131,7 +131,7 @@
     "gas_stations_no_data": "Adicione depósito e consumo à sua mota",
     "lunch_stop": "Paragem para almoço?",
     "lunch_desc": "A IA encontrará um bom local na rota",
-    "dinner_stop": "Paragem para jantar?",
+    "dinner_stop": "Paragem para comer?",
     "dinner_desc": "A IA encontrará um bom local na rota",
     "hotels": "Sugerir hotéis?",
     "hotels_desc": "A IA proporá alojamento para cada etapa",
@@ -141,7 +141,11 @@
     "origin_required": "O ponto de partida é obrigatório.",
     "destination_required": "O destino é obrigatório.",
     "moto_required": "Selecione uma mota.",
-    "weather_forecast_notice": "⚠️ A previsão meteorológica só está disponível para os próximos 5 dias. Para datas posteriores o tempo pode mudar."
+    "weather_forecast_notice": "⚠️ A previsão meteorológica só está disponível para os próximos 5 dias. Para datas posteriores o tempo pode mudar.",
+    "lunch_time_required": "Indique a hora aproximada do almoço.",
+    "dinner_time_required": "Indique a hora aproximada da refeição.",
+    "date_required": "A data de partida é obrigatória.",
+    "time_required": "A hora de partida é obrigatória."
   },
   "route_result": {
     "title": "Rota gerada",

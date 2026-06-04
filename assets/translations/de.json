@@ -105,7 +105,7 @@
     "origin": "Startpunkt",
     "origin_hint": "Stadt oder Abfahrtsadresse",
     "departure_date": "Abfahrtsdatum",
-    "departure_time_optional": "Abfahrtszeit (optional)",
+    "departure_time_optional": "Abfahrtszeit",
     "departure_time_hint": "Z.B: 09:00",
     "ai_calculates": "— KI berechnet Ankunftszeiten",
     "route_type": "Routentyp",
@@ -131,7 +131,7 @@
     "gas_stations_no_data": "Fügen Sie Tank und Verbrauch zu Ihrem Motorrad hinzu",
     "lunch_stop": "Mittagspause?",
     "lunch_desc": "KI findet einen guten Ort auf der Route",
-    "dinner_stop": "Abendessen-Stopp?",
+    "dinner_stop": "Mahlzeit-Stopp?",
     "dinner_desc": "KI findet einen guten Ort auf der Route",
     "hotels": "Hotels vorschlagen?",
     "hotels_desc": "KI schlägt Unterkunft für jede Etappe vor",
@@ -141,7 +141,11 @@
     "origin_required": "Startpunkt ist erforderlich.",
     "destination_required": "Ziel ist für Routen mit Ziel erforderlich.",
     "moto_required": "Bitte wählen Sie ein Motorrad.",
-    "weather_forecast_notice": "⚠️ Die Wettervorhersage ist nur für die nächsten 5 Tage verfügbar. Für spätere Daten kann sich das Wetter ändern."
+    "weather_forecast_notice": "⚠️ Die Wettervorhersage ist nur für die nächsten 5 Tage verfügbar. Für spätere Daten kann sich das Wetter ändern.",
+    "lunch_time_required": "Bitte geben Sie die ungefähre Mittagessenszeit an.",
+    "dinner_time_required": "Bitte geben Sie die ungefähre Essenszeit an.",
+    "date_required": "Das Abfahrtsdatum ist erforderlich.",
+    "time_required": "Die Abfahrtszeit ist erforderlich."
   },
   "route_result": {
     "title": "Generierte Route",

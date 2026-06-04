@@ -105,7 +105,7 @@
     "origin": "Punto di partenza",
     "origin_hint": "Città o indirizzo di partenza",
     "departure_date": "Data di partenza",
-    "departure_time_optional": "Ora di partenza (facoltativo)",
+    "departure_time_optional": "Ora di partenza",
     "departure_time_hint": "Es: 09:00",
     "ai_calculates": "— l'IA calcolerà gli orari di arrivo",
     "route_type": "Tipo di percorso",
@@ -131,7 +131,7 @@
     "gas_stations_no_data": "Aggiungi serbatoio e consumo alla tua moto",
     "lunch_stop": "Sosta pranzo?",
     "lunch_desc": "L'IA troverà un buon posto sul percorso",
-    "dinner_stop": "Sosta cena?",
+    "dinner_stop": "Sosta pranzo?",
     "dinner_desc": "L'IA troverà un buon posto sul percorso",
     "hotels": "Suggerisci hotel?",
     "hotels_desc": "L'IA proporrà alloggi per ogni tappa",
@@ -141,7 +141,11 @@
     "origin_required": "Il punto di partenza è obbligatorio.",
     "destination_required": "La destinazione è obbligatoria.",
     "moto_required": "Seleziona una moto.",
-    "weather_forecast_notice": "⚠️ Le previsioni meteo sono disponibili solo per i prossimi 5 giorni. Per date successive il tempo potrebbe cambiare."
+    "weather_forecast_notice": "⚠️ Le previsioni meteo sono disponibili solo per i prossimi 5 giorni. Per date successive il tempo potrebbe cambiare.",
+    "lunch_time_required": "Inserisci l'orario approssimativo del pranzo.",
+    "dinner_time_required": "Inserisci l'orario approssimativo del pasto.",
+    "date_required": "La data di partenza è obbligatoria.",
+    "time_required": "L'orario di partenza è obbligatorio."
   },
   "route_result": {
     "title": "Percorso generato",

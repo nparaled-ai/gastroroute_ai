@@ -105,7 +105,7 @@
     "origin": "Starting point",
     "origin_hint": "City or departure address",
     "departure_date": "Departure date",
-    "departure_time_optional": "Departure time (optional)",
+    "departure_time_optional": "Departure time",
     "departure_time_hint": "E.g: 09:00",
     "ai_calculates": "— AI will calculate arrival times",
     "route_type": "Route type",
@@ -131,7 +131,7 @@
     "gas_stations_no_data": "Add tank and consumption to your bike to enable",
     "lunch_stop": "Lunch stop?",
     "lunch_desc": "AI will find a good spot on the route",
-    "dinner_stop": "Dinner stop?",
+    "dinner_stop": "Lunch stop?",
     "dinner_desc": "AI will find a good spot on the route",
     "hotels": "Suggest hotels?",
     "hotels_desc": "AI will suggest accommodation for each stage",
@@ -141,7 +141,11 @@
     "origin_required": "Origin is required.",
     "destination_required": "Destination is required for routes with destination.",
     "moto_required": "Please select a bike.",
-    "weather_forecast_notice": "⚠️ Weather forecast is only available for the next 5 days. For later dates the weather may change."
+    "weather_forecast_notice": "⚠️ Weather forecast is only available for the next 5 days. For later dates the weather may change.",
+    "lunch_time_required": "Please enter the approximate lunch time.",
+    "dinner_time_required": "Please enter the approximate meal time.",
+    "date_required": "Departure date is required.",
+    "time_required": "Departure time is required."
   },
   "route_result": {
     "title": "Generated Route",

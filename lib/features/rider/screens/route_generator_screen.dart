@@ -6,38 +6,37 @@ import '../providers/rider_profile_service.dart';
 import '../providers/route_service.dart';
 
 class RouteGeneratorScreen extends StatefulWidget {
-  const RouteGeneratorScreen({super.key});
+  final Map<String, dynamic>? initialData;
+  const RouteGeneratorScreen({super.key, this.initialData});
 
   @override
   State<RouteGeneratorScreen> createState() => _RouteGeneratorScreenState();
 }
 
 class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
-  final _originController       = TextEditingController();
-  final _destinationController  = TextEditingController();
+  final _originController        = TextEditingController();
+  final _destinationController   = TextEditingController();
   final _departureTimeController = TextEditingController();
-  final _lunchTimeController    = TextEditingController();
-  final _dinnerTimeController   = TextEditingController();
+  final _lunchTimeController     = TextEditingController();
+  final _dinnerTimeController    = TextEditingController();
   final List<TextEditingController> _customPointControllers = [];
 
   List<Map<String, dynamic>> _motos = [];
   Map<String, dynamic>? _selectedMoto;
   int? _selectedMotoId;
-  String _preference = 'mixto';
-  String _difficulty = 'moderada';
-  bool _circular    = true;
-  int  _hours       = 4;
-  int  _days        = 1;
-  bool _loading     = false;
+  String _preference  = 'mixto';
+  String _difficulty  = 'moderada';
+  bool   _circular    = true;
+  int    _hours       = 4;
+  DateTime? _departureDate;
+  bool _loading      = false;
   bool _loadingMotos = true;
   String? _error;
   int? _routesRemaining;
 
-  // Nuevas opciones
   bool _suggestGasStations = true;
   bool _suggestLunch       = false;
   bool _suggestDinner      = false;
-  bool _suggestHotels      = false; // solo rutas multi-día
 
   bool get _motoHasFuelData {
     if (_selectedMoto == null) return false;
@@ -48,7 +47,55 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   @override
   void initState() {
     super.initState();
-    _loadMotos();
+    _loadMotos().then((_) {
+      if (widget.initialData != null) _restoreFormData(widget.initialData!);
+    });
+  }
+
+  void _restoreFormData(Map<String, dynamic> data) {
+    setState(() {
+      _originController.text      = data['origin'] ?? '';
+      _destinationController.text = data['destination'] ?? '';
+      _circular           = data['circular'] ?? true;
+      _preference         = data['preference'] ?? 'mixto';
+      _difficulty         = data['difficulty'] ?? 'moderada';
+      _hours              = (data['hours'] ?? 4) is double
+          ? (data['hours'] as double).round()
+          : (data['hours'] ?? 4) as int;
+      _suggestLunch       = data['suggest_lunch'] ?? false;
+      _suggestDinner      = data['suggest_dinner'] ?? false;
+      _suggestGasStations = data['suggest_gas'] ?? false;
+
+      if ((data['departure_time'] ?? '').toString().isNotEmpty)
+        _departureTimeController.text = data['departure_time'];
+      if ((data['lunch_time'] ?? '').toString().isNotEmpty)
+        _lunchTimeController.text = data['lunch_time'];
+      if ((data['dinner_time'] ?? '').toString().isNotEmpty)
+        _dinnerTimeController.text = data['dinner_time'];
+
+      // Restaurar fecha
+      if (data['departure_date'] != null) {
+        try { _departureDate = DateTime.parse(data['departure_date']); } catch (_) {}
+      }
+
+      // Restaurar moto
+      if (data['moto_id'] != null && _motos.isNotEmpty) {
+        final moto = _motos.firstWhere(
+          (m) => m['id'] == data['moto_id'],
+          orElse: () => _motos.first,
+        );
+        _selectedMotoId = moto['id'];
+        _selectedMoto   = moto;
+      }
+
+      // Restaurar puntos obligatorios
+      for (final c in _customPointControllers) c.dispose();
+      _customPointControllers.clear();
+      final points = (data['custom_points'] as List? ?? []);
+      for (final p in points) {
+        _customPointControllers.add(TextEditingController(text: p.toString()));
+      }
+    });
   }
 
   @override
@@ -84,17 +131,92 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     }
   }
 
+  Future<void> _pickDate() async {
+    final now  = DateTime.now();
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _departureDate ?? now,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+      builder: (context, child) => Theme(
+        data: ThemeData.dark().copyWith(
+          colorScheme: const ColorScheme.dark(primary: AppColors.orange, surface: AppColors.surface),
+        ),
+        child: child!,
+      ),
+    );
+    if (date != null) {
+      setState(() => _departureDate = date);
+      final diff = date.difference(DateTime.now()).inDays;
+      if (diff > 5 && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('planner.weather_forecast_notice'.tr()),
+          backgroundColor: AppColors.gold,
+          duration: const Duration(seconds: 4),
+        ));
+      }
+    }
+  }
+
+  Future<void> _pickTime(TextEditingController controller, {Color color = AppColors.orange}) async {
+    final now = TimeOfDay.now();
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: controller.text.isNotEmpty
+          ? TimeOfDay(
+              hour: int.tryParse(controller.text.split(':')[0]) ?? now.hour,
+              minute: int.tryParse(controller.text.split(':')[1]) ?? 0,
+            )
+          : now,
+      builder: (context, child) => Theme(
+        data: ThemeData.dark().copyWith(
+          colorScheme: ColorScheme.dark(primary: color, surface: AppColors.surface),
+          timePickerTheme: TimePickerThemeData(
+            backgroundColor: AppColors.surface,
+            hourMinuteColor: AppColors.background,
+            hourMinuteTextColor: color,
+            dialHandColor: color,
+            dialBackgroundColor: AppColors.background,
+            entryModeIconColor: color,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      final h = picked.hour.toString().padLeft(2, '0');
+      final m = picked.minute.toString().padLeft(2, '0');
+      setState(() => controller.text = '$h:$m');
+    }
+  }
+
   Future<void> _generate() async {
+    if (_selectedMotoId == null) {
+      setState(() => _error = 'planner.moto_required'.tr());
+      return;
+    }
     if (_originController.text.trim().isEmpty) {
       setState(() => _error = 'planner.origin_required'.tr());
+      return;
+    }
+    if (_departureDate == null) {
+      setState(() => _error = 'planner.date_required'.tr());
+      return;
+    }
+    if (_departureTimeController.text.trim().isEmpty) {
+      setState(() => _error = 'planner.time_required'.tr());
       return;
     }
     if (!_circular && _destinationController.text.trim().isEmpty) {
       setState(() => _error = 'planner.destination_required'.tr());
       return;
     }
-    if (_selectedMotoId == null) {
-      setState(() => _error = 'planner.moto_required'.tr());
+    if (_suggestLunch && _lunchTimeController.text.trim().isEmpty) {
+      setState(() => _error = 'planner.lunch_time_required'.tr());
+      return;
+    }
+    if (_suggestDinner && _dinnerTimeController.text.trim().isEmpty) {
+      setState(() => _error = 'planner.dinner_time_required'.tr());
       return;
     }
 
@@ -106,15 +228,17 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
         .toList();
 
     final data = {
-      'origin':              _originController.text.trim(),
-      'moto_id':             _selectedMotoId,
-      'circular':            _circular,
-      'preference':          _preference,
-      'difficulty':          _difficulty,
-      if (_days > 1) 'days': _days else 'hours': _hours,
+      'origin':               _originController.text.trim(),
+      'moto_id':              _selectedMotoId,
+      'circular':             _circular,
+      'preference':           _preference,
+      'difficulty':           _difficulty,
+      'hours':                _hours,
       if (customPoints.isNotEmpty) 'custom_points': customPoints,
       if (_departureTimeController.text.trim().isNotEmpty)
         'departure_time': _departureTimeController.text.trim(),
+      if (_departureDate != null)
+        'departure_date': '${_departureDate!.year}-${_departureDate!.month.toString().padLeft(2, '0')}-${_departureDate!.day.toString().padLeft(2, '0')}',
       if (!_circular && _destinationController.text.trim().isNotEmpty)
         'destination': _destinationController.text.trim(),
       'suggest_gas_stations': _motoHasFuelData && _suggestGasStations,
@@ -122,7 +246,6 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       'lunch_time':           _suggestLunch ? _lunchTimeController.text.trim() : null,
       'suggest_dinner':       _suggestDinner,
       'dinner_time':          _suggestDinner ? _dinnerTimeController.text.trim() : null,
-      if (_days > 1) 'suggest_hotels': _suggestHotels,
     };
 
     final result = await RouteService.generateRoute(data);
@@ -135,7 +258,34 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       return;
     }
 
-    context.go('/rider/route-result', extra: result['result']);
+    // Pasar también los datos del formulario para poder restaurarlos al volver
+    final formData = {
+      'origin':         _originController.text.trim(),
+      'destination':    _destinationController.text.trim(),
+      'moto_id':        _selectedMotoId,
+      'circular':       _circular,
+      'preference':     _preference,
+      'difficulty':     _difficulty,
+      'hours':          _hours,
+      'departure_date': _departureDate != null
+          ? '${_departureDate!.year}-${_departureDate!.month.toString().padLeft(2, '0')}-${_departureDate!.day.toString().padLeft(2, '0')}'
+          : null,
+      'departure_time': _departureTimeController.text.trim(),
+      'suggest_lunch':  _suggestLunch,
+      'lunch_time':     _lunchTimeController.text.trim(),
+      'suggest_dinner': _suggestDinner,
+      'dinner_time':    _dinnerTimeController.text.trim(),
+      'suggest_gas':    _suggestGasStations,
+      'custom_points':  _customPointControllers
+          .map((c) => c.text.trim())
+          .where((s) => s.isNotEmpty)
+          .toList(),
+    };
+
+    context.go('/rider/route-result', extra: {
+      ...result['result'] as Map<String, dynamic>,
+      'form_data': formData,
+    });
   }
 
   @override
@@ -147,7 +297,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-          onPressed: () => context.go('/rider/home'),
+          onPressed: () => context.go('/rider/planner'),
         ),
         title: Text('planner.title'.tr(),
             style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
@@ -170,24 +320,22 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.orange.withOpacity(0.3)),
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.auto_awesome, color: AppColors.orange, size: 28),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('planner.ai_generated'.tr(),
-                                  style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 15)),
-                              if (_routesRemaining != null)
-                                Text('planner.routes_remaining'.tr(args: ['$_routesRemaining']),
-                                    style: const TextStyle(color: AppColors.grey, fontSize: 12)),
-                            ],
-                          ),
+                    child: Row(children: [
+                      const Icon(Icons.auto_awesome, color: AppColors.orange, size: 28),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('planner.ai_generated'.tr(),
+                                style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+                            if (_routesRemaining != null)
+                              Text('planner.routes_remaining'.tr(args: ['$_routesRemaining']),
+                                  style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ]),
                   ),
 
                   const SizedBox(height: 24),
@@ -198,11 +346,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   if (_motos.isEmpty)
                     Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.greyDark),
-                      ),
+                      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.greyDark)),
                       child: Text('profile.no_motos'.tr(), style: const TextStyle(color: AppColors.grey)),
                     )
                   else
@@ -211,22 +355,14 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                       dropdownColor: AppColors.surface,
                       style: const TextStyle(color: AppColors.white),
                       decoration: InputDecoration(
-                        filled: true,
-                        fillColor: AppColors.surface,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: AppColors.greyDark)),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: AppColors.greyDark)),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: AppColors.orange, width: 2)),
+                        filled: true, fillColor: AppColors.surface,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.greyDark)),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.greyDark)),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.orange, width: 2)),
                       ),
                       items: _motos.map((moto) => DropdownMenuItem<int>(
                         value: moto['id'],
-                        child: Text(moto['alias'] ?? '${moto['brand']} ${moto['model']}',
-                            style: const TextStyle(color: AppColors.white)),
+                        child: Text(moto['alias'] ?? '${moto['brand']} ${moto['model']}', style: const TextStyle(color: AppColors.white)),
                       )).toList(),
                       onChanged: (val) => setState(() {
                         _selectedMotoId = val;
@@ -236,7 +372,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
 
                   const SizedBox(height: 20),
 
-                  // 2. Punto de origen
+                  // 2. Origen
                   Text('planner.origin'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
                   const SizedBox(height: 8),
                   TextFormField(
@@ -248,28 +384,67 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     ),
                   ),
 
+                  const SizedBox(height: 20),
+
+                  // 3. Fecha de salida
+                  Text('planner.departure_date'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: _pickDate,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _departureDate != null ? AppColors.orange : AppColors.greyDark,
+                          width: _departureDate != null ? 2 : 1,
+                        ),
+                      ),
+                      child: Row(children: [
+                        Icon(Icons.calendar_today,
+                            color: _departureDate != null ? AppColors.orange : AppColors.grey, size: 20),
+                        const SizedBox(width: 12),
+                        Text(
+                          _departureDate != null
+                              ? '${_departureDate!.day.toString().padLeft(2, '0')}/${_departureDate!.month.toString().padLeft(2, '0')}/${_departureDate!.year}'
+                              : 'planner.departure_date'.tr(),
+                          style: TextStyle(
+                            color: _departureDate != null ? AppColors.white : AppColors.grey,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (_departureDate != null)
+                          GestureDetector(
+                            onTap: () => setState(() => _departureDate = null),
+                            child: const Icon(Icons.clear, color: AppColors.grey, size: 18),
+                          ),
+                      ]),
+                    ),
+                  ),
+
                   const SizedBox(height: 16),
 
-                  // 3. Hora de salida (opcional)
+                  // 4. Hora de salida (obligatoria)
                   Row(children: [
                     Text('planner.departure_time_optional'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                    const SizedBox(width: 4),
+                    const Text('*', style: TextStyle(color: AppColors.error, fontSize: 13)),
                     const SizedBox(width: 8),
                     Text('planner.ai_calculates'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 11)),
                   ]),
                   const SizedBox(height: 8),
-                  TextFormField(
+                  _TimePickerButton(
                     controller: _departureTimeController,
-                    style: const TextStyle(color: AppColors.white),
-                    keyboardType: TextInputType.datetime,
-                    decoration: InputDecoration(
-                      hintText: 'planner.departure_time_hint'.tr(),
-                      prefixIcon: const Icon(Icons.schedule, color: AppColors.grey),
-                    ),
+                    color: AppColors.orange,
+                    hint: 'planner.departure_time_hint'.tr(),
+                    onTap: () => _pickTime(_departureTimeController, color: AppColors.orange),
                   ),
 
                   const SizedBox(height: 20),
 
-                  // 4. Tipo de ruta
+                  // 5. Tipo de ruta
                   Text('planner.route_type'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
                   const SizedBox(height: 8),
                   Row(children: [
@@ -278,7 +453,6 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     _OptionChip(label: 'planner.with_destination'.tr(), selected: !_circular, onTap: () => setState(() => _circular = false)),
                   ]),
 
-                  // 5. Destino
                   if (!_circular) ...[
                     const SizedBox(height: 16),
                     Text('planner.destination'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
@@ -313,7 +487,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   ),
                   const SizedBox(height: 8),
                   ..._customPointControllers.asMap().entries.map((entry) {
-                    final i = entry.key;
+                    final i    = entry.key;
                     final ctrl = entry.value;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
@@ -341,10 +515,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                         ),
                         const SizedBox(width: 8),
                         GestureDetector(
-                          onTap: () => setState(() {
-                            ctrl.dispose();
-                            _customPointControllers.removeAt(i);
-                          }),
+                          onTap: () => setState(() { ctrl.dispose(); _customPointControllers.removeAt(i); }),
                           child: const Icon(Icons.remove_circle_outline, color: AppColors.error, size: 20),
                         ),
                       ]),
@@ -353,29 +524,17 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
 
                   const SizedBox(height: 20),
 
-                  // 7. Duración
-                  Text('planner.duration'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
-                  const SizedBox(height: 8),
-                  Row(children: [
-                    _OptionChip(label: 'planner.route'.tr(), selected: _days == 1, onTap: () => setState(() => _days = 1)),
-                    const SizedBox(width: 8),
-                    _OptionChip(label: '2 ${"planner.trip".tr()}', selected: _days == 2, onTap: () => setState(() => _days = 2)),
-                    const SizedBox(width: 8),
-                    _OptionChip(label: '3+ ${"planner.trip".tr()}', selected: _days >= 3, onTap: () => setState(() => _days = 3)),
-                  ]),
-                  if (_days == 1) ...[
-                    const SizedBox(height: 12),
-                    Text('planner.hours_available'.tr(args: ['$_hours']),
-                        style: const TextStyle(color: AppColors.white, fontSize: 13)),
-                    Slider(
-                      value: _hours.toDouble(), min: 2, max: 12, divisions: 10,
-                      activeColor: AppColors.orange, inactiveColor: AppColors.greyDark,
-                      label: '$_hours h',
-                      onChanged: (val) => setState(() => _hours = val.round()),
-                    ),
-                  ],
+                  // 7. Horas disponibles
+                  Text('planner.hours_available'.tr(args: ['$_hours']),
+                      style: const TextStyle(color: AppColors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                  Slider(
+                    value: _hours.toDouble(), min: 2, max: 12, divisions: 10,
+                    activeColor: AppColors.orange, inactiveColor: AppColors.greyDark,
+                    label: '$_hours h',
+                    onChanged: (val) => setState(() => _hours = val.round()),
+                  ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
                   // 8. Preferencia
                   Text('planner.preference'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
@@ -416,67 +575,38 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     color: AppColors.gold,
                     onChanged: (val) => setState(() => _suggestGasStations = val),
                   ),
-
                   const SizedBox(height: 8),
-
                   _ToggleOption(
                     icon: Icons.restaurant_outlined,
                     label: 'planner.lunch_stop'.tr(),
                     subtitle: 'planner.lunch_desc'.tr(),
-                    value: _suggestLunch,
-                    enabled: true,
-                    color: AppColors.orange,
+                    value: _suggestLunch, enabled: true, color: AppColors.orange,
                     onChanged: (val) => setState(() => _suggestLunch = val),
                   ),
                   if (_suggestLunch) ...[
                     const SizedBox(height: 8),
-                    TextFormField(
+                    _TimePickerButton(
                       controller: _lunchTimeController,
-                      style: const TextStyle(color: AppColors.white),
-                      keyboardType: TextInputType.datetime,
-                      decoration: InputDecoration(
-                        hintText: 'planner.time_approx_hint'.tr(args: ['14:00']),
-                        prefixIcon: const Icon(Icons.schedule, color: AppColors.orange),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      ),
+                      color: AppColors.orange,
+                      hint: 'planner.time_approx_hint'.tr(args: ['14:00']),
+                      onTap: () => _pickTime(_lunchTimeController, color: AppColors.orange),
                     ),
                   ],
-
                   const SizedBox(height: 8),
-
                   _ToggleOption(
                     icon: Icons.dinner_dining,
                     label: 'planner.dinner_stop'.tr(),
                     subtitle: 'planner.dinner_desc'.tr(),
-                    value: _suggestDinner,
-                    enabled: true,
-                    color: AppColors.cyan,
+                    value: _suggestDinner, enabled: true, color: AppColors.cyan,
                     onChanged: (val) => setState(() => _suggestDinner = val),
                   ),
                   if (_suggestDinner) ...[
                     const SizedBox(height: 8),
-                    TextFormField(
+                    _TimePickerButton(
                       controller: _dinnerTimeController,
-                      style: const TextStyle(color: AppColors.white),
-                      keyboardType: TextInputType.datetime,
-                      decoration: InputDecoration(
-                        hintText: 'planner.time_approx_hint'.tr(args: ['21:00']),
-                        prefixIcon: const Icon(Icons.schedule, color: AppColors.cyan),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      ),
-                    ),
-                  ],
-
-                  if (_days > 1) ...[
-                    const SizedBox(height: 8),
-                    _ToggleOption(
-                      icon: Icons.hotel_outlined,
-                      label: 'planner.hotels'.tr(),
-                      subtitle: 'planner.hotels_desc'.tr(),
-                      value: _suggestHotels,
-                      enabled: true,
-                      color: AppColors.gold,
-                      onChanged: (val) => setState(() => _suggestHotels = val),
+                      color: AppColors.cyan,
+                      hint: 'planner.time_approx_hint'.tr(args: ['15:00']),
+                      onTap: () => _pickTime(_dinnerTimeController, color: AppColors.cyan),
                     ),
                   ],
 
@@ -508,22 +638,16 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     child: _loading
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
-                              const SizedBox(width: 12),
-                              Text('planner.generating'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                            ],
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
-                              const SizedBox(width: 8),
-                              Text('planner.generate_button'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
-                            ],
-                          ),
+                        ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                            const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
+                            const SizedBox(width: 12),
+                            Text('planner.generating'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                          ])
+                        : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                            const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
+                            const SizedBox(width: 8),
+                            Text('planner.generate_button'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+                          ]),
                   ),
 
                   const SizedBox(height: 32),
@@ -534,7 +658,72 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   }
 }
 
-// Widget toggle reutilizable
+class _TimePickerButton extends StatefulWidget {
+  final TextEditingController controller;
+  final Color color;
+  final String hint;
+  final VoidCallback onTap;
+
+  const _TimePickerButton({
+    required this.controller,
+    required this.color,
+    required this.hint,
+    required this.onTap,
+  });
+
+  @override
+  State<_TimePickerButton> createState() => _TimePickerButtonState();
+}
+
+class _TimePickerButtonState extends State<_TimePickerButton> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_rebuild);
+  }
+
+  void _rebuild() => setState(() {});
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_rebuild);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasValue = widget.controller.text.isNotEmpty;
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: hasValue ? widget.color : AppColors.greyDark,
+            width: hasValue ? 2 : 1,
+          ),
+        ),
+        child: Row(children: [
+          Icon(Icons.schedule, color: hasValue ? widget.color : AppColors.grey, size: 20),
+          const SizedBox(width: 12),
+          Text(
+            hasValue ? widget.controller.text : widget.hint,
+            style: TextStyle(
+              color: hasValue ? AppColors.white : AppColors.grey,
+              fontSize: 14,
+            ),
+          ),
+          const Spacer(),
+          if (hasValue)
+            Icon(Icons.edit_outlined, color: widget.color, size: 16),
+        ]),
+      ),
+    );
+  }
+}
+
 class _ToggleOption extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -544,15 +733,8 @@ class _ToggleOption extends StatelessWidget {
   final Color color;
   final ValueChanged<bool> onChanged;
 
-  const _ToggleOption({
-    required this.icon,
-    required this.label,
-    required this.subtitle,
-    required this.value,
-    required this.enabled,
-    required this.color,
-    required this.onChanged,
-  });
+  const _ToggleOption({required this.icon, required this.label, required this.subtitle,
+      required this.value, required this.enabled, required this.color, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -566,28 +748,12 @@ class _ToggleOption extends StatelessWidget {
       child: Row(children: [
         Icon(icon, color: enabled ? color : AppColors.greyDark, size: 22),
         const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: TextStyle(
-                color: enabled ? AppColors.white : AppColors.greyDark,
-                fontSize: 14, fontWeight: FontWeight.w600,
-              )),
-              Text(subtitle, style: TextStyle(
-                color: enabled ? AppColors.grey : AppColors.greyDark,
-                fontSize: 11,
-              )),
-            ],
-          ),
-        ),
-        Switch(
-          value: value && enabled,
-          onChanged: enabled ? onChanged : null,
-          activeColor: color,
-          inactiveThumbColor: AppColors.greyDark,
-          inactiveTrackColor: AppColors.surface,
-        ),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label, style: TextStyle(color: enabled ? AppColors.white : AppColors.greyDark, fontSize: 14, fontWeight: FontWeight.w600)),
+          Text(subtitle, style: TextStyle(color: enabled ? AppColors.grey : AppColors.greyDark, fontSize: 11)),
+        ])),
+        Switch(value: value && enabled, onChanged: enabled ? onChanged : null,
+            activeColor: color, inactiveThumbColor: AppColors.greyDark, inactiveTrackColor: AppColors.surface),
       ]),
     );
   }
@@ -611,19 +777,11 @@ class _OptionChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: selected ? AppColors.orange.withOpacity(0.15) : AppColors.surface,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: selected ? AppColors.orange : AppColors.greyDark,
-              width: selected ? 2 : 1,
-            ),
+            border: Border.all(color: selected ? AppColors.orange : AppColors.greyDark, width: selected ? 2 : 1),
           ),
-          child: Text(label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: selected ? AppColors.orange : AppColors.grey,
-              fontSize: 12,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
-            ),
-          ),
+          child: Text(label, textAlign: TextAlign.center,
+            style: TextStyle(color: selected ? AppColors.orange : AppColors.grey,
+                fontSize: 12, fontWeight: selected ? FontWeight.w700 : FontWeight.normal)),
         ),
       ),
     );

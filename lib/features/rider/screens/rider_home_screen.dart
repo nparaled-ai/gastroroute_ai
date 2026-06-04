@@ -73,7 +73,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
               title: 'home.planner'.tr(),
               desc: 'home.planner_desc'.tr(),
               color: AppColors.cyan,
-              onTap: () => context.go('/rider/route-generator'),
+              onTap: () => context.go('/rider/planner'),
             ),
             const SizedBox(height: 16),
             _QuickAccessCard(
