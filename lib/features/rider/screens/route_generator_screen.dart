@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/rider_profile_service.dart';
 import '../providers/route_service.dart';
@@ -28,9 +30,18 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   String _difficulty  = 'moderada';
   bool   _circular    = true;
   int    _hours       = 4;
+  int    _km          = 200;
+  String _durationMode = 'ai'; // 'ai', 'hours', 'km'
   DateTime? _departureDate;
   bool _loading      = false;
   bool _loadingMotos = true;
+  bool _detectingLocation = false;
+  bool _originValidated   = false;
+  bool _destinationValidated = false;
+  List<Map<String, dynamic>> _originSuggestions = [];
+  List<Map<String, dynamic>> _destinationSuggestions = [];
+  List<List<Map<String, dynamic>>> _pointSuggestions = [];
+  List<bool> _pointValidated = [];
   String? _error;
   int? _routesRemaining;
 
@@ -55,13 +66,19 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   void _restoreFormData(Map<String, dynamic> data) {
     setState(() {
       _originController.text      = data['origin'] ?? '';
+      _originValidated            = (data['origin'] ?? '').isNotEmpty;
       _destinationController.text = data['destination'] ?? '';
+      _destinationValidated       = (data['destination'] ?? '').isNotEmpty;
       _circular           = data['circular'] ?? true;
       _preference         = data['preference'] ?? 'mixto';
       _difficulty         = data['difficulty'] ?? 'moderada';
+      _durationMode       = data['duration_mode'] ?? 'hours';
       _hours              = (data['hours'] ?? 4) is double
           ? (data['hours'] as double).round()
           : (data['hours'] ?? 4) as int;
+      _km                 = (data['km'] ?? 200) is double
+          ? (data['km'] as double).round()
+          : (data['km'] ?? 200) as int;
       _suggestLunch       = data['suggest_lunch'] ?? false;
       _suggestDinner      = data['suggest_dinner'] ?? false;
       _suggestGasStations = data['suggest_gas'] ?? false;
@@ -91,9 +108,13 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       // Restaurar puntos obligatorios
       for (final c in _customPointControllers) c.dispose();
       _customPointControllers.clear();
+      _pointSuggestions.clear();
+      _pointValidated.clear();
       final points = (data['custom_points'] as List? ?? []);
       for (final p in points) {
         _customPointControllers.add(TextEditingController(text: p.toString()));
+        _pointSuggestions.add([]);
+        _pointValidated.add(true); // ya validados previamente
       }
     });
   }
@@ -128,6 +149,144 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       });
     } else {
       setState(() => _loadingMotos = false);
+    }
+
+    // Cargar ubicación del perfil como origen por defecto
+    if (_originController.text.isEmpty) {
+      final profileResult = await RiderProfileService.getProfile();
+      if (!mounted) return;
+      final province = profileResult['profile']?['province'];
+      if (province != null && province.toString().isNotEmpty) {
+        setState(() {
+          _originController.text = province;
+          _originValidated = true;
+        });
+      }
+    }
+  }
+
+  Future<void> _searchOrigin(String query) async {
+    setState(() { _originValidated = false; _originSuggestions = []; });
+    if (query.length < 3) return;
+    try {
+      final response = await ApiClient.dio.get('/location/search', queryParameters: {
+        'q': query, 'lang': 'es',
+      });
+      final List data = response.data as List? ?? [];
+      if (data.isNotEmpty && mounted) {
+        setState(() {
+          _originSuggestions = data.map<Map<String, dynamic>>((p) => {
+            'description': p['description'] as String,
+            'place_id':    p['place_id'] as String,
+          }).toList();
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _searchDestination(String query) async {
+    setState(() { _destinationValidated = false; _destinationSuggestions = []; });
+    if (query.length < 3) return;
+    try {
+      final response = await ApiClient.dio.get('/location/search', queryParameters: {
+        'q': query, 'lang': 'es',
+      });
+      final List data = response.data as List? ?? [];
+      if (data.isNotEmpty && mounted) {
+        setState(() {
+          _destinationSuggestions = data.map<Map<String, dynamic>>((p) => {
+            'description': p['description'] as String,
+            'place_id':    p['place_id'] as String,
+          }).toList();
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _searchPoint(int index, String query) async {
+    if (index >= _pointSuggestions.length) return;
+    setState(() {
+      _pointValidated[index] = false;
+      _pointSuggestions[index] = [];
+    });
+    if (query.length < 3) return;
+    try {
+      final response = await ApiClient.dio.get('/location/search', queryParameters: {
+        'q': query, 'lang': 'es', 'poi': '1', // incluye puertos, montañas, POI
+      });
+      final List data = response.data as List? ?? [];
+      if (data.isNotEmpty && mounted) {
+        setState(() {
+          _pointSuggestions[index] = data.map<Map<String, dynamic>>((p) => {
+            'description': p['description'] as String,
+            'place_id':    p['place_id'] as String,
+          }).toList();
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _detectOriginLocation() async {
+    setState(() => _detectingLocation = true);
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) { setState(() => _detectingLocation = false); return; }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Activa los permisos de ubicación en ajustes.'), backgroundColor: AppColors.error));
+        setState(() => _detectingLocation = false); return;
+      }
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium));
+      final response = await ApiClient.dio.get('/location/search', queryParameters: {
+        'q': '${position.latitude},${position.longitude}', 'lang': 'es', 'reverse': '1',
+      });
+      final List data = response.data as List? ?? [];
+      if (data.isNotEmpty && mounted) {
+        setState(() {
+          _originController.text = data[0]['description'] as String;
+          _originValidated = true;
+          _originSuggestions = [];
+        });
+      }
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('No se pudo obtener la ubicación.'), backgroundColor: AppColors.error));
+    }
+    if (mounted) setState(() => _detectingLocation = false);
+  }
+
+  // Aviso si hay puntos obligatorios que pueden sobrepasar el límite
+  void _checkDurationWarning() {
+    if (_customPointControllers.isEmpty) return;
+    if (_durationMode == 'ai') return;
+
+    final pointCount = _customPointControllers.where((c) => c.text.trim().isNotEmpty).length;
+    if (pointCount == 0) return;
+
+    String? warning;
+    if (_durationMode == 'hours' && _hours <= 4 && pointCount >= 2) {
+      warning = '⚠️ Tienes $_hours horas y $pointCount puntos obligatorios. La ruta puede sobrepasar el tiempo disponible. Considera ampliar las horas o dejar que la IA calcule.';
+    } else if (_durationMode == 'hours' && _hours <= 6 && pointCount >= 3) {
+      warning = '⚠️ Con $pointCount puntos obligatorios y $_hours horas disponibles la ruta puede ser ajustada. La IA intentará optimizarla.';
+    } else if (_durationMode == 'km' && _km <= 150 && pointCount >= 2) {
+      warning = '⚠️ Tienes $_km km y $pointCount puntos obligatorios. La distancia puede ser insuficiente. Considera ampliar los km o dejar que la IA calcule.';
+    }
+
+    if (warning != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(warning),
+        backgroundColor: AppColors.gold,
+        duration: const Duration(seconds: 5),
+        action: SnackBarAction(
+          label: 'Dejar a la IA',
+          textColor: AppColors.background,
+          onPressed: () => setState(() => _durationMode = 'ai'),
+        ),
+      ));
     }
   }
 
@@ -220,6 +379,28 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       return;
     }
 
+    // Validar mínimo 4 horas entre almuerzo y comida
+    if (_suggestLunch && _suggestDinner &&
+        _lunchTimeController.text.isNotEmpty &&
+        _dinnerTimeController.text.isNotEmpty) {
+      final lParts = _lunchTimeController.text.split(':');
+      final dParts = _dinnerTimeController.text.split(':');
+      if (lParts.length == 2 && dParts.length == 2) {
+        final lMins = int.parse(lParts[0]) * 60 + int.parse(lParts[1]);
+        final dMins = int.parse(dParts[0]) * 60 + int.parse(dParts[1]);
+        if (dMins - lMins < 240) {
+          final suggested = TimeOfDay(
+            hour: (lMins + 240) ~/ 60,
+            minute: (lMins + 240) % 60,
+          );
+          final h = suggested.hour.toString().padLeft(2, '0');
+          final m = suggested.minute.toString().padLeft(2, '0');
+          setState(() => _error = 'Debe haber al menos 4 horas entre almuerzo y comida. Hora de comida mínima: $h:$m');
+          return;
+        }
+      }
+    }
+
     setState(() { _loading = true; _error = null; });
 
     final customPoints = _customPointControllers
@@ -233,7 +414,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       'circular':             _circular,
       'preference':           _preference,
       'difficulty':           _difficulty,
-      'hours':                _hours,
+      'duration_mode':        _durationMode,
+      if (_durationMode == 'hours') 'hours': _hours,
+      if (_durationMode == 'km')    'km':    _km,
       if (customPoints.isNotEmpty) 'custom_points': customPoints,
       if (_departureTimeController.text.trim().isNotEmpty)
         'departure_time': _departureTimeController.text.trim(),
@@ -266,7 +449,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       'circular':       _circular,
       'preference':     _preference,
       'difficulty':     _difficulty,
+      'duration_mode':  _durationMode,
       'hours':          _hours,
+      'km':             _km,
       'departure_date': _departureDate != null
           ? '${_departureDate!.year}-${_departureDate!.month.toString().padLeft(2, '0')}-${_departureDate!.day.toString().padLeft(2, '0')}'
           : null,
@@ -373,16 +558,75 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   const SizedBox(height: 20),
 
                   // 2. Origen
-                  Text('planner.origin'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('planner.origin'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                      GestureDetector(
+                        onTap: _detectingLocation ? null : _detectOriginLocation,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.cyan.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: AppColors.cyan.withOpacity(0.4)),
+                          ),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            _detectingLocation
+                                ? const SizedBox(width: 12, height: 12,
+                                    child: CircularProgressIndicator(color: AppColors.cyan, strokeWidth: 2))
+                                : const Icon(Icons.my_location, color: AppColors.cyan, size: 13),
+                            const SizedBox(width: 4),
+                            const Text('Usar mi ubicación',
+                                style: TextStyle(color: AppColors.cyan, fontSize: 11, fontWeight: FontWeight.w600)),
+                          ]),
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _originController,
                     style: const TextStyle(color: AppColors.white),
+                    onChanged: _searchOrigin,
                     decoration: InputDecoration(
                       hintText: 'planner.origin_hint'.tr(),
                       prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.orange),
+                      suffixIcon: _originController.text.isNotEmpty
+                          ? _originValidated
+                              ? const Icon(Icons.check_circle, color: Colors.green, size: 20)
+                              : IconButton(
+                                  icon: const Icon(Icons.clear, color: AppColors.grey, size: 18),
+                                  onPressed: () => setState(() {
+                                    _originController.clear();
+                                    _originSuggestions = [];
+                                    _originValidated = false;
+                                  }))
+                          : null,
                     ),
                   ),
+                  if (_originSuggestions.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.greyDark),
+                      ),
+                      child: Column(
+                        children: _originSuggestions.map((s) => ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.location_city, color: AppColors.grey, size: 18),
+                          title: Text(s['description'],
+                              style: const TextStyle(color: AppColors.white, fontSize: 13)),
+                          onTap: () => setState(() {
+                            _originController.text = s['description'];
+                            _originValidated = true;
+                            _originSuggestions = [];
+                          }),
+                        )).toList(),
+                      ),
+                    ),
 
                   const SizedBox(height: 20),
 
@@ -460,11 +704,45 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     TextFormField(
                       controller: _destinationController,
                       style: const TextStyle(color: AppColors.white),
+                      onChanged: _searchDestination,
                       decoration: InputDecoration(
                         hintText: 'planner.destination_hint'.tr(),
                         prefixIcon: const Icon(Icons.flag_outlined, color: AppColors.cyan),
+                        suffixIcon: _destinationController.text.isNotEmpty
+                            ? _destinationValidated
+                                ? const Icon(Icons.check_circle, color: Colors.green, size: 20)
+                                : IconButton(
+                                    icon: const Icon(Icons.clear, color: AppColors.grey, size: 18),
+                                    onPressed: () => setState(() {
+                                      _destinationController.clear();
+                                      _destinationSuggestions = [];
+                                      _destinationValidated = false;
+                                    }))
+                            : null,
                       ),
                     ),
+                    if (_destinationSuggestions.isNotEmpty)
+                      Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.greyDark),
+                        ),
+                        child: Column(
+                          children: _destinationSuggestions.map((s) => ListTile(
+                            dense: true,
+                            leading: const Icon(Icons.location_city, color: AppColors.grey, size: 18),
+                            title: Text(s['description'],
+                                style: const TextStyle(color: AppColors.white, fontSize: 13)),
+                            onTap: () => setState(() {
+                              _destinationController.text = s['description'];
+                              _destinationValidated = true;
+                              _destinationSuggestions = [];
+                            }),
+                          )).toList(),
+                        ),
+                      ),
                   ],
 
                   const SizedBox(height: 20),
@@ -476,7 +754,11 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                       Text('planner.mandatory_points'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
                       if (_customPointControllers.length < 5)
                         GestureDetector(
-                          onTap: () => setState(() => _customPointControllers.add(TextEditingController())),
+                          onTap: () => setState(() {
+                            _customPointControllers.add(TextEditingController());
+                            _pointSuggestions.add([]);
+                            _pointValidated.add(false);
+                          }),
                           child: Row(children: [
                             const Icon(Icons.add_circle_outline, color: AppColors.orange, size: 18),
                             const SizedBox(width: 4),
@@ -491,48 +773,164 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     final ctrl = entry.value;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(children: [
-                        Container(
-                          width: 24, height: 24,
-                          decoration: BoxDecoration(
-                            color: AppColors.orange.withOpacity(0.15),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.orange),
-                          ),
-                          child: Center(child: Text('${i + 1}',
-                              style: const TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w700))),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextFormField(
-                            controller: ctrl,
-                            style: const TextStyle(color: AppColors.white),
-                            decoration: InputDecoration(
-                              hintText: 'planner.point_hint'.tr(),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      child: Column(
+                        children: [
+                          Row(children: [
+                            Container(
+                              width: 24, height: 24,
+                              decoration: BoxDecoration(
+                                color: AppColors.orange.withOpacity(0.15),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.orange),
+                              ),
+                              child: Center(child: Text('${i + 1}',
+                                  style: const TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w700))),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        GestureDetector(
-                          onTap: () => setState(() { ctrl.dispose(); _customPointControllers.removeAt(i); }),
-                          child: const Icon(Icons.remove_circle_outline, color: AppColors.error, size: 20),
-                        ),
-                      ]),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextFormField(
+                                controller: ctrl,
+                                style: const TextStyle(color: AppColors.white),
+                                onChanged: (q) => _searchPoint(i, q),
+                                decoration: InputDecoration(
+                                  hintText: 'planner.point_hint'.tr(),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  suffixIcon: ctrl.text.isNotEmpty
+                                      ? (i < _pointValidated.length && _pointValidated[i])
+                                          ? const Icon(Icons.check_circle, color: Colors.green, size: 18)
+                                          : null
+                                      : null,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () => setState(() {
+                                ctrl.dispose();
+                                _customPointControllers.removeAt(i);
+                                if (i < _pointSuggestions.length) _pointSuggestions.removeAt(i);
+                                if (i < _pointValidated.length) _pointValidated.removeAt(i);
+                              }),
+                              child: const Icon(Icons.remove_circle_outline, color: AppColors.error, size: 20),
+                            ),
+                          ]),
+                          if (i < _pointSuggestions.length && _pointSuggestions[i].isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(top: 4, left: 32),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.greyDark),
+                              ),
+                              child: Column(
+                                children: _pointSuggestions[i].map((s) => ListTile(
+                                  dense: true,
+                                  leading: const Icon(Icons.location_city, color: AppColors.grey, size: 18),
+                                  title: Text(s['description'],
+                                      style: const TextStyle(color: AppColors.white, fontSize: 13)),
+                                  onTap: () => setState(() {
+                                    ctrl.text = s['description'];
+                                    _pointValidated[i] = true;
+                                    _pointSuggestions[i] = [];
+                                  }),
+                                )).toList(),
+                              ),
+                            ),
+                        ],
+                      ),
                     );
                   }),
 
                   const SizedBox(height: 20),
 
-                  // 7. Horas disponibles
-                  Text('planner.hours_available'.tr(args: ['$_hours']),
-                      style: const TextStyle(color: AppColors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                  Slider(
-                    value: _hours.toDouble(), min: 2, max: 12, divisions: 10,
-                    activeColor: AppColors.orange, inactiveColor: AppColors.greyDark,
-                    label: '$_hours h',
-                    onChanged: (val) => setState(() => _hours = val.round()),
-                  ),
+                  // 7. Duración
+                  Text('planner.duration'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                  const SizedBox(height: 8),
+
+                  // Selector de modo
+                  Row(children: [
+                    _DurationModeChip(
+                      icon: Icons.auto_awesome,
+                      label: 'La IA decide',
+                      selected: _durationMode == 'ai',
+                      color: AppColors.gold,
+                      onTap: () => setState(() => _durationMode = 'ai'),
+                    ),
+                    const SizedBox(width: 8),
+                    _DurationModeChip(
+                      icon: Icons.access_time,
+                      label: 'Por horas',
+                      selected: _durationMode == 'hours',
+                      color: AppColors.orange,
+                      onTap: () {
+                        setState(() => _durationMode = 'hours');
+                        _checkDurationWarning();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _DurationModeChip(
+                      icon: Icons.speed,
+                      label: 'Por km',
+                      selected: _durationMode == 'km',
+                      color: AppColors.cyan,
+                      onTap: () {
+                        setState(() => _durationMode = 'km');
+                        _checkDurationWarning();
+                      },
+                    ),
+                  ]),
+
+                  // Slider según modo
+                  if (_durationMode == 'hours') ...[
+                    const SizedBox(height: 8),
+                    Text('planner.hours_available'.tr(args: ['$_hours']),
+                        style: const TextStyle(color: AppColors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                    Slider(
+                      value: _hours.toDouble(), min: 2, max: 12, divisions: 10,
+                      activeColor: AppColors.orange, inactiveColor: AppColors.greyDark,
+                      label: '$_hours h',
+                      onChanged: (val) {
+                        setState(() => _hours = val.round());
+                        _checkDurationWarning();
+                      },
+                    ),
+                  ],
+
+                  if (_durationMode == 'km') ...[
+                    const SizedBox(height: 8),
+                    Text('📏 Distancia objetivo: $_km km',
+                        style: const TextStyle(color: AppColors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                    Slider(
+                      value: _km.toDouble(), min: 50, max: 600, divisions: 22,
+                      activeColor: AppColors.cyan, inactiveColor: AppColors.greyDark,
+                      label: '$_km km',
+                      onChanged: (val) {
+                        setState(() => _km = (val / 25).round() * 25);
+                        _checkDurationWarning();
+                      },
+                    ),
+                  ],
+
+                  if (_durationMode == 'ai')
+                    Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.gold.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+                      ),
+                      child: Row(children: [
+                        const Icon(Icons.auto_awesome, color: AppColors.gold, size: 16),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'La IA calculará la duración óptima según tus puntos, moto y preferencias.',
+                            style: TextStyle(color: AppColors.gold, fontSize: 12),
+                          ),
+                        ),
+                      ]),
+                    ),
 
                   const SizedBox(height: 12),
 
@@ -569,7 +967,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   _ToggleOption(
                     icon: Icons.local_gas_station,
                     label: 'planner.gas_stations'.tr(),
-                    subtitle: _motoHasFuelData ? 'planner.gas_stations_desc'.tr() : 'planner.gas_stations_no_data'.tr(),
+                    subtitle: (_motoHasFuelData
+                        ? 'planner.gas_stations_desc'.tr()
+                        : 'planner.gas_stations_no_data'.tr()) + ' (parada ~15 min)',
                     value: _motoHasFuelData && _suggestGasStations,
                     enabled: _motoHasFuelData,
                     color: AppColors.gold,
@@ -579,7 +979,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   _ToggleOption(
                     icon: Icons.restaurant_outlined,
                     label: 'planner.lunch_stop'.tr(),
-                    subtitle: 'planner.lunch_desc'.tr(),
+                    subtitle: 'planner.lunch_desc'.tr() + ' (parada ~30 min)',
                     value: _suggestLunch, enabled: true, color: AppColors.orange,
                     onChanged: (val) => setState(() => _suggestLunch = val),
                   ),
@@ -596,7 +996,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   _ToggleOption(
                     icon: Icons.dinner_dining,
                     label: 'planner.dinner_stop'.tr(),
-                    subtitle: 'planner.dinner_desc'.tr(),
+                    subtitle: 'planner.dinner_desc'.tr() + ' (parada ~1 hora)',
                     value: _suggestDinner, enabled: true, color: AppColors.cyan,
                     onChanged: (val) => setState(() => _suggestDinner = val),
                   ),
@@ -654,6 +1054,44 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                 ],
               ),
             ),
+    );
+  }
+}
+
+class _DurationModeChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _DurationModeChip({
+    required this.icon, required this.label, required this.selected,
+    required this.color, required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: selected ? color.withOpacity(0.15) : AppColors.surface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: selected ? color : AppColors.greyDark, width: selected ? 2 : 1),
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Icon(icon, color: selected ? color : AppColors.grey, size: 18),
+            const SizedBox(height: 4),
+            Text(label, textAlign: TextAlign.center,
+                style: TextStyle(color: selected ? color : AppColors.grey,
+                    fontSize: 10, fontWeight: selected ? FontWeight.w700 : FontWeight.normal)),
+          ]),
+        ),
+      ),
     );
   }
 }

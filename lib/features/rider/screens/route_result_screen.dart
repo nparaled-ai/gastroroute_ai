@@ -27,6 +27,126 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     return Map<String, dynamic>.from(widget.result['form_data'] ?? {});
   }
 
+  Widget _buildDayWarning() {
+    final distKm  = ((_route['distance_km'] ?? 0) as num).toDouble();
+    final hours   = ((_route['duration_minutes'] ?? 0) as num).toDouble() / 60;
+
+    // Sin problema
+    if (distKm <= 500 && hours <= 8) return const SizedBox.shrink();
+
+    final bool critical = distKm > 700 || hours > 12;
+    final color = critical ? AppColors.error : AppColors.gold;
+    final icon  = critical ? Icons.warning_rounded : Icons.info_outline;
+
+    String message = '';
+    if (critical) {
+      message = '⛔ Ruta muy exigente para 1 día: ${distKm.toInt()} km / ${hours.toStringAsFixed(1)} h. Considera dividirla en 2 días o reducir el recorrido.';
+    } else {
+      message = '⚠️ Ruta larga para 1 día: ${distKm.toInt()} km / ${hours.toStringAsFixed(1)} h. Asegúrate de salir temprano y llevar energía suficiente.';
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Icon(icon, color: color, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(message,
+                  style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w600)),
+            ),
+          ]),
+          const SizedBox(height: 10),
+          Column(children: [
+            Row(children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => context.go('/rider/route-generator', extra: {
+                    ..._buildFormData(),
+                    'duration_mode': 'ai',
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: color.withOpacity(0.4)),
+                    ),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Icon(Icons.auto_awesome, color: color, size: 13),
+                      const SizedBox(width: 5),
+                      Flexible(child: Text('Regenerar más corta',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600))),
+                    ]),
+                  ),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 6),
+            Row(children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => context.go('/rider/route-generator', extra: {
+                    ..._buildFormData(),
+                    'duration_mode': 'hours',
+                    'hours': 6,
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      color: AppColors.cyan.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.cyan.withOpacity(0.4)),
+                    ),
+                    child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Icon(Icons.access_time, color: AppColors.cyan, size: 13),
+                      SizedBox(width: 5),
+                      Text('Limitar a 6 horas',
+                          style: TextStyle(color: AppColors.cyan, fontSize: 11, fontWeight: FontWeight.w600)),
+                    ]),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => context.go('/rider/route-generator', extra: {
+                    ..._buildFormData(),
+                    'duration_mode': 'km',
+                    'km': 350,
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      color: AppColors.orange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.orange.withOpacity(0.4)),
+                    ),
+                    child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Icon(Icons.speed, color: AppColors.orange, size: 13),
+                      SizedBox(width: 5),
+                      Text('Limitar a 350 km',
+                          style: TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w600)),
+                    ]),
+                  ),
+                ),
+              ),
+            ]),
+          ]),
+        ],
+      ),
+    );
+  }
+
   Future<void> _openInGoogleMaps() async {
     final url = _route['google_maps_url'];
     if (url == null) return;
@@ -138,6 +258,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                   _StatBadge(icon: Icons.terrain, label: _route['difficulty'] ?? '', color: AppColors.gold),
                 ]),
 
+                // Aviso si la ruta es muy larga para 1 día
+                _buildDayWarning(),
+
                 const SizedBox(height: 16),
 
                 // Clima
@@ -165,25 +288,35 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Autonomía
                 if (_fuelRangeKm != null) ...[
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: _fuelRangeKm! < (_route['distance_km'] ?? 999) ? AppColors.error.withOpacity(0.5) : AppColors.greyDark),
-                    ),
-                    child: Row(children: [
-                      Icon(Icons.local_gas_station, color: _fuelRangeKm! < (_route['distance_km'] ?? 999) ? AppColors.error : AppColors.grey, size: 24),
-                      const SizedBox(width: 12),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('route_result.autonomy'.tr(args: ['$_fuelRangeKm']), style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600)),
-                        if (_aiSummary?['fuel_stop_after_km'] != null)
-                          Text('route_result.refuel_at'.tr(args: ['${_aiSummary!["fuel_stop_after_km"]}']), style: const TextStyle(color: AppColors.error, fontSize: 12)),
-                      ])),
-                    ]),
-                  ),
+                  Builder(builder: (context) {
+                    final fuelStops = List<num>.from(_aiSummary?['fuel_stops'] ?? []);
+                    final distKm = (_route['distance_km'] ?? 0) as num;
+                    final needsRefuel = distKm > _fuelRangeKm!;
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: needsRefuel ? AppColors.error.withOpacity(0.5) : AppColors.greyDark),
+                      ),
+                      child: Row(children: [
+                        Icon(Icons.local_gas_station, color: needsRefuel ? AppColors.error : AppColors.grey, size: 24),
+                        const SizedBox(width: 12),
+                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text('route_result.autonomy'.tr(args: ['$_fuelRangeKm']),
+                              style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600)),
+                          if (fuelStops.isNotEmpty)
+                            Text(
+                              fuelStops.length == 1
+                                  ? 'Necesitas 1 parada para repostar (aprox. ${fuelStops[0]} km)'
+                                  : 'Necesitas ${fuelStops.length} paradas: ${fuelStops.map((k) => '${k}km').join(', ')}',
+                              style: const TextStyle(color: AppColors.error, fontSize: 12),
+                            ),
+                        ])),
+                      ]),
+                    );
+                  }),
                   const SizedBox(height: 16),
                 ],
 
@@ -260,11 +393,12 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   }
 
   Widget _buildWaypoints() {
-    final fuelStopKm    = _aiSummary?['fuel_stop_after_km'];
+    final aiSummary     = _aiSummary ?? {};
+    final fuelStops     = List<num>.from(aiSummary['fuel_stops'] ?? []);
     final totalKm       = (_route['distance_km'] ?? 0).toDouble();
     final totalMins     = (_route['duration_minutes'] ?? 1).toDouble();
-    final departureTime = _aiSummary?['best_departure_time'];
-    bool fuelInserted   = false;
+    final departureTime = aiSummary['best_departure_time'];
+    final insertedFuelStops = <int>{}; // índices ya insertados
     bool lunchInserted  = false;
     bool dinnerInserted = false;
 
@@ -285,15 +419,19 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     final lunchMins     = timeToMins(lunchStop?['estimated_time']);
     final dinnerMins    = timeToMins(dinnerStop?['estimated_time']);
 
-    // Porcentaje de ruta para cada parada (fallback sin horas)
-    // Almuerzo: 40% de la ruta, Comida: 65%
-    final lunchPct  = 0.4;
-    final dinnerPct = 0.65;
-
     final List<Widget> items = [];
 
     for (int i = 0; i < _waypoints.length; i++) {
       final wp      = _waypoints[i];
+
+      // Filtrar waypoints de gasolinera que la IA haya colado
+      final wpName = (wp['name'] ?? '').toLowerCase();
+      final wpNote = (wp['note'] ?? '').toLowerCase();
+      final isFuelWaypoint = wpName.contains('repostaje') || wpName.contains('gasolinera') ||
+          wpName.contains('repostar') || wpName.contains('gas station') ||
+          wpNote.contains('repostar antes') || wpNote.contains('gasolinera estratégica');
+      if (isFuelWaypoint) continue; // saltar — ya lo gestionamos nosotros
+
       final isFirst = i == 0;
       final isLast  = i == _waypoints.length - 1;
       final mins    = (wp['estimated_minutes_from_start'] ?? 0).toDouble();
@@ -301,10 +439,12 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       final pct      = totalMins > 0 ? (mins / totalMins).clamp(0.0, 1.0) : 0.0;
       final wpAbsMins = departureMins != null ? departureMins + mins.toInt() : null;
 
-      // Insertar gasolinera
-      if (!fuelInserted && fuelStopKm != null && approxKm >= (fuelStopKm as num).toDouble()) {
-        fuelInserted = true;
-        items.add(_FuelStopRow(km: fuelStopKm));
+      // Insertar paradas de gasolinera necesarias antes de este waypoint
+      for (int s = 0; s < fuelStops.length; s++) {
+        if (!insertedFuelStops.contains(s) && approxKm >= fuelStops[s].toDouble()) {
+          insertedFuelStops.add(s);
+          items.add(_FuelStopRow(km: fuelStops[s], stopNumber: s + 1, total: fuelStops.length));
+        }
       }
 
       // Insertar almuerzo
@@ -313,17 +453,14 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         if (wpAbsMins != null && lunchMins != null) {
           insert = wpAbsMins >= lunchMins;
         } else {
-          insert = pct >= lunchPct;
+          insert = pct >= 0.4;
         }
         if (insert) {
           lunchInserted = true;
           items.add(_MealStopRow(
-            icon: Icons.restaurant_outlined,
-            color: AppColors.orange,
-            location: lunchStop['location'] ?? '',
-            suggestion: lunchStop['suggestion'] ?? '',
-            time: lunchStop['estimated_time'],
-            label: 'route_result.lunch_stop'.tr(),
+            icon: Icons.restaurant_outlined, color: AppColors.orange,
+            location: lunchStop['location'] ?? '', suggestion: lunchStop['suggestion'] ?? '',
+            time: lunchStop['estimated_time'], label: 'route_result.lunch_stop'.tr(),
           ));
         }
       }
@@ -334,17 +471,14 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         if (wpAbsMins != null && dinnerMins != null) {
           insert = wpAbsMins >= dinnerMins;
         } else {
-          insert = pct >= dinnerPct;
+          insert = pct >= 0.65;
         }
         if (insert) {
           dinnerInserted = true;
           items.add(_MealStopRow(
-            icon: Icons.dinner_dining,
-            color: AppColors.cyan,
-            location: dinnerStop['location'] ?? '',
-            suggestion: dinnerStop['suggestion'] ?? '',
-            time: dinnerStop['estimated_time'],
-            label: 'route_result.dinner_stop'.tr(),
+            icon: Icons.dinner_dining, color: AppColors.cyan,
+            location: dinnerStop['location'] ?? '', suggestion: dinnerStop['suggestion'] ?? '',
+            time: dinnerStop['estimated_time'], label: 'route_result.dinner_stop'.tr(),
           ));
         }
       }
@@ -352,7 +486,14 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       items.add(_WaypointRow(index: i, isFirst: isFirst, isLast: isLast, wp: wp, weather: _weather));
     }
 
-    // Si llegamos al final sin insertar, añadir al final antes del último punto
+    // Fallback: insertar paradas de gasolinera no insertadas antes del último waypoint
+    for (int s = 0; s < fuelStops.length; s++) {
+      if (!insertedFuelStops.contains(s)) {
+        final lastIdx = items.length - 1;
+        items.insert(lastIdx > 0 ? lastIdx : 0,
+            _FuelStopRow(km: fuelStops[s], stopNumber: s + 1, total: fuelStops.length));
+      }
+    }
     if (!lunchInserted && lunchStop != null) {
       final lastIdx = items.length - 1;
       items.insert(lastIdx > 0 ? lastIdx : 0, _MealStopRow(
@@ -579,10 +720,15 @@ class _MealStopRow extends StatelessWidget {
 // Fila de parada de gasolinera intercalada
 class _FuelStopRow extends StatelessWidget {
   final num km;
-  const _FuelStopRow({required this.km});
+  final int stopNumber;
+  final int total;
+  const _FuelStopRow({required this.km, required this.stopNumber, required this.total});
 
   @override
   Widget build(BuildContext context) {
+    final label = total > 1
+        ? 'route_result.refuel_at'.tr(args: ['$km']) + ' ($stopNumber/$total)'
+        : 'route_result.refuel_at'.tr(args: ['$km']);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -594,7 +740,11 @@ class _FuelStopRow extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.gold),
             ),
-            child: const Center(child: Icon(Icons.local_gas_station, color: AppColors.gold, size: 16)),
+            child: Center(
+              child: total > 1
+                  ? Text('$stopNumber\u26fd', style: const TextStyle(color: AppColors.gold, fontSize: 11, fontWeight: FontWeight.w800))
+                  : const Icon(Icons.local_gas_station, color: AppColors.gold, size: 16),
+            ),
           ),
           Container(width: 2, height: 40, color: AppColors.greyDark),
         ]),
@@ -603,8 +753,12 @@ class _FuelStopRow extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(top: 4, bottom: 16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('route_result.refuel_at'.tr(args: ['$km']), style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 13)),
-              Text('⛽ Busca gasolinera cerca', style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+              Row(children: [
+                const Icon(Icons.local_gas_station, color: AppColors.gold, size: 14),
+                const SizedBox(width: 4),
+                Text(label, style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 13)),
+              ]),
+              const Text('⛽ Busca gasolinera cerca', style: TextStyle(color: AppColors.grey, fontSize: 12)),
             ]),
           ),
         ),

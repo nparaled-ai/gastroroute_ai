@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/auth_service.dart';
+import '../../../core/storage/auth_storage.dart';
 import '../../../core/theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,7 +17,25 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   bool _obscure = true;
+  bool _rememberMe = true;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final saved = await AuthStorage.getSavedCredentials();
+    if (saved['remember_me'] == 'true') {
+      setState(() {
+        _emailController.text    = saved['email'] ?? '';
+        _passwordController.text = saved['password'] ?? '';
+        _rememberMe = true;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -29,8 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() { _loading = true; _error = null; });
 
     final result = await AuthService.login(
-      email:    _emailController.text.trim(),
-      password: _passwordController.text,
+      email:      _emailController.text.trim(),
+      password:   _passwordController.text,
+      rememberMe: _rememberMe,
     );
 
     if (!mounted) return;
@@ -125,6 +145,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Recordar datos
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24, height: 24,
+                    child: Checkbox(
+                      value: _rememberMe,
+                      onChanged: (val) => setState(() => _rememberMe = val ?? true),
+                      activeColor: AppColors.orange,
+                      side: const BorderSide(color: AppColors.grey),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => setState(() => _rememberMe = !_rememberMe),
+                    child: const Text('Recordar usuario y contraseña',
+                        style: TextStyle(color: AppColors.grey, fontSize: 13)),
+                  ),
+                ],
               ),
 
               if (_error != null) ...[

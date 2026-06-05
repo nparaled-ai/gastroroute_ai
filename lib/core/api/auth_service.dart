@@ -6,6 +6,7 @@ class AuthService {
   static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
+    bool rememberMe = false,
   }) async {
     try {
       final response = await ApiClient.dio.post('/auth/login', data: {
@@ -14,6 +15,13 @@ class AuthService {
       });
 
       final data = response.data;
+
+      // Guardar credenciales si se pidió
+      if (rememberMe) {
+        await AuthStorage.saveCredentials(email, password);
+      } else {
+        await AuthStorage.clearCredentials();
+      }
 
       // Si tiene varios roles, devuelve lista para elegir
       if (data['select_role'] == true) {

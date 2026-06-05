@@ -61,6 +61,15 @@ dependencies:
   # Selector de imagen
   image_picker: ^1.1.2
 
+  # HTTP para Places API
+  http: ^1.2.1
+
+  # SharedPreferences para credenciales
+  shared_preferences: ^2.2.3
+
+  # Geolocalización
+  geolocator: ^13.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
