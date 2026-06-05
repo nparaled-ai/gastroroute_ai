@@ -20,6 +20,8 @@ class RiderEditProfileScreen extends StatefulWidget {
 }
 
 class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
   late TextEditingController _nicknameController;
   late TextEditingController _bioController;
   late TextEditingController _provinceController;
@@ -51,7 +53,9 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _nicknameController = TextEditingController(text: widget.profile['nickname']);
+    _firstNameController = TextEditingController(text: widget.profile['first_name'] ?? '');
+    _lastNameController  = TextEditingController(text: widget.profile['last_name'] ?? '');
+    _nicknameController  = TextEditingController(text: widget.profile['nickname']);
     _bioController      = TextEditingController(text: widget.profile['bio'] ?? '');
     _provinceController = TextEditingController(text: widget.profile['province'] ?? '');
     _experienceLevel    = widget.profile['experience_level'] ?? 'novato';
@@ -64,6 +68,8 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
 
   @override
   void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _nicknameController.dispose();
     _bioController.dispose();
     _provinceController.dispose();
@@ -196,6 +202,14 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
   }
 
   Future<void> _save() async {
+    if (_firstNameController.text.trim().isEmpty) {
+      setState(() => _error = 'El nombre es obligatorio.');
+      return;
+    }
+    if (_lastNameController.text.trim().isEmpty) {
+      setState(() => _error = 'Los apellidos son obligatorios.');
+      return;
+    }
     if (_provinceController.text.trim().isEmpty) {
       setState(() => _error = 'La ubicación es obligatoria.');
       return;
@@ -206,6 +220,8 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     }
     setState(() { _loading = true; _error = null; });
     final result = await RiderProfileService.updateProfile({
+      'first_name':       _firstNameController.text.trim(),
+      'last_name':        _lastNameController.text.trim(),
       'nickname':         _nicknameController.text.trim(),
       'bio':              _bioController.text.trim(),
       'province':         _provinceController.text.trim(),
@@ -279,6 +295,68 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
             ),
 
             const SizedBox(height: 32),
+
+            // Email (inmodificable)
+            const Text('Email', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: AppColors.greyDark.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.greyDark),
+              ),
+              child: Row(children: [
+                const Icon(Icons.email_outlined, color: AppColors.grey, size: 18),
+                const SizedBox(width: 12),
+                Text(
+                  widget.profile['email'] ?? '',
+                  style: const TextStyle(color: AppColors.grey, fontSize: 14),
+                ),
+                const Spacer(),
+                const Icon(Icons.lock_outline, color: AppColors.greyDark, size: 16),
+              ]),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Nombre
+            Row(children: [
+              const Text('Nombre', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+              const SizedBox(width: 4),
+              const Text('*', style: TextStyle(color: AppColors.error, fontSize: 13)),
+            ]),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _firstNameController,
+              style: const TextStyle(color: AppColors.white),
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.person_outlined, color: AppColors.grey),
+                hintText: 'Tu nombre',
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Apellidos
+            Row(children: [
+              const Text('Apellidos', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+              const SizedBox(width: 4),
+              const Text('*', style: TextStyle(color: AppColors.error, fontSize: 13)),
+            ]),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _lastNameController,
+              style: const TextStyle(color: AppColors.white),
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.person_outlined, color: AppColors.grey),
+                hintText: 'Tus apellidos',
+              ),
+            ),
+
+            const SizedBox(height: 20),
 
             // Nickname
             const Text('Nickname', style: TextStyle(color: AppColors.grey, fontSize: 13)),
