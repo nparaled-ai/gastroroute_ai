@@ -12,6 +12,10 @@ import '../features/rider/screens/rider_motos_screen.dart';
 import '../features/rider/screens/rider_moto_form_screen.dart';
 import '../features/rider/screens/route_generator_screen.dart';
 import '../features/rider/screens/route_result_screen.dart';
+import '../features/rider/screens/friends_screen.dart';
+import '../features/rider/screens/friends_search_screen.dart';
+import '../features/rider/screens/my_routes_screen.dart';
+import '../features/rider/screens/route_detail_screen.dart';
 import '../features/rider/screens/planner_selection_screen.dart';
 
 final router = GoRouter(
@@ -69,6 +73,25 @@ final router = GoRouter(
         final extra = state.extra as Map<String, dynamic>;
         return RiderMotoFormScreen(moto: extra);
       },
+    ),
+    GoRoute(
+      path: '/rider/my-routes',
+      builder: (context, state) => const MyRoutesScreen(),
+    ),
+    GoRoute(
+      path: '/rider/routes/:id',
+      builder: (context, state) {
+        final id = int.parse(state.pathParameters['id']!);
+        return RouteDetailScreen(routeId: id);
+      },
+    ),
+    GoRoute(
+      path: '/rider/friends',
+      builder: (context, state) => const FriendsScreen(),
+    ),
+    GoRoute(
+      path: '/rider/friends/search',
+      builder: (context, state) => const FriendsSearchScreen(),
     ),
     GoRoute(
       path: '/rider/planner',

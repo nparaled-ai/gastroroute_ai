@@ -415,8 +415,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       'preference':           _preference,
       'difficulty':           _difficulty,
       'duration_mode':        _durationMode,
-      if (_durationMode == 'hours') 'hours': _hours,
-      if (_durationMode == 'km')    'km':    _km,
+      'hours':                _durationMode == 'hours' ? _hours : null,
+      'km':                   _durationMode == 'km'    ? _km    : null,
       if (customPoints.isNotEmpty) 'custom_points': customPoints,
       if (_departureTimeController.text.trim().isNotEmpty)
         'departure_time': _departureTimeController.text.trim(),
