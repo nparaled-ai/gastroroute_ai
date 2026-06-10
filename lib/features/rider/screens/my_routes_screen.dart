@@ -167,56 +167,99 @@ class _RouteCard extends StatelessWidget {
     }
   }
 
+  String _formatDate(String date) {
+    try {
+      final d = DateTime.parse(date);
+      final days   = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
+      final months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      return '${days[d.weekday - 1]} ${d.day} ${months[d.month - 1]} ${d.year}';
+    } catch (_) { return date; }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final date       = route['departure_date'];
+    final time       = route['departure_time'];
+    final hasDateTime = date != null || time != null;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.greyDark),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(
-              child: Text(route['title'] ?? 'Sin título',
-                  style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 15)),
-            ),
+
+          // Fecha/hora remarcada arriba
+          if (hasDateTime)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: _visibilityColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: _visibilityColor.withOpacity(0.3)),
+                color: AppColors.cyan.withOpacity(0.12),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                border: Border(bottom: BorderSide(color: AppColors.cyan.withOpacity(0.3))),
               ),
-              child: Text(_visibilityLabel,
-                  style: TextStyle(color: _visibilityColor, fontSize: 10, fontWeight: FontWeight.w600)),
+              child: Row(children: [
+                const Icon(Icons.event, color: AppColors.cyan, size: 16),
+                const SizedBox(width: 8),
+                if (date != null)
+                  Text(_formatDate(date),
+                      style: const TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700, fontSize: 13)),
+                if (date != null && time != null) const SizedBox(width: 12),
+                if (time != null) ...[
+                  const Icon(Icons.schedule, color: AppColors.cyan, size: 14),
+                  const SizedBox(width: 4),
+                  Text('Salida: $time',
+                      style: const TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700, fontSize: 13)),
+                ],
+              ]),
             ),
-          ]),
-          const SizedBox(height: 8),
-          Row(children: [
-            _Chip(icon: Icons.route, label: '${route['distance_km'] ?? '?'} km', color: AppColors.orange),
-            const SizedBox(width: 8),
-            _Chip(icon: Icons.access_time,
-                label: '${(((route['duration_minutes'] ?? 0)) / 60).toStringAsFixed(1)} h',
-                color: AppColors.cyan),
-            const SizedBox(width: 8),
-            _Chip(icon: Icons.terrain, label: route['difficulty'] ?? '', color: AppColors.gold),
-          ]),
-          const SizedBox(height: 8),
-          Row(children: [
-            const Icon(Icons.location_on_outlined, color: AppColors.grey, size: 14),
-            const SizedBox(width: 4),
-            Expanded(
-              child: Text(route['origin'] ?? '',
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: AppColors.grey, fontSize: 12)),
-            ),
-            const Icon(Icons.arrow_forward_ios, color: AppColors.greyDark, size: 12),
-          ]),
+
+          // Contenido
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Expanded(
+                  child: Text(route['title'] ?? 'Sin título',
+                      style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: _visibilityColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: _visibilityColor.withOpacity(0.3)),
+                  ),
+                  child: Text(_visibilityLabel,
+                      style: TextStyle(color: _visibilityColor, fontSize: 10, fontWeight: FontWeight.w600)),
+                ),
+              ]),
+              const SizedBox(height: 10),
+              Row(children: [
+                _Chip(icon: Icons.route,       label: '${route['distance_km'] ?? '?'} km', color: AppColors.orange),
+                const SizedBox(width: 8),
+                _Chip(icon: Icons.access_time, label: '${(((route['duration_minutes'] ?? 0)) / 60).toStringAsFixed(1)} h', color: AppColors.cyan),
+                const SizedBox(width: 8),
+                _Chip(icon: Icons.terrain,     label: route['difficulty'] ?? '', color: AppColors.gold),
+              ]),
+              const SizedBox(height: 8),
+              Row(children: [
+                const Icon(Icons.location_on_outlined, color: AppColors.grey, size: 14),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(route['origin'] ?? '',
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+                ),
+                const Icon(Icons.arrow_forward_ios, color: AppColors.greyDark, size: 12),
+              ]),
+            ]),
+          ),
         ]),
       ),
     );

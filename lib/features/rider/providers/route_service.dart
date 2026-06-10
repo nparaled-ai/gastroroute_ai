@@ -35,6 +35,15 @@ class RouteService {
     }
   }
 
+  static Future<Map<String, dynamic>> saveRoute(Map<String, dynamic> saveData) async {
+    try {
+      final response = await ApiClient.dio.post('/rider/routes/save', data: {'_save_data': saveData});
+      return {'route': response.data['route'], 'message': response.data['message']};
+    } on DioException catch (e) {
+      return {'error': e.response?.data['message'] ?? 'Error al guardar.'};
+    }
+  }
+
   static Future<Map<String, dynamic>> refreshWeather(dynamic lat, dynamic lng) async {
     try {
       final response = await ApiClient.dio.get('/rider/routes/weather', queryParameters: {

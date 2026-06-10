@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -42,6 +43,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   List<Map<String, dynamic>> _destinationSuggestions = [];
   List<List<Map<String, dynamic>>> _pointSuggestions = [];
   List<bool> _pointValidated = [];
+  List<Map<String, double>?> _pointCoords = []; // lat/lng de cada punto
+  double? _originLat;
+  double? _originLng;
   String? _error;
   int? _routesRemaining;
 
@@ -110,11 +114,13 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       _customPointControllers.clear();
       _pointSuggestions.clear();
       _pointValidated.clear();
+      _pointCoords.clear();
       final points = (data['custom_points'] as List? ?? []);
       for (final p in points) {
         _customPointControllers.add(TextEditingController(text: p.toString()));
         _pointSuggestions.add([]);
         _pointValidated.add(true); // ya validados previamente
+        _pointCoords.add(null);
       }
     });
   }
@@ -155,13 +161,39 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     if (_originController.text.isEmpty) {
       final profileResult = await RiderProfileService.getProfile();
       if (!mounted) return;
-      final province = profileResult['profile']?['province'];
+      final profile  = profileResult['profile'];
+      final province = profile?['province'];
       if (province != null && province.toString().isNotEmpty) {
         setState(() {
           _originController.text = province;
           _originValidated = true;
         });
+        // Intentar obtener coordenadas del perfil (province_lat/lng)
+        final lat = (profile?['province_lat'] as num?)?.toDouble();
+        final lng = (profile?['province_lng'] as num?)?.toDouble();
+        if (lat != null && lng != null && lat != 0 && lng != 0) {
+          setState(() { _originLat = lat; _originLng = lng; });
+        } else {
+          // Geocodificar el nombre
+          try {
+            final response = await ApiClient.dio.get('/location/search', queryParameters: {
+              'q': province, 'lang': 'es',
+            });
+            final List data = response.data as List? ?? [];
+            if (data.isNotEmpty && mounted) {
+              setState(() {
+                _originLat = (data[0]['lat'] as num?)?.toDouble();
+                _originLng = (data[0]['lng'] as num?)?.toDouble();
+              });
+            }
+          } catch (_) {}
+        }
       }
+    }
+
+    // Hora de salida por defecto: 09:00
+    if (_departureTimeController.text.isEmpty) {
+      setState(() => _departureTimeController.text = '09:00');
     }
   }
 
@@ -178,6 +210,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
           _originSuggestions = data.map<Map<String, dynamic>>((p) => {
             'description': p['description'] as String,
             'place_id':    p['place_id'] as String,
+            'lat':         (p['lat'] as num?)?.toDouble() ?? 0.0,
+            'lng':         (p['lng'] as num?)?.toDouble() ?? 0.0,
           }).toList();
         });
       }
@@ -203,16 +237,30 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     } catch (_) {}
   }
 
+  double? _distanceToOrigin(Map<String, double>? coords) {
+    if (coords == null || _originLat == null || _originLng == null) return null;
+    const r = 6371.0;
+    final dLat = _toRad(coords['lat']! - _originLat!);
+    final dLng = _toRad(coords['lng']! - _originLng!);
+    final a = sin(dLat/2)*sin(dLat/2) +
+        cos(_toRad(_originLat!)) * cos(_toRad(coords['lat']!)) *
+        sin(dLng/2)*sin(dLng/2);
+    return r * 2 * atan2(sqrt(a), sqrt(1-a));
+  }
+
+  double _toRad(double deg) => deg * pi / 180;
+
   Future<void> _searchPoint(int index, String query) async {
     if (index >= _pointSuggestions.length) return;
     setState(() {
       _pointValidated[index] = false;
+      _pointCoords[index] = null;
       _pointSuggestions[index] = [];
     });
     if (query.length < 3) return;
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
-        'q': query, 'lang': 'es', 'poi': '1', // incluye puertos, montañas, POI
+        'q': query, 'lang': 'es', 'poi': '1',
       });
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty && mounted) {
@@ -220,10 +268,40 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
           _pointSuggestions[index] = data.map<Map<String, dynamic>>((p) => {
             'description': p['description'] as String,
             'place_id':    p['place_id'] as String,
+            'lat':         (p['lat'] as num?)?.toDouble() ?? 0.0,
+            'lng':         (p['lng'] as num?)?.toDouble() ?? 0.0,
           }).toList();
         });
       }
     } catch (_) {}
+  }
+
+  void _movePointUp(int i) {
+    if (i == 0) return;
+    setState(() {
+      final ctrl = _customPointControllers.removeAt(i);
+      _customPointControllers.insert(i - 1, ctrl);
+      final sugg = _pointSuggestions.removeAt(i);
+      _pointSuggestions.insert(i - 1, sugg);
+      final val = _pointValidated.removeAt(i);
+      _pointValidated.insert(i - 1, val);
+      final coord = _pointCoords.removeAt(i);
+      _pointCoords.insert(i - 1, coord);
+    });
+  }
+
+  void _movePointDown(int i) {
+    if (i >= _customPointControllers.length - 1) return;
+    setState(() {
+      final ctrl = _customPointControllers.removeAt(i);
+      _customPointControllers.insert(i + 1, ctrl);
+      final sugg = _pointSuggestions.removeAt(i);
+      _pointSuggestions.insert(i + 1, sugg);
+      final val = _pointValidated.removeAt(i);
+      _pointValidated.insert(i + 1, val);
+      final coord = _pointCoords.removeAt(i);
+      _pointCoords.insert(i + 1, coord);
+    });
   }
 
   Future<void> _detectOriginLocation() async {
@@ -318,7 +396,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   }
 
   Future<void> _pickTime(TextEditingController controller, {Color color = AppColors.orange}) async {
-    final now = TimeOfDay.now();
+    final now = const TimeOfDay(hour: 9, minute: 0);
     final picked = await showTimePicker(
       context: context,
       initialTime: controller.text.isNotEmpty
@@ -398,6 +476,18 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
           setState(() => _error = 'Debe haber al menos 4 horas entre almuerzo y comida. Hora de comida mínima: $h:$m');
           return;
         }
+      }
+    }
+
+    // Validar que los puntos obligatorios no estén vacíos
+    for (int i = 0; i < _customPointControllers.length; i++) {
+      if (_customPointControllers[i].text.trim().isEmpty) {
+        setState(() => _error = 'El punto ${i + 1} está vacío. Rellénalo o elimínalo.');
+        return;
+      }
+      if (i < _pointValidated.length && !_pointValidated[i]) {
+        setState(() => _error = 'El punto ${i + 1} no está validado. Selecciónalo de la lista de sugerencias.');
+        return;
       }
     }
 
@@ -623,6 +713,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                             _originController.text = s['description'];
                             _originValidated = true;
                             _originSuggestions = [];
+                            _originLat = (s['lat'] as num?)?.toDouble();
+                            _originLng = (s['lng'] as num?)?.toDouble();
                           }),
                         )).toList(),
                       ),
@@ -758,6 +850,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                             _customPointControllers.add(TextEditingController());
                             _pointSuggestions.add([]);
                             _pointValidated.add(false);
+                            _pointCoords.add(null);
                           }),
                           child: Row(children: [
                             const Icon(Icons.add_circle_outline, color: AppColors.orange, size: 18),
@@ -771,11 +864,13 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   ..._customPointControllers.asMap().entries.map((entry) {
                     final i    = entry.key;
                     final ctrl = entry.value;
+                    final total = _customPointControllers.length;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Column(
                         children: [
                           Row(children: [
+                            // Número
                             Container(
                               width: 24, height: 24,
                               decoration: BoxDecoration(
@@ -787,6 +882,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                                   style: const TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w700))),
                             ),
                             const SizedBox(width: 8),
+                            // Campo
                             Expanded(
                               child: TextFormField(
                                 controller: ctrl,
@@ -803,17 +899,34 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 4),
+                            // Botones orden
+                            if (total > 1) Column(mainAxisSize: MainAxisSize.min, children: [
+                              GestureDetector(
+                                onTap: i > 0 ? () => _movePointUp(i) : null,
+                                child: Icon(Icons.keyboard_arrow_up,
+                                    color: i > 0 ? AppColors.cyan : AppColors.greyDark, size: 20),
+                              ),
+                              GestureDetector(
+                                onTap: i < total - 1 ? () => _movePointDown(i) : null,
+                                child: Icon(Icons.keyboard_arrow_down,
+                                    color: i < total - 1 ? AppColors.cyan : AppColors.greyDark, size: 20),
+                              ),
+                            ]),
+                            const SizedBox(width: 4),
+                            // Eliminar
                             GestureDetector(
                               onTap: () => setState(() {
                                 ctrl.dispose();
                                 _customPointControllers.removeAt(i);
                                 if (i < _pointSuggestions.length) _pointSuggestions.removeAt(i);
-                                if (i < _pointValidated.length) _pointValidated.removeAt(i);
+                                if (i < _pointValidated.length)   _pointValidated.removeAt(i);
+                                if (i < _pointCoords.length)      _pointCoords.removeAt(i);
                               }),
                               child: const Icon(Icons.remove_circle_outline, color: AppColors.error, size: 20),
                             ),
                           ]),
+                          // Desplegable sugerencias
                           if (i < _pointSuggestions.length && _pointSuggestions[i].isNotEmpty)
                             Container(
                               margin: const EdgeInsets.only(top: 4, left: 32),
@@ -832,10 +945,49 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                                     ctrl.text = s['description'];
                                     _pointValidated[i] = true;
                                     _pointSuggestions[i] = [];
+                                    if (i < _pointCoords.length) {
+                                      _pointCoords[i] = {
+                                        'lat': (s['lat'] as num?)?.toDouble() ?? 0.0,
+                                        'lng': (s['lng'] as num?)?.toDouble() ?? 0.0,
+                                      };
+                                    }
                                   }),
                                 )).toList(),
                               ),
                             ),
+                          // Badge distancia al origen
+                          if (i < _pointValidated.length && _pointValidated[i] &&
+                              i < _pointCoords.length && _pointCoords[i] != null)
+                            Builder(builder: (context) {
+                              final dist = _distanceToOrigin(_pointCoords[i]);
+                              if (dist == null) return const SizedBox.shrink();
+                              final isWarning  = dist > 300;
+                              final isCritical = dist > 500;
+                              final color = isCritical ? AppColors.error : isWarning ? AppColors.gold : Colors.green;
+                              final icon  = isCritical ? '⛔' : isWarning ? '⚠️' : '✅';
+                              final msg   = isCritical
+                                  ? 'Muy lejos del origen — puede generar ruta incorrecta'
+                                  : isWarning ? 'Lejos del origen — la ruta será larga' : null;
+                              return Container(
+                                margin: const EdgeInsets.only(top: 4, left: 32),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: color.withOpacity(0.4)),
+                                ),
+                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  Row(children: [
+                                    Text(icon, style: const TextStyle(fontSize: 12)),
+                                    const SizedBox(width: 6),
+                                    Text('${dist.toInt()} km del origen',
+                                        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600)),
+                                  ]),
+                                  if (msg != null)
+                                    Text(msg, style: TextStyle(color: color, fontSize: 11)),
+                                ]),
+                              );
+                            }),
                         ],
                       ),
                     );

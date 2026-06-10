@@ -17,8 +17,11 @@ class RouteResultScreen extends StatefulWidget {
 }
 
 class _RouteResultScreenState extends State<RouteResultScreen> {
-  bool _publishing       = false;
+  bool _publishing        = false;
+  bool _saving            = false;
   bool _refreshingWeather = false;
+  bool _saved             = false; // true cuando ya se guardó
+  Map<String, dynamic>? _savedRoute; // ruta guardada con ID
   Map<String, dynamic>? _currentWeather;
 
   Map<String, dynamic> get _route        => widget.result['route'] ?? {};
@@ -58,34 +61,50 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     }
   }
 
-  // Compartir
+  // Guardar y luego compartir
+  Future<void> _saveAndShare() async {
+    // Si ya está guardada, abrir directo el bottom sheet
+    if (_saved && _savedRoute != null) {
+      _showShareDialog();
+      return;
+    }
+    setState(() => _saving = true);
+    final saveData = Map<String, dynamic>.from(widget.result['_save_data'] ?? {});
+    final result = await RouteService.saveRoute(saveData);
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (result['error'] != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['error']), backgroundColor: AppColors.error));
+      return;
+    }
+    setState(() {
+      _saved      = true;
+      _savedRoute = result['route'];
+    });
+    _showShareDialog();
+  }
+
+  // Compartir (usa _savedRoute que ya tiene ID)
   Future<void> _shareWithFriends(List<int> selectedFriendIds) async {
-    final routeId = _route['id'];
+    final routeId = _savedRoute?['id'] ?? _route['id'];
     if (routeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Error: ruta sin ID. Regenera la ruta.'),
-        backgroundColor: AppColors.error,
-      ));
+        content: Text('Error: ruta sin ID.'), backgroundColor: AppColors.error));
       return;
     }
     setState(() => _publishing = true);
-    final result = await RouteShareService.share(
-      routeId,
-      visibility: 'friends',
-      friendIds: selectedFriendIds,
-    );
+    final result = await RouteShareService.share(routeId, visibility: 'friends', friendIds: selectedFriendIds);
     if (!mounted) return;
     setState(() => _publishing = false);
     _showShareResult(result);
   }
 
   Future<void> _sharePublic() async {
-    final routeId = _route['id'];
+    final routeId = _savedRoute?['id'] ?? _route['id'];
     if (routeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Error: ruta sin ID. Regenera la ruta.'),
-        backgroundColor: AppColors.error,
-      ));
+        content: Text('Error: ruta sin ID.'), backgroundColor: AppColors.error));
       return;
     }
     setState(() => _publishing = true);
@@ -100,11 +119,53 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['error']), backgroundColor: AppColors.error),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'] ?? '¡Ruta compartida!'), backgroundColor: Colors.green),
-      );
+      return;
     }
+
+    // Dialog de confirmación con acciones
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.check_circle, color: Colors.green, size: 64),
+          const SizedBox(height: 16),
+          Text(
+            result['message'] ?? '¡Ruta compartida!',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700),
+          ),
+          if ((result['notified_count'] ?? 0) > 0) ...[  
+            const SizedBox(height: 8),
+            Text(
+              '${result['notified_count']} ${result['notified_count'] == 1 ? 'motero notificado' : 'moteros notificados'}',
+              style: const TextStyle(color: AppColors.grey, fontSize: 13),
+            ),
+          ],
+        ]),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.go('/rider/route-generator', extra: _buildFormData()..['origin'] = _route['origin']);
+            },
+            child: const Text('Generar otra', style: TextStyle(color: AppColors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.go('/rider/my-routes');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.orange,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Ver mis rutas', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showShareDialog() {
@@ -125,14 +186,10 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     final url = _route['google_maps_url'];
     if (url == null) return;
     final uri = Uri.parse(url);
-    try {
-      await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
-    } catch (_) {
-      try {
-        await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
-      } catch (_) {
-        await launchUrl(uri, mode: LaunchMode.platformDefault);
-      }
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      await launchUrl(uri, mode: LaunchMode.platformDefault);
     }
   }
 
@@ -195,7 +252,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined, color: AppColors.orange),
-            onPressed: _showShareDialog,
+            onPressed: _saveAndShare,
           ),
         ],
       ),
@@ -344,8 +401,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
 
               const SizedBox(height: 24),
 
-              // Almuerzo
-              if (_route['lunch_stop'] != null) ...[
+              // Almuerzo - solo si se pidió
+              if (_route['lunch_stop'] != null && (widget.result['form_data']?['suggest_lunch'] == true)) ...[
                 _SectionHeader(icon: Icons.restaurant_outlined,
                     label: 'route_result.lunch_stop'.tr(), color: AppColors.orange),
                 const SizedBox(height: 8),
@@ -356,8 +413,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                 const SizedBox(height: 16),
               ],
 
-              // Comer
-              if (_route['dinner_stop'] != null) ...[
+              // Comer - solo si se pidió
+              if (_route['dinner_stop'] != null && (widget.result['form_data']?['suggest_dinner'] == true)) ...[
                 _SectionHeader(icon: Icons.dinner_dining,
                     label: 'route_result.dinner_stop'.tr(), color: AppColors.cyan),
                 const SizedBox(height: 8),
@@ -404,19 +461,20 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               const SizedBox(height: 12),
 
               OutlinedButton(
-                onPressed: _publishing ? null : _showShareDialog,
+                onPressed: (_publishing || _saving) ? null : _saveAndShare,
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
                   side: const BorderSide(color: AppColors.orange),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: _publishing
+                child: (_publishing || _saving)
                     ? const SizedBox(width: 20, height: 20,
                         child: CircularProgressIndicator(color: AppColors.orange, strokeWidth: 2))
                     : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        const Icon(Icons.share_outlined, color: AppColors.orange, size: 20),
+                        Icon(_saved ? Icons.share_outlined : Icons.save_outlined,
+                            color: AppColors.orange, size: 20),
                         const SizedBox(width: 8),
-                        Text('route_result.share'.tr(),
+                        Text(_saved ? 'Compartir' : 'Guardar y compartir',
                             style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700)),
                       ]),
               ),
@@ -438,8 +496,10 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     final insertedFuelStops = <int>{};
     bool lunchInserted      = false;
     bool dinnerInserted     = false;
-    final lunchStop         = _route['lunch_stop'];
-    final dinnerStop        = _route['dinner_stop'];
+    final lunchStop  = (_route['lunch_stop'] != null && (widget.result['form_data']?['suggest_lunch'] == true))
+        ? _route['lunch_stop'] : null;
+    final dinnerStop = (_route['dinner_stop'] != null && (widget.result['form_data']?['suggest_dinner'] == true))
+        ? _route['dinner_stop'] : null;
 
     int? timeToMins(String? t) {
       if (t == null) return null;
@@ -460,8 +520,19 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       final wp = _waypoints[i];
       final wpName = (wp['name'] ?? '').toLowerCase();
       final wpNote = (wp['note'] ?? '').toLowerCase();
+
+      // Filtrar waypoints de gasolinera
       if (wpName.contains('repostaje') || wpName.contains('gasolinera') ||
           wpName.contains('repostar') || wpNote.contains('repostar antes')) continue;
+
+      // Filtrar waypoints de comida si ya tenemos dinner_stop
+      if (dinnerStop != null && (wpName.contains('comida') || wpName.contains('comer') ||
+          wpName.contains('dinner') || wpNote.contains('parada para comer') ||
+          wpNote.contains('comida'))) continue;
+
+      // Filtrar waypoints de almuerzo si ya tenemos lunch_stop
+      if (lunchStop != null && (wpName.contains('almuerzo') || wpName.contains('lunch') ||
+          wpNote.contains('almuerzo') || wpNote.contains('parada para almorzar'))) continue;
 
       final isFirst   = i == 0;
       final isLast    = i == _waypoints.length - 1;
