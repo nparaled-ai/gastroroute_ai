@@ -15,12 +15,13 @@ class RouteDetailScreen extends StatefulWidget {
 
 class _RouteDetailScreenState extends State<RouteDetailScreen> {
   Map<String, dynamic>? _route;
-  List<Map<String, dynamic>> _participants = [];
-  bool _loading   = true;
-  bool _isOwner   = false;
-  bool _isJoined  = false;
-  int  _count     = 0;
-  bool _joining   = false;
+  List<Map<String, dynamic>> _confirmed = [];
+  List<Map<String, dynamic>> _pending   = [];
+  bool _loading  = true;
+  bool _isOwner  = false;
+  bool _isJoined = false;
+  int  _count    = 0;
+  bool _joining  = false;
 
   @override
   void initState() {
@@ -36,12 +37,13 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     ]);
     if (!mounted) return;
     setState(() {
-      _route        = results[0]['route'];
-      _isOwner      = results[0]['route']?['is_owner'] ?? false;
-      _isJoined     = results[1]['is_joined'] ?? false;
-      _count        = results[1]['count'] ?? 0;
-      _participants = List<Map<String, dynamic>>.from(results[1]['participants'] ?? []);
-      _loading      = false;
+      _route     = results[0]['route'];
+      _isOwner   = results[1]['is_owner']  ?? results[0]['route']?['is_owner'] ?? false;
+      _isJoined  = results[1]['is_joined'] ?? false;
+      _count     = results[1]['count']     ?? 0;
+      _confirmed = List<Map<String, dynamic>>.from(results[1]['confirmed'] ?? []);
+      _pending   = List<Map<String, dynamic>>.from(results[1]['pending']   ?? []);
+      _loading   = false;
     });
   }
 
@@ -86,11 +88,21 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     if (url == null) return;
     final uri = Uri.parse(url);
     try {
-      await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (_) {
       await launchUrl(uri, mode: LaunchMode.platformDefault);
     }
   }
+
+  Widget _emptyParticipants(String text) => Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: AppColors.greyDark),
+    ),
+    child: Center(child: Text(text, style: const TextStyle(color: AppColors.grey))),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -123,8 +135,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(colors: [
-                          AppColors.orange.withOpacity(0.2),
-                          AppColors.surface,
+                          AppColors.orange.withOpacity(0.2), AppColors.surface,
                         ]),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: AppColors.orange.withOpacity(0.3)),
@@ -186,7 +197,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                                 color: AppColors.orange.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text('Tú', style: TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w700)),
+                              child: const Text('Tú',
+                                  style: TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w700)),
                             ),
                           ],
                         ]),
@@ -194,7 +206,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       const SizedBox(height: 20),
                     ],
 
-                    // Detalles
+                    // Fecha/hora
                     if (_route!['departure_date'] != null || _route!['departure_time'] != null) ...[
                       const Text('Salida', style: TextStyle(color: AppColors.grey, fontSize: 13)),
                       const SizedBox(height: 8),
@@ -221,64 +233,31 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       const SizedBox(height: 20),
                     ],
 
-                    // Participantes
+                    // Confirmados
                     Row(children: [
-                      const Icon(Icons.people_outlined, color: AppColors.cyan, size: 18),
+                      const Icon(Icons.check_circle_outline, color: Colors.green, size: 18),
                       const SizedBox(width: 8),
-                      Text('Participantes ($_count)',
+                      Text('Confirmados ($_count)',
                           style: const TextStyle(color: AppColors.white, fontSize: 15, fontWeight: FontWeight.w700)),
                     ]),
                     const SizedBox(height: 12),
-
-                    if (_participants.isEmpty)
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.greyDark),
-                        ),
-                        child: const Center(
-                          child: Text('Nadie se ha apuntado todavía.',
-                              style: TextStyle(color: AppColors.grey)),
-                        ),
-                      )
+                    if (_confirmed.isEmpty)
+                      _emptyParticipants('Nadie confirmado todavía.')
                     else
-                      ...(_participants.map((p) => Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.greyDark),
-                        ),
-                        child: Row(children: [
-                          RiderAvatar(
-                            avatarUrl: p['avatar_url'],
-                            level: p['experience_level'] ?? 'novato',
-                            size: 40,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text(
-                              '${p['first_name'] ?? ''} ${p['last_name'] ?? ''}'.trim(),
-                              style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600, fontSize: 13),
-                            ),
-                            if (p['nickname'] != null)
-                              Text('@${p['nickname']}',
-                                  style: const TextStyle(color: AppColors.orange, fontSize: 11)),
-                          ])),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text('✅ Apuntado',
-                                style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.w600)),
-                          ),
-                        ]),
-                      ))),
+                      ..._confirmed.map((p) => _ParticipantRow(p: p)),
+
+                    // Pendientes
+                    if (_pending.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Row(children: [
+                        const Icon(Icons.schedule, color: AppColors.gold, size: 18),
+                        const SizedBox(width: 8),
+                        Text('Invitados pendientes (${_pending.length})',
+                            style: const TextStyle(color: AppColors.gold, fontSize: 15, fontWeight: FontWeight.w700)),
+                      ]),
+                      const SizedBox(height: 12),
+                      ..._pending.map((p) => _ParticipantRow(p: p)),
+                    ],
 
                     const SizedBox(height: 24),
 
@@ -300,7 +279,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
 
                     const SizedBox(height: 12),
 
-                    // Botón apuntarse / desapuntarse (solo si no es el creador)
+                    // Botón apuntarse / desapuntarse
                     if (!_isOwner)
                       ElevatedButton(
                         onPressed: _joining ? null : (_isJoined ? _leave : _join),
@@ -347,6 +326,55 @@ class _InfoChip extends StatelessWidget {
         Icon(icon, color: color, size: 13),
         const SizedBox(width: 4),
         Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
+      ]),
+    );
+  }
+}
+
+class _ParticipantRow extends StatelessWidget {
+  final Map<String, dynamic> p;
+  const _ParticipantRow({required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    final name      = '${p['first_name'] ?? ''} ${p['last_name'] ?? ''}'.trim();
+    final confirmed = p['status'] == 'confirmed';
+    final badgeColor = confirmed ? Colors.green : AppColors.gold;
+    final badgeText  = confirmed ? '✅ Apuntado' : '⏳ Pendiente';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: confirmed ? AppColors.greyDark : AppColors.gold.withOpacity(0.3)),
+      ),
+      child: Row(children: [
+        RiderAvatar(
+          avatarUrl: p['avatar_url'],
+          level: p['experience_level'] ?? 'novato',
+          size: 40,
+        ),
+        const SizedBox(width: 10),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(name.isNotEmpty ? name : p['nickname'] ?? '',
+              style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600, fontSize: 13)),
+          if (p['nickname'] != null)
+            Text('@${p['nickname']}',
+                style: const TextStyle(color: AppColors.orange, fontSize: 11)),
+        ])),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: badgeColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: badgeColor.withOpacity(0.3)),
+          ),
+          child: Text(badgeText,
+              style: TextStyle(color: badgeColor, fontSize: 10, fontWeight: FontWeight.w600)),
+        ),
       ]),
     );
   }

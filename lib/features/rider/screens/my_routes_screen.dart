@@ -24,7 +24,7 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadRoutes();
   }
 
@@ -92,14 +92,6 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
             ),
             Tab(
               child: _TabLabel(
-                icon: '📝',
-                label: 'Borradores',
-                count: _drafts.length,
-                activeColor: AppColors.gold,
-              ),
-            ),
-            Tab(
-              child: _TabLabel(
                 icon: '📨',
                 label: 'Recibidas',
                 count: _received.length,
@@ -127,11 +119,6 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                   empty: 'No tienes rutas históricas aún.',
                   emptyIcon: Icons.history,
                   onTap: (r) => context.push('/rider/routes/${r['id']}'),
-                ),
-                _DraftList(
-                  drafts: _drafts,
-                  onTap: (r) => context.push('/rider/routes/${r['id']}'),
-                  onNew: () => context.go('/rider/planner'),
                 ),
                 _ReceivedList(
                   routes: _received,

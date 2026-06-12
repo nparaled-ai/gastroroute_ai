@@ -48,9 +48,11 @@ class RouteShareService {
     try {
       final response = await ApiClient.dio.get('/rider/routes/$routeId/participants');
       return {
-        'participants': List<Map<String, dynamic>>.from(response.data['participants']),
-        'count':        response.data['count'],
-        'is_joined':    response.data['is_joined'],
+        'confirmed':  List<Map<String, dynamic>>.from(response.data['confirmed'] ?? []),
+        'pending':    List<Map<String, dynamic>>.from(response.data['pending']   ?? []),
+        'count':      response.data['count']    ?? 0,
+        'is_joined':  response.data['is_joined'] ?? false,
+        'is_owner':   response.data['is_owner']  ?? false,
       };
     } on DioException catch (e) {
       return {'error': e.response?.data['message'] ?? 'Error.'};

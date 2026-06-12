@@ -61,6 +61,65 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     }
   }
 
+  // Solo guardar sin compartir
+  Future<void> _saveOnly() async {
+    if (_saved && _savedRoute != null) {
+      _showSaveResult();
+      return;
+    }
+    setState(() => _saving = true);
+    final saveData = Map<String, dynamic>.from(widget.result['_save_data'] ?? {});
+    final result = await RouteService.saveRoute(saveData);
+    if (!mounted) return;
+    setState(() { _saving = false; });
+    if (result['error'] != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['error']), backgroundColor: AppColors.error));
+      return;
+    }
+    setState(() { _saved = true; _savedRoute = result['route']; });
+    _showSaveResult();
+  }
+
+  void _showSaveResult() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.check_circle, color: Colors.green, size: 64),
+          const SizedBox(height: 16),
+          const Text('¡Ruta guardada!',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          const Text('Guardada en Mis Rutas. Solo tú puedes verla.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.grey, fontSize: 13)),
+        ]),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.go('/rider/route-generator', extra: _buildFormData());
+            },
+            child: const Text('Generar otra', style: TextStyle(color: AppColors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () { Navigator.pop(ctx); context.go('/rider/my-routes'); },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.orange,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Ver mis rutas',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Guardar y luego compartir
   Future<void> _saveAndShare() async {
     // Si ya está guardada, abrir directo el bottom sheet
@@ -178,6 +237,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       builder: (ctx) => _ShareBottomSheet(
         onShareFriends: (friendIds) => _shareWithFriends(friendIds),
         onSharePublic:  () => _sharePublic(),
+        onSaveOnly:     () => _saveOnly(),
       ),
     );
   }
@@ -600,185 +660,243 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
 class _ShareBottomSheet extends StatefulWidget {
   final Function(List<int>) onShareFriends;
   final VoidCallback onSharePublic;
-  const _ShareBottomSheet({required this.onShareFriends, required this.onSharePublic});
+  final VoidCallback onSaveOnly;
+  const _ShareBottomSheet({
+    required this.onShareFriends,
+    required this.onSharePublic,
+    required this.onSaveOnly,
+  });
 
   @override
   State<_ShareBottomSheet> createState() => _ShareBottomSheetState();
 }
 
 class _ShareBottomSheetState extends State<_ShareBottomSheet> {
-  List<Map<String, dynamic>> _friends = [];
-  Set<int> _selected = {};
-  bool _loading = true;
-  bool _shareAll = false;
+// 0 = menu principal, 1 = seleccionar amigos
+int _step = 0;
+List<Map<String, dynamic>> _friends = [];
+Set<int> _selected = {};
+  bool _loading = false;
+bool _shareAll = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadFriends();
-  }
-
-  Future<void> _loadFriends() async {
-    final result = await FriendshipService.getFriends();
+Future<void> _loadFriends() async {
+setState(() { _loading = true; });
+  final result = await FriendshipService.getFriends();
     if (!mounted) return;
-    setState(() {
-      _friends = List<Map<String, dynamic>>.from(result['friends'] ?? []);
-      _loading = false;
-    });
-  }
+  setState(() {
+  _friends = List<Map<String, dynamic>>.from(result['friends'] ?? []);
+  _loading = false;
+  _step = 1;
+});
+}
+
+@override
+  Widget build(BuildContext context) {
+  return SafeArea(
+    child: SingleChildScrollView(
+    padding: EdgeInsets.only(
+    left: 24, right: 24, top: 24,
+    bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+),
+child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+    // Handle
+    Center(child: Container(width: 40, height: 4,
+      decoration: BoxDecoration(color: AppColors.greyDark, borderRadius: BorderRadius.circular(2)))),
+const SizedBox(height: 20),
+
+if (_step == 0) ..._buildMainMenu(),
+if (_step == 1) ..._buildFriendSelector(),
+        ]),
+),
+);
+}
+
+List<Widget> _buildMainMenu() => [
+const Text('¿Qué quieres hacer con esta ruta?',
+style: TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+const SizedBox(height: 20),
+
+// Opción 1 — Guardar para mí
+_OptionCard(
+icon: Icons.lock_outline,
+color: AppColors.grey,
+title: 'Guardar para mí',
+desc: 'Solo tú puedes verla. Aparecerá en Mis Rutas.',
+onTap: () {
+Navigator.pop(context);
+widget.onSaveOnly();
+},
+),
+const SizedBox(height: 12),
+
+// Opción 2 — Compartir con amigos
+_OptionCard(
+icon: Icons.people_outlined,
+color: AppColors.cyan,
+title: 'Compartir con amigos',
+desc: 'Elige qué amigos pueden ver la ruta y apuntarse.',
+onTap: _loadFriends,
+trailing: _loading
+          ? const SizedBox(width: 18, height: 18,
+    child: CircularProgressIndicator(color: AppColors.cyan, strokeWidth: 2))
+          : const Icon(Icons.arrow_forward_ios, color: AppColors.cyan, size: 14),
+),
+const SizedBox(height: 12),
+
+// Opción 3 — Publicar para todos
+_OptionCard(
+icon: Icons.public,
+color: AppColors.orange,
+title: 'Publicar para todos',
+desc: 'Cualquier motero de tu zona puede verla y apuntarse.',
+onTap: () {
+Navigator.pop(context);
+widget.onSharePublic();
+},
+),
+const SizedBox(height: 8),
+];
+
+List<Widget> _buildFriendSelector() => [
+Row(children: [
+GestureDetector(
+onTap: () => setState(() => _step = 0),
+child: const Icon(Icons.arrow_back_ios, color: AppColors.grey, size: 18),
+      ),
+const SizedBox(width: 8),
+const Text('Selecciona amigos',
+style: TextStyle(color: AppColors.white, fontSize: 17, fontWeight: FontWeight.w700)),
+const Spacer(),
+if (_friends.isNotEmpty)
+GestureDetector(
+onTap: () => setState(() {
+if (_shareAll) { _selected.clear(); _shareAll = false; }
+else { _selected = _friends.map((f) => f['user_id'] as int).toSet(); _shareAll = true; }
+}),
+child: Text(_shareAll ? 'Quitar todos' : 'Todos',
+style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+),
+]),
+const SizedBox(height: 16),
+
+if (_friends.isEmpty)
+const Padding(
+padding: EdgeInsets.all(16),
+child: Text('No tienes amigos aún.', style: TextStyle(color: AppColors.grey))
+)
+else
+SizedBox(
+height: 300,
+child: ListView.builder(
+itemCount: _friends.length,
+itemBuilder: (ctx, i) {
+final f   = _friends[i];
+final uid = f['user_id'] as int;
+final chk = _selected.contains(uid);
+final name = '${f['first_name'] ?? ''} ${f['last_name'] ?? ''}'.trim();
+return ListTile(
+contentPadding: EdgeInsets.zero,
+leading: RiderAvatar(avatarUrl: f['avatar_url'],
+level: f['experience_level'] ?? 'novato', size: 44),
+title: Text(name.isNotEmpty ? name : f['nickname'] ?? '',
+style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600)),
+subtitle: f['nickname'] != null
+? Text('@${f['nickname']}',
+style: const TextStyle(color: AppColors.orange, fontSize: 12))
+: null,
+trailing: Checkbox(
+value: chk,
+activeColor: AppColors.cyan,
+side: const BorderSide(color: AppColors.grey),
+onChanged: (_) => setState(() {
+if (chk) _selected.remove(uid); else _selected.add(uid);
+}),
+),
+              onTap: () => setState(() {
+      if (chk) _selected.remove(uid); else _selected.add(uid);
+              }),
+          );
+        },
+      ),
+  ),
+
+const SizedBox(height: 12),
+  ElevatedButton(
+    onPressed: _selected.isEmpty ? null : () {
+      final ids = _selected.toList();
+      Navigator.pop(context);
+      widget.onShareFriends(ids);
+    },
+    style: ElevatedButton.styleFrom(
+    backgroundColor: AppColors.cyan,
+minimumSize: const Size(double.infinity, 48),
+shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  ),
+    child: Text(
+      _selected.isEmpty
+            ? 'Selecciona al menos un amigo'
+          : 'Compartir con ${_selected.length} amigo${_selected.length > 1 ? 's' : ''}',
+style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+),
+),
+const SizedBox(height: 8),
+];
+}
+
+// Widgets auxiliares
+class _OptionCard extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String desc;
+  final VoidCallback onTap;
+  final Widget? trailing;
+
+  const _OptionCard({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.desc,
+    required this.onTap,
+    this.trailing,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-      padding: EdgeInsets.only(
-        left: 24, right: 24, top: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: SingleChildScrollView(
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-  // Handle
-  Center(child: Container(width: 40, height: 4,
-    decoration: BoxDecoration(color: AppColors.greyDark, borderRadius: BorderRadius.circular(2)))),
-  const SizedBox(height: 16),
-
-  Text('route_result.share_title'.tr(),
-            style: const TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-  const SizedBox(height: 20),
-
-  // Opción pública
-        GestureDetector(
-  onTap: () {
-    Navigator.pop(context);
-    widget.onSharePublic();
-  },
-  child: Container(
-  padding: const EdgeInsets.all(16),
-  decoration: BoxDecoration(
-  color: AppColors.orange.withOpacity(0.1),
-  borderRadius: BorderRadius.circular(12),
-  border: Border.all(color: AppColors.orange.withOpacity(0.3)),
-  ),
-  child: Row(children: [
-  const Icon(Icons.public, color: AppColors.orange, size: 24),
-  const SizedBox(width: 12),
-  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-  Text('route_result.share_public'.tr(),
-      style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700)),
-  Text('route_result.share_public_desc'.tr(),
-  style: const TextStyle(color: AppColors.grey, fontSize: 12)),
-  ])),
-  const Icon(Icons.arrow_forward_ios, color: AppColors.orange, size: 14),
-  ]),
-  ),
-  ),
-
-  const SizedBox(height: 16),
-
-  // Opción amigos
-        Row(children: [
-  const Icon(Icons.people_outlined, color: AppColors.cyan, size: 20),
-  const SizedBox(width: 8),
-  Text('route_result.share_friends'.tr(),
-    style: const TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700, fontSize: 15)),
-  const Spacer(),
-  if (_friends.isNotEmpty)
-  GestureDetector(
-    onTap: () => setState(() {
-    if (_shareAll) {
-    _selected.clear(); _shareAll = false;
-  } else {
-  _selected = _friends.map((f) => f['user_id'] as int).toSet();
-  _shareAll = true;
-  }
-  }),
-  child: Text(_shareAll ? 'Deseleccionar todo' : 'Seleccionar todo',
-  style: const TextStyle(color: AppColors.grey, fontSize: 12)),
-  ),
-  ]),
-  const SizedBox(height: 8),
-
-  // Lista de amigos — altura fija sin ScrollController conflictivo
-  _loading
-            ? const Center(child: Padding(
-        padding: EdgeInsets.all(24),
-        child: CircularProgressIndicator(color: AppColors.cyan)))
-  : _friends.isEmpty
-  ? const Padding(
-      padding: EdgeInsets.all(16),
-  child: Text('No tienes amigos aún.',
-  style: TextStyle(color: AppColors.grey)))
-  : SizedBox(
-  height: 280,
-  child: ListView.builder(
-  itemCount: _friends.length,
-  itemBuilder: (ctx, i) {
-  final f       = _friends[i];
-  final uid     = f['user_id'] as int;
-  final checked = _selected.contains(uid);
-  final name    = '${f['first_name'] ?? ''} ${f['last_name'] ?? ''}'.trim();
-  return ListTile(
-  contentPadding: EdgeInsets.zero,
-  leading: RiderAvatar(
-  avatarUrl: f['avatar_url'],
-  level: f['experience_level'] ?? 'novato',
-  size: 44,
-  ),
-  title: Text(name.isNotEmpty ? name : f['nickname'] ?? '',
-    style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600)),
-  subtitle: f['nickname'] != null
-  ? Text('@${f['nickname']}',
-    style: const TextStyle(color: AppColors.orange, fontSize: 12))
-    : null,
-  trailing: Checkbox(
-  value: checked,
-  activeColor: AppColors.cyan,
-  side: const BorderSide(color: AppColors.grey),
-  onChanged: (_) => setState(() {
-  if (checked) _selected.remove(uid);
-  else _selected.add(uid);
-  }),
-  ),
-  onTap: () => setState(() {
-  if (checked) _selected.remove(uid);
-  else _selected.add(uid);
-  }),
-  );
-  },
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withOpacity(0.35)),
+        ),
+        child: Row(children: [
+          Container(
+            width: 42, height: 42,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
             ),
-                  ),
-
-  const SizedBox(height: 12),
-
-  if (_friends.isNotEmpty)
-  ElevatedButton(
-  onPressed: _selected.isEmpty ? null : () {
-    final ids = _selected.toList();
-    Navigator.pop(context);
-    widget.onShareFriends(ids);
-  },
-  style: ElevatedButton.styleFrom(
-  backgroundColor: AppColors.cyan,
-  minimumSize: const Size(double.infinity, 48),
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-  ),
-  child: Text(
-  _selected.isEmpty
-  ? 'Selecciona amigos'
-    : 'Compartir con ${_selected.length} amigo${_selected.length > 1 ? 's' : ''}',
-  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-  ),
-  ),
-
-  const SizedBox(height: 8),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: TextStyle(
+                color: color, fontWeight: FontWeight.w700, fontSize: 14)),
+            const SizedBox(height: 3),
+            Text(desc, style: const TextStyle(
+                color: AppColors.grey, fontSize: 12, height: 1.3)),
+          ])),
+          const SizedBox(width: 8),
+          trailing ?? Icon(Icons.arrow_forward_ios, color: color, size: 14),
         ]),
       ),
-    ),
     );
   }
 }
 
-// Widgets auxiliares
 class _ActionBtn extends StatelessWidget {
   final String label;
   final IconData icon;
