@@ -16,11 +16,16 @@ class RouteService {
   static Future<Map<String, dynamic>> getMyRoutes() async {
     try {
       final response = await ApiClient.dio.get('/rider/routes');
-      return {'routes': response.data};
-    } on DioException catch (e) {
+      final data = response.data as Map<String, dynamic>;
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'upcoming':   List<Map<String, dynamic>>.from(data['upcoming']   ?? []),
+        'historical': List<Map<String, dynamic>>.from(data['historical'] ?? []),
+        'no_date':    List<Map<String, dynamic>>.from(data['no_date']    ?? []),
+        'drafts':     List<Map<String, dynamic>>.from(data['drafts']     ?? []),
+        'received':   List<Map<String, dynamic>>.from(data['received']   ?? []),
       };
+    } on DioException catch (e) {
+      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
     }
   }
 
