@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/rider_avatar.dart';
 import '../providers/route_service.dart';
@@ -56,7 +57,13 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-          onPressed: () => context.go('/rider/home'),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/rider/home');
+            }
+          },
         ),
         title: const Text('Mis Rutas',
             style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
@@ -111,18 +118,29 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                   routes: _upcoming,
                   empty: 'No tienes rutas previstas.\nGuarda una ruta con fecha futura.',
                   emptyIcon: Icons.event_outlined,
-                  onTap: (r) => context.push('/rider/routes/${r['id']}'),
+                  onTap: (r) async {
+                    await context.push('/rider/routes/${r['id']}');
+                    _loadRoutes();
+                  },
                   onNew: () => context.go('/rider/planner'),
                 ),
                 _RouteList(
                   routes: _historical,
                   empty: 'No tienes rutas históricas aún.',
                   emptyIcon: Icons.history,
-                  onTap: (r) => context.push('/rider/routes/${r['id']}'),
+                  onTap: (r) async {
+                    await context.push('/rider/routes/${r['id']}');
+                    _loadRoutes();
+                  },
                 ),
-                _ReceivedList(
+                _RouteList(
                   routes: _received,
-                  onTap: (r) => context.push('/rider/routes/${r['id']}'),
+                  empty: 'No has recibido ninguna ruta aún.',
+                  emptyIcon: Icons.mail_outline,
+                  onTap: (r) async {
+                    await context.push('/rider/routes/${r['id']}');
+                    _loadRoutes(); // recargar al volver
+                  },
                 ),
               ],
             ),
@@ -219,7 +237,11 @@ class _RouteList extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
       itemCount: routes.length,
-      itemBuilder: (_, i) => _RouteCard(route: routes[i], onTap: () => onTap(routes[i])),
+      itemBuilder: (_, i) => _RouteCard(
+        route: routes[i],
+        onTap: () => onTap(routes[i]),
+        isReceived: routes[i]['is_received'] == true,
+      ),
     );
   }
 }
@@ -311,9 +333,17 @@ class _RouteCard extends StatelessWidget {
     this.isReceived = false,
   });
 
+  bool get _isReceived => isReceived || route['is_received'] == true;
+
   Color get _statusColor {
-    if (isDraft)    return AppColors.gold;
-    if (isReceived) return AppColors.orange;
+    if (isDraft) return AppColors.gold;
+    if (_isReceived) {
+      final confirmed = route['is_confirmed'] == true;
+      final declined  = route['is_declined']  == true;
+      return confirmed ? Colors.green
+           : declined  ? AppColors.error
+           : AppColors.orange;
+    }
     switch (route['visibility']) {
       case 'public':  return AppColors.orange;
       case 'friends': return AppColors.cyan;
@@ -322,8 +352,16 @@ class _RouteCard extends StatelessWidget {
   }
 
   String get _statusLabel {
-    if (isDraft)    return '📝 Borrador';
-    if (isReceived) return '📨 Recibida';
+    if (isDraft) return '📝 Borrador';
+    if (_isReceived) {
+      final confirmed = route['is_confirmed'] == true;
+      final declined  = route['is_declined']  == true;
+      final visLabel  = route['visibility'] == 'public' ? '🌍 Pública' : '👥 Amigos';
+      final stateLabel = confirmed ? '✅ Apuntado'
+          : declined  ? '❌ Rechazada'
+          : '📨 Pendiente';
+      return '$visLabel · $stateLabel';
+    }
     switch (route['visibility']) {
       case 'public':  return '🌍 Pública';
       case 'friends': return '👥 Amigos';
@@ -393,18 +431,22 @@ class _RouteCard extends StatelessWidget {
               ]),
             ),
 
-          // Creador (si es recibida)
-          if (isReceived && route['owner_name'] != null)
+          // Creador (si es ruta recibida de otro)
+          if (_isReceived && route['owner_name'] != null)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
               child: Row(children: [
-                const Icon(Icons.person_outline, color: AppColors.orange, size: 14),
-                const SizedBox(width: 5),
-                Text(
-                  '${route['owner_name']}'
-                  '${route['owner_nick'] != null ? ' @${route['owner_nick']}' : ''}',
-                  style: const TextStyle(
-                      color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w600),
+                Icon(Icons.person_outline,
+                    color: route['is_confirmed'] == true ? AppColors.cyan : AppColors.orange,
+                    size: 14),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'De: ${route['owner_name']}${route['owner_nick'] != null ? ' @${route['owner_nick']}' : ''}',
+                    style: TextStyle(
+                        color: route['is_confirmed'] == true ? AppColors.cyan : AppColors.orange,
+                        fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ]),
             ),
@@ -445,6 +487,17 @@ class _RouteCard extends StatelessWidget {
                 _Chip(Icons.terrain, route['difficulty'] ?? '', AppColors.gold),
               ]),
               const SizedBox(height: 8),
+              // Moto
+              if (route['moto_info'] != null)
+                Row(children: [
+                  const Icon(Icons.two_wheeler, color: AppColors.grey, size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${route['moto_info']['brand']} ${route['moto_info']['model']} · ${route['moto_info']['engine_cc']} cc',
+                    style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                  ),
+                ]),
+              const SizedBox(height: 6),
               Row(children: [
                 const Icon(Icons.location_on_outlined, color: AppColors.grey, size: 14),
                 const SizedBox(width: 4),
@@ -453,7 +506,32 @@ class _RouteCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: AppColors.grey, fontSize: 12)),
                 ),
-                const Icon(Icons.arrow_forward_ios, color: AppColors.greyDark, size: 12),
+                // Botón Ver en Maps
+                if (route['google_maps_url'] != null)
+                  GestureDetector(
+                    onTap: () async {
+                      final uri = Uri.parse(route['google_maps_url']);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: AppColors.cyan.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.cyan.withOpacity(0.4)),
+                      ),
+                      child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.map_outlined, color: AppColors.cyan, size: 13),
+                        SizedBox(width: 4),
+                        Text('Maps', style: TextStyle(
+                            color: AppColors.cyan, fontSize: 11, fontWeight: FontWeight.w600)),
+                      ]),
+                    ),
+                  )
+                else
+                  const Icon(Icons.arrow_forward_ios, color: AppColors.greyDark, size: 12),
               ]),
             ]),
           ),

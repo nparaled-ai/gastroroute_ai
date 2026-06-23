@@ -33,6 +33,8 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
   String? _error;
   String? _avatarUrl;
   File? _localAvatar;
+  int _notificationRadius = 100;
+  bool _notifyPublicRoutes = true;
 
   List<Map<String, dynamic>> _locationSuggestions = [];
   bool _loadingLocation = false;
@@ -62,6 +64,8 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     _language           = widget.profile['language'] ?? 'es';
     _gender             = widget.profile['gender'];
     _avatarUrl          = widget.profile['avatar_url'];
+    _notificationRadius = (widget.profile['notification_radius_km'] as num?)?.toInt() ?? 100;
+    _notifyPublicRoutes  = widget.profile['notify_public_routes'] != false;
     // Si ya tiene ubicación guardada se considera validada
     _locationValidated  = (widget.profile['province'] ?? '').isNotEmpty;
   }
@@ -228,6 +232,8 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       'experience_level': _experienceLevel,
       'language':         _language,
       'gender':           _gender,
+      'notification_radius_km': _notificationRadius,
+      'notify_public_routes':   _notifyPublicRoutes,
     });
     if (!mounted) return;
     setState(() => _loading = false);
@@ -560,6 +566,77 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                   ),
                 );
               }).toList(),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Notificaciones de rutas públicas
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.greyDark),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  const Icon(Icons.public, color: AppColors.orange, size: 20),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('Rutas públicas de la zona',
+                          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                      Text('Recibir notificaciones cuando alguien publique una ruta cerca de ti',
+                          style: TextStyle(color: AppColors.grey, fontSize: 11, height: 1.4)),
+                    ]),
+                  ),
+                  Switch(
+                    value: _notifyPublicRoutes,
+                    activeColor: AppColors.orange,
+                    onChanged: (v) => setState(() => _notifyPublicRoutes = v),
+                  ),
+                ]),
+
+                // Slider de radio (solo si está activado)
+                if (_notifyPublicRoutes) ...[  
+                  const SizedBox(height: 12),
+                  const Divider(color: AppColors.greyDark),
+                  const SizedBox(height: 8),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    const Text('Radio de notificación',
+                        style: TextStyle(color: AppColors.grey, fontSize: 12)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.orange.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text('$_notificationRadius km',
+                          style: const TextStyle(
+                              color: AppColors.orange,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14)),
+                    ),
+                  ]),
+                  Slider(
+                    value: _notificationRadius.toDouble(),
+                    min: 25,
+                    max: 500,
+                    divisions: 19,
+                    activeColor: AppColors.orange,
+                    inactiveColor: AppColors.greyDark,
+                    label: '$_notificationRadius km',
+                    onChanged: (v) => setState(() => _notificationRadius = v.toInt()),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                      Text('25 km', style: TextStyle(color: AppColors.grey, fontSize: 11)),
+                      Text('500 km', style: TextStyle(color: AppColors.grey, fontSize: 11)),
+                    ]),
+                  ),
+                ],
+              ]),
             ),
 
             if (_error != null) ...[

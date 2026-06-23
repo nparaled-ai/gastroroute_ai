@@ -5,6 +5,8 @@ import '../features/auth/screens/splash_screen.dart';
 import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/register_screen.dart';
 import '../features/auth/screens/select_role_screen.dart';
+import '../features/auth/screens/forgot_password_screen.dart';
+import '../features/auth/screens/reset_password_screen.dart';
 import '../features/rider/screens/rider_home_screen.dart';
 import '../features/rider/screens/rider_profile_screen.dart';
 import '../features/rider/screens/rider_edit_profile_screen.dart';
@@ -28,6 +30,17 @@ final router = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/forgot-password',
+      builder: (context, state) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: '/reset-password',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return ResetPasswordScreen(email: extra?['email'] ?? '');
+      },
     ),
     GoRoute(
       path: '/register',
@@ -117,7 +130,9 @@ final router = GoRouter(
     final isSplash   = state.matchedLocation == '/splash';
     final isAuth     = state.matchedLocation == '/login' ||
                        state.matchedLocation == '/register' ||
-                       state.matchedLocation == '/select-role';
+                       state.matchedLocation == '/select-role' ||
+                       state.matchedLocation == '/forgot-password' ||
+                       state.matchedLocation.startsWith('/reset-password');
 
     if (!isLoggedIn && !isAuth && !isSplash) return '/login';
     return null;

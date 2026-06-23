@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/api/auth_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/friendship_service.dart';
+import '../providers/route_service.dart';
 import '../providers/rider_profile_service.dart';
 
 class RiderHomeScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class RiderHomeScreen extends StatefulWidget {
 class _RiderHomeScreenState extends State<RiderHomeScreen> {
   int _pendingRequests  = 0;
   int _acceptedRecently = 0;
+  int _pendingRoutes    = 0;
   String? _nickname;
   String? _gender;
 
@@ -40,23 +42,30 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
     final results = await Future.wait([
       FriendshipService.getPendingReceived(),
       FriendshipService.getPendingSent(),
+      RouteService.getMyRoutes(),
     ]);
     if (!mounted) return;
     final received = results[0]['requests'] as List? ?? [];
     final sent     = results[1]['requests'] as List? ?? [];
+    final routes   = results[2]['received']  as List? ?? [];
 
     // Filtrar aceptadas y rechazadas ya vistas
     final prefs    = await SharedPreferences.getInstance();
     final seenIds  = prefs.getStringList('seen_accepted_requests') ?? [];
+    final seenRouteIds = prefs.getStringList('seen_received_routes') ?? [];
     final unseenNotifications = sent.where((s) =>
         (s['status'] == 'accepted' || s['status'] == 'rejected') &&
         !seenIds.contains('${s['friendship_id']}'),
+    ).length;
+    final unseenRoutes = routes.where((r) =>
+        r['is_confirmed'] != true,
     ).length;
 
     if (!mounted) return;
     setState(() {
       _pendingRequests  = received.length;
       _acceptedRecently = unseenNotifications;
+      _pendingRoutes    = unseenRoutes;
     });
   }
 
@@ -152,9 +161,16 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
             _QuickAccessCard(
               icon: Icons.route,
               title: 'Mis Rutas',
-              desc: 'Ver y gestionar tus rutas',
+              desc: _pendingRoutes > 0
+                  ? '$_pendingRoutes ruta${_pendingRoutes > 1 ? 's' : ''} recibida${_pendingRoutes > 1 ? 's' : ''}'
+                  : 'Ver y gestionar tus rutas',
               color: AppColors.cyan,
-              onTap: () => context.go('/rider/my-routes'),
+              badge: _pendingRoutes,
+              badgeColor: AppColors.orange,
+              onTap: () async {
+                await context.push('/rider/my-routes');
+                _loadNotifications();
+              },
             ),
             const SizedBox(height: 16),
             _QuickAccessCard(

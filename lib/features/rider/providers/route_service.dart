@@ -49,12 +49,11 @@ class RouteService {
     }
   }
 
-  static Future<Map<String, dynamic>> refreshWeather(dynamic lat, dynamic lng) async {
+  static Future<Map<String, dynamic>> refreshWeather(dynamic lat, dynamic lng, {String? date}) async {
     try {
-      final response = await ApiClient.dio.get('/rider/routes/weather', queryParameters: {
-        'lat': '$lat',
-        'lng': '$lng',
-      });
+      final params = <String, dynamic>{'lat': '$lat', 'lng': '$lng'};
+      if (date != null) params['date'] = date;
+      final response = await ApiClient.dio.get('/rider/routes/weather', queryParameters: params);
       return {'weather': response.data['weather']};
     } on DioException catch (e) {
       return {'error': e.response?.data['message'] ?? 'Error al actualizar el clima.'};

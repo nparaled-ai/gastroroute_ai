@@ -44,15 +44,35 @@ class RouteShareService {
     }
   }
 
+  static Future<Map<String, dynamic>> dismiss(int routeId) async {
+    try {
+      final response = await ApiClient.dio.post('/rider/routes/$routeId/dismiss');
+      return {'success': true, 'message': response.data['message']};
+    } on DioException catch (e) {
+      return {'error': e.response?.data['message'] ?? 'Error.'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> decline(int routeId) async {
+    try {
+      final response = await ApiClient.dio.post('/rider/routes/$routeId/decline');
+      return {'success': true, 'message': response.data['message']};
+    } on DioException catch (e) {
+      return {'error': e.response?.data['message'] ?? 'Error.'};
+    }
+  }
+
   static Future<Map<String, dynamic>> getParticipants(int routeId) async {
     try {
       final response = await ApiClient.dio.get('/rider/routes/$routeId/participants');
       return {
         'confirmed':  List<Map<String, dynamic>>.from(response.data['confirmed'] ?? []),
+        'declined':   List<Map<String, dynamic>>.from(response.data['declined']  ?? []),
         'pending':    List<Map<String, dynamic>>.from(response.data['pending']   ?? []),
-        'count':      response.data['count']    ?? 0,
-        'is_joined':  response.data['is_joined'] ?? false,
-        'is_owner':   response.data['is_owner']  ?? false,
+        'count':      response.data['count']     ?? 0,
+        'is_joined':  response.data['is_joined']  ?? false,
+        'is_declined':response.data['is_declined'] ?? false,
+        'is_owner':   response.data['is_owner']   ?? false,
       };
     } on DioException catch (e) {
       return {'error': e.response?.data['message'] ?? 'Error.'};

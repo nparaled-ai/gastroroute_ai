@@ -149,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 12),
 
-              // Recordar datos
+              // Recordar datos y olvidé contraseña
               Row(
                 children: [
                   SizedBox(
@@ -167,6 +167,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     onTap: () => setState(() => _rememberMe = !_rememberMe),
                     child: const Text('Recordar usuario y contraseña',
                         style: TextStyle(color: AppColors.grey, fontSize: 13)),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => context.push('/forgot-password'),
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                    child: const Text('¿Olvidaste tu contraseña?',
+                        style: TextStyle(color: AppColors.cyan, fontSize: 12)),
                   ),
                 ],
               ),
