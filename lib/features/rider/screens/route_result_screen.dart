@@ -24,7 +24,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   Map<String, dynamic>? _savedRoute; // ruta guardada con ID
   Map<String, dynamic>? _currentWeather;
 
-  Map<String, dynamic> get _route        => widget.result['route'] ?? {};
+  Map<String, dynamic> get _route => widget.result['route'] ?? {};
+  bool get _isImported => (_route['tags'] as List? ?? []).contains('importada');
   Map<String, dynamic>? get _weather     => _currentWeather ?? widget.result['weather'];
   Map<String, dynamic>? get _aiSummary   => widget.result['ai_summary'];
   List                  get _waypoints   => _route['waypoints'] ?? [];
@@ -245,11 +246,19 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   Future<void> _openInGoogleMaps() async {
     final url = _route['google_maps_url'];
     if (url == null) return;
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      await launchUrl(uri, mode: LaunchMode.platformDefault);
+    try {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al abrir Google Maps: $e'),
+              backgroundColor: AppColors.error));
+      }
     }
   }
 
@@ -305,7 +314,13 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-          onPressed: () => context.go('/rider/route-generator', extra: _buildFormData()),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/rider/route-generator', extra: _buildFormData());
+            }
+          },
         ),
         title: Text('route_result.title'.tr(),
             style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
@@ -330,10 +345,13 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                const Icon(Icons.auto_awesome, color: AppColors.orange, size: 16),
+                Icon(
+                  _isImported ? Icons.download_outlined : Icons.auto_awesome,
+                  color: AppColors.orange, size: 16),
                 const SizedBox(width: 6),
-                Text('route_result.generated_by_ai'.tr(),
-                    style: const TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w600)),
+                Text(
+                  _isImported ? 'Importada de Google Maps' : 'route_result.generated_by_ai'.tr(),
+                  style: const TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 if (_routesRemaining != null)
                   Container(
@@ -343,6 +361,23 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                         style: const TextStyle(color: AppColors.grey, fontSize: 11)),
                   ),
               ]),
+              // Fecha de salida si existe
+              if (_route['departure_date'] != null) ...[  
+                const SizedBox(height: 6),
+                Row(children: [
+                  const Icon(Icons.event, color: AppColors.cyan, size: 14),
+                  const SizedBox(width: 6),
+                  Text(_route['departure_date'],
+                      style: const TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700, fontSize: 13)),
+                  if (_route['departure_time'] != null) ...[  
+                    const SizedBox(width: 10),
+                    const Icon(Icons.schedule, color: AppColors.cyan, size: 13),
+                    const SizedBox(width: 4),
+                    Text('Salida: ${_route['departure_time']}',
+                        style: const TextStyle(color: AppColors.cyan, fontSize: 13, fontWeight: FontWeight.w600)),
+                  ],
+                ]),
+              ],
               const SizedBox(height: 12),
               Text(_route['title'] ?? '',
                   style: const TextStyle(color: AppColors.white, fontSize: 22, fontWeight: FontWeight.w800)),

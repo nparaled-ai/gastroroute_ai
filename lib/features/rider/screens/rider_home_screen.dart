@@ -159,6 +159,14 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
             ),
             const SizedBox(height: 16),
             _QuickAccessCard(
+              icon: Icons.download_outlined,
+              title: 'Importar de Google Maps',
+              desc: 'Importa cualquier ruta de Google Maps',
+              color: const Color(0xFF4285F4),
+              onTap: () => context.push('/rider/route-import'),
+            ),
+            const SizedBox(height: 16),
+            _QuickAccessCard(
               icon: Icons.route,
               title: 'Mis Rutas',
               desc: _pendingRoutes > 0
