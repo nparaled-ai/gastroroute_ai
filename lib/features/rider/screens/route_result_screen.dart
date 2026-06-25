@@ -318,7 +318,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go('/rider/route-generator', extra: _buildFormData());
+              context.go('/rider/home');
             }
           },
         ),

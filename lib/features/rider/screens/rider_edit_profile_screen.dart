@@ -162,14 +162,23 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     final picked = await picker.pickImage(source: source, imageQuality: 80, maxWidth: 800);
     if (picked == null) return;
     final file = File(picked.path);
-    setState(() { _uploadingAvatar = true; _localAvatar = file; });
+    setState(() { _uploadingAvatar = true; _localAvatar = file; _error = null; });
     final result = await AvatarService.uploadAvatar(file);
     if (!mounted) return;
     setState(() => _uploadingAvatar = false);
     if (result['error'] != null) {
-      setState(() => _error = result['error']);
+      setState(() {
+        _error = 'Error al subir la foto: ${result['error']}';
+        _localAvatar = null; // revertir preview
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${result['error']}'), backgroundColor: AppColors.error));
     } else {
       setState(() => _avatarUrl = result['avatar_url']);
+      debugPrint('Avatar URL: ${result['avatar_url']}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('✅ Foto actualizada correctamente'),
+            backgroundColor: Colors.green, duration: Duration(seconds: 2)));
     }
   }
 

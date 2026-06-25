@@ -557,7 +557,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
           .toList(),
     };
 
-    context.go('/rider/route-result', extra: {
+    context.push('/rider/route-result', extra: {
       ...result['result'] as Map<String, dynamic>,
       'form_data': formData,
     });
@@ -572,7 +572,13 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-          onPressed: () => context.go('/rider/planner'),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/rider/home');
+            }
+          },
         ),
         title: Text('planner.title'.tr(),
             style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),

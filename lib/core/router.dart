@@ -12,6 +12,7 @@ import '../features/rider/screens/rider_profile_screen.dart';
 import '../features/rider/screens/rider_edit_profile_screen.dart';
 import '../features/rider/screens/rider_motos_screen.dart';
 import '../features/rider/screens/rider_moto_form_screen.dart';
+import '../features/rider/screens/create_route_screen.dart';
 import '../features/rider/screens/route_generator_screen.dart';
 import '../features/rider/screens/route_import_screen.dart';
 import '../features/rider/screens/route_result_screen.dart';
@@ -19,7 +20,6 @@ import '../features/rider/screens/friends_screen.dart';
 import '../features/rider/screens/friends_search_screen.dart';
 import '../features/rider/screens/my_routes_screen.dart';
 import '../features/rider/screens/route_detail_screen.dart';
-import '../features/rider/screens/planner_selection_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/splash',
@@ -108,8 +108,8 @@ final router = GoRouter(
       builder: (context, state) => const FriendsSearchScreen(),
     ),
     GoRoute(
-      path: '/rider/planner',
-      builder: (context, state) => const PlannerSelectionScreen(),
+      path: '/rider/create-route',
+      builder: (context, state) => const CreateRouteScreen(),
     ),
     GoRoute(
       path: '/rider/route-generator',

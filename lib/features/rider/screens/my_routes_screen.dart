@@ -122,7 +122,7 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                     await context.push('/rider/routes/${r['id']}');
                     _loadRoutes();
                   },
-                  onNew: () => context.go('/rider/planner'),
+                  onNew: () => context.push('/rider/create-route'),
                 ),
                 _RouteList(
                   routes: _historical,
@@ -145,7 +145,7 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
               ],
             ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/rider/planner'),
+        onPressed: () => context.push('/rider/create-route'),
         backgroundColor: AppColors.orange,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text('Nueva ruta',

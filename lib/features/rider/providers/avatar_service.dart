@@ -18,7 +18,14 @@ class AvatarService {
         options: Options(contentType: 'multipart/form-data'),
       );
 
-      return {'avatar_url': response.data['avatar_url']};
+      // Reemplazar localhost por la IP base del servidor
+      String avatarUrl = response.data['avatar_url'] ?? '';
+      final baseUrl = ApiClient.dio.options.baseUrl;
+      final uri = Uri.parse(baseUrl);
+      final serverBase = '${uri.scheme}://${uri.host}:${uri.port}';
+      avatarUrl = avatarUrl.replaceFirst('http://localhost', serverBase);
+
+      return {'avatar_url': avatarUrl};
     } on DioException catch (e) {
       return {'error': e.response?.data['message'] ?? 'Error al subir la imagen.'};
     }
