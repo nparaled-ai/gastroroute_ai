@@ -125,6 +125,8 @@
     "easy": "😌 Facile",
     "moderate": "💪 Moderato",
     "hard": "🔥 Impegnativo",
+    "avoid_highways": "Evita autostrade e superstrade",
+    "avoid_highways_desc": "Privilegia strade secondarie e di montagna",
     "extra_suggestions": "Suggerimenti aggiuntivi",
     "gas_stations": "Suggerisci stazioni di servizio",
     "gas_stations_desc": "In base all'autonomia della tua moto",

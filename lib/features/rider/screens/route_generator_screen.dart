@@ -30,6 +30,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   String _preference  = 'mixto';
   String _difficulty  = 'moderada';
   bool   _circular    = true;
+  bool   _avoidHighways = true;
   int    _hours       = 4;
   int    _km          = 200;
   String _durationMode = 'ai'; // 'ai', 'hours', 'km'
@@ -74,6 +75,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       _destinationController.text = data['destination'] ?? '';
       _destinationValidated       = (data['destination'] ?? '').isNotEmpty;
       _circular           = data['circular'] ?? true;
+      _avoidHighways      = data['avoid_highways'] ?? true;
       _preference         = data['preference'] ?? 'mixto';
       _difficulty         = data['difficulty'] ?? 'moderada';
       _durationMode       = data['duration_mode'] ?? 'hours';
@@ -502,6 +504,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       'origin':               _originController.text.trim(),
       'moto_id':              _selectedMotoId,
       'circular':             _circular,
+      'avoid_highways':       _avoidHighways,
       'preference':           _preference,
       'difficulty':           _difficulty,
       'duration_mode':        _durationMode,
@@ -537,6 +540,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       'destination':    _destinationController.text.trim(),
       'moto_id':        _selectedMotoId,
       'circular':       _circular,
+      'avoid_highways': _avoidHighways,
       'preference':     _preference,
       'difficulty':     _difficulty,
       'duration_mode':  _durationMode,
@@ -1115,6 +1119,17 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     const SizedBox(width: 8),
                     _OptionChip(label: 'planner.hard'.tr(),     selected: _difficulty == 'exigente',  onTap: () => setState(() => _difficulty = 'exigente')),
                   ]),
+
+                  const SizedBox(height: 20),
+
+                  // 9b. Evitar autovías/autopistas
+                  _ToggleOption(
+                    icon: Icons.alt_route,
+                    label: 'planner.avoid_highways'.tr(),
+                    subtitle: 'planner.avoid_highways_desc'.tr(),
+                    value: _avoidHighways, enabled: true, color: AppColors.cyan,
+                    onChanged: (val) => setState(() => _avoidHighways = val),
+                  ),
 
                   const SizedBox(height: 24),
 

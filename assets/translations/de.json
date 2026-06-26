@@ -125,6 +125,8 @@
     "easy": "😌 Einfach",
     "moderate": "💪 Mittel",
     "hard": "🔥 Schwer",
+    "avoid_highways": "Autobahnen und Schnellstraßen vermeiden",
+    "avoid_highways_desc": "Bevorzugt Landstraßen und Bergstraßen",
     "extra_suggestions": "Zusätzliche Vorschläge",
     "gas_stations": "Tankstellen vorschlagen",
     "gas_stations_desc": "Basierend auf der Reichweite Ihres Motorrads",

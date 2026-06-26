@@ -125,6 +125,8 @@
     "easy": "😌 Easy",
     "moderate": "💪 Moderate",
     "hard": "🔥 Challenging",
+    "avoid_highways": "Avoid motorways and highways",
+    "avoid_highways_desc": "Prioritize secondary and mountain roads",
     "extra_suggestions": "Additional suggestions",
     "gas_stations": "Suggest gas stations",
     "gas_stations_desc": "Based on your bike's range",
