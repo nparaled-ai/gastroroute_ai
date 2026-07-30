@@ -15,6 +15,7 @@ import '../features/rider/screens/rider_moto_form_screen.dart';
 import '../features/rider/screens/create_route_screen.dart';
 import '../features/rider/screens/route_generator_screen.dart';
 import '../features/rider/screens/route_import_screen.dart';
+import '../features/rider/screens/route_import_gpx_screen.dart';
 import '../features/rider/screens/route_result_screen.dart';
 import '../features/rider/screens/friends_screen.dart';
 import '../features/rider/screens/friends_search_screen.dart';
@@ -121,6 +122,10 @@ final router = GoRouter(
     GoRoute(
       path: '/rider/route-import',
       builder: (context, state) => const RouteImportScreen(),
+    ),
+    GoRoute(
+      path: '/rider/route-import-gpx',
+      builder: (context, state) => const RouteImportGpxScreen(),
     ),
     GoRoute(
       path: '/rider/route-result',

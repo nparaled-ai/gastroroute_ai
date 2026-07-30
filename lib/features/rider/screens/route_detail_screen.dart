@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:dio/dio.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/api/api_client.dart';
 import '../../../widgets/rider_avatar.dart';
 import '../../../widgets/route_waypoints_view.dart';
 import '../providers/route_service.dart';
@@ -35,6 +39,39 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   void initState() {
     super.initState();
     _loadRoute();
+  }
+
+  Future<void> _downloadGpx() async {
+    final routeId = _route?['id'];
+    if (routeId == null) return;
+    try {
+      final dir      = await getApplicationDocumentsDirectory();
+      final filename = '${(_route?['title'] ?? 'ruta').toString().replaceAll(RegExp(r'[^\w]'), '_')}.gpx';
+      final savePath = '${dir.path}/$filename';
+
+      await ApiClient.dio.download(
+        '/rider/routes/$routeId/gpx',
+        savePath,
+        options: Options(responseType: ResponseType.bytes),
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('GPX guardado: $filename'),
+        backgroundColor: AppColors.cyan,
+        action: SnackBarAction(
+          label: 'OK',
+          textColor: Colors.white,
+          onPressed: () {},
+        ),
+      ));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Error al descargar el archivo GPX.'),
+        backgroundColor: AppColors.error,
+      ));
+    }
   }
 
   Future<void> _loadRoute() async {
@@ -173,58 +210,35 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     saveData.remove('visibility');
     saveData.remove('created_at');
     saveData.remove('updated_at');
+    saveData.remove('gpx_temp_path');
 
-    // Guardar primero como saved
-    setState(() => _loading = true);
-    final result = await RouteService.saveRoute(saveData);
-    if (!mounted) return;
-    setState(() => _loading = false);
-
-    if (result['error'] != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['error']), backgroundColor: AppColors.error));
-      return;
+    // Actualizar clima para la nueva fecha
+    Map<String, dynamic>? freshWeather;
+    final lat = _route!['origin_lat'];
+    final lng = _route!['origin_lng'];
+    if (lat != null && lng != null) {
+      final weatherResult = await RouteService.refreshWeather(
+        double.tryParse(lat.toString()) ?? lat,
+        double.tryParse(lng.toString()) ?? lng,
+        date: date,
+      );
+      freshWeather = weatherResult['weather'];
+    }
+    if (freshWeather != null) {
+      saveData['weather_summary'] = {'current': freshWeather};
+    } else {
+      saveData.remove('weather_summary');
     }
 
-    final newRouteId = result['route']?['id'];
-
-    // Mostrar opciones de compartir
+    // Navegar a la pantalla de resultado igual que una ruta nueva
     if (!mounted) return;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.surface,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => _RepeatShareBottomSheet(
-        onSaveOnly: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Ruta guardada en Previstas.'),
-                backgroundColor: Colors.green));
-          context.pop();
-        },
-        onShareFriends: (ids) async {
-          if (newRouteId != null) {
-            await RouteShareService.share(newRouteId, visibility: 'friends', friendIds: ids);
-          }
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Ruta guardada y compartida con amigos.'),
-                backgroundColor: Colors.green));
-          context.pop();
-        },
-        onSharePublic: () async {
-          if (newRouteId != null) {
-            await RouteShareService.share(newRouteId, visibility: 'public');
-          }
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Ruta guardada y publicada.'),
-                backgroundColor: Colors.green));
-          context.pop();
-        },
-      ),
-    );
+    context.push('/rider/route-result', extra: {
+      'route': saveData,
+      'weather': freshWeather,
+      'ai_summary': _route!['ai_summary'],
+      'form_data': {},
+      '_save_data': saveData,
+    });
   }
 
   Future<void> _dismiss() async {
@@ -551,6 +565,30 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                                     fontWeight: FontWeight.w700)),
                           ]),
                     ),
+
+                    // ── Botón descargar GPX ───────────────────────────
+                    if (_route?['source_type'] == 'gpx') ...[
+                      const SizedBox(height: 10),
+                      OutlinedButton(
+                        onPressed: _downloadGpx,
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 52),
+                          side: const BorderSide(color: AppColors.cyan),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.download, color: AppColors.cyan, size: 20),
+                              SizedBox(width: 8),
+                              Text('Descargar GPX',
+                                  style: TextStyle(
+                                      color: AppColors.cyan,
+                                      fontWeight: FontWeight.w700)),
+                            ]),
+                      ),
+                    ],
 
                     // ── Botones invitado: Apuntarme / No puedo ir / Olvidar ──
                     if (!_isOwner) ...[  

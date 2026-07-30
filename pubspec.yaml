@@ -61,6 +61,12 @@ dependencies:
   # Selector de imagen
   image_picker: ^1.1.2
 
+  # Selector de ficheros (GPX import)
+  file_picker: ^8.1.2
+
+  # Directorio de documentos (descarga GPX)
+  path_provider: ^2.1.0
+
   # HTTP para Places API
   http: ^1.2.1
 

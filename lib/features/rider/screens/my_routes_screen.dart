@@ -196,8 +196,8 @@ class _TabLabel extends StatelessWidget {
   }
 }
 
-// ─── Lista genérica de rutas ──────────────────────────────────────────────────
-class _RouteList extends StatelessWidget {
+// ─── Lista genérica de rutas con filtros ─────────────────────────────────────
+class _RouteList extends StatefulWidget {
   final List<Map<String, dynamic>> routes;
   final String empty;
   final IconData emptyIcon;
@@ -213,37 +213,190 @@ class _RouteList extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    if (routes.isEmpty) {
-      return Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(emptyIcon, color: AppColors.greyDark, size: 64),
-          const SizedBox(height: 16),
-          Text(empty,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
-          if (onNew != null) ...[
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: onNew,
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Crear ruta'),
-            ),
-          ],
-        ]),
-      );
-    }
+  State<_RouteList> createState() => _RouteListState();
+}
 
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-      itemCount: routes.length,
-      itemBuilder: (_, i) => _RouteCard(
-        route: routes[i],
-        onTap: () => onTap(routes[i]),
-        isReceived: routes[i]['is_received'] == true,
+class _RouteListState extends State<_RouteList> {
+  final _searchController = TextEditingController();
+  String _search      = '';
+  String? _difficulty; // tranquila | moderada | exigente
+  String? _routeType;  // circular | destino
+  String? _source;     // ai | google_maps | gpx
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Map<String, dynamic>> get _filtered {
+    return widget.routes.where((r) {
+      final title  = (r['title']  ?? '').toString().toLowerCase();
+      final origin = (r['origin'] ?? '').toString().toLowerCase();
+      final q      = _search.toLowerCase();
+      if (q.isNotEmpty && !title.contains(q) && !origin.contains(q)) return false;
+      if (_difficulty != null && r['difficulty'] != _difficulty) return false;
+      if (_routeType  != null && r['route_type']  != _routeType)  return false;
+      if (_source     != null && r['source_type'] != _source)     return false;
+      return true;
+    }).toList();
+  }
+
+  bool get _hasFilters => _search.isNotEmpty || _difficulty != null || _routeType != null || _source != null;
+
+  void _clearFilters() => setState(() {
+    _search = '';
+    _searchController.clear();
+    _difficulty = null;
+    _routeType  = null;
+    _source     = null;
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = _filtered;
+
+    return Column(children: [
+      // ── Barra de búsqueda ──
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        child: TextField(
+          controller: _searchController,
+          style: const TextStyle(color: AppColors.white, fontSize: 14),
+          onChanged: (v) => setState(() => _search = v),
+          decoration: InputDecoration(
+            hintText: 'Buscar por título u origen…',
+            hintStyle: const TextStyle(color: AppColors.grey, fontSize: 13),
+            prefixIcon: const Icon(Icons.search, color: AppColors.grey, size: 20),
+            suffixIcon: _search.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear, color: AppColors.grey, size: 18),
+                    onPressed: () => setState(() { _search = ''; _searchController.clear(); }),
+                  )
+                : null,
+            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          ),
+        ),
+      ),
+
+      // ── Chips de filtro ──
+      SizedBox(
+        height: 44,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          children: [
+            // Dificultad
+            _FilterChip(label: 'Tranquila', active: _difficulty == 'tranquila', color: Colors.green,
+                onTap: () => setState(() => _difficulty = _difficulty == 'tranquila' ? null : 'tranquila')),
+            _FilterChip(label: 'Moderada',  active: _difficulty == 'moderada',  color: AppColors.gold,
+                onTap: () => setState(() => _difficulty = _difficulty == 'moderada'  ? null : 'moderada')),
+            _FilterChip(label: 'Exigente',  active: _difficulty == 'exigente',  color: AppColors.error,
+                onTap: () => setState(() => _difficulty = _difficulty == 'exigente'  ? null : 'exigente')),
+            const _FilterDivider(),
+            // Tipo
+            _FilterChip(label: 'Circular',    active: _routeType == 'circular', color: AppColors.cyan,
+                onTap: () => setState(() => _routeType = _routeType == 'circular'    ? null : 'circular')),
+            _FilterChip(label: 'Con destino', active: _routeType == 'destino',  color: AppColors.cyan,
+                onTap: () => setState(() => _routeType = _routeType == 'destino'     ? null : 'destino')),
+            const _FilterDivider(),
+            // Origen
+            _FilterChip(label: 'IA',    active: _source == 'ai',           color: AppColors.orange,
+                onTap: () => setState(() => _source = _source == 'ai'           ? null : 'ai')),
+            _FilterChip(label: 'Maps',  active: _source == 'google_maps',  color: AppColors.orange,
+                onTap: () => setState(() => _source = _source == 'google_maps'  ? null : 'google_maps')),
+            _FilterChip(label: 'GPX',   active: _source == 'gpx',          color: AppColors.cyan,
+                onTap: () => setState(() => _source = _source == 'gpx'          ? null : 'gpx')),
+            if (_hasFilters) ...[
+              const _FilterDivider(),
+              _FilterChip(label: 'Limpiar', active: false, color: AppColors.grey, onTap: _clearFilters,
+                  icon: Icons.close),
+            ],
+          ],
+        ),
+      ),
+
+      // ── Lista ──
+      Expanded(
+        child: filtered.isEmpty
+            ? Center(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(_hasFilters ? Icons.filter_list_off : widget.emptyIcon,
+                      color: AppColors.greyDark, size: 56),
+                  const SizedBox(height: 16),
+                  Text(
+                    _hasFilters ? 'Sin resultados con estos filtros.' : widget.empty,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5),
+                  ),
+                  if (_hasFilters) ...[
+                    const SizedBox(height: 12),
+                    TextButton(onPressed: _clearFilters,
+                        child: const Text('Limpiar filtros', style: TextStyle(color: AppColors.orange))),
+                  ] else if (widget.onNew != null) ...[
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: widget.onNew,
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text('Crear ruta'),
+                    ),
+                  ],
+                ]),
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                itemCount: filtered.length,
+                itemBuilder: (_, i) => _RouteCard(
+                  route: filtered[i],
+                  onTap: () => widget.onTap(filtered[i]),
+                  isReceived: filtered[i]['is_received'] == true,
+                ),
+              ),
+      ),
+    ]);
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool active;
+  final Color color;
+  final VoidCallback onTap;
+  final IconData? icon;
+  const _FilterChip({required this.label, required this.active, required this.color, required this.onTap, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.only(right: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: active ? color.withOpacity(0.2) : AppColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: active ? color : AppColors.greyDark),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (icon != null) ...[Icon(icon, color: active ? color : AppColors.grey, size: 13), const SizedBox(width: 4)],
+          Text(label, style: TextStyle(
+            color: active ? color : AppColors.grey,
+            fontSize: 12, fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+          )),
+        ]),
       ),
     );
   }
+}
+
+class _FilterDivider extends StatelessWidget {
+  const _FilterDivider();
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 1, height: 20, margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    color: AppColors.greyDark,
+  );
 }
 
 // ─── Lista de borradores ──────────────────────────────────────────────────────
@@ -485,6 +638,10 @@ class _RouteCard extends StatelessWidget {
                     AppColors.cyan),
                 const SizedBox(width: 8),
                 _Chip(Icons.terrain, route['difficulty'] ?? '', AppColors.gold),
+                if (route['source_type'] == 'gpx') ...[
+                  const SizedBox(width: 8),
+                  _Chip(Icons.folder_open, 'GPX', AppColors.cyan),
+                ],
               ]),
               const SizedBox(height: 8),
               // Moto

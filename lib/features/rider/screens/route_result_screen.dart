@@ -47,6 +47,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     final result = await RouteService.refreshWeather(
       _route['origin_lat'],
       _route['origin_lng'],
+      date: _route['departure_date'],
     );
     if (!mounted) return;
     setState(() {

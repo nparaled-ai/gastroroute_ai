@@ -65,8 +65,7 @@ class CreateRouteScreen extends StatelessWidget {
             title: 'Archivo GPX',
             desc: 'Importa rutas desde Wikiloc, Komoot, Garmin Connect u otras apps. Compatible con cualquier archivo .gpx.',
             tags: ['Wikiloc', 'Komoot', 'Garmin'],
-            comingSoon: true,
-            onTap: () {},
+            onTap: () => context.push('/rider/route-import-gpx'),
           ),
           const SizedBox(height: 16),
 
