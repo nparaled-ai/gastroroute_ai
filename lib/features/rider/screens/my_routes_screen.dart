@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/rider_avatar.dart';
-import '../providers/route_service.dart';
+import '../providers/route_service.dart' show RouteService, routeListRefresh;
 
 class MyRoutesScreen extends StatefulWidget {
   const MyRoutesScreen({super.key});
@@ -26,11 +26,13 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    routeListRefresh.addListener(_loadRoutes);
     _loadRoutes();
   }
 
   @override
   void dispose() {
+    routeListRefresh.removeListener(_loadRoutes);
     _tabController.dispose();
     super.dispose();
   }

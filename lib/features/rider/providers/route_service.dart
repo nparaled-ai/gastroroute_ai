@@ -1,5 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import '../../../core/api/api_client.dart';
+
+/// Señal global para que MyRoutesScreen recargue cuando se guarda una ruta
+final routeListRefresh = ValueNotifier<int>(0);
 
 class RouteService {
   static Future<Map<String, dynamic>> generateRoute(Map<String, dynamic> data) async {

@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/rider_avatar.dart';
 import '../providers/friendship_service.dart';
-import '../providers/route_service.dart';
+import '../providers/route_service.dart' show RouteService, routeListRefresh;
 import '../providers/route_share_service.dart';
 
 class RouteResultScreen extends StatefulWidget {
@@ -20,9 +20,17 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   bool _publishing        = false;
   bool _saving            = false;
   bool _refreshingWeather = false;
-  bool _saved             = false; // true cuando ya se guardó
-  Map<String, dynamic>? _savedRoute; // ruta guardada con ID
+  bool _saved             = false;
+  Map<String, dynamic>? _savedRoute;
   Map<String, dynamic>? _currentWeather;
+
+  // Edición inline de título y descripción
+  bool _editingTitle       = false;
+  bool _editingDescription = false;
+  late TextEditingController _titleCtrl;
+  late TextEditingController _descCtrl;
+  final _titleFocus = FocusNode();
+  final _descFocus  = FocusNode();
 
   Map<String, dynamic> get _route => widget.result['route'] ?? {};
   bool get _isImported => (_route['tags'] as List? ?? []).contains('importada');
@@ -36,6 +44,29 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   void initState() {
     super.initState();
     _currentWeather = widget.result['weather'];
+    _titleCtrl = TextEditingController(text: _route['title'] ?? '');
+    _descCtrl  = TextEditingController(text: _route['description'] ?? '');
+  }
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _descCtrl.dispose();
+    _titleFocus.dispose();
+    _descFocus.dispose();
+    super.dispose();
+  }
+
+  void _commitTitle() {
+    final val = _titleCtrl.text.trim();
+    if (val.isNotEmpty) widget.result['route']['title'] = val;
+    else _titleCtrl.text = _route['title'] ?? '';
+    setState(() => _editingTitle = false);
+  }
+
+  void _commitDescription() {
+    widget.result['route']['description'] = _descCtrl.text.trim();
+    setState(() => _editingDescription = false);
   }
 
   Map<String, dynamic> _buildFormData() =>
@@ -71,6 +102,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     }
     setState(() => _saving = true);
     final saveData = Map<String, dynamic>.from(widget.result['_save_data'] ?? {});
+    saveData['title']       = _route['title'];
+    saveData['description'] = _route['description'];
     final result = await RouteService.saveRoute(saveData);
     if (!mounted) return;
     setState(() { _saving = false; });
@@ -80,6 +113,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       return;
     }
     setState(() { _saved = true; _savedRoute = result['route']; });
+    routeListRefresh.value++;
     _showSaveResult();
   }
 
@@ -131,6 +165,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     }
     setState(() => _saving = true);
     final saveData = Map<String, dynamic>.from(widget.result['_save_data'] ?? {});
+    saveData['title']       = _route['title'];
+    saveData['description'] = _route['description'];
     final result = await RouteService.saveRoute(saveData);
     if (!mounted) return;
     setState(() => _saving = false);
@@ -143,6 +179,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       _saved      = true;
       _savedRoute = result['route'];
     });
+    routeListRefresh.value++;
     _showShareDialog();
   }
 
@@ -380,11 +417,69 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                 ]),
               ],
               const SizedBox(height: 12),
-              Text(_route['title'] ?? '',
-                  style: const TextStyle(color: AppColors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+
+              // Título editable
+              GestureDetector(
+                onTap: () {
+                  setState(() { _editingTitle = true; _editingDescription = false; });
+                  Future.microtask(() => _titleFocus.requestFocus());
+                },
+                child: _editingTitle
+                    ? TextField(
+                        controller: _titleCtrl,
+                        focusNode: _titleFocus,
+                        style: const TextStyle(color: AppColors.white, fontSize: 22, fontWeight: FontWeight.w800),
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                          border: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.orange)),
+                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.orange, width: 2)),
+                        ),
+                        onSubmitted: (_) => _commitTitle(),
+                        onTapOutside: (_) => _commitTitle(),
+                      )
+                    : Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Expanded(
+                          child: Text(_route['title'] ?? '',
+                              style: const TextStyle(color: AppColors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.edit, color: AppColors.greyDark, size: 14),
+                      ]),
+              ),
+
               const SizedBox(height: 8),
-              Text(_route['description'] ?? '',
-                  style: const TextStyle(color: AppColors.grey, fontSize: 13, height: 1.5)),
+
+              // Descripción editable
+              GestureDetector(
+                onTap: () {
+                  setState(() { _editingDescription = true; _editingTitle = false; });
+                  Future.microtask(() => _descFocus.requestFocus());
+                },
+                child: _editingDescription
+                    ? TextField(
+                        controller: _descCtrl,
+                        focusNode: _descFocus,
+                        style: const TextStyle(color: AppColors.grey, fontSize: 13, height: 1.5),
+                        maxLines: 5,
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                          border: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.greyDark)),
+                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.orange)),
+                        ),
+                        onTapOutside: (_) => _commitDescription(),
+                      )
+                    : Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Expanded(
+                          child: Text(_route['description'] ?? '',
+                              style: const TextStyle(color: AppColors.grey, fontSize: 13, height: 1.5)),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.edit, color: AppColors.greyDark, size: 14),
+                      ]),
+              ),
             ]),
           ),
 
