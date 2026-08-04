@@ -21,6 +21,7 @@ import '../features/rider/screens/friends_screen.dart';
 import '../features/rider/screens/friends_search_screen.dart';
 import '../features/rider/screens/my_routes_screen.dart';
 import '../features/rider/screens/route_detail_screen.dart';
+import '../features/rider/screens/notifications_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/splash',
@@ -99,6 +100,10 @@ final router = GoRouter(
         final id = int.parse(state.pathParameters['id']!);
         return RouteDetailScreen(routeId: id);
       },
+    ),
+    GoRoute(
+      path: '/rider/notifications',
+      builder: (context, state) => const NotificationsScreen(),
     ),
     GoRoute(
       path: '/rider/friends',

@@ -34,4 +34,10 @@ class AppNotificationService {
       await ApiClient.dio.patch('/rider/notifications/$id/read');
     } catch (_) {}
   }
+
+  static Future<void> registerFcmToken(String token) async {
+    try {
+      await ApiClient.dio.post('/rider/fcm-token', data: {'token': token});
+    } catch (_) {}
+  }
 }

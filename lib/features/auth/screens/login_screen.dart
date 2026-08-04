@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/auth_service.dart';
+import '../../../core/services/push_notification_service.dart';
 import '../../../core/storage/auth_storage.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -72,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result['success'] == true) {
       final role = result['role'];
+      PushNotificationService.registerToken();
       if (role == 'rider') context.go('/rider/home');
     }
   }

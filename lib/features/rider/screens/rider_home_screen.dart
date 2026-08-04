@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/api/auth_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../providers/app_notification_service.dart';
 import '../providers/friendship_service.dart';
 import '../providers/route_service.dart';
 import '../providers/rider_profile_service.dart';
@@ -19,6 +20,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
   int _pendingRequests  = 0;
   int _acceptedRecently = 0;
   int _pendingRoutes    = 0;
+  int _unreadNotifications = 0;
   String? _nickname;
   String? _gender;
 
@@ -43,6 +45,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
       FriendshipService.getPendingReceived(),
       FriendshipService.getPendingSent(),
       RouteService.getMyRoutes(),
+      AppNotificationService.getUnreadCount(),
     ]);
     if (!mounted) return;
     final received = results[0]['requests'] as List? ?? [];
@@ -63,9 +66,10 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
 
     if (!mounted) return;
     setState(() {
-      _pendingRequests  = received.length;
-      _acceptedRecently = unseenNotifications;
-      _pendingRoutes    = unseenRoutes;
+      _pendingRequests     = received.length;
+      _acceptedRecently    = unseenNotifications;
+      _pendingRoutes       = unseenRoutes;
+      _unreadNotifications = results[3] as int? ?? 0;
     });
   }
 
@@ -93,6 +97,34 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
           ),
         ),
         actions: [
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined, color: AppColors.white),
+                onPressed: () async {
+                  await context.push('/rider/notifications');
+                  _loadNotifications();
+                },
+              ),
+              if (_unreadNotifications > 0)
+                Positioned(
+                  top: 6, right: 6,
+                  child: Container(
+                    width: 16, height: 16,
+                    decoration: const BoxDecoration(
+                      color: AppColors.error,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        _unreadNotifications > 9 ? '9+' : '$_unreadNotifications',
+                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.person_outlined, color: AppColors.white),
             onPressed: () => context.go('/rider/profile'),
