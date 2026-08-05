@@ -38,7 +38,9 @@
     "enter_button": "ENTER",
     "logout": "Logout",
     "email_verified": "Email verified successfully.",
-    "invalid_credentials": "Invalid credentials."
+    "invalid_credentials": "Invalid credentials.",
+    "remember_me": "Remember me",
+    "forgot_password": "Forgot password?"
   },
   "home": {
     "welcome": "Welcome, rider!",

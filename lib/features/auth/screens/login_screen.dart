@@ -57,6 +57,11 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
     setState(() => _loading = false);
 
+    if (result['verify_pending'] == true) {
+      context.go('/verify-email', extra: {'email': result['email']});
+      return;
+    }
+
     if (result['error'] != null) {
       setState(() => _error = result['error']);
       return;
@@ -165,17 +170,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () => setState(() => _rememberMe = !_rememberMe),
-                    child: const Text('Recordar usuario y contraseña',
-                        style: TextStyle(color: AppColors.grey, fontSize: 13)),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _rememberMe = !_rememberMe),
+                      child: Text('auth.remember_me'.tr(),
+                          style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                    ),
                   ),
-                  const Spacer(),
                   TextButton(
                     onPressed: () => context.push('/forgot-password'),
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                    child: const Text('¿Olvidaste tu contraseña?',
-                        style: TextStyle(color: AppColors.cyan, fontSize: 12)),
+                    child: Text('auth.forgot_password'.tr(),
+                        style: const TextStyle(color: AppColors.cyan, fontSize: 12)),
                   ),
                 ],
               ),

@@ -43,8 +43,16 @@ class AuthService {
       return {'success': true, 'role': data['user']['active_role']};
 
     } on DioException catch (e) {
+      final data = e.response?.data;
+      if (e.response?.statusCode == 403 && data?['verify_pending'] == true) {
+        return {
+          'verify_pending': true,
+          'email': data['email'] ?? '',
+          'message': data['message'] ?? '',
+        };
+      }
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': data?['message'] ?? 'Error de conexión.',
       };
     }
   }
@@ -91,7 +99,15 @@ class AuthService {
         'nickname': nickname,
       });
 
-      return {'success': true, 'message': response.data['message']};
+      final data = response.data;
+      if (data['verify_pending'] == true) {
+        return {
+          'verify_pending': true,
+          'email': data['email'] ?? '',
+          'message': data['message'] ?? '',
+        };
+      }
+      return {'success': true, 'message': data['message']};
 
     } on DioException catch (e) {
       final errors = e.response?.data['errors'];

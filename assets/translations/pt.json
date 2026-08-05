@@ -38,7 +38,9 @@
     "enter_button": "ENTRAR",
     "logout": "Terminar sessão",
     "email_verified": "Email verificado com sucesso.",
-    "invalid_credentials": "Credenciais incorretas."
+    "invalid_credentials": "Credenciais incorretas.",
+    "remember_me": "Lembrar-me",
+    "forgot_password": "Esqueceu a palavra-passe?"
   },
   "home": {
     "welcome": "Bem-vindo, motard!",

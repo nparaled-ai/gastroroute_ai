@@ -38,7 +38,9 @@
     "enter_button": "ENTRAR",
     "logout": "Cerrar sesión",
     "email_verified": "Email verificado correctamente.",
-    "invalid_credentials": "Credenciales incorrectas."
+    "invalid_credentials": "Credenciales incorrectas.",
+    "remember_me": "Recordar usuario",
+    "forgot_password": "¿Olvidaste tu contraseña?"
   },
   "home": {
     "welcome": "¡Bienvenido, motero!",

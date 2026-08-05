@@ -38,7 +38,9 @@
     "enter_button": "ENTRA",
     "logout": "Esci",
     "email_verified": "Email verificata con successo.",
-    "invalid_credentials": "Credenziali non valide."
+    "invalid_credentials": "Credenziali non valide.",
+    "remember_me": "Ricordami",
+    "forgot_password": "Hai dimenticato la password?"
   },
   "home": {
     "welcome": "Benvenuto, motociclista!",

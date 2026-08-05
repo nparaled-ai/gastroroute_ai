@@ -41,16 +41,16 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
   }
 
   Future<void> _loadNotifications() async {
-    final results = await Future.wait([
+    final friendResults = await Future.wait([
       FriendshipService.getPendingReceived(),
       FriendshipService.getPendingSent(),
       RouteService.getMyRoutes(),
-      AppNotificationService.getUnreadCount(),
     ]);
+    final unread = await AppNotificationService.getUnreadCount();
     if (!mounted) return;
-    final received = results[0]['requests'] as List? ?? [];
-    final sent     = results[1]['requests'] as List? ?? [];
-    final routes   = results[2]['received']  as List? ?? [];
+    final received = friendResults[0]['requests'] as List? ?? [];
+    final sent     = friendResults[1]['requests'] as List? ?? [];
+    final routes   = friendResults[2]['received']  as List? ?? [];
 
     // Filtrar aceptadas y rechazadas ya vistas
     final prefs    = await SharedPreferences.getInstance();
@@ -69,7 +69,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
       _pendingRequests     = received.length;
       _acceptedRecently    = unseenNotifications;
       _pendingRoutes       = unseenRoutes;
-      _unreadNotifications = results[3] as int? ?? 0;
+      _unreadNotifications = unread;
     });
   }
 

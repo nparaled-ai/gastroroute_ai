@@ -38,7 +38,9 @@
     "enter_button": "EINTRETEN",
     "logout": "Abmelden",
     "email_verified": "E-Mail erfolgreich verifiziert.",
-    "invalid_credentials": "Ungültige Anmeldedaten."
+    "invalid_credentials": "Ungültige Anmeldedaten.",
+    "remember_me": "Angemeldet bleiben",
+    "forgot_password": "Passwort vergessen?"
   },
   "home": {
     "welcome": "Willkommen, Fahrer!",
