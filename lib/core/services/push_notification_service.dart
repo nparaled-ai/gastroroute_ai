@@ -18,6 +18,7 @@ class PushNotificationService {
     'GastroRouteAI',
     description: 'Notificaciones de rutas y amigos',
     importance: Importance.high,
+    sound: RawResourceAndroidNotificationSound('sound_moto'),
   );
 
   static Future<void> init() async {
@@ -60,8 +61,9 @@ class PushNotificationService {
             importance: Importance.high,
             priority: Priority.high,
             icon: '@mipmap/ic_launcher',
+            sound: const RawResourceAndroidNotificationSound('sound_moto'),
           ),
-          iOS: const DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(sound: 'sound_moto.mp3'),
         ),
       );
     });
