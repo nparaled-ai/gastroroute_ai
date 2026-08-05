@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -59,10 +60,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final dt = DateTime.tryParse(createdAt);
     if (dt == null) return '';
     final diff = DateTime.now().difference(dt);
-    if (diff.inMinutes < 1)  return 'ahora';
-    if (diff.inMinutes < 60) return 'hace ${diff.inMinutes} min';
-    if (diff.inHours < 24)   return 'hace ${diff.inHours} h';
-    if (diff.inDays < 7)     return 'hace ${diff.inDays} d';
+    if (diff.inMinutes < 1)  return 'notifications.now'.tr();
+    if (diff.inMinutes < 60) return 'notifications.minutes_ago'.tr(namedArgs: {'n': '${diff.inMinutes}'});
+    if (diff.inHours < 24)   return 'notifications.hours_ago'.tr(namedArgs: {'n': '${diff.inHours}'});
+    if (diff.inDays < 7)     return 'notifications.days_ago'.tr(namedArgs: {'n': '${diff.inDays}'});
     return '${dt.day}/${dt.month}/${dt.year}';
   }
 
@@ -86,8 +87,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-        title: const Text('Notificaciones',
-            style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
+        title: Text('notifications.title'.tr(),
+            style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.pop(),
@@ -100,10 +101,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.notifications_none, color: AppColors.greyDark, size: 64),
-                      SizedBox(height: 16),
-                      Text('Sin notificaciones',
-                          style: TextStyle(color: AppColors.grey, fontSize: 16)),
+                      const Icon(Icons.notifications_none, color: AppColors.greyDark, size: 64),
+                      const SizedBox(height: 16),
+                      Text('notifications.empty'.tr(),
+                          style: const TextStyle(color: AppColors.grey, fontSize: 16)),
                     ],
                   ),
                 )

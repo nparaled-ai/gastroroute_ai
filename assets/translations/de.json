@@ -173,6 +173,21 @@
     "departure": "Abfahrt",
     "day": "Tag {}"
   },
+  "verify_email": {
+    "title": "E-Mail bestätigen!",
+    "sent_to": "Wir haben einen Bestätigungslink gesendet an",
+    "instruction": "Klicke auf den Link in der E-Mail, um dein Konto zu aktivieren.",
+    "resend": "E-Mail erneut senden",
+    "back_to_login": "Zurück zur Anmeldung"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "empty": "Keine Benachrichtigungen",
+    "now": "jetzt",
+    "minutes_ago": "vor {n} Min.",
+    "hours_ago": "vor {n} Std.",
+    "days_ago": "vor {n} T."
+  },
   "languages": {
     "es": "Español",
     "en": "English",

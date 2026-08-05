@@ -173,6 +173,21 @@
     "departure": "Partida",
     "day": "Dia {}"
   },
+  "verify_email": {
+    "title": "Verifique o seu email!",
+    "sent_to": "Enviámos um link de verificação para",
+    "instruction": "Clique no link do email para ativar a sua conta.",
+    "resend": "Reenviar email",
+    "back_to_login": "Voltar ao início de sessão"
+  },
+  "notifications": {
+    "title": "Notificações",
+    "empty": "Sem notificações",
+    "now": "agora",
+    "minutes_ago": "há {n} min",
+    "hours_ago": "há {n} h",
+    "days_ago": "há {n} d"
+  },
   "languages": {
     "es": "Español",
     "en": "English",

@@ -105,6 +105,15 @@ class AuthService {
     }
   }
 
+  static Future<Map<String, dynamic>> resendVerification(String email) async {
+    try {
+      final response = await ApiClient.dio.post('/auth/resend-verification', data: {'email': email});
+      return {'success': true, 'message': response.data['message']};
+    } on DioException catch (e) {
+      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+    }
+  }
+
   static Future<void> logout() async {
     try {
       await ApiClient.dio.post('/auth/logout');

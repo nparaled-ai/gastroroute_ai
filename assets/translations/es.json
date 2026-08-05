@@ -173,6 +173,21 @@
     "departure": "Salida",
     "day": "Día {}"
   },
+  "verify_email": {
+    "title": "¡Verifica tu email!",
+    "sent_to": "Hemos enviado un enlace de verificación a",
+    "instruction": "Pulsa el enlace del correo para activar tu cuenta.",
+    "resend": "Reenviar correo",
+    "back_to_login": "Volver al inicio de sesión"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "empty": "Sin notificaciones",
+    "now": "ahora",
+    "minutes_ago": "hace {n} min",
+    "hours_ago": "hace {n} h",
+    "days_ago": "hace {n} d"
+  },
   "languages": {
     "es": "Español",
     "en": "English",

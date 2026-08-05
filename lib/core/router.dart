@@ -22,6 +22,7 @@ import '../features/rider/screens/friends_search_screen.dart';
 import '../features/rider/screens/my_routes_screen.dart';
 import '../features/rider/screens/route_detail_screen.dart';
 import '../features/rider/screens/notifications_screen.dart';
+import '../features/auth/screens/verify_email_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/splash',
@@ -48,6 +49,13 @@ final router = GoRouter(
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/verify-email',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return VerifyEmailScreen(email: extra['email']);
+      },
     ),
     GoRoute(
       path: '/select-role',
@@ -145,6 +153,7 @@ final router = GoRouter(
     final isSplash   = state.matchedLocation == '/splash';
     final isAuth     = state.matchedLocation == '/login' ||
                        state.matchedLocation == '/register' ||
+                       state.matchedLocation == '/verify-email' ||
                        state.matchedLocation == '/select-role' ||
                        state.matchedLocation == '/forgot-password' ||
                        state.matchedLocation.startsWith('/reset-password');

@@ -173,6 +173,21 @@
     "departure": "Departure",
     "day": "Day {}"
   },
+  "verify_email": {
+    "title": "Verify your email!",
+    "sent_to": "We have sent a verification link to",
+    "instruction": "Click the link in the email to activate your account.",
+    "resend": "Resend email",
+    "back_to_login": "Back to login"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "now": "now",
+    "minutes_ago": "{n} min ago",
+    "hours_ago": "{n} h ago",
+    "days_ago": "{n} d ago"
+  },
   "languages": {
     "es": "Español",
     "en": "English",
