@@ -125,7 +125,6 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                     await context.push('/rider/routes/${r['id']}');
                     _loadRoutes();
                   },
-                  onNew: () => context.push('/rider/create-route'),
                 ),
                 _RouteList(
                   routes: _historical,

@@ -73,6 +73,36 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       Map<String, dynamic>.from(widget.result['form_data'] ?? {});
 
   // Actualizar clima
+  bool _canRefreshWeather() {
+    final date = _route['departure_date'];
+    if (date == null) return true;
+    final diff = DateTime.parse(date).difference(DateTime.now()).inDays;
+    return diff <= 5;
+  }
+
+  Widget _buildWeatherCard() {
+    if (_weather != null) return const SizedBox.shrink();
+    final date = _route['departure_date'];
+    if (date == null) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.greyDark),
+      ),
+      child: Row(children: [
+        const Icon(Icons.cloud_off_outlined, color: AppColors.grey, size: 22),
+        const SizedBox(width: 10),
+        Expanded(child: Text(
+          'planner.weather_forecast_notice'.tr(),
+          style: const TextStyle(color: AppColors.grey, fontSize: 12, height: 1.4),
+        )),
+      ]),
+    );
+  }
+
   Future<void> _refreshWeather() async {
     setState(() => _refreshingWeather = true);
     final result = await RouteService.refreshWeather(
@@ -501,7 +531,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
 
               const SizedBox(height: 16),
 
-              // Clima con botón actualizar
+              // Clima: aviso si no hay previsión, o datos si los hay
+              _buildWeatherCard(),
               if (_weather != null) ...[
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -516,11 +547,15 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('${_weather!['temp']?.toStringAsFixed(0)}°C · ${_weather!['description']}',
                           style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600)),
-                      Text('Viento ${_weather!['wind_speed']} m/s · Humedad ${_weather!['humidity']}%',
-                          style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+                      if (_weather!['humidity'] != null)
+                        Text('Viento ${_weather!['wind_speed']} m/s · Humedad ${_weather!['humidity']}%',
+                            style: const TextStyle(color: AppColors.grey, fontSize: 12))
+                      else
+                        Text('Viento ${_weather!['wind_speed']} m/s · ${_weather!['temp_min']?.toStringAsFixed(0)}° / ${_weather!['temp_max']?.toStringAsFixed(0)}°',
+                            style: const TextStyle(color: AppColors.grey, fontSize: 12)),
                     ])),
-                    // Botón actualizar clima
-                    GestureDetector(
+                    // Botón actualizar solo si la fecha está dentro de los próximos 5 días o no hay fecha
+                    if (_canRefreshWeather()) GestureDetector(
                       onTap: _refreshingWeather ? null : _refreshWeather,
                       child: Container(
                         padding: const EdgeInsets.all(8),
