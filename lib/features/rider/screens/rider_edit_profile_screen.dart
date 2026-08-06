@@ -187,28 +187,36 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       context: context,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppColors.orange),
-              title: const Text('Hacer foto', style: TextStyle(color: AppColors.white)),
-              onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.camera); },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library, color: AppColors.cyan),
-              title: const Text('Elegir de galería', style: TextStyle(color: AppColors.white)),
-              onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.gallery); },
-            ),
-            if (_avatarUrl != null)
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 24, right: 24, top: 24,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(child: Container(width: 40, height: 4,
+                decoration: BoxDecoration(color: AppColors.greyDark, borderRadius: BorderRadius.circular(2)))),
+              const SizedBox(height: 16),
               ListTile(
-                leading: const Icon(Icons.delete_outline, color: AppColors.error),
-                title: const Text('Eliminar foto', style: TextStyle(color: AppColors.error)),
-                onTap: () { Navigator.pop(ctx); setState(() { _avatarUrl = null; _localAvatar = null; }); },
+                leading: const Icon(Icons.camera_alt, color: AppColors.orange),
+                title: const Text('Hacer foto', style: TextStyle(color: AppColors.white)),
+                onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.camera); },
               ),
-          ],
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: AppColors.cyan),
+                title: const Text('Elegir de galería', style: TextStyle(color: AppColors.white)),
+                onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.gallery); },
+              ),
+              if (_avatarUrl != null)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline, color: AppColors.error),
+                  title: const Text('Eliminar foto', style: TextStyle(color: AppColors.error)),
+                  onTap: () { Navigator.pop(ctx); setState(() { _avatarUrl = null; _localAvatar = null; }); },
+                ),
+            ],
+          ),
         ),
       ),
     );
