@@ -516,7 +516,10 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       _buildDeparture(),
 
                     // ── Clima ─────────────────────────────────────────
-                    if (_weather != null) _buildWeather(),
+                    if (_weather != null)
+                      _buildWeather()
+                    else if (_isFuture)
+                      _buildWeatherUnavailable(),
 
                     // ── Autonomía ─────────────────────────────────────
                     if (_fuelRangeKm != null) _buildFuel(),
@@ -836,6 +839,26 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       ),
       const SizedBox(height: 16),
     ]);
+  }
+
+  Widget _buildWeatherUnavailable() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.greyDark),
+      ),
+      child: Row(children: [
+        const Icon(Icons.cloud_off_outlined, color: AppColors.grey, size: 22),
+        const SizedBox(width: 10),
+        Expanded(child: Text(
+          'planner.weather_forecast_notice'.tr(),
+          style: const TextStyle(color: AppColors.grey, fontSize: 12, height: 1.4),
+        )),
+      ]),
+    );
   }
 
   Widget _buildWeather() {
