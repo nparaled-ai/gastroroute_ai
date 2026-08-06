@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/auth_service.dart';
+import '../../../core/api/google_auth_service.dart';
 import '../../../core/services/push_notification_service.dart';
 import '../../../core/storage/auth_storage.dart';
 import '../../../core/theme/app_theme.dart';
@@ -17,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController    = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
+  bool _loadingGoogle = false;
   bool _obscure = true;
   bool _rememberMe = true;
   String? _error;
@@ -80,6 +82,36 @@ class _LoginScreenState extends State<LoginScreen> {
       final role = result['role'];
       PushNotificationService.registerToken();
       if (role == 'rider') context.go('/rider/home');
+    }
+  }
+
+  Future<void> _loginWithGoogle() async {
+    setState(() { _loadingGoogle = true; _error = null; });
+    final result = await GoogleAuthService.signIn();
+    if (!mounted) return;
+    setState(() => _loadingGoogle = false);
+
+    if (result['cancelled'] == true) return;
+
+    if (result['verify_pending'] == true) {
+      context.go('/verify-email', extra: {'email': result['email']});
+      return;
+    }
+    if (result['error'] != null) {
+      setState(() => _error = result['error']);
+      return;
+    }
+    if (result['select_role'] == true) {
+      context.go('/select-role', extra: {
+        'user_id': result['user_id'],
+        'roles':   result['roles'],
+        'password': '',
+      });
+      return;
+    }
+    if (result['success'] == true) {
+      PushNotificationService.registerToken();
+      if (result['role'] == 'rider') context.go('/rider/home');
     }
   }
 
@@ -215,6 +247,37 @@ class _LoginScreenState extends State<LoginScreen> {
                     : Text('auth.login_button'.tr()),
               ),
 
+              const SizedBox(height: 16),
+
+              // Separador
+              Row(children: [
+                const Expanded(child: Divider(color: AppColors.greyDark)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('auth.or'.tr(),
+                      style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                ),
+                const Expanded(child: Divider(color: AppColors.greyDark)),
+              ]),
+
+              const SizedBox(height: 16),
+
+              // Botón Google
+              OutlinedButton.icon(
+                onPressed: (_loading || _loadingGoogle) ? null : _loginWithGoogle,
+                icon: _loadingGoogle
+                    ? const SizedBox(width: 18, height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white))
+                    : const _GoogleIcon(),
+                label: Text('auth.sign_in_google'.tr(),
+                    style: const TextStyle(color: AppColors.white, fontSize: 15, fontWeight: FontWeight.w600)),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  side: const BorderSide(color: AppColors.greyDark),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+
               const SizedBox(height: 24),
 
               Center(
@@ -242,4 +305,52 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+}
+
+class _GoogleIcon extends StatelessWidget {
+  const _GoogleIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 20, height: 20,
+      child: CustomPaint(painter: _GoogleLogoPainter()),
+    );
+  }
+}
+
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r  = size.width / 2;
+
+    final colors = [
+      const Color(0xFF4285F4), // blue
+      const Color(0xFF34A853), // green
+      const Color(0xFFFBBC05), // yellow
+      const Color(0xFFEA4335), // red
+    ];
+
+    final sweeps = [90.0, 90.0, 90.0, 90.0];
+    final starts = [-90.0, 0.0, 90.0, 180.0];
+
+    for (int i = 0; i < 4; i++) {
+      final paint = Paint()
+        ..color = colors[i]
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = size.width * 0.25;
+      canvas.drawArc(
+        Rect.fromCircle(center: Offset(cx, cy), radius: r * 0.7),
+        starts[i] * 3.14159 / 180,
+        sweeps[i] * 3.14159 / 180,
+        false,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
 }

@@ -40,7 +40,9 @@
     "email_verified": "E-Mail erfolgreich verifiziert.",
     "invalid_credentials": "Ungültige Anmeldedaten.",
     "remember_me": "Angemeldet bleiben",
-    "forgot_password": "Passwort vergessen?"
+    "forgot_password": "Passwort vergessen?",
+    "sign_in_google": "Mit Google fortfahren",
+    "or": "oder"
   },
   "home": {
     "welcome": "Willkommen, Fahrer!",

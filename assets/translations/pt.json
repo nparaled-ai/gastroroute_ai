@@ -40,7 +40,9 @@
     "email_verified": "Email verificado com sucesso.",
     "invalid_credentials": "Credenciais incorretas.",
     "remember_me": "Lembrar-me",
-    "forgot_password": "Esqueceu a palavra-passe?"
+    "forgot_password": "Esqueceu a palavra-passe?",
+    "sign_in_google": "Continuar com o Google",
+    "or": "ou"
   },
   "home": {
     "welcome": "Bem-vindo, motard!",

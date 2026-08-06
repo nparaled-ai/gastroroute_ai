@@ -40,7 +40,9 @@
     "email_verified": "Email verified successfully.",
     "invalid_credentials": "Invalid credentials.",
     "remember_me": "Remember me",
-    "forgot_password": "Forgot password?"
+    "forgot_password": "Forgot password?",
+    "sign_in_google": "Continue with Google",
+    "or": "or"
   },
   "home": {
     "welcome": "Welcome, rider!",
