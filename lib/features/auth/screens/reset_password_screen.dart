@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -12,13 +13,21 @@ class ResetPasswordScreen extends StatefulWidget {
 }
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final _tokenController    = TextEditingController();
-  final _passController     = TextEditingController();
-  final _confirmController  = TextEditingController();
+  final _tokenController   = TextEditingController();
+  final _passController    = TextEditingController();
+  final _confirmController = TextEditingController();
   bool _loading  = false;
   bool _success  = false;
   bool _showPass = false;
   String? _error;
+
+  @override
+  void dispose() {
+    _tokenController.dispose();
+    _passController.dispose();
+    _confirmController.dispose();
+    super.dispose();
+  }
 
   Future<void> _submit() async {
     final token    = _tokenController.text.trim();
@@ -26,15 +35,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final confirm  = _confirmController.text;
 
     if (token.isEmpty || password.isEmpty || confirm.isEmpty) {
-      setState(() => _error = 'Rellena todos los campos.');
+      setState(() => _error = 'reset_password.fill_all'.tr());
       return;
     }
     if (password.length < 8) {
-      setState(() => _error = 'La contraseña debe tener al menos 8 caracteres.');
+      setState(() => _error = 'reset_password.min_length'.tr());
       return;
     }
     if (password != confirm) {
-      setState(() => _error = 'Las contraseñas no coinciden.');
+      setState(() => _error = 'reset_password.no_match'.tr());
       return;
     }
 
@@ -77,14 +86,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         const SizedBox(height: 16),
         const Text('🔐', style: TextStyle(fontSize: 48)),
         const SizedBox(height: 16),
-        const Text('Nueva contraseña',
-            style: TextStyle(color: AppColors.white, fontSize: 26, fontWeight: FontWeight.w800)),
+        Text('reset_password.title'.tr(),
+            style: const TextStyle(color: AppColors.white, fontSize: 26, fontWeight: FontWeight.w800)),
         const SizedBox(height: 8),
-        Text('Email: ${widget.email}',
+        Text(widget.email,
             style: const TextStyle(color: AppColors.grey, fontSize: 13)),
         const SizedBox(height: 32),
 
-        // Código
         TextFormField(
           controller: _tokenController,
           keyboardType: TextInputType.text,
@@ -100,21 +108,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               );
             }
           },
-          decoration: const InputDecoration(
-            labelText: 'Código de verificación',
-            hintText: 'XXXXXX',
-            prefixIcon: Icon(Icons.key_outlined, color: AppColors.orange),
+          decoration: InputDecoration(
+            labelText: 'reset_password.code_label'.tr(),
+            hintText: 'reset_password.code_hint'.tr(),
+            prefixIcon: const Icon(Icons.key_outlined, color: AppColors.orange),
           ),
         ),
         const SizedBox(height: 16),
 
-        // Nueva contraseña
         TextFormField(
           controller: _passController,
           obscureText: !_showPass,
           style: const TextStyle(color: AppColors.white),
           decoration: InputDecoration(
-            labelText: 'Nueva contraseña',
+            labelText: 'reset_password.new_password'.tr(),
             prefixIcon: const Icon(Icons.lock_outline, color: AppColors.grey),
             suffixIcon: IconButton(
               icon: Icon(_showPass ? Icons.visibility_off : Icons.visibility,
@@ -125,14 +132,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         ),
         const SizedBox(height: 16),
 
-        // Confirmar
         TextFormField(
           controller: _confirmController,
           obscureText: !_showPass,
           style: const TextStyle(color: AppColors.white),
-          decoration: const InputDecoration(
-            labelText: 'Confirmar contraseña',
-            prefixIcon: Icon(Icons.lock_outline, color: AppColors.grey),
+          decoration: InputDecoration(
+            labelText: 'reset_password.confirm_password'.tr(),
+            prefixIcon: const Icon(Icons.lock_outline, color: AppColors.grey),
           ),
         ),
 
@@ -160,8 +166,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           child: _loading
               ? const SizedBox(width: 22, height: 22,
                   child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-              : const Text('Restablecer contraseña',
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+              : Text('reset_password.submit'.tr(),
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
         ),
       ]),
     );
@@ -172,11 +178,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       const SizedBox(height: 16),
       const Text('✅', style: TextStyle(fontSize: 48)),
       const SizedBox(height: 16),
-      const Text('¡Contraseña cambiada!',
-          style: TextStyle(color: AppColors.white, fontSize: 26, fontWeight: FontWeight.w800)),
+      Text('reset_password.success_title'.tr(),
+          style: const TextStyle(color: AppColors.white, fontSize: 26, fontWeight: FontWeight.w800)),
       const SizedBox(height: 12),
-      const Text('Tu contraseña se ha restablecido correctamente. Ya puedes iniciar sesión.',
-          style: TextStyle(color: AppColors.grey, fontSize: 15, height: 1.5)),
+      Text('reset_password.success_body'.tr(),
+          style: const TextStyle(color: AppColors.grey, fontSize: 15, height: 1.5)),
       const SizedBox(height: 40),
       ElevatedButton(
         onPressed: () => context.go('/login'),
@@ -185,8 +191,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           minimumSize: const Size(double.infinity, 54),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
-        child: const Text('Iniciar sesión',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+        child: Text('reset_password.login_button'.tr(),
+            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
       ),
     ]);
   }

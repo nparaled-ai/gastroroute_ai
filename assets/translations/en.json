@@ -190,6 +190,30 @@
     "hours_ago": "{n} h ago",
     "days_ago": "{n} d ago"
   },
+  "forgot_password": {
+    "title": "Forgot your password?",
+    "subtitle": "Enter your email and we'll send you a code to reset it.",
+    "email_empty": "Please enter your email.",
+    "send_button": "Send code",
+    "sent_title": "Code sent!",
+    "sent_body": "We've sent a code to {email}.\n\nCheck your inbox and use it in the app.",
+    "have_code": "I have the code",
+    "resend": "Resend code"
+  },
+  "reset_password": {
+    "title": "New password",
+    "code_label": "Verification code",
+    "code_hint": "XXXXXX",
+    "new_password": "New password",
+    "confirm_password": "Confirm password",
+    "fill_all": "Please fill in all fields.",
+    "min_length": "Password must be at least 8 characters.",
+    "no_match": "Passwords do not match.",
+    "submit": "Reset password",
+    "success_title": "Password changed!",
+    "success_body": "Your password has been reset successfully. You can now log in.",
+    "login_button": "Log in"
+  },
   "languages": {
     "es": "Español",
     "en": "English",

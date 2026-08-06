@@ -190,6 +190,30 @@
     "hours_ago": "hace {n} h",
     "days_ago": "hace {n} d"
   },
+  "forgot_password": {
+    "title": "¿Olvidaste tu contraseña?",
+    "subtitle": "Introduce tu email y te enviaremos un código para restablecerla.",
+    "email_empty": "Introduce tu email.",
+    "send_button": "Enviar código",
+    "sent_title": "¡Código enviado!",
+    "sent_body": "Hemos enviado un código a {email}.\n\nRevisa tu bandeja de entrada y úsalo en la app.",
+    "have_code": "Tengo el código",
+    "resend": "Reenviar código"
+  },
+  "reset_password": {
+    "title": "Nueva contraseña",
+    "code_label": "Código de verificación",
+    "code_hint": "XXXXXX",
+    "new_password": "Nueva contraseña",
+    "confirm_password": "Confirmar contraseña",
+    "fill_all": "Rellena todos los campos.",
+    "min_length": "La contraseña debe tener al menos 8 caracteres.",
+    "no_match": "Las contraseñas no coinciden.",
+    "submit": "Restablecer contraseña",
+    "success_title": "¡Contraseña cambiada!",
+    "success_body": "Tu contraseña se ha restablecido correctamente. Ya puedes iniciar sesión.",
+    "login_button": "Iniciar sesión"
+  },
   "languages": {
     "es": "Español",
     "en": "English",

@@ -190,6 +190,30 @@
     "hours_ago": "vor {n} Std.",
     "days_ago": "vor {n} T."
   },
+  "forgot_password": {
+    "title": "Passwort vergessen?",
+    "subtitle": "Gib deine E-Mail ein und wir senden dir einen Code zum Zurücksetzen.",
+    "email_empty": "Bitte gib deine E-Mail ein.",
+    "send_button": "Code senden",
+    "sent_title": "Code gesendet!",
+    "sent_body": "Wir haben einen Code an {email} gesendet.\n\nÜberprüfe deinen Posteingang und verwende ihn in der App.",
+    "have_code": "Ich habe den Code",
+    "resend": "Code erneut senden"
+  },
+  "reset_password": {
+    "title": "Neues Passwort",
+    "code_label": "Bestätigungscode",
+    "code_hint": "XXXXXX",
+    "new_password": "Neues Passwort",
+    "confirm_password": "Passwort bestätigen",
+    "fill_all": "Bitte fülle alle Felder aus.",
+    "min_length": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+    "no_match": "Die Passwörter stimmen nicht überein.",
+    "submit": "Passwort zurücksetzen",
+    "success_title": "Passwort geändert!",
+    "success_body": "Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich jetzt anmelden.",
+    "login_button": "Anmelden"
+  },
   "languages": {
     "es": "Español",
     "en": "English",

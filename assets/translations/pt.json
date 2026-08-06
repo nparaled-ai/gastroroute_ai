@@ -190,6 +190,30 @@
     "hours_ago": "há {n} h",
     "days_ago": "há {n} d"
   },
+  "forgot_password": {
+    "title": "Esqueceu a palavra-passe?",
+    "subtitle": "Introduza o seu email e enviaremos um código para a redefinir.",
+    "email_empty": "Introduza o seu email.",
+    "send_button": "Enviar código",
+    "sent_title": "Código enviado!",
+    "sent_body": "Enviámos um código para {email}.\n\nVerifique a sua caixa de entrada e use-o na app.",
+    "have_code": "Tenho o código",
+    "resend": "Reenviar código"
+  },
+  "reset_password": {
+    "title": "Nova palavra-passe",
+    "code_label": "Código de verificação",
+    "code_hint": "XXXXXX",
+    "new_password": "Nova palavra-passe",
+    "confirm_password": "Confirmar palavra-passe",
+    "fill_all": "Preencha todos os campos.",
+    "min_length": "A palavra-passe deve ter pelo menos 8 caracteres.",
+    "no_match": "As palavras-passe não coincidem.",
+    "submit": "Redefinir palavra-passe",
+    "success_title": "Palavra-passe alterada!",
+    "success_body": "A sua palavra-passe foi redefinida com sucesso. Já pode iniciar sessão.",
+    "login_button": "Iniciar sessão"
+  },
   "languages": {
     "es": "Español",
     "en": "English",

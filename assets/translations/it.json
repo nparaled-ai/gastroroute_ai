@@ -190,6 +190,30 @@
     "hours_ago": "{n} h fa",
     "days_ago": "{n} g fa"
   },
+  "forgot_password": {
+    "title": "Hai dimenticato la password?",
+    "subtitle": "Inserisci la tua email e ti invieremo un codice per reimpostarla.",
+    "email_empty": "Inserisci la tua email.",
+    "send_button": "Invia codice",
+    "sent_title": "Codice inviato!",
+    "sent_body": "Abbiamo inviato un codice a {email}.\n\nControlla la tua casella di posta e usalo nell'app.",
+    "have_code": "Ho il codice",
+    "resend": "Reinvia codice"
+  },
+  "reset_password": {
+    "title": "Nuova password",
+    "code_label": "Codice di verifica",
+    "code_hint": "XXXXXX",
+    "new_password": "Nuova password",
+    "confirm_password": "Conferma password",
+    "fill_all": "Compila tutti i campi.",
+    "min_length": "La password deve contenere almeno 8 caratteri.",
+    "no_match": "Le password non coincidono.",
+    "submit": "Reimposta password",
+    "success_title": "Password modificata!",
+    "success_body": "La tua password è stata reimpostata con successo. Ora puoi accedere.",
+    "login_button": "Accedi"
+  },
   "languages": {
     "es": "Español",
     "en": "English",

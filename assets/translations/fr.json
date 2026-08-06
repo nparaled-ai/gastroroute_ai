@@ -190,6 +190,30 @@
     "hours_ago": "il y a {n} h",
     "days_ago": "il y a {n} j"
   },
+  "forgot_password": {
+    "title": "Mot de passe oublié ?",
+    "subtitle": "Entrez votre email et nous vous enverrons un code pour le réinitialiser.",
+    "email_empty": "Veuillez entrer votre email.",
+    "send_button": "Envoyer le code",
+    "sent_title": "Code envoyé !",
+    "sent_body": "Nous avons envoyé un code à {email}.\n\nVérifiez votre boîte de réception et utilisez-le dans l'application.",
+    "have_code": "J'ai le code",
+    "resend": "Renvoyer le code"
+  },
+  "reset_password": {
+    "title": "Nouveau mot de passe",
+    "code_label": "Code de vérification",
+    "code_hint": "XXXXXX",
+    "new_password": "Nouveau mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "fill_all": "Veuillez remplir tous les champs.",
+    "min_length": "Le mot de passe doit comporter au moins 8 caractères.",
+    "no_match": "Les mots de passe ne correspondent pas.",
+    "submit": "Réinitialiser le mot de passe",
+    "success_title": "Mot de passe modifié !",
+    "success_body": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
+    "login_button": "Se connecter"
+  },
   "languages": {
     "es": "Español",
     "en": "English",
