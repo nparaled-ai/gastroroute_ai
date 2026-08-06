@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -67,8 +68,8 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
             }
           },
         ),
-        title: const Text('Mis Rutas',
-            style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
+        title: Text('my_routes.title'.tr(),
+            style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: AppColors.grey),
@@ -86,7 +87,7 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
             Tab(
               child: _TabLabel(
                 icon: '📅',
-                label: 'Previstas',
+                label: 'my_routes.upcoming'.tr(),
                 count: _upcoming.length,
                 activeColor: AppColors.cyan,
               ),
@@ -94,7 +95,7 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
             Tab(
               child: _TabLabel(
                 icon: '📚',
-                label: 'Históricas',
+                label: 'my_routes.historical'.tr(),
                 count: _historical.length,
                 activeColor: AppColors.grey,
               ),
@@ -102,7 +103,7 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
             Tab(
               child: _TabLabel(
                 icon: '📨',
-                label: 'Recibidas',
+                label: 'my_routes.received'.tr(),
                 count: _received.length,
                 activeColor: AppColors.orange,
                 highlight: _received.isNotEmpty,
@@ -118,7 +119,7 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
               children: [
                 _RouteList(
                   routes: _upcoming,
-                  empty: 'No tienes rutas previstas.\nGuarda una ruta con fecha futura.',
+                  empty: 'my_routes.empty_upcoming'.tr(),
                   emptyIcon: Icons.event_outlined,
                   onTap: (r) async {
                     await context.push('/rider/routes/${r['id']}');
@@ -128,7 +129,7 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                 ),
                 _RouteList(
                   routes: _historical,
-                  empty: 'No tienes rutas históricas aún.',
+                  empty: 'my_routes.empty_historical'.tr(),
                   emptyIcon: Icons.history,
                   onTap: (r) async {
                     await context.push('/rider/routes/${r['id']}');
@@ -137,11 +138,11 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                 ),
                 _RouteList(
                   routes: _received,
-                  empty: 'No has recibido ninguna ruta aún.',
+                  empty: 'my_routes.empty_received'.tr(),
                   emptyIcon: Icons.mail_outline,
                   onTap: (r) async {
                     await context.push('/rider/routes/${r['id']}');
-                    _loadRoutes(); // recargar al volver
+                    _loadRoutes();
                   },
                 ),
               ],
@@ -150,8 +151,8 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
         onPressed: () => context.push('/rider/create-route'),
         backgroundColor: AppColors.orange,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Nueva ruta',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        label: Text('my_routes.new_route'.tr(),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -267,7 +268,7 @@ class _RouteListState extends State<_RouteList> {
           style: const TextStyle(color: AppColors.white, fontSize: 14),
           onChanged: (v) => setState(() => _search = v),
           decoration: InputDecoration(
-            hintText: 'Buscar por título u origen…',
+            hintText: 'my_routes.search_hint'.tr(),
             hintStyle: const TextStyle(color: AppColors.grey, fontSize: 13),
             prefixIcon: const Icon(Icons.search, color: AppColors.grey, size: 20),
             suffixIcon: _search.isNotEmpty
@@ -289,29 +290,27 @@ class _RouteListState extends State<_RouteList> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           children: [
             // Dificultad
-            _FilterChip(label: 'Tranquila', active: _difficulty == 'tranquila', color: Colors.green,
+            _FilterChip(label: 'my_routes.filter_easy'.tr(), active: _difficulty == 'tranquila', color: Colors.green,
                 onTap: () => setState(() => _difficulty = _difficulty == 'tranquila' ? null : 'tranquila')),
-            _FilterChip(label: 'Moderada',  active: _difficulty == 'moderada',  color: AppColors.gold,
+            _FilterChip(label: 'my_routes.filter_moderate'.tr(), active: _difficulty == 'moderada', color: AppColors.gold,
                 onTap: () => setState(() => _difficulty = _difficulty == 'moderada'  ? null : 'moderada')),
-            _FilterChip(label: 'Exigente',  active: _difficulty == 'exigente',  color: AppColors.error,
+            _FilterChip(label: 'my_routes.filter_hard'.tr(), active: _difficulty == 'exigente', color: AppColors.error,
                 onTap: () => setState(() => _difficulty = _difficulty == 'exigente'  ? null : 'exigente')),
             const _FilterDivider(),
-            // Tipo
-            _FilterChip(label: 'Circular',    active: _routeType == 'circular', color: AppColors.cyan,
+            _FilterChip(label: 'my_routes.filter_circular'.tr(), active: _routeType == 'circular', color: AppColors.cyan,
                 onTap: () => setState(() => _routeType = _routeType == 'circular'    ? null : 'circular')),
-            _FilterChip(label: 'Con destino', active: _routeType == 'destino',  color: AppColors.cyan,
+            _FilterChip(label: 'my_routes.filter_destination'.tr(), active: _routeType == 'destino', color: AppColors.cyan,
                 onTap: () => setState(() => _routeType = _routeType == 'destino'     ? null : 'destino')),
             const _FilterDivider(),
-            // Origen
-            _FilterChip(label: 'IA',    active: _source == 'ai',           color: AppColors.orange,
+            _FilterChip(label: 'IA', active: _source == 'ai', color: AppColors.orange,
                 onTap: () => setState(() => _source = _source == 'ai'           ? null : 'ai')),
-            _FilterChip(label: 'Maps',  active: _source == 'google_maps',  color: AppColors.orange,
+            _FilterChip(label: 'Maps', active: _source == 'google_maps', color: AppColors.orange,
                 onTap: () => setState(() => _source = _source == 'google_maps'  ? null : 'google_maps')),
-            _FilterChip(label: 'GPX',   active: _source == 'gpx',          color: AppColors.cyan,
+            _FilterChip(label: 'GPX', active: _source == 'gpx', color: AppColors.cyan,
                 onTap: () => setState(() => _source = _source == 'gpx'          ? null : 'gpx')),
             if (_hasFilters) ...[
               const _FilterDivider(),
-              _FilterChip(label: 'Limpiar', active: false, color: AppColors.grey, onTap: _clearFilters,
+              _FilterChip(label: 'my_routes.filter_clear'.tr(), active: false, color: AppColors.grey, onTap: _clearFilters,
                   icon: Icons.close),
             ],
           ],
@@ -327,20 +326,20 @@ class _RouteListState extends State<_RouteList> {
                       color: AppColors.greyDark, size: 56),
                   const SizedBox(height: 16),
                   Text(
-                    _hasFilters ? 'Sin resultados con estos filtros.' : widget.empty,
+                    _hasFilters ? 'my_routes.empty_filters'.tr() : widget.empty,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5),
                   ),
                   if (_hasFilters) ...[
                     const SizedBox(height: 12),
                     TextButton(onPressed: _clearFilters,
-                        child: const Text('Limpiar filtros', style: TextStyle(color: AppColors.orange))),
+                        child: Text('my_routes.filter_clear_all'.tr(), style: const TextStyle(color: AppColors.orange))),
                   ] else if (widget.onNew != null) ...[
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
                       onPressed: widget.onNew,
                       icon: const Icon(Icons.add, size: 18),
-                      label: const Text('Crear ruta'),
+                      label: Text('my_routes.create_route'.tr()),
                     ),
                   ],
                 ]),
@@ -416,14 +415,14 @@ class _DraftList extends StatelessWidget {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.edit_note_outlined, color: AppColors.greyDark, size: 64),
           const SizedBox(height: 16),
-          const Text('No tienes borradores.\nLas rutas generadas aparecen aquí.',
+          Text('my_routes.empty_drafts'.tr(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
+              style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: onNew,
             icon: const Icon(Icons.auto_awesome, size: 18),
-            label: const Text('Generar ruta'),
+            label: Text('my_routes.generate_route'.tr()),
           ),
         ]),
       );
@@ -451,13 +450,13 @@ class _ReceivedList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (routes.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.mail_outline, color: AppColors.greyDark, size: 64),
-          SizedBox(height: 16),
-          Text('No has recibido ninguna ruta aún.\nCuando un amigo comparta contigo aparecerá aquí.',
+          const Icon(Icons.mail_outline, color: AppColors.greyDark, size: 64),
+          const SizedBox(height: 16),
+          Text('my_routes.empty_received_full'.tr(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
+              style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
         ]),
       );
     }
@@ -507,20 +506,20 @@ class _RouteCard extends StatelessWidget {
   }
 
   String get _statusLabel {
-    if (isDraft) return '📝 Borrador';
+    if (isDraft) return 'my_routes.status_draft'.tr();
     if (_isReceived) {
       final confirmed = route['is_confirmed'] == true;
       final declined  = route['is_declined']  == true;
-      final visLabel  = route['visibility'] == 'public' ? '🌍 Pública' : '👥 Amigos';
-      final stateLabel = confirmed ? '✅ Apuntado'
-          : declined  ? '❌ Rechazada'
-          : '📨 Pendiente';
+      final visLabel  = route['visibility'] == 'public' ? 'my_routes.status_public'.tr() : 'my_routes.status_friends'.tr();
+      final stateLabel = confirmed ? 'my_routes.status_joined'.tr()
+          : declined  ? 'my_routes.status_declined'.tr()
+          : 'my_routes.status_pending'.tr();
       return '$visLabel · $stateLabel';
     }
     switch (route['visibility']) {
-      case 'public':  return '🌍 Pública';
-      case 'friends': return '👥 Amigos';
-      default:        return '🔒 Privada';
+      case 'public':  return 'my_routes.status_public'.tr();
+      case 'friends': return 'my_routes.status_friends'.tr();
+      default:        return 'my_routes.status_private'.tr();
     }
   }
 
@@ -611,7 +610,7 @@ class _RouteCard extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Expanded(
-                  child: Text(route['title'] ?? 'Sin título',
+                  child: Text(route['title'] ?? 'my_routes.no_title'.tr(),
                       style: const TextStyle(
                           color: AppColors.white,
                           fontWeight: FontWeight.w700,

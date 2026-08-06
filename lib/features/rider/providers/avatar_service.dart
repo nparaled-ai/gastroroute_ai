@@ -30,4 +30,13 @@ class AvatarService {
       return {'error': e.response?.data['message'] ?? 'Error al subir la imagen.'};
     }
   }
+
+  static Future<Map<String, dynamic>> deleteAvatar() async {
+    try {
+      await ApiClient.dio.delete('/rider/profile/avatar');
+      return {'success': true};
+    } on DioException catch (e) {
+      return {'error': e.response?.data['message'] ?? 'Error al eliminar la foto.'};
+    }
+  }
 }

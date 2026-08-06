@@ -188,8 +188,10 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
         ),
 
         // Navegación
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+        SafeArea(
+          top: false,
+          child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
           child: _currentStep < _steps.length - 1
               ? Row(children: [
                   if (_currentStep > 0)
@@ -223,8 +225,8 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
                     ),
                   ),
                 ])
-              : _buildImportPanel(),
-        ),
+              : SingleChildScrollView(child: _buildImportPanel()),
+        )),
       ]),
     );
   }

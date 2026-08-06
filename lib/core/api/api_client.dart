@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+// Callback que el router registra al iniciarse para redirigir al login sin dependencia circular
+void Function()? onUnauthorized;
+
 class ApiClient {
   static const String baseUrl = 'http://192.168.0.103:8000/api/v1';
 
@@ -29,7 +32,11 @@ class ApiClient {
           options.headers['Accept-Language'] = lang;
           return handler.next(options);
         },
-        onError: (error, handler) {
+        onError: (error, handler) async {
+          if (error.response?.statusCode == 401) {
+            await _storage.delete(key: 'access_token');
+            onUnauthorized?.call();
+          }
           return handler.next(error);
         },
       ),

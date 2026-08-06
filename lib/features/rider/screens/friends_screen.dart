@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -78,13 +79,13 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Eliminar amigo', style: TextStyle(color: AppColors.white)),
-        content: Text('¿Dejar de ser amigo de $name?', style: const TextStyle(color: AppColors.grey)),
+        title: Text('friends_screen.remove_title'.tr(), style: const TextStyle(color: AppColors.white)),
+        content: Text('friends_screen.remove_confirm'.tr(namedArgs: {'name': name}), style: const TextStyle(color: AppColors.grey)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar', style: TextStyle(color: AppColors.grey))),
+              child: Text('common.cancel'.tr(), style: const TextStyle(color: AppColors.grey))),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Eliminar', style: TextStyle(color: AppColors.error))),
+              child: Text('common.delete'.tr(), style: const TextStyle(color: AppColors.error))),
         ],
       ),
     );
@@ -105,17 +106,17 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Amigos', style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
+        title: Text('friends_screen.title'.tr(), style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.orange,
           labelColor: AppColors.orange,
           unselectedLabelColor: AppColors.grey,
           tabs: [
-            Tab(text: 'Amigos (${_friends.length})'),
+            Tab(text: 'friends_screen.tab_friends'.tr(args: ['${_friends.length}'])),
             Tab(
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                const Text('Recibidas'),
+                Text('friends_screen.tab_received'.tr()),
                 if (_received.isNotEmpty) ...[
                   const SizedBox(width: 6),
                   Container(
@@ -126,7 +127,7 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
                 ],
               ]),
             ),
-            Tab(text: 'Enviadas (${_sent.length})'),
+            Tab(text: 'friends_screen.tab_sent'.tr(args: ['${_sent.length}'])),
           ],
         ),
       ),
@@ -163,10 +164,10 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.orange.withOpacity(0.5)),
               ),
-              child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Icon(Icons.person_search_outlined, color: AppColors.orange, size: 22),
-                SizedBox(width: 10),
-                Text('Buscar moteros', style: TextStyle(color: AppColors.orange, fontSize: 15, fontWeight: FontWeight.w700)),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Icon(Icons.person_search_outlined, color: AppColors.orange, size: 22),
+                const SizedBox(width: 10),
+                Text('friends_screen.search_riders'.tr(), style: const TextStyle(color: AppColors.orange, fontSize: 15, fontWeight: FontWeight.w700)),
               ]),
             ),
           ),
@@ -199,16 +200,16 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.people_outline, color: AppColors.greyDark, size: 64),
         const SizedBox(height: 16),
-        const Text('Aún no tienes amigos.\nUsa el botón de arriba para buscar moteros.',
+        Text('friends_screen.empty'.tr(),
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
+            style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
       ]),
     );
   }
 
   Widget _buildReceivedList() {
     if (_received.isEmpty) {
-      return _buildEmpty('No tienes solicitudes pendientes.', Icons.mail_outline);
+      return _buildEmpty('friends_screen.no_pending'.tr(), Icons.mail_outline);
     }
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -227,7 +228,7 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.green.withOpacity(0.4)),
                 ),
-                child: const Text('Aceptar', style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.w600)),
+                child: Text('friends_screen.accept'.tr(), style: const TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.w600)),
               ),
             ),
             const SizedBox(width: 8),
@@ -240,7 +241,7 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.error.withOpacity(0.3)),
                 ),
-                child: const Text('Rechazar', style: TextStyle(color: AppColors.error, fontSize: 12, fontWeight: FontWeight.w600)),
+                child: Text('friends_screen.reject'.tr(), style: const TextStyle(color: AppColors.error, fontSize: 12, fontWeight: FontWeight.w600)),
               ),
             ),
           ]),
@@ -251,7 +252,7 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
 
   Widget _buildSentList() {
     if (_sent.isEmpty) {
-      return _buildEmpty('No tienes solicitudes enviadas.', Icons.send_outlined);
+      return _buildEmpty('friends_screen.no_sent'.tr(), Icons.send_outlined);
     }
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -269,10 +270,10 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.green.withOpacity(0.4)),
             ),
-            child: const Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 14),
-              SizedBox(width: 4),
-              Text('¡Aceptada!', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.w700)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.check_circle, color: Colors.green, size: 14),
+              const SizedBox(width: 4),
+              Text('friends_screen.accepted'.tr(), style: const TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.w700)),
             ]),
           );
         } else if (status == 'rejected') {
@@ -283,10 +284,10 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.error.withOpacity(0.4)),
             ),
-            child: const Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.cancel_outlined, color: AppColors.error, size: 14),
-              SizedBox(width: 4),
-              Text('Rechazada', style: TextStyle(color: AppColors.error, fontSize: 11, fontWeight: FontWeight.w700)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.cancel_outlined, color: AppColors.error, size: 14),
+              const SizedBox(width: 4),
+              Text('friends_screen.rejected'.tr(), style: const TextStyle(color: AppColors.error, fontSize: 11, fontWeight: FontWeight.w700)),
             ]),
           );
         } else {
@@ -297,7 +298,7 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.gold.withOpacity(0.3)),
             ),
-            child: const Text('Pendiente', style: TextStyle(color: AppColors.gold, fontSize: 11)),
+            child: Text('friends_screen.pending_status'.tr(), style: const TextStyle(color: AppColors.gold, fontSize: 11)),
           );
         }
 
@@ -316,7 +317,7 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
         ElevatedButton.icon(
           onPressed: () async { await context.push('/rider/friends/search'); _loadAll(); },
           icon: const Icon(Icons.person_search_outlined, size: 18),
-          label: const Text('Buscar moteros'),
+          label: Text('friends_screen.search_riders'.tr()),
         ),
       ]),
     );

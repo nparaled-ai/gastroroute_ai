@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'core/api/api_client.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router.dart';
 import 'core/services/push_notification_service.dart';
@@ -11,6 +12,8 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
   await PushNotificationService.init();
+
+  onUnauthorized = () => router.go('/login');
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(

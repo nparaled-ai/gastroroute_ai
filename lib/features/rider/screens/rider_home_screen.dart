@@ -143,8 +143,8 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
             const SizedBox(height: 16),
             Text(
               _gender == 'motera'
-                  ? '¡Bienvenida, motera!'
-                  : '¡Bienvenido, motero!',
+                  ? 'home.welcome_female'.tr()
+                  : 'home.welcome_male'.tr(),
               style: const TextStyle(color: AppColors.white, fontSize: 24, fontWeight: FontWeight.w700),
             ),
             if (_nickname != null && _nickname!.isNotEmpty) ...[  
@@ -184,18 +184,18 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
             const SizedBox(height: 16),
             _QuickAccessCard(
               icon: Icons.add_road,
-              title: 'Crear ruta',
-              desc: 'Genera con IA, Google Maps o GPX',
+              title: 'home.create_route'.tr(),
+              desc: 'home.create_route_desc'.tr(),
               color: AppColors.orange,
               onTap: () => context.push('/rider/create-route'),
             ),
             const SizedBox(height: 16),
             _QuickAccessCard(
               icon: Icons.route,
-              title: 'Mis Rutas',
+              title: 'home.my_routes'.tr(),
               desc: _pendingRoutes > 0
-                  ? '$_pendingRoutes ruta${_pendingRoutes > 1 ? 's' : ''} recibida${_pendingRoutes > 1 ? 's' : ''}'
-                  : 'Ver y gestionar tus rutas',
+                  ? 'home.my_routes_pending'.plural(_pendingRoutes)
+                  : 'home.my_routes_desc'.tr(),
               color: AppColors.cyan,
               badge: _pendingRoutes,
               badgeColor: AppColors.orange,
@@ -207,12 +207,12 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
             const SizedBox(height: 16),
             _QuickAccessCard(
               icon: Icons.people_outlined,
-              title: 'Amigos',
+              title: 'home.friends'.tr(),
               desc: _pendingRequests > 0
-                  ? '$_pendingRequests solicitud${_pendingRequests > 1 ? 'es' : ''} pendiente${_pendingRequests > 1 ? 's' : ''}'
+                  ? 'home.friends_pending'.plural(_pendingRequests)
                   : _acceptedRecently > 0
-                      ? '$_acceptedRecently notificación${_acceptedRecently > 1 ? 'es' : ''} de amistad'
-                      : 'Busca y conecta con otros moteros',
+                      ? 'home.friends_notification'.plural(_acceptedRecently)
+                      : 'home.friends_desc'.tr(),
               color: AppColors.gold,
               badge: _pendingRequests + _acceptedRecently,
               badgeColor: _pendingRequests > 0 ? AppColors.error : AppColors.cyan,

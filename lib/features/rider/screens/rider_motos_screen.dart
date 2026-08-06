@@ -89,6 +89,12 @@ class _RiderMotosScreenState extends State<RiderMotosScreen> {
     );
   }
 
+  Widget _motoIconBox() => Container(
+    width: 48, height: 48,
+    decoration: BoxDecoration(color: AppColors.orange.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+    child: const Icon(Icons.two_wheeler, color: AppColors.orange, size: 26),
+  );
+
   Widget _buildEmpty() {
     return Center(
       child: Column(
@@ -128,10 +134,16 @@ class _RiderMotosScreenState extends State<RiderMotosScreen> {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 48, height: 48,
-                    decoration: BoxDecoration(color: AppColors.orange.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
-                    child: const Icon(Icons.two_wheeler, color: AppColors.orange, size: 26),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: moto['photo_url'] != null
+                        ? Image.network(
+                            moto['photo_url'],
+                            width: 48, height: 48,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => _motoIconBox(),
+                          )
+                        : _motoIconBox(),
                   ),
                   const SizedBox(width: 12),
                   Expanded(

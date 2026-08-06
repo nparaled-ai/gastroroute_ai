@@ -1,9 +1,66 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../providers/rider_profile_service.dart';
 
-class CreateRouteScreen extends StatelessWidget {
+class CreateRouteScreen extends StatefulWidget {
   const CreateRouteScreen({super.key});
+
+  @override
+  State<CreateRouteScreen> createState() => _CreateRouteScreenState();
+}
+
+class _CreateRouteScreenState extends State<CreateRouteScreen> {
+  List<dynamic> _motos = [];
+  bool _loadingMotos = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMotos();
+  }
+
+  Future<void> _loadMotos() async {
+    final result = await RiderProfileService.getMotos();
+    if (!mounted) return;
+    setState(() {
+      _motos = result['motos'] ?? [];
+      _loadingMotos = false;
+    });
+  }
+
+  void _requireMoto(VoidCallback onHasMoto) {
+    if (_loadingMotos) return;
+    if (_motos.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text('create_route.no_moto_title'.tr(),
+              style: const TextStyle(color: AppColors.white)),
+          content: Text('create_route.no_moto_body'.tr(),
+              style: const TextStyle(color: AppColors.grey)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('common.cancel'.tr(),
+                  style: const TextStyle(color: AppColors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                context.push('/rider/motos');
+              },
+              child: Text('create_route.add_moto'.tr()),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+    onHasMoto();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,66 +73,61 @@ class CreateRouteScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Crear ruta',
-            style: TextStyle(
+        title: Text('create_route.title'.tr(),
+            style: const TextStyle(
                 color: AppColors.white, fontWeight: FontWeight.w700)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const SizedBox(height: 8),
-          const Text('¿Cómo quieres crear tu ruta?',
-              style: TextStyle(
+          Text('create_route.how'.tr(),
+              style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
-          const Text(
-              'Elige la opción que mejor se adapte a tu aventura.',
-              style: TextStyle(
+          Text('create_route.subtitle'.tr(),
+              style: const TextStyle(
                   color: AppColors.grey, fontSize: 14, height: 1.5)),
           const SizedBox(height: 32),
 
-          // ── Generar con IA ────────────────────────────────
           _OptionCard(
             emoji: '✨',
             color: AppColors.orange,
-            title: 'Generar con IA',
-            desc: 'Describe tu aventura y la IA crea la ruta perfecta para ti: waypoints, tiempos, gasolineras y clima.',
-            tags: ['Recomendado', 'Rutas únicas'],
-            onTap: () => context.push('/rider/route-generator'),
+            title: 'create_route.ai_title'.tr(),
+            desc: 'create_route.ai_desc'.tr(),
+            tags: ['create_route.ai_tag1'.tr(), 'create_route.ai_tag2'.tr()],
+            onTap: () => _requireMoto(() => context.push('/rider/route-generator')),
           ),
           const SizedBox(height: 16),
 
-          // ── Google Maps ───────────────────────────────────
           _OptionCard(
             emoji: '🗺️',
             color: const Color(0xFF4285F4),
-            title: 'Desde Google Maps',
-            desc: 'Importa cualquier ruta que tengas en Google Maps. Pega el enlace y la procesamos automáticamente.',
-            tags: ['Enlace corto o largo', 'Con waypoints'],
-            onTap: () => context.push('/rider/route-import'),
+            title: 'create_route.maps_title'.tr(),
+            desc: 'create_route.maps_desc'.tr(),
+            tags: ['create_route.maps_tag1'.tr(), 'create_route.maps_tag2'.tr()],
+            onTap: () => _requireMoto(() => context.push('/rider/route-import')),
           ),
           const SizedBox(height: 16),
 
-          // ── GPX ───────────────────────────────────────────
           _OptionCard(
             emoji: '📂',
             color: AppColors.cyan,
-            title: 'Archivo GPX',
-            desc: 'Importa rutas desde Wikiloc, Komoot, Garmin Connect u otras apps. Compatible con cualquier archivo .gpx.',
+            title: 'create_route.gpx_title'.tr(),
+            desc: 'create_route.gpx_desc'.tr(),
             tags: ['Wikiloc', 'Komoot', 'Garmin'],
-            onTap: () => context.push('/rider/route-import-gpx'),
+            onTap: () => _requireMoto(() => context.push('/rider/route-import-gpx')),
           ),
           const SizedBox(height: 16),
 
-          // ── Viaje multi-día ───────────────────────────────
           _OptionCard(
             emoji: '🏕️',
             color: AppColors.gold,
-            title: 'Viaje multi-día',
-            desc: 'Planifica un viaje de varios días con alojamiento, etapas y todo lo necesario para la aventura.',
-            tags: ['Multi-día', 'Con hoteles'],
+            title: 'create_route.multiday_title'.tr(),
+            desc: 'create_route.multiday_desc'.tr(),
+            tags: ['create_route.multiday_tag1'.tr(), 'create_route.multiday_tag2'.tr()],
             comingSoon: true,
             onTap: () {},
           ),
@@ -156,8 +208,8 @@ class _OptionCard extends StatelessWidget {
                       color: AppColors.greyDark,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text('Próximamente',
-                        style: TextStyle(
+                    child: Text('create_route.coming_soon'.tr(),
+                        style: const TextStyle(
                             color: AppColors.grey,
                             fontSize: 10,
                             fontWeight: FontWeight.w600)),

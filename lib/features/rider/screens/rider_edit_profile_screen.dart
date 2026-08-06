@@ -167,18 +167,14 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     if (!mounted) return;
     setState(() => _uploadingAvatar = false);
     if (result['error'] != null) {
-      setState(() {
-        _error = 'Error al subir la foto: ${result['error']}';
-        _localAvatar = null; // revertir preview
-      });
+      setState(() { _localAvatar = null; });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${result['error']}'), backgroundColor: AppColors.error));
+        SnackBar(content: Text('profile.avatar_upload_error'.tr()), backgroundColor: AppColors.error));
     } else {
       setState(() => _avatarUrl = result['avatar_url']);
-      debugPrint('Avatar URL: ${result['avatar_url']}');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Foto actualizada correctamente'),
-            backgroundColor: Colors.green, duration: Duration(seconds: 2)));
+        SnackBar(content: Text('profile.avatar_updated'.tr()),
+            backgroundColor: Colors.green, duration: const Duration(seconds: 2)));
     }
   }
 
@@ -201,19 +197,23 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
               const SizedBox(height: 16),
               ListTile(
                 leading: const Icon(Icons.camera_alt, color: AppColors.orange),
-                title: const Text('Hacer foto', style: TextStyle(color: AppColors.white)),
+                title: Text('motos.photo_camera'.tr(), style: const TextStyle(color: AppColors.white)),
                 onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.camera); },
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library, color: AppColors.cyan),
-                title: const Text('Elegir de galería', style: TextStyle(color: AppColors.white)),
+                title: Text('motos.photo_gallery'.tr(), style: const TextStyle(color: AppColors.white)),
                 onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.gallery); },
               ),
               if (_avatarUrl != null)
                 ListTile(
                   leading: const Icon(Icons.delete_outline, color: AppColors.error),
-                  title: const Text('Eliminar foto', style: TextStyle(color: AppColors.error)),
-                  onTap: () { Navigator.pop(ctx); setState(() { _avatarUrl = null; _localAvatar = null; }); },
+                  title: Text('motos.photo_remove'.tr(), style: const TextStyle(color: AppColors.error)),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    setState(() { _avatarUrl = null; _localAvatar = null; });
+                    await AvatarService.deleteAvatar();
+                  },
                 ),
             ],
           ),
