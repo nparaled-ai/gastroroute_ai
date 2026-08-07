@@ -78,7 +78,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                         children: [
                           TextSpan(text: 'GAS', style: TextStyle(color: AppColors.orange)),
-                          TextSpan(text: 'troroute', style: TextStyle(color: AppColors.white)),
+                          TextSpan(text: 'troRoute', style: TextStyle(color: AppColors.white)),
                           TextSpan(text: 'AI', style: TextStyle(color: AppColors.cyan)),
                         ],
                       ),

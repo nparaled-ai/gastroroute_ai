@@ -419,6 +419,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
 
   Map<String, dynamic>? get _weather {
     if (_currentWeather != null) return _currentWeather;
+    // Primero intentar campo directo 'weather' (devuelto por /view)
+    if (_route?['weather'] != null) return Map<String, dynamic>.from(_route!['weather']);
+    // Fallback: weather_summary (formato antiguo)
     final ws = _route?['weather_summary'];
     if (ws == null) return null;
     if (ws is Map) return Map<String, dynamic>.from(ws['current'] ?? ws);

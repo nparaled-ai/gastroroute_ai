@@ -647,7 +647,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                       ),
                       items: _motos.map((moto) => DropdownMenuItem<int>(
                         value: moto['id'],
-                        child: Text(moto['alias'] ?? '${moto['brand']} ${moto['model']}', style: const TextStyle(color: AppColors.white)),
+                        child: Text(moto['alias'] ?? '${moto['brand']} ${moto['model'] ?? ''}'.trim(), style: const TextStyle(color: AppColors.white)),
                       )).toList(),
                       onChanged: (val) => setState(() {
                         _selectedMotoId = val;

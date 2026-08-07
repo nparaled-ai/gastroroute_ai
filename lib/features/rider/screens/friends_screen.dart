@@ -216,35 +216,10 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
       itemCount: _received.length,
       itemBuilder: (context, index) {
         final r = _received[index];
-        return _FriendCard(
+        return _FriendCardWithActions(
           friend: r,
-          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-            GestureDetector(
-              onTap: () => _accept(r['friendship_id']),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.withOpacity(0.4)),
-                ),
-                child: Text('friends_screen.accept'.tr(), style: const TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.w600)),
-              ),
-            ),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () => _reject(r['friendship_id']),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.error.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.error.withOpacity(0.3)),
-                ),
-                child: Text('friends_screen.reject'.tr(), style: const TextStyle(color: AppColors.error, fontSize: 12, fontWeight: FontWeight.w600)),
-              ),
-            ),
-          ]),
+          onAccept: () => _accept(r['friendship_id']),
+          onReject: () => _reject(r['friendship_id']),
         );
       },
     );
@@ -320,6 +295,127 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
           label: Text('friends_screen.search_riders'.tr()),
         ),
       ]),
+    );
+  }
+}
+
+class _FriendCardWithActions extends StatelessWidget {
+  final Map<String, dynamic> friend;
+  final VoidCallback onAccept;
+  final VoidCallback onReject;
+  const _FriendCardWithActions({required this.friend, required this.onAccept, required this.onReject});
+
+  String _flag(String? lang) {
+    switch (lang) {
+      case 'en': return '🇬🇧';
+      case 'fr': return '🇫🇷';
+      case 'de': return '🇩🇪';
+      case 'it': return '🇮🇹';
+      case 'pt': return '🇵🇹';
+      default:   return '🇪🇸';
+    }
+  }
+
+  Color _levelColor(String? level) {
+    switch (level) {
+      case 'experto':    return AppColors.gold;
+      case 'intermedio': return AppColors.cyan;
+      default:           return AppColors.grey;
+    }
+  }
+
+  String _levelLabel(String? level) {
+    switch (level) {
+      case 'experto':    return 'EXPERTO';
+      case 'intermedio': return 'INTER.';
+      default:           return 'NOVATO';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final name  = '${friend['first_name'] ?? ''} ${friend['last_name'] ?? ''}'.trim();
+    final nick  = friend['nickname'] ?? '';
+    final level = friend['experience_level'];
+    final lang  = friend['language'];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.greyDark),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            RiderAvatar(avatarUrl: friend['avatar_url'], level: level ?? 'novato', size: 48),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(name.isNotEmpty ? name : nick,
+                    style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 14)),
+                if (nick.isNotEmpty)
+                  Text('@$nick', style: const TextStyle(color: AppColors.orange, fontSize: 12)),
+                const SizedBox(height: 4),
+                Row(children: [
+                  if (lang != null) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(color: AppColors.greyDark.withOpacity(0.5), borderRadius: BorderRadius.circular(6)),
+                      child: Text(_flag(lang), style: const TextStyle(fontSize: 12)),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: _levelColor(level).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: _levelColor(level).withOpacity(0.4)),
+                    ),
+                    child: Text(_levelLabel(level), style: TextStyle(color: _levelColor(level), fontSize: 10, fontWeight: FontWeight.w700)),
+                  ),
+                ]),
+              ]),
+            ),
+          ]),
+          const SizedBox(height: 12),
+          Row(children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: onAccept,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green.withOpacity(0.4)),
+                  ),
+                  child: Center(child: Text('friends_screen.accept'.tr(), style: const TextStyle(color: Colors.green, fontSize: 13, fontWeight: FontWeight.w600))),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: GestureDetector(
+                onTap: onReject,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                  ),
+                  child: Center(child: Text('friends_screen.reject'.tr(), style: const TextStyle(color: AppColors.error, fontSize: 13, fontWeight: FontWeight.w600))),
+                ),
+              ),
+            ),
+          ]),
+        ],
+      ),
     );
   }
 }

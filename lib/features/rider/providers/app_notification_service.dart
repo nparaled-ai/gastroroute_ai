@@ -35,6 +35,18 @@ class AppNotificationService {
     } catch (_) {}
   }
 
+  static Future<void> deleteNotification(int id) async {
+    try {
+      await ApiClient.dio.delete('/rider/notifications/$id');
+    } catch (_) {}
+  }
+
+  static Future<void> deleteAllNotifications() async {
+    try {
+      await ApiClient.dio.delete('/rider/notifications/all');
+    } catch (_) {}
+  }
+
   static Future<void> registerFcmToken(String token) async {
     try {
       await ApiClient.dio.post('/rider/fcm-token', data: {'token': token});

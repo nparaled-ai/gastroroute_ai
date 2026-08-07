@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen>
                     style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900),
                     children: [
                       TextSpan(text: 'GAS',       style: TextStyle(color: AppColors.orange)),
-                      TextSpan(text: 'troroute',  style: TextStyle(color: AppColors.white)),
+                      TextSpan(text: 'troRoute',  style: TextStyle(color: AppColors.white)),
                       TextSpan(text: 'AI',        style: TextStyle(color: AppColors.cyan)),
                     ],
                   ),

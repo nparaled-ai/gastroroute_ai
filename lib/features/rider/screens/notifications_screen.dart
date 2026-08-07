@@ -31,6 +31,55 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     await AppNotificationService.markAllRead();
   }
 
+  Future<void> _deleteOne(int index) async {
+    final n  = _notifications[index];
+    final id = n['id'] as int;
+    setState(() => _notifications.removeAt(index));
+    await AppNotificationService.deleteNotification(id);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('notifications.deleted'.tr()),
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.all(16),
+      duration: const Duration(seconds: 2),
+    ));
+  }
+
+  Future<void> _deleteAll() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('notifications.delete_all'.tr(),
+            style: const TextStyle(color: AppColors.white)),
+        content: Text('notifications.delete_all_confirm'.tr(),
+            style: const TextStyle(color: AppColors.grey)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('common.cancel'.tr(),
+                style: const TextStyle(color: AppColors.grey)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('notifications.delete_all'.tr(),
+                style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() => _notifications.clear());
+    await AppNotificationService.deleteAllNotifications();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('notifications.deleted_all'.tr()),
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.all(16),
+      duration: const Duration(seconds: 2),
+    ));
+  }
+
   IconData _iconFor(String type) {
     switch (type) {
       case 'friend_request':  return Icons.person_add_outlined;
@@ -93,6 +142,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          if (_notifications.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.grey),
+              tooltip: 'notifications.delete_all'.tr(),
+              onPressed: _deleteAll,
+            ),
+        ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: AppColors.orange))
@@ -118,63 +175,74 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     final type = n['type'] as String? ?? '';
                     final read = n['read'] == true || n['read'] == 1;
 
-                    return InkWell(
-                      onTap: () => _onTap(n),
-                      child: Container(
-                        color: read ? Colors.transparent : AppColors.orange.withOpacity(0.05),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 44, height: 44,
-                              decoration: BoxDecoration(
-                                color: _colorFor(type).withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
+                    return Dismissible(
+                      key: ValueKey(n['id']),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        color: AppColors.error,
+                        child: const Icon(Icons.delete_outline, color: Colors.white, size: 26),
+                      ),
+                      onDismissed: (_) => _deleteOne(i),
+                      child: InkWell(
+                        onTap: () => _onTap(n),
+                        child: Container(
+                          color: read ? Colors.transparent : AppColors.orange.withOpacity(0.05),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 44, height: 44,
+                                decoration: BoxDecoration(
+                                  color: _colorFor(type).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(_iconFor(type), color: _colorFor(type), size: 22),
                               ),
-                              child: Icon(_iconFor(type), color: _colorFor(type), size: 22),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          n['title'] ?? '',
-                                          style: TextStyle(
-                                            color: AppColors.white,
-                                            fontSize: 14,
-                                            fontWeight: read ? FontWeight.w500 : FontWeight.w700,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            n['title'] ?? '',
+                                            style: TextStyle(
+                                              color: AppColors.white,
+                                              fontSize: 14,
+                                              fontWeight: read ? FontWeight.w500 : FontWeight.w700,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        _timeAgo(n['created_at'] as String?),
-                                        style: const TextStyle(color: AppColors.grey, fontSize: 11),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    n['body'] ?? '',
-                                    style: const TextStyle(color: AppColors.grey, fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (!read)
-                              const Padding(
-                                padding: EdgeInsets.only(left: 8, top: 4),
-                                child: CircleAvatar(
-                                  radius: 4,
-                                  backgroundColor: AppColors.orange,
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          _timeAgo(n['created_at'] as String?),
+                                          style: const TextStyle(color: AppColors.grey, fontSize: 11),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      n['body'] ?? '',
+                                      style: const TextStyle(color: AppColors.grey, fontSize: 13),
+                                    ),
+                                  ],
                                 ),
                               ),
-                          ],
+                              if (!read)
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8, top: 4),
+                                  child: CircleAvatar(
+                                    radius: 4,
+                                    backgroundColor: AppColors.orange,
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     );

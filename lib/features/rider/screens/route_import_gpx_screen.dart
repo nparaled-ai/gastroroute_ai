@@ -286,7 +286,7 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
                           style: TextStyle(color: AppColors.grey, fontSize: 13)),
                       items: _motos.map((m) => DropdownMenuItem<int>(
                         value: m['id'] as int,
-                        child: Text('${m['brand']} ${m['model']}',
+                        child: Text('${m['brand']} ${m['model'] ?? ''}'.trim(),
                             style: const TextStyle(color: AppColors.white, fontSize: 13)),
                       )).toList(),
                       onChanged: (val) => setState(() => _motoId = val),

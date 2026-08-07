@@ -650,7 +650,7 @@ class _RouteCard extends StatelessWidget {
                   const Icon(Icons.two_wheeler, color: AppColors.grey, size: 14),
                   const SizedBox(width: 4),
                   Text(
-                    '${route['moto_info']['brand']} ${route['moto_info']['model']} · ${route['moto_info']['engine_cc']} cc',
+                    '${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim() + ' · ${route['moto_info']['engine_cc']} cc',
                     style: const TextStyle(color: AppColors.grey, fontSize: 12),
                   ),
                 ]),

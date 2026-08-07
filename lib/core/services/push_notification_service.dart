@@ -15,7 +15,7 @@ class PushNotificationService {
 
   static const _androidChannel = AndroidNotificationChannel(
     'gastroroute_default',
-    'GastroRouteAI',
+    'GAStroRouteAI',
     description: 'Notificaciones de rutas y amigos',
     importance: Importance.high,
     sound: RawResourceAndroidNotificationSound('sound_moto'),

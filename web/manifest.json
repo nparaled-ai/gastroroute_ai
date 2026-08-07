@@ -1,6 +1,6 @@
 {
-    "name": "gastroroute_ai",
-    "short_name": "gastroroute_ai",
+    "name": "GAStroRouteAI",
+    "short_name": "GAStroRouteAI",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

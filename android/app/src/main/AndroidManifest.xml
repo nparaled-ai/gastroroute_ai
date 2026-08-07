@@ -18,7 +18,7 @@
     </queries>
 
     <application
-        android:label="gastroroute_ai"
+        android:label="GAStroRouteAI"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

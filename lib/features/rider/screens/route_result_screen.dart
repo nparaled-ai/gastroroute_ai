@@ -76,7 +76,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   bool _canRefreshWeather() {
     final date = _route['departure_date'];
     if (date == null) return true;
-    final diff = DateTime.parse(date).difference(DateTime.now()).inDays;
+    final target = DateTime.parse(date);
+    final today  = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final diff   = target.difference(today).inDays;
     return diff <= 5;
   }
 

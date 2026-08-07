@@ -131,14 +131,12 @@ class _LoginScreenState extends State<LoginScreen> {
               Center(
                 child: Column(
                   children: [
-                    Image.asset('assets/images/logo.png', width: 120, height: 120, fit: BoxFit.contain),
-                    const SizedBox(height: 16),
                     RichText(
                       text: const TextSpan(
                         style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
                         children: [
                           TextSpan(text: 'GAS', style: TextStyle(color: AppColors.orange)),
-                          TextSpan(text: 'troroute', style: TextStyle(color: AppColors.white)),
+                          TextSpan(text: 'troRoute', style: TextStyle(color: AppColors.white)),
                           TextSpan(text: 'AI', style: TextStyle(color: AppColors.cyan)),
                         ],
                       ),

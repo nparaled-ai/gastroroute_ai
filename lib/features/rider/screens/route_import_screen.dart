@@ -48,14 +48,14 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
       color: AppColors.cyan,
       title: 'Copia el enlace',
       description: 'En el menú que aparece, selecciona "Copiar enlace". El enlace se guardará en tu portapapeles.',
-      tip: 'También puedes compartir directamente a GastroRouteAI si aparece en las opciones.',
+      tip: 'También puedes compartir directamente a GAStroRouteAI si aparece en las opciones.',
       illustration: _StepIllustration.copyLink,
     ),
     _TutorialStep(
       icon: Icons.download_outlined,
       color: Colors.green,
       title: 'Pega el enlace aquí',
-      description: 'Vuelve a GastroRouteAI y pega el enlace. Procesaremos la ruta y añadiremos tiempos, gasolineras y clima automáticamente.',
+      description: 'Vuelve a GAStroRouteAI y pega el enlace. Procesaremos la ruta y añadiremos tiempos, gasolineras y clima automáticamente.',
       tip: null,
       illustration: _StepIllustration.pasteLink,
     ),
@@ -81,7 +81,7 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
     if (primary.isNotEmpty) {
       setState(() {
         _motoId    = primary['id'];
-        _motoLabel = '${primary['brand']} ${primary['model']}';
+        _motoLabel = '${primary['brand']} ${primary['model'] ?? ''}'.trim();
       });
     }
   }
@@ -476,13 +476,13 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
                       style: TextStyle(color: AppColors.grey, fontSize: 13)),
                   items: _motos.map((m) => DropdownMenuItem<int>(
                     value: m['id'] as int,
-                    child: Text('${m['brand']} ${m['model']}',
+                    child: Text('${m['brand']} ${m['model'] ?? ''}'.trim(),
                         style: const TextStyle(color: AppColors.white, fontSize: 13)),
                   )).toList(),
                   onChanged: (val) => setState(() {
                     _motoId = val;
                     final m = _motos.firstWhere((m) => m['id'] == val, orElse: () => {});
-                    _motoLabel = m.isNotEmpty ? '${m['brand']} ${m['model']}' : null;
+                    _motoLabel = m.isNotEmpty ? '${m['brand']} ${m['model'] ?? ''}'.trim() : null;
                   }),
                 ),
               ),

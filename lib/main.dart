@@ -45,7 +45,7 @@ class GastroRouteApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'GastroRouteAI',
+      title: 'GAStroRouteAI',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
       routerConfig: router,

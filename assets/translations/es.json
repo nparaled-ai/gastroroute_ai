@@ -1,5 +1,5 @@
 ﻿{
-    "app_name":  "GastroRouteAI",
+    "app_name":  "GAStroRouteAI",
     "common":  {
                    "save":  "Guardar",
                    "cancel":  "Cancelar",
@@ -217,7 +217,12 @@
                           "now":  "ahora",
                           "minutes_ago":  "hace {n} min",
                           "hours_ago":  "hace {n} h",
-                          "days_ago":  "hace {n} d"
+                          "days_ago":  "hace {n} d",
+                          "delete_all":  "Eliminar todas",
+                          "delete":  "Eliminar",
+                          "delete_all_confirm":  "¿Eliminar todas las notificaciones?",
+                          "deleted":  "Notificación eliminada",
+                          "deleted_all":  "Todas las notificaciones eliminadas"
                       },
     "forgot_password":  {
                             "title":  "¿Olvidaste tu contraseña?",
