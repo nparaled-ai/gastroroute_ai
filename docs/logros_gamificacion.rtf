@@ -1,0 +1,522 @@
+{\rtf1\ansi\ansicpg1252\deff0
+{\fonttbl{\f0\fswiss\fcharset0 Arial;}}
+{\colortbl ;\red232\green98\blue26;\red26\green26\blue46;\red102\green102\blue102;\red255\green255\blue255;}
+\f0\fs20
+\pard\qc\sb800\sa200\b\fs56\cf1 GAStroRouteAI\b0\par
+\pard\qc\sb0\sa100\b\fs32\cf2 Sistema de Logros y Gamificaci\'f3n\b0\par
+\pard\qc\sb0\sa800\i\fs20\cf3 Documento de planificaci\'f3n \'97 Agosto 2026\i0\par
+\pard\sb200\sa200\brdrb\brdrs\brdrw10\brdrcf1\fs4  \par
+\pard\sb300\sa150\b\fs32\cf1 1. Introducci\'f3n\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 El sistema de logros de GAStroRouteAI tiene como objetivo gamificar la experiencia del motero, premiando sus aventuras con badges visuales organizados en cuatro niveles: Bronce, Plata, Oro y Platino.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 Los logros se muestran en el perfil del usuario al estilo Strava: una secci\'f3n de badges con iconos tem\'e1ticos y nivel de consecuci\'f3n visible.\i0\par
+\pard\sb200\sa200\brdrb\brdrs\brdrw10\brdrcf1\fs4  \par
+\pard\sb300\sa150\b\fs32\cf1 2. C\'f3mo se registra una ruta completada\b0\par
+\pard\sb240\sa100\b\fs26\cf2 2.1 Inicio de ruta \'97 Detecci\'f3n (opci\'f3n B, elegida)\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 DECISI\'d3N: se implementa la opci\'f3n B, sin permiso de localizaci\'f3n en segundo plano. Motivo: ACCESS_BACKGROUND_LOCATION en Android es un permiso sensible que exige formulario de justificaci\'f3n en Google Play, v\'eddeo demostrativo y una revisi\'f3n que puede tardar semanas o ser rechazada (en iOS, el equivalente "Always"). La opci\'f3n B cubre el caso real sin bloquear la publicaci\'f3n.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 \i C\'f3mo funciona la opci\'f3n B:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Notificaci\'f3n local programada el d\'eda de la ruta, a la hora de salida: "\'bfSales hoy de ruta? Iniciar tracking". Solo usa fecha y hora, sin GPS de fondo.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Con la app abierta s\'ed se puede usar la detecci\'f3n por proximidad GPS al punto de origen (menos de 500 m) dentro del margen de \'b11 hora respecto a la hora de salida.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Inicio manual siempre disponible: bot\'f3n "Iniciar ruta" en el detalle de cualquier ruta guardada.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i El Foreground Service necesario para el tracking una vez iniciada la ruta NO tiene este problema de revisi\'f3n: solo lo tiene la localizaci\'f3n en segundo plano con la app cerrada.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 \i A FUTURO: queda apuntada la opci\'f3n A (pedir ACCESS_BACKGROUND_LOCATION y pasar la revisi\'f3n de Google Play) para tener detecci\'f3n autom\'e1tica completa con la app cerrada. Es un cambio contemplado, no descartado.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 2.2 Durante la ruta \'97 Tracking GPS\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Una vez iniciada la ruta, la app activa un servicio en primer plano (Foreground Service) que registra continuamente la posici\'f3n GPS:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Notificaci\'f3n persistente: "Ruta en curso \'97 X km recorridos"\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El track GPS se guarda localmente como lista de coordenadas\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Al finalizar, el track se sube al servidor\par
+\pard\sb240\sa100\b\fs26\cf2 2.3 Fin de ruta \'97 Detecci\'f3n autom\'e1tica de llegada\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 El fin de ruta funciona de forma sim\'e9trica al inicio. El sistema detecta autom\'e1ticamente la llegada al destino cuando se cumplen estas condiciones:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El GPS detecta que el usuario est\'e1 a menos de 500 metros del punto de destino (coordenadas fijas guardadas en la ruta)\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El usuario lleva al menos 3 minutos en esa zona (evita falso positivo si solo se pasa cerca)\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} En rutas circulares (origen = destino): adem\'e1s se exige haber completado al menos el 80% del tiempo estimado de la ruta\par
+\pard\sb60\sa60\b0\fs20\cf2 Cuando se cumplen las condiciones, la app env\'eda una notificaci\'f3n: "\'bfHas llegado a tu destino? Finalizar ruta / Seguir"\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Fallback manual (siempre disponible):\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Bot\'f3n "Finalizar ruta" en la notificaci\'f3n persistente del tracking\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Bot\'f3n "Finalizar ruta" en la pantalla "Ruta en curso"\par
+\pard\sb240\sa100\b\fs26\cf2 2.4 Fin de ruta \'97 Pantalla de resumen\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Tras finalizar (autom\'e1tica o manualmente), aparece la pantalla de resumen con:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Km reales recorridos (calculados del track GPS con f\'f3rmula Haversine)\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Tiempo total y velocidad media\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Mapa con el track dibujado\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} POIs detectados autom\'e1ticamente como visitados\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} POIs donde no se par\'f3 suficiente, con opci\'f3n de marcar manualmente\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Logros desbloqueados durante la ruta\par
+\pard\sb200\sa200\brdrb\brdrs\brdrw10\brdrcf1\fs4  \par
+\pard\sb300\sa150\b\fs32\cf1 3. Detecci\'f3n de visita a POIs\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 La detecci\'f3n de visita a un POI es autom\'e1tica durante el tracking y depende de la categor\'eda del punto:\i0\par
+\pard\sb240\sa100\b\fs26\cf2 3.1 Separaci\'f3n POIs / Gastronom\'eda\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los POIs son puntos geogr\'e1ficos y paisaj\'edsticos (puertos, miradores, monumentos, pueblos...). No incluyen restaurantes ni bares.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los restaurantes y bares solo cuentan para el logro de Gastronom\'eda, y \'fanicamente si tienen perfil de partner activo en la app. Detecci\'f3n autom\'e1tica por GPS, no se pueden a\'f1adir manualmente.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Un restaurante partner suma solo en Gastronom\'eda, nunca tambi\'e9n en POIs visitados. No hay doble c\'f3mputo.\par
+\pard\sb240\sa100\b\fs26\cf2 3.2 Fuentes de POIs\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 El sistema de POIs se construye con la opci\'f3n C (combinada):\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Seeding inicial desde OpenStreetMap (overpass-turbo), ampliando el comando php artisan pois:seed ya existente.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Crecimiento org\'e1nico: los moteros pueden proponer POIs no registrados desde la pantalla de resumen de ruta. El administrador los valida antes de que computen para logros (y quedan incorporados a la BD para todos).\par
+\pard\sb240\sa100\b\fs26\cf2 3.3 BD de POIs: ampliaci\'f3n a 5 pa\'edses (COMPLETADO)\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Situaci\'f3n previa: la tabla points_of_interest conten\'eda 67 registros, pr\'e1cticamente todos en Espa\'f1a. No exist\'eda columna country, solo region como texto libre. Un motero extranjero no habr\'eda tenido ning\'fan POI que visitar, dejando los logros de POIs y Exploraci\'f3n inalcanzables para \'e9l.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 Trabajo realizado:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Migraci\'f3n add_country_to_points_of_interest: columna country char(2) ISO 3166-1, default ES, indexada. Corrige adem\'e1s los registros previos (los 4 de Pirineos Franceses pasan a FR, Puerto de Envalira a AD).\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Modelo PointOfInterest: country a\'f1adido a fillable.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Comando pois:seed reescrito: el antiguo country_hint (que no se guardaba) pasa a ser country, persistido en BD. Nueva opci\'f3n --country=XX para sembrar un pa\'eds concreto.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los registros existentes ahora se actualizan en lugar de saltarse, de modo que un reseeding no consume cuota de Google Maps para lo ya sembrado.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Soporte de coordenadas expl\'edcitas en la lista curada: los top\'f3nimos ambiguos no se geocodifican. Se detectaron y corrigieron 4 errores de geocoding (Route des Cr\'eates ca\'eda en Provenza en lugar de los Vosgos, Tre Cime di Lavaredo en la llanura del Po, Kesselbergstra\'dfe en el centro de M\'fanich y Brocken en Bremen) m\'e1s un centroide redondeado en Serra da Arr\'e1bida.\par
+\pard\sb60\sa60\b0\fs20\cf2 La lista curada qued\'f3 en 129 POIs, cifra claramente insuficiente (14 para toda Alemania). Por eso se a\'f1adi\'f3 despu\'e9s la importaci\'f3n masiva desde OpenStreetMap descrita en 3.5.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 3.5 Importaci\'f3n masiva desde OpenStreetMap (COMPLETADO)\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Comando pois:import-osm, que consulta la Overpass API. Ventajas frente al geocoding de Google: es gratuito y sin cuota, las coordenadas vienen en el propio dato (desaparece el problema del geocoding ambiguo) y las etiquetas OSM mapean casi directas a nuestras categor\'edas.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 Resultado final: 53.185 POIs (129 curados + 53.056 importados).\i0\par
+\trowd\trgaph108\trleft-108\clcbpat1\cellx4500\clcbpat1\cellx8000
+\pard\intbl\b\fs18\cf4 Pa\'eds\b0\cell
+\pard\intbl\b\fs18\cf4 POIs\b0\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Francia\cell
+\pard\intbl\b0\fs18\cf2 18.936\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Alemania\cell
+\pard\intbl\b0\fs18\cf2 15.005\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Espa\'f1a\cell
+\pard\intbl\b0\fs18\cf2 9.768\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Italia\cell
+\pard\intbl\b0\fs18\cf2 7.578\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Portugal\cell
+\pard\intbl\b0\fs18\cf2 1.868\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Andorra\cell
+\pard\intbl\b0\fs18\cf2 30\cell
+\row
+\pard\sb60\sa60\b0\fs20\cf2 \i Criterio de calidad aplicado (opci\'f3n B elegida): se importa solo lo alcanzable en moto.\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Puertos: se exige que el nodo est\'e9 SOBRE una v\'eda asfaltada. La etiqueta mountain_pass=yes por s\'ed sola incluye collados de senderismo: en Espa\'f1a hab\'eda 3.482 etiquetados frente a 1.242 realmente sobre carretera. Se detect\'f3 ordenando por altitud y viendo puertos a 2.700-3.267 m, alturas a las que no llega ninguna carretera espa\'f1ola.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Se descarta natural=saddle (a\'f1ad\'eda unos 6.000 puntos inalcanzables solo en Espa\'f1a) y historic=monument (placas y monumentos menores).\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Miradores: sin filtro de carretera. Cruzar toda la red viaria de un pa\'eds contra miles de miradores agota el timeout de Overpass. No compensa trocear: un mirador de sendero no falsea los logros, porque nunca se estar\'e1 dentro del radio de detecci\'f3n rodando. Solo aparece en la pantalla de POIs, donde se filtra por destacados.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Detalles t\'e9cnicos que costaron trabajo descubrir:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Overpass exige cabecera User-Agent: sin ella el Apache que tiene delante responde 406 Not Acceptable.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El PHP CLI del entorno no tiene curl.cainfo configurado; se usa withoutVerifying() por consistencia con GoogleMapsService. El arreglo real es configurar curl.cainfo en php.ini.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Overpass devuelve 429 (cuota) y 504 (timeout) con frecuencia. El comando reintenta 4 veces con espera creciente y espacia las consultas 8 segundos.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Modo --split: consulta subdivisi\'f3n a subdivisi\'f3n (ISO 3166-2) cuando la consulta de pa\'eds agota el timeout. Fue necesario para los puertos de Francia. Hay subdivisiones definidas para ES, FR, DE, IT y PT.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Deduplicaci\'f3n por osm_id y por proximidad (300 m + nombre similar), para no duplicar los curados a mano.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Columnas nuevas: source (curated/osm), featured, osm_type, osm_id y elevation. \'cdndices por (lat,lng) y (country,category), imprescindibles con 53.000 filas.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Huecos verificados, no perdidos: Andorra da 0 embalses y 0 monumentos naturales realmente (no es fallo de consulta), y las regiones francesas Centre-Val de Loire e \'cele-de-France dan 0 puertos porque son llanas. Ambos casos se comprobaron con consulta directa antes de darlos por buenos.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 3.6 Relleno de la regi\'f3n (COMPLETADO)\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Overpass no devuelve la divisi\'f3n administrativa junto al POI, as\'ed que los 53.056 importados quedaron sin region. Resuelto con el comando pois:fill-regions: los 53.185 POIs tienen regi\'f3n asignada.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 Enfoque: en lugar de geocodificar inversamente punto por punto (Google ser\'edan ~53.000 llamadas de pago, unos 265 d\'f3lares; Nominatim est\'e1 limitado a 1 petici\'f3n/segundo, casi 15 horas y contra su pol\'edtica de uso), se aprovecha que ya se guardaba el osm_id de cada POI. Se pregunta a Overpass qu\'e9 elementos hay dentro de cada regi\'f3n administrativa y se cruza por ese id: unas 90 consultas en total, gratis y exacto.\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los nombres de regi\'f3n se piden a OSM, una consulta por pa\'eds, en vez de mantener a mano 85 top\'f3nimos.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} No se sobreescribe lo existente: los 129 curados conservan su nombre motero. Con --force puede forzarse.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Rescate por proximidad como \'faltima fase: los puntos costeros (espigones, faros, islotes, cuevas marinas) caen geom\'e9tricamente fuera del pol\'edgono de su regi\'f3n, as\'ed que heredan la del POI con regi\'f3n m\'e1s cercano dentro de 50 km. Se ejecuta solo sobre lo que qued\'f3 hu\'e9rfano, nunca en lugar de la asignaci\'f3n exacta.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Errores de c\'f3digos ISO detectados y corregidos (todos daban 0 elementos en silencio, sin error):\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Faltaban Ceuta (ES-CE) y Melilla (ES-ML): Espa\'f1a tiene 17 comunidades aut\'f3nomas M\'c1S 2 ciudades aut\'f3nomas. Dejaba 36 POIs sin regi\'f3n.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} C\'f3rcega es FR-20R, no FR-COR (colectividad territorial desde 2018). Adem\'e1s de la regi\'f3n, esto provoc\'f3 que sus puertos de monta\'f1a no se importaran en la pasada con --split.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El \'e1rea ISO3166-1=FR de OSM incluye los territorios de ultramar, de donde entraron unos 490 POIs no previstos (Reuni\'f3n, Nueva Caledonia, Polinesia, Guadalupe, Martinica, Guayana, e incluso las islas Kerguelen). Se decidi\'f3 conservarlos y asignarles su regi\'f3n.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} No se debe acotar por admin_level=2 al buscar por ISO3166-1: los territorios franceses de ultramar son colectividades, no pa\'edses, y su relaci\'f3n en OSM est\'e1 en otro nivel. Con Andorra funcionaba porque s\'ed es un pa\'eds, lo que ocult\'f3 el fallo.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Inconsistencia de OSM: Guayana y Reuni\'f3n llevan la etiqueta ISO3166-2 de Francia (FR-GF, FR-RE), pero Guadalupe, Martinica y Mayotte no. Por ser regiones ultraperif\'e9ricas de la UE tienen c\'f3digo ISO 3166-1 propio (GP, MQ, YT) y van etiquetadas as\'ed, aunque administrativamente las cinco sean departamentos de ultramar.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Lecci\'f3n: lo que destap\'f3 todos estos fallos fue contar cu\'e1ntos POIs quedaban sin regi\'f3n despu\'e9s de cada pasada, en vez de dar el proceso por terminado. Un 0 de Overpass puede significar "no hay" o "la consulta est\'e1 mal", y hay que distinguirlo comprobando.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 \i La columna category sigue siendo un enum cerrado con 8 valores: puerto_montana, mirador, monumento, monumento_natural, parque_natural, desfiladero, embalse, pueblo_historico. Todos los POIs nuevos encajan en ellas, pero ampliar categor\'edas en el futuro exigir\'e1 migraci\'f3n del enum.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 3.4 Tabla de categor\'edas y tiempos de parada\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Alineada con las categor\'edas reales de la BD. Los puntos que se disfrutan rodando cuentan al pasar; los que implican bajarse de la moto exigen parada real.\i0\par
+\trowd\trgaph108\trleft-108\clcbpat1\cellx4500\clcbpat1\cellx8000\clcbpat1\cellx10000
+\pard\intbl\b\fs18\cf4 Categor\'eda\b0\cell
+\pard\intbl\b\fs18\cf4 Parada m\'ednima\b0\cell
+\pard\intbl\b\fs18\cf4 Detecci\'f3n\b0\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 puerto_montana\cell
+\pard\intbl\b0\fs18\cf2 Paso por el punto\cell
+\pard\intbl\b0\fs18\cf2 GPS proximidad\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 desfiladero\cell
+\pard\intbl\b0\fs18\cf2 Paso por el punto\cell
+\pard\intbl\b0\fs18\cf2 GPS proximidad\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 parque_natural\cell
+\pard\intbl\b0\fs18\cf2 Paso por el punto\cell
+\pard\intbl\b0\fs18\cf2 GPS proximidad\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 mirador\cell
+\pard\intbl\b0\fs18\cf2 2 minutos parado\cell
+\pard\intbl\b0\fs18\cf2 GPS + tiempo\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 monumento\cell
+\pard\intbl\b0\fs18\cf2 3 minutos parado\cell
+\pard\intbl\b0\fs18\cf2 GPS + tiempo\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 monumento_natural\cell
+\pard\intbl\b0\fs18\cf2 3 minutos parado\cell
+\pard\intbl\b0\fs18\cf2 GPS + tiempo\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 embalse\cell
+\pard\intbl\b0\fs18\cf2 3 minutos parado\cell
+\pard\intbl\b0\fs18\cf2 GPS + tiempo\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 pueblo_historico\cell
+\pard\intbl\b0\fs18\cf2 10 minutos parado\cell
+\pard\intbl\b0\fs18\cf2 GPS + tiempo\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Restaurante / bar (partner)\cell
+\pard\intbl\b0\fs18\cf2 15 minutos parado\cell
+\pard\intbl\b0\fs18\cf2 GPS + tiempo\cell
+\row
+\pard\sb60\sa60\b0\fs20\cf2 \i Nota: 'parado' significa velocidad GPS aprox. 0 o desplazamiento menor de 50 metros durante el tiempo indicado.\i0\par
+\pard\sb200\sa200\brdrb\brdrs\brdrw10\brdrcf1\fs4  \par
+\pard\sb300\sa150\b\fs32\cf1 4. Sistema de logros \'97 Opci\'f3n A (Bronce / Plata / Oro / Platino)\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Cada logro tiene cuatro niveles progresivos. Los km y rutas se acumulan desde el inicio de la actividad del usuario (los logros nunca se resetean). Se muestran estad\'edsticas anuales en el perfil pero los logros son vitalicios.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 4.1 Kil\'f3metros recorridos\b0\par
+\trowd\trgaph108\trleft-108\clcbpat1\cellx4500\clcbpat1\cellx8000\clcbpat1\cellx10000
+\pard\intbl\b\fs18\cf4 Nivel\b0\cell
+\pard\intbl\b\fs18\cf4 Requisito\b0\cell
+\pard\intbl\b\fs18\cf4 Badge\b0\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Bronce\cell
+\pard\intbl\b0\fs18\cf2 500 km reales recorridos\cell
+\pard\intbl\b0\fs18\cf2 Km-Bronce\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Plata\cell
+\pard\intbl\b0\fs18\cf2 5.000 km reales recorridos\cell
+\pard\intbl\b0\fs18\cf2 Km-Plata\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Oro\cell
+\pard\intbl\b0\fs18\cf2 25.000 km reales recorridos\cell
+\pard\intbl\b0\fs18\cf2 Km-Oro\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Platino\cell
+\pard\intbl\b0\fs18\cf2 100.000 km reales recorridos\cell
+\pard\intbl\b0\fs18\cf2 Km-Platino\cell
+\row
+\pard\sb240\sa100\b\fs26\cf2 4.2 Rutas completadas\b0\par
+\trowd\trgaph108\trleft-108\clcbpat1\cellx4500\clcbpat1\cellx8000\clcbpat1\cellx10000
+\pard\intbl\b\fs18\cf4 Nivel\b0\cell
+\pard\intbl\b\fs18\cf4 Requisito\b0\cell
+\pard\intbl\b\fs18\cf4 Badge\b0\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Bronce\cell
+\pard\intbl\b0\fs18\cf2 5 rutas completadas\cell
+\pard\intbl\b0\fs18\cf2 Rutas-Bronce\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Plata\cell
+\pard\intbl\b0\fs18\cf2 10 rutas completadas\cell
+\pard\intbl\b0\fs18\cf2 Rutas-Plata\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Oro\cell
+\pard\intbl\b0\fs18\cf2 25 rutas completadas\cell
+\pard\intbl\b0\fs18\cf2 Rutas-Oro\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Platino\cell
+\pard\intbl\b0\fs18\cf2 100 rutas completadas\cell
+\pard\intbl\b0\fs18\cf2 Rutas-Platino\cell
+\row
+\pard\sb60\sa60\b0\fs20\cf2 \i Nota: cuentan rutas propias y rutas de otros moteros en las que el usuario participa.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 4.3 Gastronom\'eda\b0\par
+\trowd\trgaph108\trleft-108\clcbpat1\cellx4500\clcbpat1\cellx8000\clcbpat1\cellx10000
+\pard\intbl\b\fs18\cf4 Nivel\b0\cell
+\pard\intbl\b\fs18\cf4 Requisito\b0\cell
+\pard\intbl\b\fs18\cf4 Badge\b0\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Bronce\cell
+\pard\intbl\b0\fs18\cf2 5 restaurantes / bares visitados\cell
+\pard\intbl\b0\fs18\cf2 Gastro-Bronce\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Plata\cell
+\pard\intbl\b0\fs18\cf2 15 restaurantes / bares visitados\cell
+\pard\intbl\b0\fs18\cf2 Gastro-Plata\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Oro\cell
+\pard\intbl\b0\fs18\cf2 40 restaurantes / bares visitados\cell
+\pard\intbl\b0\fs18\cf2 Gastro-Oro\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Platino\cell
+\pard\intbl\b0\fs18\cf2 100 restaurantes / bares visitados\cell
+\pard\intbl\b0\fs18\cf2 Gastro-Platino\cell
+\row
+\pard\sb60\sa60\b0\fs20\cf2 \i BLOQUEANTE CONOCIDO: este logro depende de restaurantes con perfil de partner, y el rol partner todav\'eda no tiene endpoints implementados (las rutas existen en la API pero est\'e1n vac\'edas). Al lanzar no habr\'e1 ning\'fan restaurante registrado, por lo que Gastronom\'eda ser\'e1 visible pero inalcanzable hasta que se monte el perfil de partner. Decisi\'f3n tomada: se deja visible igualmente.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 4.4 POIs visitados\b0\par
+\trowd\trgaph108\trleft-108\clcbpat1\cellx4500\clcbpat1\cellx8000\clcbpat1\cellx10000
+\pard\intbl\b\fs18\cf4 Nivel\b0\cell
+\pard\intbl\b\fs18\cf4 Requisito\b0\cell
+\pard\intbl\b\fs18\cf4 Badge\b0\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Bronce\cell
+\pard\intbl\b0\fs18\cf2 10 POIs visitados en total\cell
+\pard\intbl\b0\fs18\cf2 POI-Bronce\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Plata\cell
+\pard\intbl\b0\fs18\cf2 30 POIs visitados en total\cell
+\pard\intbl\b0\fs18\cf2 POI-Plata\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Oro\cell
+\pard\intbl\b0\fs18\cf2 75 POIs visitados en total\cell
+\pard\intbl\b0\fs18\cf2 POI-Oro\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Platino\cell
+\pard\intbl\b0\fs18\cf2 200 POIs visitados en total\cell
+\pard\intbl\b0\fs18\cf2 POI-Platino\cell
+\row
+\pard\sb240\sa100\b\fs26\cf2 4.5 Exploraci\'f3n geogr\'e1fica\b0\par
+\trowd\trgaph108\trleft-108\clcbpat1\cellx4500\clcbpat1\cellx8000\clcbpat1\cellx10000
+\pard\intbl\b\fs18\cf4 Nivel\b0\cell
+\pard\intbl\b\fs18\cf4 Requisito\b0\cell
+\pard\intbl\b\fs18\cf4 Badge\b0\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Bronce\cell
+\pard\intbl\b0\fs18\cf2 Rutas en 3 provincias distintas\cell
+\pard\intbl\b0\fs18\cf2 Explorer-Bronce\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Plata\cell
+\pard\intbl\b0\fs18\cf2 Rutas en 8 provincias distintas\cell
+\pard\intbl\b0\fs18\cf2 Explorer-Plata\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Oro\cell
+\pard\intbl\b0\fs18\cf2 Rutas en 20 provincias distintas\cell
+\pard\intbl\b0\fs18\cf2 Explorer-Oro\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Platino\cell
+\pard\intbl\b0\fs18\cf2 Rutas en 40 provincias / regiones distintas\cell
+\pard\intbl\b0\fs18\cf2 Explorer-Platino\cell
+\row
+\pard\sb60\sa60\b0\fs20\cf2 \i Criterio gen\'e9rico, no espec\'edfico de Espa\'f1a: la app soporta 6 idiomas y debe funcionar igual para moteros de cualquier pa\'eds. La provincia o regi\'f3n se deduce del track GPS por geocodificaci\'f3n inversa.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 4.6 Social\b0\par
+\trowd\trgaph108\trleft-108\clcbpat1\cellx4500\clcbpat1\cellx8000\clcbpat1\cellx10000
+\pard\intbl\b\fs18\cf4 Nivel\b0\cell
+\pard\intbl\b\fs18\cf4 Requisito\b0\cell
+\pard\intbl\b\fs18\cf4 Badge\b0\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Bronce\cell
+\pard\intbl\b0\fs18\cf2 1 amigo en la app\cell
+\pard\intbl\b0\fs18\cf2 Social-Bronce\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Plata\cell
+\pard\intbl\b0\fs18\cf2 5 amigos en la app\cell
+\pard\intbl\b0\fs18\cf2 Social-Plata\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Oro\cell
+\pard\intbl\b0\fs18\cf2 10 amigos en la app\cell
+\pard\intbl\b0\fs18\cf2 Social-Oro\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000\cellx10000
+\pard\intbl\b0\fs18\cf2 Platino\cell
+\pard\intbl\b0\fs18\cf2 25 amigos en la app\cell
+\pard\intbl\b0\fs18\cf2 Social-Platino\cell
+\row
+\pard\sb200\sa200\brdrb\brdrs\brdrw10\brdrcf1\fs4  \par
+\pard\sb300\sa150\b\fs32\cf1 5. Logros especiales (sin niveles)\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Los logros especiales se desbloquean una sola vez al cumplir la condici\'f3n:\i0\par
+\trowd\trgaph108\trleft-108\clcbpat1\cellx4500\clcbpat1\cellx8000
+\pard\intbl\b\fs18\cf4 Badge\b0\cell
+\pard\intbl\b\fs18\cf4 Condici\'f3n\b0\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Madrugador\cell
+\pard\intbl\b0\fs18\cf2 Completar una ruta con salida antes de las 7:00h\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Noct\'e1mbulo\cell
+\pard\intbl\b0\fs18\cf2 Completar una ruta que termina despu\'e9s de las 22:00h\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Trotamundos\cell
+\pard\intbl\b0\fs18\cf2 Completar una ruta de m\'e1s de 500 km\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Gastron\'f3mico\cell
+\pard\intbl\b0\fs18\cf2 Visitar 2 o m\'e1s restaurantes en una misma ruta\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Circular\cell
+\pard\intbl\b0\fs18\cf2 Completar una ruta circular (origen = destino)\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Cuatro Estaciones\cell
+\pard\intbl\b0\fs18\cf2 Completar rutas en primavera, verano, oto\'f1o e invierno\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Constante\cell
+\pard\intbl\b0\fs18\cf2 Completar al menos una ruta cada mes durante 3 meses seguidos\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Turista\cell
+\pard\intbl\b0\fs18\cf2 Visitar 5 miradores en total\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Explorador\cell
+\pard\intbl\b0\fs18\cf2 Primera ruta fuera de tu provincia habitual\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 En grupo\cell
+\pard\intbl\b0\fs18\cf2 Completar una ruta en grupo con otro motero\cell
+\row
+\trowd\trgaph108\trleft-108\cellx4500\cellx8000
+\pard\intbl\b0\fs18\cf2 Coleccionista\cell
+\pard\intbl\b0\fs18\cf2 Visitar 50 POIs distintos en total\cell
+\row
+\pard\sb200\sa200\brdrb\brdrs\brdrw10\brdrcf1\fs4  \par
+\pard\sb300\sa150\b\fs32\cf1 6. Dise\'f1o de pantallas\b0\par
+\pard\sb240\sa100\b\fs26\cf2 6.1 Acceso\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} La pantalla de logros va en la pantalla principal, en cuarta posici\'f3n: despu\'e9s de "Mis rutas" y antes de "Amigos".\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Color de la tarjeta: AppColors.gold (idea de medalla, ya usado en la app).\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Aprovecha el sistema de badge de _QuickAccessCard: contador naranja cuando hay logros desbloqueados sin ver.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Se mantiene adem\'e1s un acceso desde el perfil, necesario porque en el perfil de otros moteros los logros se muestran ah\'ed.\par
+\pard\sb240\sa100\b\fs26\cf2 6.2 Pantalla de logros (propia)\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Cabecera con progreso global: "12 de 34 logros" + porcentaje + barra. Da sensaci\'f3n de avance desde el primer vistazo.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Colores de nivel: Bronce #CD7F32, Plata #C0C0C0, Oro #F5A800 (AppColors.gold), Platino #00D4FF (AppColors.cyan).\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Cada tarjeta progresiva muestra el nivel YA conseguido en el badge, y la barra el avance hacia el siguiente.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Texto "faltan X" bajo cada barra: motiva m\'e1s que mostrar solo lo acumulado.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los logros bloqueados se muestran atenuados pero visibles, para que se vea lo que hay por conseguir.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Orden de los progresivos: siempre fijo (Kil\'f3metros, Rutas, Gastronom\'eda, POIs, Exploraci\'f3n, Social). No din\'e1mico.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los especiales van en rejilla compacta, sin barra de progreso (no tienen niveles).\par
+\pard\sb240\sa100\b\fs26\cf2 6.3 Detalle de un logro\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Al pulsar una tarjeta se abre una hoja deslizante desde abajo (showModalBottomSheet), no una pantalla nueva: se cierra deslizando y se vuelve a la lista sin perder el scroll. Contiene:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Icono grande, nombre del nivel actual y descripci\'f3n del logro\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Bloque "Siguiente nivel" con progreso y cu\'e1nto falta\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los cuatro niveles listados, con fecha de consecuci\'f3n en los ya conseguidos y candado en los bloqueados\par
+\pard\sb240\sa100\b\fs26\cf2 6.3.b Pantalla de resumen de ruta (IMPLEMENTADA)\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Muestra kil\'f3metros reales, tiempo, velocidad media, mapa con el recorrido y los POIs detectados. Deliberadamente NO menciona los logros: la celebraci\'f3n es el momento del descubrimiento.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Mapa: opci\'f3n A elegida (Google Static Maps)\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} La app no ten\'eda ning\'fan paquete de mapas: mostraba los waypoints como lista y abr\'eda Google Maps por fuera. Hab\'eda que elegir.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Se eligi\'f3 Static Maps: una petici\'f3n HTTP devuelve un PNG con el track dibujado. La pantalla de resumen no necesita zoom ni desplazamiento, solo ver por d\'f3nde se ha ido. Evita meter un SDK nativo nuevo y es la opci\'f3n m\'e1s barata con mapa real.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} La imagen se sirve DESDE Laravel, no se devuelve la URL de Google al cliente: as\'ed la clave de la API no sale del servidor.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El track se reduce a 180 puntos antes de codificar la polil\'ednea. La URL de Static Maps tiene un l\'edmite de unos 8.000 caracteres y un track de 8 horas trae miles de puntos.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} PENDIENTE PARA EL FUTURO (opci\'f3n B): mapa interactivo con google_maps_flutter, con zoom y desplazamiento. Tiene sentido en la pantalla de POIs, y resolver\'eda el apelotonamiento de marcadores que en un mapa est\'e1tico es inevitable.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Problemas encontrados y resueltos en el mapa:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los marcadores de salida y llegada no aparec\'edan. Se pasaban como array de PHP, que se serializa como markers[0]=...&markers[1]=..., y Google espera el par\'e1metro markers REPETIDO. Lo ignoraba en silencio: devolv\'eda el mapa correcto pero sin marcadores.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} En rutas circulares, salida y llegada caen en el mismo punto y Google dibujaba uno encima del otro: solo se ve\'eda el de llegada y parec\'eda que la ruta empezaba donde termina. Ahora, si el final est\'e1 a menos de 200 m del inicio, se dibuja un \'fanico marcador. La detecci\'f3n se hace midiendo el TRACK, no leyendo route_type: ese campo dice lo que el motero plane\'f3, y el track lo que hizo.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los POIs visitados no se marcaban. Ahora salen en cian, numerados en orden de paso, y la lista de la pantalla lleva el mismo n\'famero: Static Maps solo admite UN car\'e1cter por etiqueta, as\'ed que no se puede escribir el nombre encima. Numerar adem\'e1s evita que los nombres se solapen.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Varios POIs de una misma localidad se pisaban (tres monumentos dentro de Jaca, en un mapa que abarca 178 km). Se separan en abanico alrededor de su posici\'f3n real, en anillos de 8 posiciones, acotado a 2 anillos. A ese zoom un p\'edxel son cientos de metros, as\'ed que se pierde precisi\'f3n irrelevante a cambio de no ocultar puntos.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} La numeraci\'f3n la calcula el SERVIDOR (map_label), no la pantalla. Si cada lado numerase por su cuenta, al omitir o desplazar marcadores el 5 del mapa dejar\'eda de ser el 5 de la lista.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Calibraci\'f3n de la detecci\'f3n de POIs:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El radio de detecci\'f3n no puede ser \'fanico para todas las categor\'edas. Un puerto de monta\'f1a ES un punto sobre la carretera (300 m vale), pero un desfiladero es un ca\'f1\'f3n de kil\'f3metros representado por una sola coordenada en su centro, y un parque natural puede tener el centroide a decenas de km de la carretera. Con radio \'fanico de 300 m, atravesar el Congosto de J\'e1novas entero no contaba: se quedaba fuera por 15 metros.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Radios por categor\'eda: 300 m puertos, miradores y monumentos; 400 m monumentos naturales; 1 km embalses y pueblos hist\'f3ricos; 2,5 km desfiladeros; 8 km parques naturales.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El radio de sugerencia es el doble del de cada categor\'eda.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Verificado con tracks reales obtenidos de Directions: el Puerto de Cotefablo cuenta con 25 s de paso, mientras que el Castillo de A\'ednsa necesit\'f3 355 s parado. La distinci\'f3n por categor\'eda funciona.\par
+\pard\sb240\sa100\b\fs26\cf2 6.4 Estado vac\'edo (usuario nuevo)\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Se muestran las dos cosas: un banner de bienvenida arriba ("Completa tu primera ruta para empezar a desbloquear logros") y debajo las 6 categor\'edas a cero con sus requisitos visibles. El banner desaparece al conseguir el primer logro.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 6.5 Logros en el perfil de otro motero\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Resumen compacto, no la vista completa:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Solo los badges conseguidos, con su nivel. Sin barras de progreso ni logros bloqueados (eso es informaci\'f3n personal).\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Contador tipo "12 logros conseguidos".\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Al tocar un badge se abre el mismo detalle, pero sin "siguiente nivel" ni "te faltan X".\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Si no tiene ninguno: mensaje "Todav\'eda no tiene logros".\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Todo ello solo si su privacy_level lo permite. Si es privado, la secci\'f3n no aparece.\par
+\pard\sb240\sa100\b\fs26\cf2 6.6 Notificaci\'f3n y celebraci\'f3n al desbloquear\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Flujo: Finalizar ruta -> Resumen -> Celebraci\'f3n -> Home.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El resumen de ruta NO menciona los logros conseguidos: la celebraci\'f3n es el momento del descubrimiento y adelantarlo en el resumen lo deja sin efecto.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Si se desbloquean varios logros a la vez, se muestra UNA sola pantalla de celebraci\'f3n con todos, no una por logro.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} La celebraci\'f3n sale encadenada en el momento, no en la siguiente apertura de la app.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} La notificaci\'f3n push solo aplica al caso de cierre autom\'e1tico a las 24h con la app cerrada: al abrir, se ve la celebraci\'f3n pendiente.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El badge aparece inmediatamente en la secci\'f3n de logros del perfil.\par
+\pard\sb200\sa200\brdrb\brdrs\brdrw10\brdrcf1\fs4  \par
+\pard\sb300\sa150\b\fs32\cf1 7. Arquitectura t\'e9cnica necesaria\b0\par
+\pard\sb240\sa100\b\fs26\cf2 Backend (Laravel)\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Tabla achievements: definici\'f3n de todos los logros (id, nombre, categor\'eda, nivel, condici\'f3n)\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Tabla user_achievements: logros conseguidos por usuario (user_id, achievement_id, fecha)\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Tabla route_tracks: track GPS de cada ruta completada (coordenadas, timestamps)\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Tabla completed_routes: rutas completadas con km reales y POIs visitados\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Tabla visited_pois: registro de visitas a POIs por usuario\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Servicio AchievementService: eval\'faa logros al finalizar cada ruta\par
+\pard\sb240\sa100\b\fs26\cf2 Flutter (app m\'f3vil)\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Foreground Service Android para tracking GPS en background\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Pantalla "Ruta en curso" con mapa, km y tiempo en tiempo real\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Pantalla "Resumen de ruta" al finalizar\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Pantalla de celebraci\'f3n al desbloquear logro\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Secci\'f3n de badges en el perfil (estilo Strava)\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Notificaci\'f3n local al desbloquear logro\par
+\pard\sb200\sa200\brdrb\brdrs\brdrw10\brdrcf1\fs4  \par
+\pard\sb300\sa150\b\fs32\cf1 8. Decisiones adicionales\b0\par
+\pard\sb240\sa100\b\fs26\cf2 8.1 Tracking \'97 comportamiento del servicio\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Si el m\'f3vil se reinicia durante el tracking: se recupera el track parcial guardado localmente y se permite continuar la ruta.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Si se pierde se\'f1al GPS (t\'fanel, zona rural): se interpola en l\'ednea recta entre el \'faltimo punto conocido y el siguiente con se\'f1al (igual que Strava). Si el hueco supera varios minutos se marca como p\'e9rdida de GPS en el resumen.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Cierre autom\'e1tico: si el usuario no finaliza la ruta manualmente ni el GPS detecta llegada, el tracking se cierra autom\'e1ticamente a las 24 horas del inicio.\par
+\pard\sb240\sa100\b\fs26\cf2 8.2 Privacidad\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El track GPS y los logros tienen configuraci\'f3n de privacidad en el perfil: Privado / Solo amigos (por defecto) / Todo el mundo. IMPLEMENTADO: columna privacy_level en rider_profiles, selector en la pantalla de editar perfil, traducido a los 6 idiomas.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El perfil p\'fablico de otros moteros muestra sus badges si su configuraci\'f3n lo permite.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Cada badge muestra la fecha de consecuci\'f3n.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} No se env\'eda notificaci\'f3n cuando un amigo consigue un logro (evita ruido).\par
+\pard\sb240\sa100\b\fs26\cf2 8.3 Rutas y viajes\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Una ruta = 1 d\'eda. Si el motero hace un recorrido de varios d\'edas, cada d\'eda es una ruta separada; el conjunto es un viaje.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} No existe pausa de ruta: si se interrumpe y se retoma al d\'eda siguiente son dos rutas distintas.\par
+\pard\sb60\sa60\b0\fs20\cf2 PROBLEMA DETECTADO en el c\'f3digo actual: la tabla routes ya tiene los campos trip_id y day_number, y existe la tabla trips, pero ning\'fan controlador los escribe: est\'e1n siempre a NULL. Hoy una ruta multi-d\'eda generada por IA (con paradas de hotel) se guarda como UNA sola fila, no como una por d\'eda.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 Consecuencias si no se corrige: contar\'eda como 1 ruta completada en lugar de N, los km de todos los d\'edas ir\'edan en un \'fanico tracking (que se cerrar\'eda solo a las 24h a mitad del viaje) y el l\'edmite antitrampa de 1.200 km/d\'eda saltar\'eda en falso.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 \i DECISI\'d3N: el viaje (trip) queda pendiente de montar. Mientras tanto, el control de rutas multi-d\'eda debe hacerse en los dos puntos de entrada donde nace una ruta: la generaci\'f3n con IA y la importaci\'f3n.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 8.4 Validaciones anti-trampa (servidor)\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} M\'e1ximo 1.200 km por d\'eda.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} M\'e1ximo 30 POIs visitados por d\'eda.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} M\'e1ximo 3 rutas completadas por d\'eda.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Cualquier ruta o sesi\'f3n que supere estos l\'edmites se rechaza y no computa para logros.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 8.5 Datos previos\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 La app es nueva y todav\'eda no la usa nadie, por lo que no hay datos acumulados que migrar. Todos los usuarios empiezan a cero y no hace falta c\'f3mputo retroactivo de total_km, routes_completed ni lunches_completed.\i0\par
+\pard\sb240\sa100\b\fs26\cf2 8.6 Bloqueantes antes de lanzar logros\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} HECHO: ampliar el seeding de POIs a Francia, Alemania, Italia y Portugal, y a\'f1adir columna country a points_of_interest. Ver 3.3.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Perfil de partner sin implementar: el logro de Gastronom\'eda queda visible pero inalcanzable hasta que exista.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Pantalla de resumen de ruta: hay que crearla desde cero, no existe en la app.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Control de rutas multi-d\'eda en generaci\'f3n IA e importaci\'f3n (trip_id / day_number nunca se escriben hoy).\par
+\pard\sb240\sa100\b\fs26\cf2 8.7 Pendiente para despu\'e9s de los 5 puntos\b0\par
+\pard\sb60\sa60\b0\fs20\cf2 Solicitado durante el desarrollo del punto 1. Se abordar\'e1 cuando est\'e9n terminados los 5 puntos del plan de implementaci\'f3n, y se comentar\'e1 entonces en detalle.\i0\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Pantalla de POIs:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Pantalla propia donde se listan los POIs disponibles.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Vista en mapa adem\'e1s del listado.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} La BD ya tiene lo necesario: lat, lng, region, country, category, source y featured, con \'edndices por (lat,lng) y (country,category).\par
+\pard\sb60\sa60\b0\fs20\cf2 \i B\'fasqueda: un \'fanico campo de texto (decidido)\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} UN solo campo de b\'fasqueda que consulta a la vez tres campos: la regi\'f3n administrativa, el \'e1rea motera y el nombre del POI. Escribiendo "Cantabria", "Picos de Europa" o "Somport" se encuentra resultado en los tres casos.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Se descart\'f3 el desplegable de regiones: es m\'e1s claro un campo \'fanico, y encaja con c\'f3mo busca la gente en realidad (nadie piensa "filtrar por comunidad aut\'f3noma", piensa el nombre del sitio y lo escribe).\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Ventaja a\'f1adida: al no haber desplegable, que existan dos formas de nombrar una zona deja de ser un defecto y pasa a ser una ayuda. Cuantos m\'e1s alias, m\'e1s f\'e1cil acertar escribiendo.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} El filtro de CATEGOR\'cdA s\'ed se mantiene aparte, en forma de chips: son 8 valores cerrados y responden a otra necesidad (ver qu\'e9 tipo de sitios hay, no buscar uno concreto), que no encaja en un campo de texto.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Dos columnas: region administrativa y area motera\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Al rellenar la region de los POIs importados, la columna qued\'f3 con dos esquemas mezclados: los importados llevan el nombre administrativo (Arag\'f3n, Bayern, Toscana) y los 129 curados conservan el nombre motero (Pirineo Aragon\'e9s, Alpes B\'e1varos, Picos de Europa). Eso da 37 valores distintos en Espa\'f1a o 26 en Alemania.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Se decidi\'f3 NO homogeneizar con --force: para un motero "Picos de Europa" dice mucho m\'e1s que "Cantabria", y perder esos nombres ser\'eda un retroceso.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Soluci\'f3n: region con el nombre administrativo para todos, y area con el nombre motero solo donde exista. area se muestra como etiqueta descriptiva, y ambos campos entran en la b\'fasqueda.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Revisar la generaci\'f3n de rutas con IA para que use los POIs:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Sin definir todav\'eda: hay que decidir c\'f3mo entran los POIs en la generaci\'f3n de rutas. Opciones a valorar: que la IA los proponga como paradas, que los muestre por si el motero quiere pasar por ellos, o que se ofrezcan aparte para a\'f1adirlos a mano.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Contexto t\'e9cnico: RouteAIService genera hoy la ruta solo a partir de los par\'e1metros del motero (origen, destino, d\'edas, preferencias). No conoce la tabla points_of_interest, que hasta ahora ten\'eda 67 registros y por tanto poco que aportar. Con 53.000 POIs la situaci\'f3n cambia: se pueden seleccionar los cercanos al corredor de la ruta e inyectarlos en el prompt.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Encaja directamente con los logros: si la IA propone POIs en la ruta, el motero sabe de antemano qu\'e9 puede desbloquear, y eso cierra el c\'edrculo entre planificar y conseguir logros.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} A tener en cuenta: los POIs importados no est\'e1n curados y hay ruido (miradores llamados "13" o "14", monumentos menores). Convendr\'eda priorizar los destacados y, cuando exista, los mejor valorados con estrellas.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i POIs para moto offroad:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los POIs importados hasta ahora son para rutas de carretera: los puertos se filtran exigiendo que el nodo est\'e9 sobre una v\'eda asfaltada (motorway, trunk, primary, secondary, tertiary, unclassified, residential).\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Para offroad har\'eda falta un conjunto distinto, importando las v\'edas que ahora se excluyen expresamente: track (pistas), path (caminos) y similares.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Implicar\'eda distinguir el tipo de POI o de ruta (carretera / offroad), tanto en la BD como en los filtros de la pantalla y probablemente en los propios logros.\par
+\pard\sb60\sa60\b0\fs20\cf2 \i Valoraci\'f3n de POIs con estrellas:\i0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Los moteros podr\'e1n puntuar los POIs con estrellas.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Requiere tabla de valoraciones (usuario, POI, estrellas, fecha) y media agregada en el POI.\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Encaja bien con la pantalla de POIs: permite ordenar por mejor valorados y ayuda a separar lo bueno del ruido de OpenStreetMap, que es masivo y sin curar.\par
+\pard\sb240\sa100\b\fs26\cf2 8.8 Pendiente de decidir\b0\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} Margen de proximidad exacto al POI (\'bf300m, 500m, 1km?)\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} \'bfSe guardan los tracks GPS completos o solo resumen (km + POIs)?\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} \'bfRanking / leaderboard entre amigos?\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} \'bfTemporadas o retos especiales (ej. Reto verano 2027)?\par
+\pard\li300\sb50\sa50\b0\fs20\cf2 {\cf1\b\'b7\b0} \'bfOpci\'f3n de borrar cuenta? (Strava la tiene v\'eda formulario + confirmaci\'f3n por email). Ligado a ello: si alguien borra su cuenta y vuelve a registrarse, \'bfrecupera sus logros o empieza de cero?\par
+\pard\qc\sb600\i\fs16\cf3 GAStroRouteAI \'97 Documento interno \'97 Agosto 2026\i0\par
+}

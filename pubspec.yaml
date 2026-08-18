@@ -76,10 +76,17 @@ dependencies:
   # Geolocalización
   geolocator: ^13.0.2
 
+  # Servicio en primer plano para el tracking GPS de rutas.
+  # Mantiene vivo el proceso y la notificación persistente mientras se rueda;
+  # las posiciones las emite geolocator.
+  flutter_foreground_task: ^8.10.4
+
   # Firebase / Push notifications
   firebase_core: ^3.13.1
   firebase_messaging: ^15.2.5
   flutter_local_notifications: ^18.0.1
+  # Necesario para programar los avisos de salida en hora local del motero
+  timezone: ^0.10.0
 
   # Google Sign-In
   google_sign_in: ^6.2.1

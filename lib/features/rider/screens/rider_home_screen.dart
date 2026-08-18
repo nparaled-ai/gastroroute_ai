@@ -8,6 +8,10 @@ import '../providers/app_notification_service.dart';
 import '../providers/friendship_service.dart';
 import '../providers/route_service.dart';
 import '../providers/rider_profile_service.dart';
+import '../providers/route_tracking_service.dart';
+import '../../../core/services/route_tracking_manager.dart';
+import '../../../core/services/route_reminder_service.dart';
+import '../providers/achievement_service.dart';
 
 class RiderHomeScreen extends StatefulWidget {
   const RiderHomeScreen({super.key});
@@ -21,6 +25,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
   int _acceptedRecently = 0;
   int _pendingRoutes    = 0;
   int _unreadNotifications = 0;
+  int _pendingAchievements  = 0;
   String? _nickname;
   String? _gender;
 
@@ -29,6 +34,48 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
     super.initState();
     _loadProfile();
     _loadNotifications();
+    _recoverTracking();
+    _syncRouteReminders();
+  }
+
+  /// Reprograma los avisos de salida de las rutas guardadas.
+  ///
+  /// Se hace al entrar en la pantalla principal para que recoja los cambios de
+  /// fecha y las rutas borradas sin necesidad de engancharse a cada pantalla.
+  Future<void> _syncRouteReminders() async {
+    final result = await RouteService.getMyRoutes();
+
+    // Solo las que tienen fecha por delante: las propias próximas y las
+    // compartidas a las que el motero se ha unido.
+    final upcoming = result['upcoming'] as List? ?? [];
+    final received = result['received'] as List? ?? [];
+
+    await RouteReminderService.sync([
+      ...upcoming.map((r) => Map<String, dynamic>.from(r as Map)),
+      ...received.map((r) => Map<String, dynamic>.from(r as Map)),
+    ]);
+  }
+
+  /// Recupera una ruta que quedó grabándose (app cerrada por el sistema,
+  /// reinicio del móvil). El servidor sabe qué tracking sigue abierto y el
+  /// track parcial está guardado en local.
+  Future<void> _recoverTracking() async {
+    final tracking = await RouteTrackingService.getActive();
+    if (tracking == null || !mounted) return;
+
+    final recovered = await RouteTrackingManager.instance.resume(
+      trackingId: tracking['id'] as int,
+      routeId: tracking['route_id'] as int,
+    );
+
+    if (!recovered || !mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('tracking.resumed'.tr()),
+      backgroundColor: AppColors.surface,
+    ));
+
+    context.push('/rider/tracking', extra: tracking);
   }
 
   Future<void> _loadProfile() async {
@@ -64,12 +111,16 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
         r['is_confirmed'] != true,
     ).length;
 
+    // Logros desbloqueados que el motero todavía no ha visto celebrar.
+    final pendingAchievements = await AchievementService.pending();
+
     if (!mounted) return;
     setState(() {
-      _pendingRequests     = received.length;
-      _acceptedRecently    = unseenNotifications;
-      _pendingRoutes       = unseenRoutes;
-      _unreadNotifications = unread;
+      _pendingRequests      = received.length;
+      _acceptedRecently     = unseenNotifications;
+      _pendingRoutes        = unseenRoutes;
+      _unreadNotifications  = unread;
+      _pendingAchievements  = pendingAchievements.length;
     });
   }
 
@@ -201,6 +252,21 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
               badgeColor: AppColors.orange,
               onTap: () async {
                 await context.push('/rider/my-routes');
+                _loadNotifications();
+              },
+            ),
+            const SizedBox(height: 16),
+            _QuickAccessCard(
+              icon: Icons.emoji_events_outlined,
+              title: 'home.achievements'.tr(),
+              desc: _pendingAchievements > 0
+                  ? 'home.achievements_new'.plural(_pendingAchievements)
+                  : 'home.achievements_desc'.tr(),
+              color: AppColors.gold,
+              badge: _pendingAchievements,
+              badgeColor: AppColors.orange,
+              onTap: () async {
+                await context.push('/rider/achievements');
                 _loadNotifications();
               },
             ),

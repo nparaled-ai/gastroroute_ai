@@ -12,6 +12,8 @@ import '../../../widgets/route_waypoints_view.dart';
 import '../providers/route_service.dart';
 import '../providers/route_share_service.dart';
 import '../providers/friendship_service.dart';
+import '../providers/route_tracking_service.dart';
+import '../../../core/services/route_tracking_manager.dart';
 
 class RouteDetailScreen extends StatefulWidget {
   final int routeId;
@@ -33,6 +35,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   bool _isDeclined = false;
   bool _joining    = false;
   bool _refreshingWeather = false;
+  bool _startingTracking  = false;
   bool _publishing = false;
   Map<String, dynamic>? _currentWeather;
 
@@ -346,6 +349,47 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     }
   }
 
+  /// Arranca el tracking GPS de esta ruta y abre la pantalla "Ruta en curso".
+  Future<void> _startTracking() async {
+    if (_route == null) return;
+    setState(() => _startingTracking = true);
+
+    // Sin permiso de ubicación no hay nada que grabar.
+    if (!await RouteTrackingManager.ensurePermission()) {
+      if (!mounted) return;
+      setState(() => _startingTracking = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('tracking.no_permission'.tr()),
+        backgroundColor: AppColors.error,
+      ));
+      return;
+    }
+
+    final result = await RouteTrackingService.start(_route!['id'] as int);
+
+    if (!mounted) return;
+
+    if (result['error'] != null) {
+      setState(() => _startingTracking = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(result['error']),
+        backgroundColor: AppColors.error,
+      ));
+      return;
+    }
+
+    final tracking = result['tracking'] as Map<String, dynamic>;
+
+    await RouteTrackingManager.instance.start(
+      trackingId: tracking['id'] as int,
+      routeId: _route!['id'] as int,
+    );
+
+    if (!mounted) return;
+    setState(() => _startingTracking = false);
+    context.push('/rider/tracking', extra: tracking);
+  }
+
   Future<void> _refreshWeather() async {
     final lat  = _route?['origin_lat'];
     final lng  = _route?['origin_lng'];
@@ -551,6 +595,37 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                     ],
 
                     const SizedBox(height: 20),
+
+                    // ── Botón iniciar tracking ────────────────────────
+                    ElevatedButton(
+                      onPressed: _startingTracking ? null : _startTracking,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.orange,
+                        minimumSize: const Size(double.infinity, 52),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (_startingTracking)
+                              const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white))
+                            else
+                              const Icon(Icons.play_arrow,
+                                  color: Colors.white, size: 20),
+                            const SizedBox(width: 8),
+                            Text('tracking.start_route'.tr(),
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700)),
+                          ]),
+                    ),
+
+                    const SizedBox(height: 10),
 
                     // ── Botón Google Maps ─────────────────────────────
                     ElevatedButton(

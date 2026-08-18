@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Credenciales de Firebase.
+# El fichero del Admin SDK contiene una private_key con acceso administrativo
+# completo al proyecto: nunca debe entrar en el repositorio.
+android/app/*firebase-adminsdk*.json

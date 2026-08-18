@@ -5,6 +5,20 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
+    <!-- Tracking GPS de rutas mediante servicio en primer plano.
+         NO se pide ACCESS_BACKGROUND_LOCATION a proposito: es un permiso
+         sensible que exige formulario de justificacion y revision de Google
+         Play. El inicio de ruta se detecta por notificacion programada
+         (fecha/hora) y por proximidad solo con la app abierta. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- NO se pide SCHEDULE_EXACT_ALARM: Google lo trata como permiso
+         restringido y complica la distribucion. La notificacion de salida no
+         necesita precision al minuto, asi que se programa de forma inexacta. -->
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -43,6 +57,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Servicio en primer plano del tracking de rutas.
+             foregroundServiceType="location" es obligatorio desde Android 14. -->
+        <service
+            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+            android:foregroundServiceType="location"
+            android:exported="false"
+            android:stopWithTask="false" />
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

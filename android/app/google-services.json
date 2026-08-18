@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1063655022495",
+    "project_id": "gastrorouteai-cc354",
+    "storage_bucket": "gastrorouteai-cc354.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1063655022495:android:a64d76b9813d811075e7aa",
+        "android_client_info": {
+          "package_name": "com.example.gastroroute_ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1063655022495-594qugab53j29cu0mnkf40irpk28on76.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gastroroute_ai",
+            "certificate_hash": "224cfdb3b0e5822b9e47f773dd33e6d03b6e7f3a"
+          }
+        },
+        {
+          "client_id": "1063655022495-5763pug6e9bsqduiipdnb3os514n1n5v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsfD8xi4WSFUClRTaI0SFE_-3jedXVp6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1063655022495-5763pug6e9bsqduiipdnb3os514n1n5v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

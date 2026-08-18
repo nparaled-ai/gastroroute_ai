@@ -35,6 +35,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
   File? _localAvatar;
   int _notificationRadius = 100;
   bool _notifyPublicRoutes = true;
+  String _privacyLevel = 'friends';
 
   List<Map<String, dynamic>> _locationSuggestions = [];
   bool _loadingLocation = false;
@@ -66,6 +67,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     _avatarUrl          = widget.profile['avatar_url'];
     _notificationRadius = (widget.profile['notification_radius_km'] as num?)?.toInt() ?? 100;
     _notifyPublicRoutes  = widget.profile['notify_public_routes'] != false;
+    _privacyLevel        = widget.profile['privacy_level'] ?? 'friends';
     // Si ya tiene ubicación guardada se considera validada
     _locationValidated  = (widget.profile['province'] ?? '').isNotEmpty;
   }
@@ -251,6 +253,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       'gender':           _gender,
       'notification_radius_km': _notificationRadius,
       'notify_public_routes':   _notifyPublicRoutes,
+      'privacy_level':          _privacyLevel,
     });
     if (!mounted) return;
     setState(() => _loading = false);
@@ -653,6 +656,77 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                     ]),
                   ),
                 ],
+              ]),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Privacidad: visibilidad del track GPS y de los logros
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.greyDark),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  const Icon(Icons.lock_outline, color: AppColors.orange, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('profile.privacy_title'.tr(),
+                          style: const TextStyle(
+                              color: AppColors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                      Text('profile.privacy_subtitle'.tr(),
+                          style: const TextStyle(color: AppColors.grey, fontSize: 11, height: 1.4)),
+                    ]),
+                  ),
+                ]),
+                const SizedBox(height: 12),
+                ...[
+                  {'value': 'private', 'icon': Icons.lock,          'key': 'private'},
+                  {'value': 'friends', 'icon': Icons.group,         'key': 'friends'},
+                  {'value': 'public',  'icon': Icons.public,        'key': 'public'},
+                ].map((opt) {
+                  final value    = opt['value'] as String;
+                  final selected = _privacyLevel == value;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => setState(() => _privacyLevel = value),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: selected ? AppColors.orange.withOpacity(0.15) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                              color: selected ? AppColors.orange : AppColors.greyDark),
+                        ),
+                        child: Row(children: [
+                          Icon(opt['icon'] as IconData,
+                              color: selected ? AppColors.orange : AppColors.grey, size: 18),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text('profile.privacy_${opt['key']}'.tr(),
+                                  style: TextStyle(
+                                      color: selected ? AppColors.orange : AppColors.white,
+                                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                                      fontSize: 13)),
+                              Text('profile.privacy_${opt['key']}_desc'.tr(),
+                                  style: const TextStyle(
+                                      color: AppColors.grey, fontSize: 11, height: 1.3)),
+                            ]),
+                          ),
+                          if (selected)
+                            const Icon(Icons.check_circle, color: AppColors.orange, size: 18),
+                        ]),
+                      ),
+                    ),
+                  );
+                }),
               ]),
             ),
 

@@ -20,6 +20,10 @@ import '../features/rider/screens/route_result_screen.dart';
 import '../features/rider/screens/friends_screen.dart';
 import '../features/rider/screens/friends_search_screen.dart';
 import '../features/rider/screens/my_routes_screen.dart';
+import '../features/rider/screens/route_tracking_screen.dart';
+import '../features/rider/screens/route_summary_screen.dart';
+import '../features/rider/screens/achievements_screen.dart';
+import '../features/rider/screens/achievement_celebration_screen.dart';
 import '../features/rider/screens/route_detail_screen.dart';
 import '../features/rider/screens/notifications_screen.dart';
 import '../features/auth/screens/verify_email_screen.dart';
@@ -101,6 +105,28 @@ final router = GoRouter(
     GoRoute(
       path: '/rider/my-routes',
       builder: (context, state) => const MyRoutesScreen(),
+    ),
+    GoRoute(
+      path: '/rider/tracking',
+      builder: (context, state) => RouteTrackingScreen(
+        tracking: state.extra as Map<String, dynamic>,
+      ),
+    ),
+    GoRoute(
+      path: '/rider/summary',
+      builder: (context, state) => RouteSummaryScreen(
+        tracking: state.extra as Map<String, dynamic>,
+      ),
+    ),
+    GoRoute(
+      path: '/rider/achievements',
+      builder: (context, state) => const AchievementsScreen(),
+    ),
+    GoRoute(
+      path: '/rider/celebration',
+      builder: (context, state) => AchievementCelebrationScreen(
+        achievements: List<Map<String, dynamic>>.from(state.extra as List),
+      ),
     ),
     GoRoute(
       path: '/rider/routes/:id',
