@@ -75,7 +75,10 @@
         "my_profile_desc": "Profil und Motorräder bearbeiten",
         "achievements": "Erfolge",
         "achievements_desc": "Deine Meilensteine als Fahrer",
-        "achievements_new": "{} neuer Erfolg|{} neue Erfolge"
+        "achievements_new": {
+            "one": "1 neuer Erfolg",
+            "other": "{} neue Erfolge"
+        }
     },
     "profile": {
         "title": "Mein Profil",
@@ -262,13 +265,10 @@
     "my_routes": {
         "title": "Meine Routen",
         "upcoming": "Bevorstehend",
-        "historical": "Verlauf",
         "received": "Empfangen",
         "new_route": "Neue Route",
         "empty_upcoming": "Keine bevorstehenden Routen.\nSpeichern Sie eine Route mit einem zukünftigen Datum.",
-        "empty_historical": "Noch kein Routenverlauf.",
         "empty_received": "Noch keine Routen empfangen.",
-        "empty_drafts": "Keine Entwürfe.\nGenerierte Routen erscheinen hier.",
         "empty_received_full": "Noch keine Routen empfangen.\nWenn ein Freund eine teilt, erscheint sie hier.",
         "empty_filters": "Keine Ergebnisse mit diesen Filtern.",
         "search_hint": "Nach Titel oder Herkunft suchen…",
@@ -288,7 +288,16 @@
         "filter_moderate": "Moderat",
         "filter_hard": "Anspruchsvoll",
         "filter_circular": "Kreisförmig",
-        "filter_destination": "Mit Ziel"
+        "filter_destination": "Mit Ziel",
+        "ridden": "Gefahren",
+        "not_done": "Nicht gefahren",
+        "empty_ridden": "Du bist noch keine Route gefahren.\nStarte die Aufzeichnung beim Losfahren und sie erscheint hier.",
+        "empty_not_done": "Du hast keine ausstehenden Routen.",
+        "not_counted": "Zählt nicht für deine Erfolge: {reason}",
+        "auto_closed": "Nach 24 Std. automatisch geschlossen",
+        "source_ai": "KI",
+        "source_maps": "Maps",
+        "source_gpx": "GPX"
     },
     "friends_screen": {
         "title": "Freunde",
@@ -383,7 +392,10 @@
         "remove": "Entfernen",
         "done": "Fertig",
         "rejected": "Diese Route zählt nicht für deine Erfolge: {reason}",
-        "gps_gaps": "{} Abschnitt ohne GPS-Empfang, als Luftlinie gezählt.|{} Abschnitte ohne GPS-Empfang, als Luftlinie gezählt."
+        "gps_gaps": {
+            "one": "1 Abschnitt ohne GPS-Empfang, als Luftlinie gezählt.",
+            "other": "{} Abschnitte ohne GPS-Empfang, als Luftlinie gezählt."
+        }
     },
     "achievements": {
         "title": "Erfolge",
@@ -428,11 +440,37 @@
         "special_explorador": "Entdecker",
         "special_en_grupo": "In der Gruppe",
         "special_coleccionista": "Sammler",
-        "celebration_title": "Neuer Erfolg freigeschaltet!|{} Erfolge freigeschaltet!",
+        "celebration_title": {
+            "one": "Neuer Erfolg freigeschaltet!",
+            "other": "{} Erfolge freigeschaltet!"
+        },
         "celebration_subtitle": "Deine Mühe auf dem Motorrad zahlt sich aus",
         "celebration_button": "Super",
         "rider_none": "Noch keine Erfolge",
         "rider_count": "{n} Erfolge erreicht",
-        "rider_private": "Dieser Fahrer teilt seine Erfolge nicht"
+        "rider_private": "Dieser Fahrer teilt seine Erfolge nicht",
+        "how_to": "SO BEKOMMST DU IHN",
+        "not_yet": "Noch nicht erreicht",
+        "special_desc_madrugador": "Schließe eine Route ab, die vor 7 Uhr morgens beginnt.",
+        "special_desc_noctambulo": "Schließe eine Route ab, die nach 22 Uhr endet.",
+        "special_desc_trotamundos": "Schließe eine Route von über 500 km an einem Tag ab.",
+        "special_desc_gastronomico": "Besuche 2 oder mehr Restaurants auf derselben Route.",
+        "special_desc_circular": "Schließe eine Route ab, die dort endet, wo sie begann.",
+        "special_desc_cuatro_estaciones": "Schließe Routen im Frühling, Sommer, Herbst und Winter ab.",
+        "special_desc_constante": "Schließe 3 Monate in Folge mindestens eine Route pro Monat ab.",
+        "special_desc_turista": "Besuche 5 verschiedene Aussichtspunkte.",
+        "special_desc_explorador": "Schließe eine Route außerhalb deiner üblichen Provinz ab.",
+        "special_desc_en_grupo": "Schließe eine Route gemeinsam mit einem anderen Fahrer ab.",
+        "special_desc_coleccionista": "Besuche 50 verschiedene Sehenswürdigkeiten."
+    },
+    "repeat": {
+        "title": "Route wiederholen",
+        "button": "Diese Route wiederholen",
+        "pick_datetime": "Wähle das neue Abfahrtsdatum und die Uhrzeit:",
+        "pick_date": "Datum wählen"
+    },
+    "route_detail": {
+        "waypoints": "Wegpunkte der Route",
+        "route_map": "Streckenverlauf"
     }
 }

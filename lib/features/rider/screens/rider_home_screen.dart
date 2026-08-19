@@ -124,6 +124,27 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
     });
   }
 
+  /// Abre los logros. Si hay alguno sin celebrar, primero la celebración.
+  ///
+  /// Sin esto el contador de la tarjeta no se limpiaría nunca: los logros solo
+  /// se marcan como vistos en la pantalla de celebración, y a esa únicamente
+  /// se llegaba terminando otra ruta.
+  Future<void> _openAchievements() async {
+    final pending = await AchievementService.pending();
+    if (!mounted) return;
+
+    if (pending.isNotEmpty) {
+      context.go('/rider/celebration', extra: {
+        'achievements': pending,
+        'next': '/rider/achievements',
+      });
+      return;
+    }
+
+    await context.push('/rider/achievements');
+    _loadNotifications();
+  }
+
   Future<void> _logout() async {
     await AuthService.logout();
     if (!mounted) return;
@@ -265,10 +286,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
               color: AppColors.gold,
               badge: _pendingAchievements,
               badgeColor: AppColors.orange,
-              onTap: () async {
-                await context.push('/rider/achievements');
-                _loadNotifications();
-              },
+              onTap: _openAchievements,
             ),
             const SizedBox(height: 16),
             _QuickAccessCard(

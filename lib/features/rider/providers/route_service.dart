@@ -17,16 +17,58 @@ class RouteService {
     }
   }
 
+  /// Imagen del recorrido planificado de una ruta guardada.
+  ///
+  /// Se pide como bytes porque el endpoint requiere el token que inyecta el
+  /// interceptor de Dio, que Image.network no aplicaría.
+  static Future<Uint8List?> mapImage(int routeId) async {
+    try {
+      final response = await ApiClient.dio.get<List<int>>(
+        '/rider/routes/$routeId/map',
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final data = response.data;
+      return data == null ? null : Uint8List.fromList(data);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Imagen de una ruta recién generada, que todavía no está guardada y por
+  /// tanto no tiene id: el recorrido se manda en la petición.
+  static Future<Uint8List?> mapPreview(
+    String polyline,
+    List<Map<String, dynamic>> waypoints,
+  ) async {
+    try {
+      final response = await ApiClient.dio.post<List<int>>(
+        '/rider/routes/map-preview',
+        data: {
+          'polyline': polyline,
+          'waypoints': waypoints
+              .where((w) => w['lat'] != null && w['lng'] != null)
+              .map((w) => {'lat': w['lat'], 'lng': w['lng']})
+              .toList(),
+        },
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final data = response.data;
+      return data == null ? null : Uint8List.fromList(data);
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<Map<String, dynamic>> getMyRoutes() async {
     try {
       final response = await ApiClient.dio.get('/rider/routes');
       final data = response.data as Map<String, dynamic>;
+      // 'drafts' y 'no_date' se eliminaron del backend: eran grupos que nunca
+      // podían tener nada. Las rutas rodadas van aparte, en RouteTrackingService.
       return {
-        'upcoming':   List<Map<String, dynamic>>.from(data['upcoming']   ?? []),
-        'historical': List<Map<String, dynamic>>.from(data['historical'] ?? []),
-        'no_date':    List<Map<String, dynamic>>.from(data['no_date']    ?? []),
-        'drafts':     List<Map<String, dynamic>>.from(data['drafts']     ?? []),
-        'received':   List<Map<String, dynamic>>.from(data['received']   ?? []),
+        'upcoming': List<Map<String, dynamic>>.from(data['upcoming'] ?? []),
+        'not_done': List<Map<String, dynamic>>.from(data['not_done'] ?? []),
+        'received': List<Map<String, dynamic>>.from(data['received'] ?? []),
       };
     } on DioException catch (e) {
       return {'error': e.response?.data['message'] ?? 'Error de conexión.'};

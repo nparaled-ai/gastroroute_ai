@@ -75,7 +75,10 @@
         "my_profile_desc": "Edita tu perfil y tus motos",
         "achievements": "Logros",
         "achievements_desc": "Tus hitos como motero",
-        "achievements_new": "{} logro nuevo|{} logros nuevos"
+        "achievements_new": {
+            "one": "1 logro nuevo",
+            "other": "{} logros nuevos"
+        }
     },
     "profile": {
         "title": "Mi Perfil",
@@ -262,13 +265,10 @@
     "my_routes": {
         "title": "Mis Rutas",
         "upcoming": "Previstas",
-        "historical": "Históricas",
         "received": "Recibidas",
         "new_route": "Nueva ruta",
         "empty_upcoming": "No tienes rutas previstas.\nGuarda una ruta con fecha futura.",
-        "empty_historical": "No tienes rutas históricas aún.",
         "empty_received": "No has recibido ninguna ruta aún.",
-        "empty_drafts": "No tienes borradores.\nLas rutas generadas aparecen aquí.",
         "empty_received_full": "No has recibido ninguna ruta aún.\nCuando un amigo comparta contigo aparecerá aquí.",
         "empty_filters": "Sin resultados con estos filtros.",
         "search_hint": "Buscar por título u origen…",
@@ -288,7 +288,16 @@
         "filter_moderate": "Moderada",
         "filter_hard": "Exigente",
         "filter_circular": "Circular",
-        "filter_destination": "Con destino"
+        "filter_destination": "Con destino",
+        "ridden": "Rodadas",
+        "not_done": "No realizadas",
+        "empty_ridden": "Todavía no has rodado ninguna ruta.\nInicia el tracking al salir y aparecerá aquí.",
+        "empty_not_done": "No tienes rutas pendientes de hacer.",
+        "not_counted": "No cuenta para tus logros: {reason}",
+        "auto_closed": "Cerrada automáticamente a las 24 h",
+        "source_ai": "IA",
+        "source_maps": "Maps",
+        "source_gpx": "GPX"
     },
     "friends_screen": {
         "title": "Amigos",
@@ -383,7 +392,10 @@
         "remove": "Quitar",
         "done": "Listo",
         "rejected": "Esta ruta no cuenta para tus logros: {reason}",
-        "gps_gaps": "{} tramo sin cobertura GPS, contado en línea recta.|{} tramos sin cobertura GPS, contados en línea recta."
+        "gps_gaps": {
+            "one": "1 tramo sin cobertura GPS, contado en línea recta.",
+            "other": "{} tramos sin cobertura GPS, contados en línea recta."
+        }
     },
     "achievements": {
         "title": "Logros",
@@ -428,11 +440,37 @@
         "special_explorador": "Explorador",
         "special_en_grupo": "En grupo",
         "special_coleccionista": "Coleccionista",
-        "celebration_title": "¡Nuevo logro desbloqueado!|¡{} logros desbloqueados!",
+        "celebration_title": {
+            "one": "¡Nuevo logro desbloqueado!",
+            "other": "¡{} logros desbloqueados!"
+        },
         "celebration_subtitle": "Tu esfuerzo sobre la moto tiene premio",
         "celebration_button": "Genial",
         "rider_none": "Todavía no tiene logros",
         "rider_count": "{n} logros conseguidos",
-        "rider_private": "Este motero no comparte sus logros"
+        "rider_private": "Este motero no comparte sus logros",
+        "how_to": "CÓMO CONSEGUIRLO",
+        "not_yet": "Todavía no conseguido",
+        "special_desc_madrugador": "Completa una ruta que empiece antes de las 7 de la mañana.",
+        "special_desc_noctambulo": "Completa una ruta que termine después de las 10 de la noche.",
+        "special_desc_trotamundos": "Completa una ruta de más de 500 km en un solo día.",
+        "special_desc_gastronomico": "Visita 2 o más restaurantes en una misma ruta.",
+        "special_desc_circular": "Completa una ruta que termine donde empezó.",
+        "special_desc_cuatro_estaciones": "Completa rutas en primavera, verano, otoño e invierno.",
+        "special_desc_constante": "Completa al menos una ruta cada mes durante 3 meses seguidos.",
+        "special_desc_turista": "Visita 5 miradores distintos.",
+        "special_desc_explorador": "Completa una ruta fuera de tu provincia habitual.",
+        "special_desc_en_grupo": "Completa una ruta acompañado de otro motero.",
+        "special_desc_coleccionista": "Visita 50 puntos de interés distintos."
+    },
+    "repeat": {
+        "title": "Repetir ruta",
+        "button": "Repetir esta ruta",
+        "pick_datetime": "Elige la nueva fecha y hora de salida:",
+        "pick_date": "Selecciona fecha"
+    },
+    "route_detail": {
+        "waypoints": "Waypoints de la ruta",
+        "route_map": "Recorrido"
     }
 }

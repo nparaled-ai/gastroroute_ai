@@ -9,6 +9,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/api/api_client.dart';
 import '../../../widgets/rider_avatar.dart';
 import '../../../widgets/route_waypoints_view.dart';
+import '../../../widgets/route_map_image.dart';
 import '../providers/route_service.dart';
 import '../providers/route_share_service.dart';
 import '../providers/friendship_service.dart';
@@ -111,14 +112,15 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
           builder: (ctx, setS) => AlertDialog(
             backgroundColor: AppColors.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: const Row(children: [
-              Icon(Icons.replay, color: AppColors.cyan, size: 22),
-              SizedBox(width: 8),
-              Text('Repetir ruta', style: TextStyle(color: AppColors.white, fontSize: 18)),
+            title: Row(children: [
+              const Icon(Icons.replay, color: AppColors.cyan, size: 22),
+              const SizedBox(width: 8),
+              Text('repeat.title'.tr(),
+                  style: const TextStyle(color: AppColors.white, fontSize: 18)),
             ]),
             content: Column(mainAxisSize: MainAxisSize.min, children: [
-              const Text('Elige la nueva fecha y hora de salida:',
-                  style: TextStyle(color: AppColors.grey, fontSize: 13)),
+              Text('repeat.pick_datetime'.tr(),
+                  style: const TextStyle(color: AppColors.grey, fontSize: 13)),
               const SizedBox(height: 20),
               // Fecha
               GestureDetector(
@@ -147,7 +149,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                     const Icon(Icons.event, color: AppColors.cyan, size: 18),
                     const SizedBox(width: 10),
                     Text(
-                      dateCtrl.text.isEmpty ? 'Selecciona fecha' : dateCtrl.text,
+                      dateCtrl.text.isEmpty ? 'repeat.pick_date'.tr() : dateCtrl.text,
                       style: TextStyle(
                         color: dateCtrl.text.isEmpty ? AppColors.grey : AppColors.cyan,
                         fontWeight: FontWeight.w600,
@@ -190,12 +192,14 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Cancelar', style: TextStyle(color: AppColors.grey)),
+                child: Text('common.cancel'.tr(),
+                    style: const TextStyle(color: AppColors.grey)),
               ),
               ElevatedButton(
                 onPressed: date == null ? null : () => Navigator.pop(ctx, true),
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange),
-                child: const Text('Guardar', style: TextStyle(color: Colors.white)),
+                child: Text('common.save'.tr(),
+                    style: const TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -482,6 +486,37 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       _route?['departure_date'] != null &&
       DateTime.tryParse(_route!['departure_date'])?.isBefore(DateTime.now()) == true;
 
+  /// ¿Se puede reprogramar esta ruta?
+  ///
+  /// Tiene sentido en dos casos: la rodaste y quieres volver a hacerla, o se
+  /// te pasó la fecha y no saliste. En una ruta que aún está por delante no
+  /// aporta nada, porque ya la tienes programada.
+  bool get _canRepeat => _isOwner && (_isPast || _hasBeenRidden);
+
+  /// La ruta ya tiene alguna salida grabada.
+  bool get _hasBeenRidden => _route?['has_been_ridden'] == true;
+
+  /// ¿Es hoy el día de la ruta?
+  bool get _isToday {
+    final raw = _route?['departure_date'];
+    if (raw == null) return false;
+
+    final date = DateTime.tryParse(raw.toString());
+    if (date == null) return false;
+
+    final now = DateTime.now();
+    return date.year == now.year && date.month == now.month && date.day == now.day;
+  }
+
+  /// ¿Se puede arrancar el tracking de esta ruta?
+  ///
+  /// Solo el día previsto, y solo si es tuya o te has unido. En una ruta que
+  /// es dentro de tres semanas no tiene sentido, y además arrancarla guardaría
+  /// una salida con la fecha de hoy: la ruta pasaría a Rodadas y perderías la
+  /// planificación sin quererlo. En las pasadas tampoco, porque para eso está
+  /// Repetir, que crea una copia con fecha nueva.
+  bool get _canStartTracking => _isToday && (_isOwner || _isJoined);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -563,18 +598,30 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                         _route!['departure_time'] != null)
                       _buildDeparture(),
 
-                    // ── Clima ─────────────────────────────────────────
-                    if (_weather != null)
-                      _buildWeather()
-                    else if (_isFuture)
-                      _buildWeatherUnavailable(),
+                    // ── Clima (solo si la ruta no ha pasado) ──────────
+                    // En una ruta cuya fecha ya pasó, el tiempo no aporta
+                    // nada: o está vacío, o son datos guardados de entonces.
+                    if (!_isPast) ...[
+                      if (_weather != null)
+                        _buildWeather()
+                      else
+                        _buildWeatherUnavailable(),
+                    ],
 
                     // ── Autonomía ─────────────────────────────────────
                     if (_fuelRangeKm != null) _buildFuel(),
 
+                    // ── Mapa del recorrido ────────────────────────────
+                    const SizedBox(height: 20),
+                    RouteMapImage(
+                      title: 'route_detail.route_map'.tr(),
+                      loader: () => RouteService.mapImage(widget.routeId),
+                    ),
+                    const SizedBox(height: 20),
+
                     // ── Waypoints ─────────────────────────────────────
-                    const Text('Waypoints de la ruta',
-                        style: TextStyle(
+                    Text('route_detail.waypoints'.tr(),
+                        style: const TextStyle(
                             color: AppColors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w700)),
@@ -596,36 +643,37 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
 
                     const SizedBox(height: 20),
 
-                    // ── Botón iniciar tracking ────────────────────────
-                    ElevatedButton(
-                      onPressed: _startingTracking ? null : _startTracking,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.orange,
-                        minimumSize: const Size(double.infinity, 52),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                    // ── Botón iniciar tracking (solo el día de la ruta) ──
+                    if (_canStartTracking) ...[
+                      ElevatedButton(
+                        onPressed: _startingTracking ? null : _startTracking,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.orange,
+                          minimumSize: const Size(double.infinity, 52),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (_startingTracking)
+                                const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white))
+                              else
+                                const Icon(Icons.play_arrow,
+                                    color: Colors.white, size: 20),
+                              const SizedBox(width: 8),
+                              Text('tracking.start_route'.tr(),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700)),
+                            ]),
                       ),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (_startingTracking)
-                              const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2, color: Colors.white))
-                            else
-                              const Icon(Icons.play_arrow,
-                                  color: Colors.white, size: 20),
-                            const SizedBox(width: 8),
-                            Text('tracking.start_route'.tr(),
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700)),
-                          ]),
-                    ),
-
-                    const SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                    ],
 
                     // ── Botón Google Maps ─────────────────────────────
                     ElevatedButton(
@@ -773,10 +821,11 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                         ]),
                     ],
 
-                    // ── Compartir (previstas privadas propias) ────────
-                    if (_isOwner &&
-                        _route!['visibility'] == 'private' &&
-                        _isFuture) ...[
+                    // ── Compartir (cualquier ruta propia aún privada) ──
+                    // Ya no se exige que sea futura: compartir una ruta es
+                    // compartir el recorrido, no la fecha, y una ruta buena
+                    // sigue siendo buena aunque no llegaras a hacerla.
+                    if (_isOwner && _route!['visibility'] == 'private') ...[
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: _publishing ? null : _showShareDialog,
@@ -806,8 +855,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       ),
                     ],
 
-                    // ── Repetir (históricas propias) ──────────────────
-                    if (_isOwner && _isPast) ...[  
+                    // ── Repetir (rodadas o no realizadas, propias) ────
+                    if (_canRepeat) ...[
                       const SizedBox(height: 12),
                       OutlinedButton(
                         onPressed: _repeatRoute,
@@ -817,14 +866,14 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Row(
+                        child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.replay,
+                              const Icon(Icons.replay,
                                   color: AppColors.cyan, size: 20),
-                              SizedBox(width: 8),
-                              Text('Repetir esta ruta',
-                                  style: TextStyle(
+                              const SizedBox(width: 8),
+                              Text('repeat.button'.tr(),
+                                  style: const TextStyle(
                                       color: AppColors.cyan,
                                       fontWeight: FontWeight.w700)),
                             ]),

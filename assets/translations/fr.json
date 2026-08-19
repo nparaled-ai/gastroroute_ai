@@ -75,7 +75,10 @@
         "my_profile_desc": "Modifiez votre profil et vos motos",
         "achievements": "Trophées",
         "achievements_desc": "Vos étapes en tant que motard",
-        "achievements_new": "{} nouveau trophée|{} nouveaux trophées"
+        "achievements_new": {
+            "one": "1 nouveau trophée",
+            "other": "{} nouveaux trophées"
+        }
     },
     "profile": {
         "title": "Mon Profil",
@@ -262,13 +265,10 @@
     "my_routes": {
         "title": "Mes Itinéraires",
         "upcoming": "À venir",
-        "historical": "Historique",
         "received": "Reçus",
         "new_route": "Nouvel itinéraire",
         "empty_upcoming": "Aucun itinéraire à venir.\nEnregistrez un itinéraire avec une date future.",
-        "empty_historical": "Aucun itinéraire historique.",
         "empty_received": "Aucun itinéraire reçu.",
-        "empty_drafts": "Aucun brouillon.\nLes itinéraires générés apparaissent ici.",
         "empty_received_full": "Aucun itinéraire reçu.\nQuand un ami en partage un, il apparaîtra ici.",
         "empty_filters": "Aucun résultat avec ces filtres.",
         "search_hint": "Rechercher par titre ou origine…",
@@ -288,7 +288,16 @@
         "filter_moderate": "Modéré",
         "filter_hard": "Exigeant",
         "filter_circular": "Circulaire",
-        "filter_destination": "Avec destination"
+        "filter_destination": "Avec destination",
+        "ridden": "Effectués",
+        "not_done": "Non effectués",
+        "empty_ridden": "Vous n'avez encore parcouru aucun itinéraire.\nDémarrez le suivi au départ et il apparaîtra ici.",
+        "empty_not_done": "Vous n'avez aucun itinéraire non effectué.",
+        "not_counted": "Ne compte pas pour vos trophées : {reason}",
+        "auto_closed": "Clôturé automatiquement après 24 h",
+        "source_ai": "IA",
+        "source_maps": "Maps",
+        "source_gpx": "GPX"
     },
     "friends_screen": {
         "title": "Amis",
@@ -383,7 +392,10 @@
         "remove": "Retirer",
         "done": "Terminé",
         "rejected": "Cet itinéraire ne compte pas pour vos trophées : {reason}",
-        "gps_gaps": "{} section sans couverture GPS, comptée en ligne droite.|{} sections sans couverture GPS, comptées en ligne droite."
+        "gps_gaps": {
+            "one": "1 section sans couverture GPS, comptée en ligne droite.",
+            "other": "{} sections sans couverture GPS, comptées en ligne droite."
+        }
     },
     "achievements": {
         "title": "Trophées",
@@ -428,11 +440,37 @@
         "special_explorador": "Explorateur",
         "special_en_grupo": "En groupe",
         "special_coleccionista": "Collectionneur",
-        "celebration_title": "Nouveau trophée débloqué !|{} trophées débloqués !",
+        "celebration_title": {
+            "one": "Nouveau trophée débloqué !",
+            "other": "{} trophées débloqués !"
+        },
         "celebration_subtitle": "Vos efforts sur la moto sont récompensés",
         "celebration_button": "Super",
         "rider_none": "Pas encore de trophées",
         "rider_count": "{n} trophées obtenus",
-        "rider_private": "Ce motard ne partage pas ses trophées"
+        "rider_private": "Ce motard ne partage pas ses trophées",
+        "how_to": "COMMENT L'OBTENIR",
+        "not_yet": "Pas encore obtenu",
+        "special_desc_madrugador": "Terminez un itinéraire commençant avant 7 heures du matin.",
+        "special_desc_noctambulo": "Terminez un itinéraire se terminant après 22 heures.",
+        "special_desc_trotamundos": "Terminez un itinéraire de plus de 500 km en une journée.",
+        "special_desc_gastronomico": "Visitez 2 restaurants ou plus sur un même itinéraire.",
+        "special_desc_circular": "Terminez un itinéraire qui finit là où il a commencé.",
+        "special_desc_cuatro_estaciones": "Terminez des itinéraires au printemps, en été, en automne et en hiver.",
+        "special_desc_constante": "Terminez au moins un itinéraire chaque mois pendant 3 mois consécutifs.",
+        "special_desc_turista": "Visitez 5 points de vue différents.",
+        "special_desc_explorador": "Terminez un itinéraire hors de votre province habituelle.",
+        "special_desc_en_grupo": "Terminez un itinéraire accompagné d'un autre motard.",
+        "special_desc_coleccionista": "Visitez 50 points d'intérêt différents."
+    },
+    "repeat": {
+        "title": "Répéter l'itinéraire",
+        "button": "Répéter cet itinéraire",
+        "pick_datetime": "Choisissez la nouvelle date et heure de départ :",
+        "pick_date": "Sélectionner une date"
+    },
+    "route_detail": {
+        "waypoints": "Points de passage",
+        "route_map": "Parcours"
     }
 }

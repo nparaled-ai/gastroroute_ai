@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/rider_avatar.dart';
+import '../../../widgets/route_map_image.dart';
 import '../providers/friendship_service.dart';
 import '../providers/route_service.dart' show RouteService, routeListRefresh;
 import '../providers/route_share_service.dart';
@@ -619,6 +620,20 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                   );
                 }),
                 const SizedBox(height: 16),
+              ],
+
+              // Mapa del recorrido. La ruta aún no está guardada, así que se
+              // pide por vista previa mandando la polilínea que devolvió la
+              // generación, no por id.
+              if (_route['polyline'] != null) ...[
+                RouteMapImage(
+                  title: 'route_detail.route_map'.tr(),
+                  loader: () => RouteService.mapPreview(
+                    _route['polyline'].toString(),
+                    List<Map<String, dynamic>>.from(_waypoints),
+                  ),
+                ),
+                const SizedBox(height: 24),
               ],
 
               // Waypoints

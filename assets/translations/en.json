@@ -75,7 +75,10 @@
         "my_profile_desc": "Edit your profile and bikes",
         "achievements": "Achievements",
         "achievements_desc": "Your milestones as a rider",
-        "achievements_new": "{} new achievement|{} new achievements"
+        "achievements_new": {
+            "one": "1 new achievement",
+            "other": "{} new achievements"
+        }
     },
     "profile": {
         "title": "My Profile",
@@ -262,13 +265,10 @@
     "my_routes": {
         "title": "My Routes",
         "upcoming": "Upcoming",
-        "historical": "History",
         "received": "Received",
         "new_route": "New route",
         "empty_upcoming": "No upcoming routes.\nSave a route with a future date.",
-        "empty_historical": "No historical routes yet.",
         "empty_received": "No routes received yet.",
-        "empty_drafts": "No drafts.\nGenerated routes appear here.",
         "empty_received_full": "No routes received yet.\nWhen a friend shares one, it will appear here.",
         "empty_filters": "No results with these filters.",
         "search_hint": "Search by title or origin…",
@@ -288,7 +288,16 @@
         "filter_moderate": "Moderate",
         "filter_hard": "Demanding",
         "filter_circular": "Circular",
-        "filter_destination": "With destination"
+        "filter_destination": "With destination",
+        "ridden": "Ridden",
+        "not_done": "Not ridden",
+        "empty_ridden": "You have not ridden any route yet.\nStart tracking when you set off and it will appear here.",
+        "empty_not_done": "You have no routes left undone.",
+        "not_counted": "Does not count towards your achievements: {reason}",
+        "auto_closed": "Closed automatically after 24 h",
+        "source_ai": "AI",
+        "source_maps": "Maps",
+        "source_gpx": "GPX"
     },
     "friends_screen": {
         "title": "Friends",
@@ -383,7 +392,10 @@
         "remove": "Remove",
         "done": "Done",
         "rejected": "This route does not count towards your achievements: {reason}",
-        "gps_gaps": "{} stretch without GPS coverage, counted as a straight line.|{} stretches without GPS coverage, counted as straight lines."
+        "gps_gaps": {
+            "one": "1 stretch without GPS coverage, counted as a straight line.",
+            "other": "{} stretches without GPS coverage, counted as straight lines."
+        }
     },
     "achievements": {
         "title": "Achievements",
@@ -428,11 +440,37 @@
         "special_explorador": "Explorer",
         "special_en_grupo": "In a group",
         "special_coleccionista": "Collector",
-        "celebration_title": "New achievement unlocked!|{} achievements unlocked!",
+        "celebration_title": {
+            "one": "New achievement unlocked!",
+            "other": "{} achievements unlocked!"
+        },
         "celebration_subtitle": "Your effort on the bike pays off",
         "celebration_button": "Great",
         "rider_none": "No achievements yet",
         "rider_count": "{n} achievements earned",
-        "rider_private": "This rider does not share their achievements"
+        "rider_private": "This rider does not share their achievements",
+        "how_to": "HOW TO EARN IT",
+        "not_yet": "Not earned yet",
+        "special_desc_madrugador": "Complete a route that starts before 7 in the morning.",
+        "special_desc_noctambulo": "Complete a route that ends after 10 at night.",
+        "special_desc_trotamundos": "Complete a route of over 500 km in a single day.",
+        "special_desc_gastronomico": "Visit 2 or more restaurants on the same route.",
+        "special_desc_circular": "Complete a route that ends where it started.",
+        "special_desc_cuatro_estaciones": "Complete routes in spring, summer, autumn and winter.",
+        "special_desc_constante": "Complete at least one route every month for 3 months running.",
+        "special_desc_turista": "Visit 5 different viewpoints.",
+        "special_desc_explorador": "Complete a route outside your usual province.",
+        "special_desc_en_grupo": "Complete a route together with another rider.",
+        "special_desc_coleccionista": "Visit 50 different points of interest."
+    },
+    "repeat": {
+        "title": "Repeat route",
+        "button": "Repeat this route",
+        "pick_datetime": "Choose the new departure date and time:",
+        "pick_date": "Select date"
+    },
+    "route_detail": {
+        "waypoints": "Route waypoints",
+        "route_map": "Route"
     }
 }

@@ -114,9 +114,13 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/rider/summary',
-      builder: (context, state) => RouteSummaryScreen(
-        tracking: state.extra as Map<String, dynamic>,
-      ),
+      builder: (context, state) {
+        final tracking = state.extra as Map<String, dynamic>;
+        return RouteSummaryScreen(
+          tracking: tracking,
+          fromHistory: tracking['from_history'] == true,
+        );
+      },
     ),
     GoRoute(
       path: '/rider/achievements',
@@ -124,9 +128,20 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/rider/celebration',
-      builder: (context, state) => AchievementCelebrationScreen(
-        achievements: List<Map<String, dynamic>>.from(state.extra as List),
-      ),
+      builder: (context, state) {
+        // extra puede ser la lista de logros, o un mapa con la lista y la
+        // ruta de destino al cerrar.
+        final extra = state.extra;
+        if (extra is Map<String, dynamic>) {
+          return AchievementCelebrationScreen(
+            achievements: List<Map<String, dynamic>>.from(extra['achievements'] as List),
+            nextRoute: extra['next'] as String? ?? '/rider/home',
+          );
+        }
+        return AchievementCelebrationScreen(
+          achievements: List<Map<String, dynamic>>.from(extra as List),
+        );
+      },
     ),
     GoRoute(
       path: '/rider/routes/:id',

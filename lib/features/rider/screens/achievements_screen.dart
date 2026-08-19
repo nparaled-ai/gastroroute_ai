@@ -37,6 +37,14 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   }
 
   void _openDetail(Map<String, dynamic> category) {
+    _openSheet(_CategoryDetailSheet(category: category));
+  }
+
+  void _openSpecialDetail(Map<String, dynamic> special) {
+    _openSheet(_SpecialDetailSheet(special: special));
+  }
+
+  void _openSheet(Widget child) {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.surface,
@@ -44,7 +52,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => _CategoryDetailSheet(category: category),
+      builder: (_) => child,
     );
   }
 
@@ -172,7 +180,12 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
             childAspectRatio: 0.85,
-            children: special.map((s) => _SpecialBadge(special: s)).toList(),
+            children: special
+                .map((s) => _SpecialBadge(
+                      special: s,
+                      onTap: () => _openSpecialDetail(s),
+                    ))
+                .toList(),
           ),
 
           const SizedBox(height: 24),
@@ -319,8 +332,9 @@ class _TierPill extends StatelessWidget {
 
 class _SpecialBadge extends StatelessWidget {
   final Map<String, dynamic> special;
+  final VoidCallback onTap;
 
-  const _SpecialBadge({required this.special});
+  const _SpecialBadge({required this.special, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -328,26 +342,125 @@ class _SpecialBadge extends StatelessWidget {
     final code = special['code'] as String?;
     final color = unlocked ? AppColors.orange : AppColors.grey;
 
-    return Opacity(
-      opacity: unlocked ? 1 : 0.35,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.greyDark),
+    return GestureDetector(
+      onTap: onTap,
+      child: Opacity(
+        // Bloqueados atenuados, pero no tanto que no se puedan leer: hay que
+        // poder ver qué son para querer conseguirlos.
+        opacity: unlocked ? 1 : 0.45,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+                color: unlocked ? AppColors.orange.withValues(alpha: 0.5) : AppColors.greyDark),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(AchievementStyle.specialIcon(code), color: color, size: 22),
+              const SizedBox(height: 6),
+              Text(
+                AchievementStyle.specialLabel(code).tr(),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: AppColors.white, fontSize: 9, height: 1.25),
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+/// Detalle de un logro especial: qué hay que hacer para conseguirlo.
+///
+/// Sin esto, la rejilla solo muestra un icono y un nombre. "Coleccionista" no
+/// dice nada por sí solo, y en los bloqueados es peor: se ve que falta algo
+/// pero no qué hay que hacer.
+class _SpecialDetailSheet extends StatelessWidget {
+  final Map<String, dynamic> special;
+
+  const _SpecialDetailSheet({required this.special});
+
+  String _formatDate(String? iso) {
+    if (iso == null) return '';
+    final date = DateTime.tryParse(iso);
+    return date == null ? '' : DateFormat.yMMMMd().format(date);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final unlocked = special['unlocked'] == true;
+    final code = special['code'] as String?;
+    final color = unlocked ? AppColors.orange : AppColors.grey;
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(AchievementStyle.specialIcon(code), color: color, size: 22),
-            const SizedBox(height: 6),
-            Text(
-              AchievementStyle.specialLabel(code).tr(),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: AppColors.white, fontSize: 9, height: 1.25),
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(AchievementStyle.specialIcon(code), color: color, size: 36),
+            ),
+            const SizedBox(height: 14),
+
+            Text(AchievementStyle.specialLabel(code).tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: AppColors.white, fontSize: 19, fontWeight: FontWeight.w700)),
+
+            const SizedBox(height: 10),
+
+            // Lo importante: qué hay que hacer para conseguirlo
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.card,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(children: [
+                Text('achievements.how_to'.tr(),
+                    style: const TextStyle(
+                        color: AppColors.grey, fontSize: 11, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 6),
+                Text('achievements.special_desc_$code'.tr(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: AppColors.white, fontSize: 13, height: 1.5)),
+              ]),
+            ),
+
+            const SizedBox(height: 14),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(unlocked ? Icons.check_circle : Icons.lock_outline,
+                    color: color, size: 16),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    unlocked
+                        ? 'achievements.unlocked_on'.tr(namedArgs: {
+                            'date': _formatDate(special['unlocked_at'] as String?),
+                          })
+                        : 'achievements.not_yet'.tr(),
+                    style: TextStyle(color: color, fontSize: 12),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

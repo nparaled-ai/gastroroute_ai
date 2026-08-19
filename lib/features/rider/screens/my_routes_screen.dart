@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../widgets/rider_avatar.dart';
 import '../providers/route_service.dart' show RouteService, routeListRefresh;
+import '../providers/route_tracking_service.dart';
 
 class MyRoutesScreen extends StatefulWidget {
   const MyRoutesScreen({super.key});
@@ -17,16 +17,23 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  List<Map<String, dynamic>> _upcoming   = [];
-  List<Map<String, dynamic>> _historical = [];
-  List<Map<String, dynamic>> _drafts     = [];
-  List<Map<String, dynamic>> _received   = [];
+  List<Map<String, dynamic>> _upcoming = [];
+  List<Map<String, dynamic>> _notDone  = [];
+  List<Map<String, dynamic>> _received = [];
+
+  /// Rodadas: son trackings, no rutas. Una misma ruta rodada tres veces son
+  /// tres entradas, porque cada salida tiene sus km, sus POIs y su recorrido.
+  List<Map<String, dynamic>> _ridden = [];
+
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
+    // El botón de crear ruta se oculta en Rodadas, así que hay que repintar
+    // al cambiar de pestaña.
+    _tabController.addListener(() => setState(() {}));
     routeListRefresh.addListener(_loadRoutes);
     _loadRoutes();
   }
@@ -40,15 +47,45 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
 
   Future<void> _loadRoutes() async {
     setState(() => _loading = true);
-    final result = await RouteService.getMyRoutes();
+
+    // Las rutas planificadas y las rodadas viven en endpoints distintos:
+    // unas son filas de 'routes' y las otras trackings.
+    final results = await Future.wait([
+      RouteService.getMyRoutes(),
+      RouteTrackingService.history(),
+    ]);
+
     if (!mounted) return;
+
+    final routes = results[0] as Map<String, dynamic>;
+
     setState(() {
-      _upcoming   = List<Map<String, dynamic>>.from(result['upcoming']   ?? []);
-      _historical = List<Map<String, dynamic>>.from(result['historical'] ?? []);
-      _drafts     = List<Map<String, dynamic>>.from(result['drafts']     ?? []);
-      _received   = List<Map<String, dynamic>>.from(result['received']   ?? []);
-      _loading    = false;
+      _upcoming = List<Map<String, dynamic>>.from(routes['upcoming'] ?? []);
+      _notDone  = List<Map<String, dynamic>>.from(routes['not_done'] ?? []);
+      _received = List<Map<String, dynamic>>.from(routes['received'] ?? []);
+      _ridden   = List<Map<String, dynamic>>.from(results[1] as List);
+      _loading  = false;
     });
+  }
+
+  /// Abre el resumen de una ruta rodada: mapa, km reales y POIs detectados.
+  ///
+  /// El listado no trae el track ni los POIs, que son cientos de KB por ruta:
+  /// se piden aquí.
+  Future<void> _openRide(Map<String, dynamic> ride) async {
+    final summary = await RouteTrackingService.summary(ride['id'] as int);
+    if (!mounted) return;
+
+    if (summary == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('common.error'.tr()),
+        backgroundColor: AppColors.error,
+      ));
+      return;
+    }
+
+    await context.push('/rider/summary', extra: {...summary, 'from_history': true});
+    _loadRoutes();
   }
 
   @override
@@ -94,9 +131,17 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
             ),
             Tab(
               child: _TabLabel(
+                icon: '🏍️',
+                label: 'my_routes.ridden'.tr(),
+                count: _ridden.length,
+                activeColor: AppColors.orange,
+              ),
+            ),
+            Tab(
+              child: _TabLabel(
                 icon: '📚',
-                label: 'my_routes.historical'.tr(),
-                count: _historical.length,
+                label: 'my_routes.not_done'.tr(),
+                count: _notDone.length,
                 activeColor: AppColors.grey,
               ),
             ),
@@ -126,9 +171,13 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                     _loadRoutes();
                   },
                 ),
+                _RiddenList(
+                  rides: _ridden,
+                  onTap: _openRide,
+                ),
                 _RouteList(
-                  routes: _historical,
-                  empty: 'my_routes.empty_historical'.tr(),
+                  routes: _notDone,
+                  empty: 'my_routes.empty_not_done'.tr(),
                   emptyIcon: Icons.history,
                   onTap: (r) async {
                     await context.push('/rider/routes/${r['id']}');
@@ -146,13 +195,17 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                 ),
               ],
             ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/rider/create-route'),
-        backgroundColor: AppColors.orange,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: Text('my_routes.new_route'.tr(),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-      ),
+      floatingActionButton: _tabController.index == 1
+          // En Rodadas no tiene sentido "crear ruta": ahí solo hay historia.
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => context.push('/rider/create-route'),
+              backgroundColor: AppColors.orange,
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: Text('my_routes.new_route'.tr(),
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w700)),
+            ),
     );
   }
 }
@@ -204,14 +257,12 @@ class _RouteList extends StatefulWidget {
   final String empty;
   final IconData emptyIcon;
   final Function(Map<String, dynamic>) onTap;
-  final VoidCallback? onNew;
 
   const _RouteList({
     required this.routes,
     required this.empty,
     required this.emptyIcon,
     required this.onTap,
-    this.onNew,
   });
 
   @override
@@ -333,13 +384,6 @@ class _RouteListState extends State<_RouteList> {
                     const SizedBox(height: 12),
                     TextButton(onPressed: _clearFilters,
                         child: Text('my_routes.filter_clear_all'.tr(), style: const TextStyle(color: AppColors.orange))),
-                  ] else if (widget.onNew != null) ...[
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: widget.onNew,
-                      icon: const Icon(Icons.add, size: 18),
-                      label: Text('my_routes.create_route'.tr()),
-                    ),
                   ],
                 ]),
               )
@@ -399,97 +443,22 @@ class _FilterDivider extends StatelessWidget {
   );
 }
 
-// ─── Lista de borradores ──────────────────────────────────────────────────────
-class _DraftList extends StatelessWidget {
-  final List<Map<String, dynamic>> drafts;
-  final Function(Map<String, dynamic>) onTap;
-  final VoidCallback onNew;
-
-  const _DraftList({required this.drafts, required this.onTap, required this.onNew});
-
-  @override
-  Widget build(BuildContext context) {
-    if (drafts.isEmpty) {
-      return Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.edit_note_outlined, color: AppColors.greyDark, size: 64),
-          const SizedBox(height: 16),
-          Text('my_routes.empty_drafts'.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: onNew,
-            icon: const Icon(Icons.auto_awesome, size: 18),
-            label: Text('my_routes.generate_route'.tr()),
-          ),
-        ]),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-      itemCount: drafts.length,
-      itemBuilder: (_, i) => _RouteCard(
-        route: drafts[i],
-        onTap: () => onTap(drafts[i]),
-        isDraft: true,
-      ),
-    );
-  }
-}
-
-// ─── Lista de rutas recibidas ─────────────────────────────────────────────────
-class _ReceivedList extends StatelessWidget {
-  final List<Map<String, dynamic>> routes;
-  final Function(Map<String, dynamic>) onTap;
-
-  const _ReceivedList({required this.routes, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    if (routes.isEmpty) {
-      return Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.mail_outline, color: AppColors.greyDark, size: 64),
-          const SizedBox(height: 16),
-          Text('my_routes.empty_received_full'.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
-        ]),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-      itemCount: routes.length,
-      itemBuilder: (_, i) => _RouteCard(
-        route: routes[i],
-        onTap: () => onTap(routes[i]),
-        isReceived: true,
-      ),
-    );
-  }
-}
 
 // ─── Tarjeta de ruta ──────────────────────────────────────────────────────────
 class _RouteCard extends StatelessWidget {
   final Map<String, dynamic> route;
   final VoidCallback onTap;
-  final bool isDraft;
   final bool isReceived;
 
   const _RouteCard({
     required this.route,
     required this.onTap,
-    this.isDraft    = false,
     this.isReceived = false,
   });
 
   bool get _isReceived => isReceived || route['is_received'] == true;
 
   Color get _statusColor {
-    if (isDraft) return AppColors.gold;
     if (_isReceived) {
       final confirmed = route['is_confirmed'] == true;
       final declined  = route['is_declined']  == true;
@@ -505,7 +474,6 @@ class _RouteCard extends StatelessWidget {
   }
 
   String get _statusLabel {
-    if (isDraft) return 'my_routes.status_draft'.tr();
     if (_isReceived) {
       final confirmed = route['is_confirmed'] == true;
       final declined  = route['is_declined']  == true;
@@ -547,7 +515,7 @@ class _RouteCard extends StatelessWidget {
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDraft ? AppColors.gold.withOpacity(0.3) : AppColors.greyDark,
+            color: AppColors.greyDark,
           ),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -630,19 +598,23 @@ class _RouteCard extends StatelessWidget {
                 ),
               ]),
               const SizedBox(height: 10),
-              Row(children: [
-                _Chip(Icons.route,       '${route['distance_km'] ?? '?'} km', AppColors.orange),
-                const SizedBox(width: 8),
-                _Chip(Icons.access_time,
-                    '${(((route['duration_minutes'] ?? 0) as num) / 60).toStringAsFixed(1)} h',
-                    AppColors.cyan),
-                const SizedBox(width: 8),
-                _Chip(Icons.terrain, route['difficulty'] ?? '', AppColors.gold),
-                if (route['source_type'] == 'gpx') ...[
-                  const SizedBox(width: 8),
-                  _Chip(Icons.folder_open, 'GPX', AppColors.cyan),
+              // Los chips se envuelven: con el de origen siempre presente, en
+              // pantallas estrechas la fila se salía.
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _Chip(Icons.route, '${route['distance_km'] ?? '?'} km', AppColors.orange),
+                  _Chip(Icons.access_time,
+                      '${(((route['duration_minutes'] ?? 0) as num) / 60).toStringAsFixed(1)} h',
+                      AppColors.cyan),
+                  _Chip(Icons.terrain, route['difficulty'] ?? '', AppColors.gold),
+                  // Origen de la ruta. Antes solo se pintaba en las GPX, así
+                  // que las de IA y las de Google Maps no mostraban nada y
+                  // parecía que faltaba información según la pestaña.
+                  _SourceChip(source: route['source_type']?.toString()),
                 ],
-              ]),
+              ),
               const SizedBox(height: 8),
               // Moto
               if (route['moto_info'] != null)
@@ -720,5 +692,170 @@ class _Chip extends StatelessWidget {
             color: color, fontSize: 11, fontWeight: FontWeight.w600)),
       ]),
     );
+  }
+}
+
+/// Lista de rutas rodadas.
+///
+/// A diferencia de las demás pestañas, aquí cada entrada es un TRACKING, no
+/// una ruta: repetir la misma ruta tres veces son tres entradas, porque cada
+/// salida tiene sus kilómetros, sus POIs y su recorrido.
+class _RiddenList extends StatelessWidget {
+  final List<Map<String, dynamic>> rides;
+  final Future<void> Function(Map<String, dynamic>) onTap;
+
+  const _RiddenList({required this.rides, required this.onTap});
+
+  String _formatDate(String? iso) {
+    final date = iso == null ? null : DateTime.tryParse(iso);
+    return date == null ? '' : DateFormat.yMMMd().add_Hm().format(date.toLocal());
+  }
+
+  String _formatDuration(int seconds) {
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    return h > 0 ? '${h}h ${m}min' : '${m}min';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (rides.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.two_wheeler, color: AppColors.grey, size: 48),
+            const SizedBox(height: 16),
+            Text('my_routes.empty_ridden'.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
+          ]),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: rides.length,
+      itemBuilder: (_, i) {
+        final ride = rides[i];
+        final route = Map<String, dynamic>.from(ride['route'] ?? {});
+        final km = (ride['distance_km'] as num?)?.toDouble() ?? 0;
+        final seconds = (ride['duration_seconds'] as num?)?.toInt() ?? 0;
+        final speed = (ride['avg_speed_kmh'] as num?)?.toDouble() ?? 0;
+
+        // Una ruta rechazada por antitrampa sigue siendo una ruta que se hizo:
+        // se muestra con su motivo, en vez de desaparecer sin explicación.
+        final rejected = ride['status'] == 'rejected';
+        final autoClosed = ride['status'] == 'auto_closed';
+        final accent = rejected ? AppColors.error : AppColors.orange;
+
+        return GestureDetector(
+          onTap: () => onTap(ride),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                  color: rejected ? AppColors.error.withValues(alpha: 0.4) : AppColors.greyDark),
+            ),
+            child: Row(children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(rejected ? Icons.block : Icons.two_wheeler,
+                    color: accent, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(route['title']?.toString() ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          color: AppColors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 3),
+                  Text(_formatDate(ride['started_at'] as String?),
+                      style: const TextStyle(color: AppColors.grey, fontSize: 11)),
+                  const SizedBox(height: 6),
+                  Row(children: [
+                    _RideChip(text: '${km.toStringAsFixed(1)} km', color: accent),
+                    const SizedBox(width: 6),
+                    _RideChip(text: _formatDuration(seconds), color: AppColors.grey),
+                    const SizedBox(width: 6),
+                    _RideChip(
+                        text: '${speed.toStringAsFixed(0)} km/h', color: AppColors.grey),
+                  ]),
+                  if (rejected && ride['rejected_reason'] != null) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      'my_routes.not_counted'.tr(
+                          namedArgs: {'reason': ride['rejected_reason'].toString()}),
+                      style: const TextStyle(
+                          color: AppColors.error, fontSize: 10, height: 1.3),
+                    ),
+                  ],
+                  if (autoClosed) ...[
+                    const SizedBox(height: 6),
+                    Text('my_routes.auto_closed'.tr(),
+                        style: const TextStyle(color: AppColors.gold, fontSize: 10)),
+                  ],
+                ]),
+              ),
+              const Icon(Icons.chevron_right, color: AppColors.grey, size: 20),
+            ]),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _RideChip extends StatelessWidget {
+  final String text;
+  final Color color;
+
+  const _RideChip({required this.text, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(text,
+          style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w600)),
+    );
+  }
+}
+
+/// Chip que indica de dónde salió la ruta: generada con IA, importada de
+/// Google Maps o de un fichero GPX.
+///
+/// Se pinta siempre, en las cuatro pestañas. Antes solo aparecía en las GPX,
+/// lo que hacía parecer que unas pestañas mostraban menos datos que otras
+/// cuando en realidad dependía del tipo de ruta que hubiera en cada una.
+class _SourceChip extends StatelessWidget {
+  final String? source;
+
+  const _SourceChip({required this.source});
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, label) = switch (source) {
+      'gpx'         => (Icons.folder_open, 'my_routes.source_gpx'.tr()),
+      'google_maps' => (Icons.map_outlined, 'my_routes.source_maps'.tr()),
+      _             => (Icons.auto_awesome, 'my_routes.source_ai'.tr()),
+    };
+
+    return _Chip(icon, label, AppColors.cyan);
   }
 }

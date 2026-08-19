@@ -14,7 +14,15 @@ import '../widgets/achievement_style.dart';
 class AchievementCelebrationScreen extends StatefulWidget {
   final List<Map<String, dynamic>> achievements;
 
-  const AchievementCelebrationScreen({super.key, required this.achievements});
+  /// A dónde ir al cerrar. Viniendo de una ruta se vuelve a la principal;
+  /// viniendo de la tarjeta de Logros, a la lista, que es lo que se iba a ver.
+  final String nextRoute;
+
+  const AchievementCelebrationScreen({
+    super.key,
+    required this.achievements,
+    this.nextRoute = '/rider/home',
+  });
 
   @override
   State<AchievementCelebrationScreen> createState() =>
@@ -62,7 +70,7 @@ class _AchievementCelebrationScreenState extends State<AchievementCelebrationScr
     await AchievementService.markCelebrated(ids);
 
     if (!mounted) return;
-    context.go('/rider/home');
+    context.go(widget.nextRoute);
   }
 
   /// Nombre del logro: los progresivos llevan categoría y nivel; los

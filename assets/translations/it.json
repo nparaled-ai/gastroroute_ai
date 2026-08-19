@@ -75,7 +75,10 @@
         "my_profile_desc": "Modifica profilo e moto",
         "achievements": "Traguardi",
         "achievements_desc": "I tuoi traguardi da motociclista",
-        "achievements_new": "{} nuovo traguardo|{} nuovi traguardi"
+        "achievements_new": {
+            "one": "1 nuovo traguardo",
+            "other": "{} nuovi traguardi"
+        }
     },
     "profile": {
         "title": "Il Mio Profilo",
@@ -262,13 +265,10 @@
     "my_routes": {
         "title": "I Miei Percorsi",
         "upcoming": "Prossimi",
-        "historical": "Storico",
         "received": "Ricevuti",
         "new_route": "Nuovo percorso",
         "empty_upcoming": "Nessun percorso programmato.\nSalva un percorso con data futura.",
-        "empty_historical": "Nessun percorso storico ancora.",
         "empty_received": "Nessun percorso ricevuto ancora.",
-        "empty_drafts": "Nessuna bozza.\nI percorsi generati appaiono qui.",
         "empty_received_full": "Nessun percorso ricevuto.\nQuando un amico ne condivide uno, apparirà qui.",
         "empty_filters": "Nessun risultato con questi filtri.",
         "search_hint": "Cerca per titolo o origine…",
@@ -288,7 +288,16 @@
         "filter_moderate": "Moderato",
         "filter_hard": "Impegnativo",
         "filter_circular": "Circolare",
-        "filter_destination": "Con destinazione"
+        "filter_destination": "Con destinazione",
+        "ridden": "Percorsi",
+        "not_done": "Non effettuati",
+        "empty_ridden": "Non hai ancora percorso nessun itinerario.\nAvvia la registrazione quando parti e apparirà qui.",
+        "empty_not_done": "Non hai percorsi in sospeso.",
+        "not_counted": "Non conta per i tuoi traguardi: {reason}",
+        "auto_closed": "Chiuso automaticamente dopo 24 h",
+        "source_ai": "IA",
+        "source_maps": "Maps",
+        "source_gpx": "GPX"
     },
     "friends_screen": {
         "title": "Amici",
@@ -383,7 +392,10 @@
         "remove": "Rimuovi",
         "done": "Fatto",
         "rejected": "Questo percorso non conta per i tuoi traguardi: {reason}",
-        "gps_gaps": "{} tratto senza copertura GPS, contato in linea retta.|{} tratti senza copertura GPS, contati in linea retta."
+        "gps_gaps": {
+            "one": "1 tratto senza copertura GPS, contato in linea retta.",
+            "other": "{} tratti senza copertura GPS, contati in linea retta."
+        }
     },
     "achievements": {
         "title": "Traguardi",
@@ -428,11 +440,37 @@
         "special_explorador": "Esploratore",
         "special_en_grupo": "In gruppo",
         "special_coleccionista": "Collezionista",
-        "celebration_title": "Nuovo traguardo sbloccato!|{} traguardi sbloccati!",
+        "celebration_title": {
+            "one": "Nuovo traguardo sbloccato!",
+            "other": "{} traguardi sbloccati!"
+        },
         "celebration_subtitle": "Il tuo impegno in moto viene premiato",
         "celebration_button": "Ottimo",
         "rider_none": "Nessun traguardo ancora",
         "rider_count": "{n} traguardi ottenuti",
-        "rider_private": "Questo motociclista non condivide i suoi traguardi"
+        "rider_private": "Questo motociclista non condivide i suoi traguardi",
+        "how_to": "COME OTTENERLO",
+        "not_yet": "Non ancora ottenuto",
+        "special_desc_madrugador": "Completa un percorso che inizia prima delle 7 del mattino.",
+        "special_desc_noctambulo": "Completa un percorso che finisce dopo le 22.",
+        "special_desc_trotamundos": "Completa un percorso di oltre 500 km in un solo giorno.",
+        "special_desc_gastronomico": "Visita 2 o più ristoranti nello stesso percorso.",
+        "special_desc_circular": "Completa un percorso che finisce dove è iniziato.",
+        "special_desc_cuatro_estaciones": "Completa percorsi in primavera, estate, autunno e inverno.",
+        "special_desc_constante": "Completa almeno un percorso al mese per 3 mesi di fila.",
+        "special_desc_turista": "Visita 5 punti panoramici diversi.",
+        "special_desc_explorador": "Completa un percorso fuori dalla tua provincia abituale.",
+        "special_desc_en_grupo": "Completa un percorso insieme a un altro motociclista.",
+        "special_desc_coleccionista": "Visita 50 punti di interesse diversi."
+    },
+    "repeat": {
+        "title": "Ripeti percorso",
+        "button": "Ripeti questo percorso",
+        "pick_datetime": "Scegli la nuova data e ora di partenza:",
+        "pick_date": "Seleziona data"
+    },
+    "route_detail": {
+        "waypoints": "Punti del percorso",
+        "route_map": "Percorso"
     }
 }

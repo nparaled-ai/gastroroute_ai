@@ -1,10 +1,10 @@
-import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/route_map_image.dart';
 import '../providers/route_tracking_service.dart';
 import '../providers/achievement_service.dart';
 
@@ -17,15 +17,21 @@ import '../providers/achievement_service.dart';
 class RouteSummaryScreen extends StatefulWidget {
   final Map<String, dynamic> tracking;
 
-  const RouteSummaryScreen({super.key, required this.tracking});
+  /// true cuando se abre desde el historial: entonces es solo consulta, no
+  /// encadena con la celebración y el botón vuelve atrás en vez de ir a inicio.
+  final bool fromHistory;
+
+  const RouteSummaryScreen({
+    super.key,
+    required this.tracking,
+    this.fromHistory = false,
+  });
 
   @override
   State<RouteSummaryScreen> createState() => _RouteSummaryScreenState();
 }
 
 class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
-  Uint8List? _mapImage;
-  bool _loadingMap = true;
 
   late List<Map<String, dynamic>> _visited;
   late List<Map<String, dynamic>> _suggested;
@@ -45,17 +51,8 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
     _suggested = List<Map<String, dynamic>>.from(
         (widget.tracking['suggested_pois'] as List?) ?? []);
 
-    _loadMap();
   }
 
-  Future<void> _loadMap() async {
-    final image = await RouteTrackingService.mapImage(_trackingId);
-    if (!mounted) return;
-    setState(() {
-      _mapImage = image;
-      _loadingMap = false;
-    });
-  }
 
   /// Mueve un POI de sugeridos a visitados.
   Future<void> _addPoi(Map<String, dynamic> poi) async {
@@ -95,6 +92,12 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
   /// desbloqueado logros. El resumen no los menciona a propósito: la
   /// celebración es el momento del descubrimiento.
   Future<void> _finish() async {
+    // Desde el historial es una consulta: se vuelve por donde se vino.
+    if (widget.fromHistory) {
+      context.canPop() ? context.pop() : context.go('/rider/home');
+      return;
+    }
+
     final pending = await AchievementService.pending();
     if (!mounted) return;
 
@@ -182,37 +185,10 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
 
             const SizedBox(height: 24),
 
-            // Mapa con el recorrido
-            Text('summary.route_map'.tr(),
-                style: const TextStyle(
-                    color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: AspectRatio(
-                aspectRatio: 16 / 10,
-                child: Container(
-                  color: AppColors.surface,
-                  child: _loadingMap
-                      ? const Center(
-                          child: CircularProgressIndicator(color: AppColors.orange))
-                      : _mapImage != null
-                          ? Image.memory(_mapImage!, fit: BoxFit.cover)
-                          : Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.map_outlined,
-                                      color: AppColors.grey, size: 36),
-                                  const SizedBox(height: 8),
-                                  Text('summary.map_unavailable'.tr(),
-                                      style: const TextStyle(
-                                          color: AppColors.grey, fontSize: 12)),
-                                ],
-                              ),
-                            ),
-                ),
-              ),
+            // Mapa con el recorrido real grabado
+            RouteMapImage(
+              title: 'summary.route_map'.tr(),
+              loader: () => RouteTrackingService.mapImage(_trackingId),
             ),
 
             const SizedBox(height: 24),
@@ -266,20 +242,32 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
                   )),
             ],
 
-            const SizedBox(height: 32),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _finish,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(0, 52),
-                  backgroundColor: AppColors.orange,
-                ),
-                child: Text('summary.done'.tr()),
-              ),
-            ),
+            const SizedBox(height: 8),
           ],
+        ),
+      ),
+
+      // El botón va fijo abajo, fuera del scroll: así no hay que bajar hasta
+      // el final para terminar, y SafeArea evita que la barra de navegación
+      // de Android se lo coma.
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 12),
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _finish,
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(0, 52),
+              backgroundColor: AppColors.orange,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text('summary.done'.tr(),
+                style: const TextStyle(
+                    color: AppColors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700)),
+          ),
         ),
       ),
     );
