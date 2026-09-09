@@ -29,6 +29,10 @@ class RouteShareService {
   static Future<Map<String, dynamic>> join(int routeId) async {
     try {
       final response = await ApiClient.dio.post('/rider/routes/$routeId/join');
+
+      // No hay que programar nada: el aviso de salida lo manda el servidor por
+      // push a los participantes con status 'confirmed', que es justo en lo que
+      // te convierte esta llamada.
       return {'success': true, 'message': response.data['message']};
     } on DioException catch (e) {
       return {'error': e.response?.data['message'] ?? 'Error al apuntarse.'};
@@ -38,6 +42,9 @@ class RouteShareService {
   static Future<Map<String, dynamic>> leave(int routeId) async {
     try {
       await ApiClient.dio.delete('/rider/routes/$routeId/join');
+
+      // Nada que cancelar: al dejar de ser participante confirmado, el servidor
+      // deja de incluirte en el aviso de salida.
       return {'success': true};
     } on DioException catch (e) {
       return {'error': e.response?.data['message'] ?? 'Error.'};

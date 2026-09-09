@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/api/api_client.dart';
 import '../../../widgets/rider_avatar.dart';
@@ -37,6 +38,22 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   bool _joining    = false;
   bool _refreshingWeather = false;
   bool _startingTracking  = false;
+
+  /// Para no repetir la oferta de empezar cada vez que se recarga la ruta.
+  bool _startOffered = false;
+
+  /// Ventana alrededor de la hora de salida en la que se ofrece grabar.
+  ///
+  /// Generosa por detrás: es normal salir con retraso, y el motero que abre la
+  /// app una hora tarde sigue queriendo grabar su ruta.
+  static const _startWindowBefore = Duration(minutes: 30);
+  static const _startWindowAfter  = Duration(hours: 2);
+
+  /// Distancia máxima al origen para dar por hecho que se está saliendo.
+  ///
+  /// Amplia a propósito: el punto de salida suele ser un bar o una gasolinera
+  /// cercana, no la coordenada exacta que puso la IA.
+  static const double _startNearOriginM = 1000;
   bool _publishing = false;
   Map<String, dynamic>? _currentWeather;
 
@@ -62,7 +79,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('GPX guardado: $filename'),
+        content: Text('route_detail.gpx_saved'.tr(namedArgs: {'file': filename})),
         backgroundColor: AppColors.cyan,
         action: SnackBarAction(
           label: 'OK',
@@ -72,8 +89,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       ));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Error al descargar el archivo GPX.'),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('route_detail.gpx_error'.tr()),
         backgroundColor: AppColors.error,
       ));
     }
@@ -97,6 +114,114 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       _pending    = List<Map<String, dynamic>>.from(results[1]['pending']   ?? []);
       _loading    = false;
     });
+
+    _offerStartIfDeparting();
+  }
+
+  /// Si el motero está en el origen y a la hora, le ofrece empezar a grabar.
+  ///
+  /// Es la mitad no-GPS del arranque automático: detectar la salida con la app
+  /// cerrada exigiría ubicación en segundo plano, que se descartó por la
+  /// fricción en las tiendas. Esto cubre el caso real —el motero abre la app,
+  /// o llega aquí desde el aviso de salida— sin pedir ningún permiso nuevo.
+  ///
+  /// Se PREGUNTA, no se arranca solo: empezar a grabar la ubicación sin que
+  /// nadie lo haya pedido sorprende, y es de las cosas que acaban en malas
+  /// reseñas. El diálogo deja «Empezar» como acción principal, así que sigue
+  /// siendo un solo toque.
+  Future<void> _offerStartIfDeparting() async {
+    if (_startOffered || !mounted || _route == null) return;
+
+    // Ya se está grabando algo: no hay nada que ofrecer.
+    if (RouteTrackingManager.instance.isTracking) return;
+
+    // Solo tiene sentido en rutas que el motero va a hacer.
+    if (!_isOwner && !_isJoined) return;
+
+    final departure = _departureOf(_route!);
+    if (departure == null) return;
+
+    final now = DateTime.now();
+    if (now.isBefore(departure.subtract(_startWindowBefore)) ||
+        now.isAfter(departure.add(_startWindowAfter))) {
+      return;
+    }
+
+    // El permiso NO se pide aquí: si el motero aún no lo ha dado, preguntarle
+    // por sorpresa al abrir una ruta es peor que no ofrecer nada. Se le pedirá
+    // cuando pulse «Iniciar ruta».
+    final permission = await Geolocator.checkPermission();
+    if (permission != LocationPermission.always &&
+        permission != LocationPermission.whileInUse) {
+      return;
+    }
+
+    final originLat = _coord(_route!['origin_lat']);
+    final originLng = _coord(_route!['origin_lng']);
+    if (originLat == null || originLng == null) return;
+
+    Position position;
+    try {
+      position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+        ),
+      ).timeout(const Duration(seconds: 8));
+    } catch (_) {
+      return; // Sin posición fiable, no se ofrece nada.
+    }
+
+    if (!mounted) return;
+
+    final metres = RouteTrackingManager.haversine(
+      position.latitude, position.longitude, originLat, originLng,
+    );
+    if (metres > _startNearOriginM) return;
+
+    _startOffered = true;
+
+    final start = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('tracking.departing_title'.tr(),
+            style: const TextStyle(color: AppColors.white)),
+        content: Text('tracking.departing_body'.tr(),
+            style: const TextStyle(color: AppColors.grey)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('tracking.not_now'.tr(),
+                style: const TextStyle(color: AppColors.grey)),
+          ),
+          ElevatedButton(
+            autofocus: true,
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange),
+            child: Text('tracking.start_now'.tr(),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+
+    if (start == true && mounted) await _startTracking();
+  }
+
+  /// Combina `departure_date` y `departure_time`, que llegan como texto.
+  static DateTime? _departureOf(Map<String, dynamic> route) {
+    final date = route['departure_date']?.toString();
+    if (date == null || date.isEmpty) return null;
+
+    final day = DateTime.tryParse(date);
+    if (day == null) return null;
+
+    final parts = (route['departure_time']?.toString() ?? '').split(':');
+    final hour = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 9 : 9;
+    final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+
+    return DateTime(day.year, day.month, day.day, hour, minute);
   }
 
   Future<void> _repeatRoute() async {
@@ -254,14 +379,17 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Olvidar ruta', style: TextStyle(color: AppColors.white)),
-        content: const Text('No volverás a ver esta ruta en tus notificaciones.',
-            style: TextStyle(color: AppColors.grey)),
+        title: Text('route_detail.dismiss_title'.tr(),
+            style: const TextStyle(color: AppColors.white)),
+        content: Text('route_detail.dismiss_body'.tr(),
+            style: const TextStyle(color: AppColors.grey)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar', style: TextStyle(color: AppColors.grey))),
+              child: Text('common.cancel'.tr(),
+                  style: const TextStyle(color: AppColors.grey))),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Olvidar', style: TextStyle(color: AppColors.error))),
+              child: Text('route_detail.dismiss_confirm'.tr(),
+                  style: const TextStyle(color: AppColors.error))),
         ],
       ),
     );
@@ -282,14 +410,17 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('No puedo ir', style: TextStyle(color: AppColors.white)),
-        content: const Text('¿Seguro que quieres indicar que no puedes ir?',
-            style: TextStyle(color: AppColors.grey)),
+        title: Text('route_detail.decline_title'.tr(),
+            style: const TextStyle(color: AppColors.white)),
+        content: Text('route_detail.decline_body'.tr(),
+            style: const TextStyle(color: AppColors.grey)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar', style: TextStyle(color: AppColors.grey))),
+              child: Text('common.cancel'.tr(),
+                  style: const TextStyle(color: AppColors.grey))),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('No puedo ir', style: TextStyle(color: AppColors.error))),
+              child: Text('route_detail.decline_title'.tr(),
+                  style: const TextStyle(color: AppColors.error))),
         ],
       ),
     );
@@ -301,7 +432,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         SnackBar(content: Text(result['error']), backgroundColor: AppColors.error));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Has indicado que no puedes ir.'),
+        SnackBar(content: Text('route_detail.declined_done'.tr()),
             backgroundColor: AppColors.grey));
       _loadRoute();
     }
@@ -317,7 +448,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         SnackBar(content: Text(result['error']), backgroundColor: AppColors.error));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'] ?? '¡Te has apuntado!'),
+        SnackBar(content: Text(result['message'] ?? 'route_detail.joined'.tr()),
             backgroundColor: Colors.green));
       _loadRoute();
     }
@@ -328,14 +459,17 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Desapuntarse', style: TextStyle(color: AppColors.white)),
-        content: const Text('¿Seguro que quieres desapuntarte?',
-            style: TextStyle(color: AppColors.grey)),
+        title: Text('route_detail.leave_title'.tr(),
+            style: const TextStyle(color: AppColors.white)),
+        content: Text('route_detail.leave_body'.tr(),
+            style: const TextStyle(color: AppColors.grey)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar', style: TextStyle(color: AppColors.grey))),
+              child: Text('common.cancel'.tr(),
+                  style: const TextStyle(color: AppColors.grey))),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Desapuntarme', style: TextStyle(color: AppColors.error))),
+              child: Text('route_detail.leave_confirm'.tr(),
+                  style: const TextStyle(color: AppColors.error))),
         ],
       ),
     );
@@ -384,14 +518,31 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
 
     final tracking = result['tracking'] as Map<String, dynamic>;
 
+    // OJO: las coordenadas llegan como TEXTO, no como número — el cast
+    // decimal:7 de Eloquent las serializa así. Un `as num?` aquí revienta.
+    //
+    // Punto donde acaba la ruta, para detectar la llegada. En las circulares
+    // no hay destino: se vuelve al origen.
+    final endLat = _coord(_route!['destination_lat']) ?? _coord(_route!['origin_lat']);
+    final endLng = _coord(_route!['destination_lng']) ?? _coord(_route!['origin_lng']);
+
     await RouteTrackingManager.instance.start(
       trackingId: tracking['id'] as int,
       routeId: _route!['id'] as int,
+      targetLat: endLat,
+      targetLng: endLng,
     );
 
     if (!mounted) return;
     setState(() => _startingTracking = false);
     context.push('/rider/tracking', extra: tracking);
+  }
+
+  /// Coordenada del servidor a double, venga como número o como texto.
+  static double? _coord(dynamic v) {
+    if (v == null) return null;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString());
   }
 
   Future<void> _refreshWeather() async {
@@ -407,10 +558,10 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       if (result['weather'] != null) _currentWeather = result['weather'];
     });
     if (result['weather']?['is_forecast'] == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Previsión meteorológica para la fecha de la ruta'),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('route_detail.weather_forecast_notice'.tr()),
         backgroundColor: AppColors.cyan,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ));
     }
   }
@@ -458,7 +609,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         SnackBar(content: Text(result['error']), backgroundColor: AppColors.error));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'] ?? '¡Ruta compartida!'),
+        SnackBar(content: Text(result['message'] ?? 'route_detail.shared'.tr()),
             backgroundColor: Colors.green));
       setState(() { _route = null; _loading = true; });
       _loadRoute();
@@ -540,9 +691,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: AppColors.orange))
           : _route == null
-              ? const Center(
-                  child: Text('Ruta no encontrada.',
-                      style: TextStyle(color: AppColors.grey)))
+              ? Center(
+                  child: Text('route_detail.not_found'.tr(),
+                      style: const TextStyle(color: AppColors.grey)))
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -684,13 +835,13 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Row(
+                      child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.map, color: Colors.white, size: 20),
-                            SizedBox(width: 8),
-                            Text('Abrir en Google Maps',
-                                style: TextStyle(
+                            const Icon(Icons.map, color: Colors.white, size: 20),
+                            const SizedBox(width: 8),
+                            Text('route_detail.open_maps'.tr(),
+                                style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w700)),
                           ]),
@@ -707,13 +858,13 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Row(
+                        child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.download, color: AppColors.cyan, size: 20),
-                              SizedBox(width: 8),
-                              Text('Descargar GPX',
-                                  style: TextStyle(
+                              const Icon(Icons.download, color: AppColors.cyan, size: 20),
+                              const SizedBox(width: 8),
+                              Text('route_detail.download_gpx'.tr(),
+                                  style: const TextStyle(
                                       color: AppColors.cyan,
                                       fontWeight: FontWeight.w700)),
                             ]),
@@ -735,12 +886,12 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                           child: Row(children: [
                             const Icon(Icons.cancel_outlined, color: AppColors.grey, size: 20),
                             const SizedBox(width: 8),
-                            const Expanded(child: Text('Has indicado que no puedes ir',
-                                style: TextStyle(color: AppColors.grey))),
+                            Expanded(child: Text('route_detail.declined_banner'.tr(),
+                                style: const TextStyle(color: AppColors.grey))),
                             TextButton(
                               onPressed: _join,
-                              child: const Text('Cambiar de idea',
-                                  style: TextStyle(color: AppColors.cyan, fontSize: 12)),
+                              child: Text('route_detail.change_mind'.tr(),
+                                  style: const TextStyle(color: AppColors.cyan, fontSize: 12)),
                             ),
                           ]),
                         )
@@ -761,8 +912,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                                     ? const SizedBox(width: 20, height: 20,
                                         child: CircularProgressIndicator(
                                             color: Colors.white, strokeWidth: 2))
-                                    : const Text('¡Apuntarme!',
-                                        style: TextStyle(
+                                    : Text('route_detail.join_button'.tr(),
+                                        style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w700)),
                               ),
@@ -778,8 +929,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
                                 ),
-                                child: const Text('No puedo ir',
-                                    style: TextStyle(
+                                child: Text('route_detail.decline_title'.tr(),
+                                    style: const TextStyle(
                                         color: AppColors.error,
                                         fontWeight: FontWeight.w700)),
                               ),
@@ -796,8 +947,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                                     borderRadius: BorderRadius.circular(12)),
                                 padding: const EdgeInsets.symmetric(horizontal: 14),
                               ),
-                              child: const Text('No puedo ir',
-                                  style: TextStyle(
+                              child: Text('route_detail.decline_title'.tr(),
+                                  style: const TextStyle(
                                       color: AppColors.grey, fontSize: 13)),
                             ),
                           ],
@@ -841,14 +992,14 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                     color: Colors.white, strokeWidth: 2))
-                            : const Row(
+                            : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                    Icon(Icons.share_outlined,
+                                    const Icon(Icons.share_outlined,
                                         color: Colors.white, size: 20),
-                                    SizedBox(width: 8),
-                                    Text('Compartir ruta',
-                                        style: TextStyle(
+                                    const SizedBox(width: 8),
+                                    Text('route_detail.share_route'.tr(),
+                                        style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w700)),
                                   ]),
@@ -957,7 +1108,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
             const SizedBox(width: 12),
             const Icon(Icons.schedule, color: AppColors.cyan, size: 14),
             const SizedBox(width: 4),
-            Text('Salida: ${_route!['departure_time']}',
+            Text('route_detail.departure_time'.tr(
+                    namedArgs: {'time': '${_route!['departure_time']}'}),
                 style: const TextStyle(
                     color: AppColors.cyan,
                     fontWeight: FontWeight.w700,
@@ -1073,13 +1225,13 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
           Icon(Icons.local_gas_station,
               color: needsFuel ? AppColors.error : AppColors.grey, size: 22),
           const SizedBox(width: 12),
-          Text('Autonomía: $_fuelRangeKm km',
+          Text('route_detail.fuel_range'.tr(namedArgs: {'km': '$_fuelRangeKm'}),
               style: const TextStyle(
                   color: AppColors.white, fontWeight: FontWeight.w600)),
           if (needsFuel) ...[
             const SizedBox(width: 8),
-            const Text('Necesitas repostar',
-                style: TextStyle(color: AppColors.error, fontSize: 12)),
+            Text('route_detail.needs_fuel'.tr(),
+                style: const TextStyle(color: AppColors.error, fontSize: 12)),
           ],
         ]),
       ),
@@ -1094,7 +1246,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       Row(children: [
         const Icon(Icons.check_circle_outline, color: Colors.green, size: 18),
         const SizedBox(width: 8),
-        Text('Confirmados ($_count)',
+        Text('route_detail.confirmed_count'.tr(namedArgs: {'count': '$_count'}),
             style: const TextStyle(
                 color: AppColors.white,
                 fontSize: 15,
@@ -1107,7 +1259,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       ]),
       const SizedBox(height: 12),
       if (_confirmed.isEmpty)
-        _emptyBox('Nadie confirmado todavía.')
+        _emptyBox('route_detail.nobody_confirmed'.tr())
       else
         ..._confirmed.map((p) => _ParticipantRow(p: p)),
 
@@ -1117,14 +1269,15 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         Row(children: [
           const Icon(Icons.schedule, color: AppColors.gold, size: 18),
           const SizedBox(width: 8),
-          Text('Invitados pendientes (${_pending.length})',
+          Text('route_detail.pending_count'
+                  .tr(namedArgs: {'count': '${_pending.length}'}),
               style: const TextStyle(
                   color: AppColors.gold,
                   fontSize: 15,
                   fontWeight: FontWeight.w700)),
           const Spacer(),
           if (_isOwner && _route!['visibility'] == 'friends')
-            _inviteButton(label: 'Añadir'),
+            _inviteButton(label: 'common.add'.tr()),
         ]),
         const SizedBox(height: 12),
         ..._pending.map((p) => _ParticipantRow(p: p)),
@@ -1136,7 +1289,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         Row(children: [
           const Icon(Icons.cancel_outlined, color: AppColors.error, size: 18),
           const SizedBox(width: 8),
-          Text('No pueden ir (${_declined.length})',
+          Text('route_detail.declined_count'
+                  .tr(namedArgs: {'count': '${_declined.length}'}),
               style: const TextStyle(
                   color: AppColors.error,
                   fontSize: 15,
@@ -1150,7 +1304,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     ]);
   }
 
-  Widget _inviteButton({String label = 'Invitar'}) {
+  Widget _inviteButton({String? label}) {
+    label ??= 'route_detail.invite'.tr();
     return GestureDetector(
       onTap: () => _showShareDialog(friendsOnly: true),
       child: Container(
@@ -1370,8 +1525,8 @@ class _ShareBottomSheetState extends State<_ShareBottomSheet> {
   }
 
   List<Widget> _buildMenu() => [
-        const Text('¿Cómo quieres compartir esta ruta?',
-            style: TextStyle(
+        Text('route_detail.how_to_share'.tr(),
+            style: const TextStyle(
                 color: AppColors.white,
                 fontSize: 17,
                 fontWeight: FontWeight.w700)),
@@ -1379,8 +1534,8 @@ class _ShareBottomSheetState extends State<_ShareBottomSheet> {
         _OptionTile(
           icon: Icons.people_outlined,
           color: AppColors.cyan,
-          title: 'Con amigos',
-          desc: 'Elige qué amigos pueden verla y apuntarse.',
+          title: 'route_detail.with_friends'.tr(),
+          desc: 'route_detail.with_friends_desc'.tr(),
           onTap: _loadFriends,
           trailing: _loading
               ? const SizedBox(
@@ -1395,8 +1550,8 @@ class _ShareBottomSheetState extends State<_ShareBottomSheet> {
         _OptionTile(
           icon: Icons.public,
           color: AppColors.orange,
-          title: 'Pública (zona)',
-          desc: 'Cualquier motero de tu zona puede verla y apuntarse.',
+          title: 'route_detail.public_zone'.tr(),
+          desc: 'route_detail.public_zone_desc'.tr(),
           onTap: () {
             Navigator.pop(context);
             widget.onSharePublic();
@@ -1414,8 +1569,8 @@ class _ShareBottomSheetState extends State<_ShareBottomSheet> {
                   color: AppColors.grey, size: 18),
             ),
           const SizedBox(width: 8),
-          const Text('Selecciona amigos',
-              style: TextStyle(
+          Text('route_detail.select_friends'.tr(),
+              style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w700)),
@@ -1636,18 +1791,20 @@ class _RepeatShareBottomSheetState extends State<_RepeatShareBottomSheet> {
   }
 
   List<Widget> _buildMenu() => [
-    const Text('¿Qué quieres hacer con esta ruta?',
-        style: TextStyle(color: AppColors.white, fontSize: 17, fontWeight: FontWeight.w700)),
+    Text('route_result.what_to_do'.tr(),
+        style: const TextStyle(color: AppColors.white, fontSize: 17, fontWeight: FontWeight.w700)),
     const SizedBox(height: 20),
     _OptionTile(
       icon: Icons.lock_outline, color: AppColors.grey,
-      title: 'Guardar para mí', desc: 'Solo tú puedes verla. Aparecerá en Mis Rutas.',
+      title: 'route_detail.save_for_me'.tr(),
+      desc: 'route_detail.save_for_me_desc'.tr(),
       onTap: () { Navigator.pop(context); widget.onSaveOnly(); },
     ),
     const SizedBox(height: 12),
     _OptionTile(
       icon: Icons.people_outlined, color: AppColors.cyan,
-      title: 'Compartir con amigos', desc: 'Elige qué amigos pueden verla y apuntarse.',
+      title: 'route_result.share_friends'.tr(),
+      desc: 'route_detail.with_friends_desc'.tr(),
       onTap: _loadFriends,
       trailing: _loading
           ? const SizedBox(width: 18, height: 18,
@@ -1657,7 +1814,8 @@ class _RepeatShareBottomSheetState extends State<_RepeatShareBottomSheet> {
     const SizedBox(height: 12),
     _OptionTile(
       icon: Icons.public, color: AppColors.orange,
-      title: 'Publicar para todos', desc: 'Cualquier motero de tu zona puede verla y apuntarse.',
+      title: 'route_result.share_public'.tr(),
+      desc: 'route_detail.public_zone_desc'.tr(),
       onTap: () { Navigator.pop(context); widget.onSharePublic(); },
     ),
     const SizedBox(height: 8),
@@ -1669,8 +1827,8 @@ class _RepeatShareBottomSheetState extends State<_RepeatShareBottomSheet> {
         onTap: () => setState(() => _step = 0),
         child: const Icon(Icons.arrow_back_ios, color: AppColors.grey, size: 18)),
       const SizedBox(width: 8),
-      const Text('Selecciona amigos',
-          style: TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+      Text('route_detail.select_friends'.tr(),
+          style: const TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700)),
       const Spacer(),
       if (_friends.isNotEmpty)
         GestureDetector(
@@ -1678,14 +1836,18 @@ class _RepeatShareBottomSheetState extends State<_RepeatShareBottomSheet> {
             if (_selected.length == _friends.length) _selected.clear();
             else _selected = _friends.map((f) => f['user_id'] as int).toSet();
           }),
-          child: Text(_selected.length == _friends.length ? 'Quitar todos' : 'Todos',
+          child: Text(
+              _selected.length == _friends.length
+                  ? 'route_detail.deselect_all'.tr()
+                  : 'route_detail.select_all'.tr(),
               style: const TextStyle(color: AppColors.grey, fontSize: 12)),
         ),
     ]),
     const SizedBox(height: 16),
     if (_friends.isEmpty)
-      const Padding(padding: EdgeInsets.all(16),
-          child: Text('No tienes amigos aún.', style: TextStyle(color: AppColors.grey)))
+      Padding(padding: const EdgeInsets.all(16),
+          child: Text('route_result.no_friends'.tr(),
+              style: const TextStyle(color: AppColors.grey)))
     else
       SizedBox(
         height: 260,

@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/rider_avatar.dart';
 import '../../../widgets/route_map_image.dart';
+import '../../../widgets/route_waypoints_view.dart';
 import '../providers/friendship_service.dart';
 import '../providers/route_service.dart' show RouteService, routeListRefresh;
 import '../providers/route_share_service.dart';
@@ -119,10 +120,10 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       if (result['weather'] != null) _currentWeather = result['weather'];
     });
     if (result['weather'] != null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Clima actualizado.'),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('route_result.weather_updated'.tr()),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ));
     }
   }
@@ -159,13 +160,13 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.check_circle, color: Colors.green, size: 64),
           const SizedBox(height: 16),
-          const Text('¡Ruta guardada!',
+          Text('route_result.saved_title'.tr(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+              style: const TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          const Text('Guardada en Mis Rutas. Solo tú puedes verla.',
+          Text('route_result.saved_body'.tr(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.grey, fontSize: 13)),
+              style: const TextStyle(color: AppColors.grey, fontSize: 13)),
         ]),
         actions: [
           TextButton(
@@ -173,7 +174,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               Navigator.pop(ctx);
               context.go('/rider/route-generator', extra: _buildFormData());
             },
-            child: const Text('Generar otra', style: TextStyle(color: AppColors.grey)),
+            child: Text('route_result.generate_another'.tr(),
+                style: const TextStyle(color: AppColors.grey)),
           ),
           ElevatedButton(
             onPressed: () { Navigator.pop(ctx); context.go('/rider/my-routes'); },
@@ -181,8 +183,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               backgroundColor: AppColors.orange,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            child: const Text('Ver mis rutas',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            child: Text('route_result.view_my_routes'.tr(),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -220,8 +222,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   Future<void> _shareWithFriends(List<int> selectedFriendIds) async {
     final routeId = _savedRoute?['id'] ?? _route['id'];
     if (routeId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Error: ruta sin ID.'), backgroundColor: AppColors.error));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('route_result.error_no_id'.tr()), backgroundColor: AppColors.error));
       return;
     }
     setState(() => _publishing = true);
@@ -234,8 +236,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   Future<void> _sharePublic() async {
     final routeId = _savedRoute?['id'] ?? _route['id'];
     if (routeId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Error: ruta sin ID.'), backgroundColor: AppColors.error));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('route_result.error_no_id'.tr()), backgroundColor: AppColors.error));
       return;
     }
     setState(() => _publishing = true);
@@ -263,14 +265,15 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
           const Icon(Icons.check_circle, color: Colors.green, size: 64),
           const SizedBox(height: 16),
           Text(
-            result['message'] ?? '¡Ruta compartida!',
+            result['message'] ?? 'route_result.shared_title'.tr(),
             textAlign: TextAlign.center,
             style: const TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700),
           ),
           if ((result['notified_count'] ?? 0) > 0) ...[  
             const SizedBox(height: 8),
             Text(
-              '${result['notified_count']} ${result['notified_count'] == 1 ? 'motero notificado' : 'moteros notificados'}',
+              'route_result.riders_notified'
+                  .plural(result['notified_count'] as int),
               style: const TextStyle(color: AppColors.grey, fontSize: 13),
             ),
           ],
@@ -281,7 +284,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               Navigator.pop(ctx);
               context.go('/rider/route-generator', extra: _buildFormData()..['origin'] = _route['origin']);
             },
-            child: const Text('Generar otra', style: TextStyle(color: AppColors.grey)),
+            child: Text('route_result.generate_another'.tr(),
+                style: const TextStyle(color: AppColors.grey)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -292,7 +296,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               backgroundColor: AppColors.orange,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            child: const Text('Ver mis rutas', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            child: Text('route_result.view_my_routes'.tr(),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -327,7 +332,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al abrir Google Maps: $e'),
+          SnackBar(
+              content: Text('route_result.error_open_maps'
+                  .tr(namedArgs: {'error': '$e'})),
               backgroundColor: AppColors.error));
       }
     }
@@ -421,7 +428,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                   color: AppColors.orange, size: 16),
                 const SizedBox(width: 6),
                 Text(
-                  _isImported ? 'Importada de Google Maps' : 'route_result.generated_by_ai'.tr(),
+                  _isImported
+                      ? 'route_result.imported_from_maps'.tr()
+                      : 'route_result.generated_by_ai'.tr(),
                   style: const TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 if (_routesRemaining != null)
@@ -640,7 +649,18 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               Text('route_result.waypoints'.tr(),
                   style: const TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
-              _buildWaypoints(),
+              // Se usa el widget compartido, el mismo que el detalle de ruta.
+              // Antes esta pantalla tenía su propia copia del listado, y por
+              // eso el arreglo de la salida y la llegada solo surtió efecto en
+              // una de las dos: aquí seguía anunciando que la ruta empezaba en
+              // el primer punto intermedio.
+              RouteWaypointsView(
+                route: _route,
+                weather: _weather,
+                aiSummary: _aiSummary,
+                showLunch: widget.result['form_data']?['suggest_lunch'] == true,
+                showDinner: widget.result['form_data']?['suggest_dinner'] == true,
+              ),
 
               const SizedBox(height: 24),
 
@@ -730,113 +750,6 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     );
   }
 
-  Widget _buildWaypoints() {
-    final aiSummary         = _aiSummary ?? {};
-    final fuelStops         = List<num>.from(aiSummary['fuel_stops'] ?? []);
-    final totalKm           = (_route['distance_km'] ?? 0).toDouble();
-    final totalMins         = (_route['duration_minutes'] ?? 1).toDouble();
-    final departureTime     = aiSummary['best_departure_time'];
-    final insertedFuelStops = <int>{};
-    bool lunchInserted      = false;
-    bool dinnerInserted     = false;
-    final lunchStop  = (_route['lunch_stop'] != null && (widget.result['form_data']?['suggest_lunch'] == true))
-        ? _route['lunch_stop'] : null;
-    final dinnerStop = (_route['dinner_stop'] != null && (widget.result['form_data']?['suggest_dinner'] == true))
-        ? _route['dinner_stop'] : null;
-
-    int? timeToMins(String? t) {
-      if (t == null) return null;
-      final p = t.split(':');
-      if (p.length != 2) return null;
-      final h = int.tryParse(p[0]);
-      final m = int.tryParse(p[1]);
-      if (h == null || m == null) return null;
-      return h * 60 + m;
-    }
-
-    final departureMins = timeToMins(departureTime);
-    final lunchMins     = timeToMins(lunchStop?['estimated_time']);
-    final dinnerMins    = timeToMins(dinnerStop?['estimated_time']);
-    final List<Widget> items = [];
-
-    for (int i = 0; i < _waypoints.length; i++) {
-      final wp = _waypoints[i];
-      final wpName = (wp['name'] ?? '').toLowerCase();
-      final wpNote = (wp['note'] ?? '').toLowerCase();
-
-      // Filtrar waypoints de gasolinera
-      if (wpName.contains('repostaje') || wpName.contains('gasolinera') ||
-          wpName.contains('repostar') || wpNote.contains('repostar antes')) continue;
-
-      // Filtrar waypoints de comida si ya tenemos dinner_stop
-      if (dinnerStop != null && (wpName.contains('comida') || wpName.contains('comer') ||
-          wpName.contains('dinner') || wpNote.contains('parada para comer') ||
-          wpNote.contains('comida'))) continue;
-
-      // Filtrar waypoints de almuerzo si ya tenemos lunch_stop
-      if (lunchStop != null && (wpName.contains('almuerzo') || wpName.contains('lunch') ||
-          wpNote.contains('almuerzo') || wpNote.contains('parada para almorzar'))) continue;
-
-      final isFirst   = i == 0;
-      final isLast    = i == _waypoints.length - 1;
-      final mins      = (wp['estimated_minutes_from_start'] ?? 0).toDouble();
-      final approxKm  = totalMins > 0 ? (mins / totalMins).clamp(0.0, 1.0) * totalKm : 0.0;
-      final pct       = totalMins > 0 ? (mins / totalMins).clamp(0.0, 1.0) : 0.0;
-      final wpAbsMins = departureMins != null ? departureMins + mins.toInt() : null;
-
-      for (int s = 0; s < fuelStops.length; s++) {
-        if (!insertedFuelStops.contains(s) && approxKm >= fuelStops[s].toDouble()) {
-          insertedFuelStops.add(s);
-          items.add(_FuelStopRow(km: fuelStops[s], stopNumber: s + 1, total: fuelStops.length));
-        }
-      }
-
-      if (!lunchInserted && lunchStop != null) {
-        final insert = wpAbsMins != null && lunchMins != null
-            ? wpAbsMins >= lunchMins : pct >= 0.4;
-        if (insert) {
-          lunchInserted = true;
-          items.add(_MealStopRow(icon: Icons.restaurant_outlined, color: AppColors.orange,
-            location: lunchStop['location'] ?? '', suggestion: lunchStop['suggestion'] ?? '',
-            time: lunchStop['estimated_time'], label: 'route_result.lunch_stop'.tr()));
-        }
-      }
-
-      if (!dinnerInserted && dinnerStop != null) {
-        final insert = wpAbsMins != null && dinnerMins != null
-            ? wpAbsMins >= dinnerMins : pct >= 0.65;
-        if (insert) {
-          dinnerInserted = true;
-          items.add(_MealStopRow(icon: Icons.dinner_dining, color: AppColors.cyan,
-            location: dinnerStop['location'] ?? '', suggestion: dinnerStop['suggestion'] ?? '',
-            time: dinnerStop['estimated_time'], label: 'route_result.dinner_stop'.tr()));
-        }
-      }
-
-      items.add(_WaypointRow(index: i, isFirst: isFirst, isLast: isLast, wp: wp, weather: _weather));
-    }
-
-    for (int s = 0; s < fuelStops.length; s++) {
-      if (!insertedFuelStops.contains(s)) {
-        final li = items.length - 1;
-        items.insert(li > 0 ? li : 0, _FuelStopRow(km: fuelStops[s], stopNumber: s + 1, total: fuelStops.length));
-      }
-    }
-    if (!lunchInserted && lunchStop != null) {
-      final li = items.length - 1;
-      items.insert(li > 0 ? li : 0, _MealStopRow(icon: Icons.restaurant_outlined, color: AppColors.orange,
-        location: lunchStop['location'] ?? '', suggestion: lunchStop['suggestion'] ?? '',
-        time: lunchStop['estimated_time'], label: 'route_result.lunch_stop'.tr()));
-    }
-    if (!dinnerInserted && dinnerStop != null) {
-      final li = items.length - 1;
-      items.insert(li > 0 ? li : 0, _MealStopRow(icon: Icons.dinner_dining, color: AppColors.cyan,
-        location: dinnerStop['location'] ?? '', suggestion: dinnerStop['suggestion'] ?? '',
-        time: dinnerStop['estimated_time'], label: 'route_result.dinner_stop'.tr()));
-    }
-
-    return Column(children: items);
-  }
 }
 
 // Bottom sheet compartir con selección de amigos
@@ -895,8 +808,8 @@ if (_step == 1) ..._buildFriendSelector(),
 }
 
 List<Widget> _buildMainMenu() => [
-const Text('¿Qué quieres hacer con esta ruta?',
-style: TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+Text('route_result.what_to_do'.tr(),
+style: const TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w700)),
 const SizedBox(height: 20),
 
 // Opción 1 — Guardar para mí
@@ -963,9 +876,10 @@ style: const TextStyle(color: AppColors.grey, fontSize: 12)),
 const SizedBox(height: 16),
 
 if (_friends.isEmpty)
-const Padding(
-padding: EdgeInsets.all(16),
-child: Text('No tienes amigos aún.', style: TextStyle(color: AppColors.grey))
+Padding(
+padding: const EdgeInsets.all(16),
+child: Text('route_result.no_friends'.tr(),
+style: const TextStyle(color: AppColors.grey))
 )
 else
 SizedBox(
@@ -1105,218 +1019,6 @@ class _ActionBtn extends StatelessWidget {
               style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600))),
         ]),
       ),
-    );
-  }
-}
-
-class _WaypointRow extends StatelessWidget {
-  final int index;
-  final bool isFirst;
-  final bool isLast;
-  final dynamic wp;
-  final Map<String, dynamic>? weather;
-  const _WaypointRow({required this.index, required this.isFirst, required this.isLast, required this.wp, this.weather});
-
-  bool get _isLunch {
-    final n = (wp['name'] ?? '').toLowerCase();
-    final o = (wp['note'] ?? '').toLowerCase();
-    return n.contains('almuerzo') || n.contains('lunch') || o.contains('almuerzo');
-  }
-
-  bool get _isDinner {
-    final n = (wp['name'] ?? '').toLowerCase();
-    final o = (wp['note'] ?? '').toLowerCase();
-    return n.contains('comida') || n.contains('comer') || n.contains('dinner') || o.contains('comida');
-  }
-
-  Color get _accent => _isLunch ? AppColors.orange : _isDinner ? AppColors.cyan : AppColors.orange;
-
-  @override
-  Widget build(BuildContext context) {
-    final isMeal = _isLunch || _isDinner;
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Column(children: [
-        Container(
-          width: 32, height: 32,
-          decoration: BoxDecoration(
-            color: isFirst || isLast ? AppColors.orange : isMeal ? _accent : AppColors.surface,
-            shape: BoxShape.circle,
-            border: Border.all(color: isFirst || isLast ? AppColors.orange : isMeal ? _accent : AppColors.greyDark),
-            boxShadow: isMeal ? [BoxShadow(color: _accent.withOpacity(0.5), blurRadius: 8, spreadRadius: 2)] : null,
-          ),
-          child: Center(
-            child: isFirst ? const Text('🏁', style: TextStyle(fontSize: 14))
-                : isLast  ? const Text('🏆', style: TextStyle(fontSize: 14))
-                : _isLunch  ? const Icon(Icons.restaurant_outlined, color: Colors.white, size: 16)
-                : _isDinner ? const Icon(Icons.dinner_dining, color: Colors.white, size: 16)
-                : Text('$index', style: const TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w700)),
-          ),
-        ),
-        if (!isLast) Container(width: 2, height: 50, color: AppColors.greyDark),
-      ]),
-      const SizedBox(width: 12),
-      Expanded(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 4, bottom: 16),
-          child: isMeal
-              ? Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: _accent.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _accent.withOpacity(0.5)),
-                  ),
-                  child: _waypointContent(_accent),
-                )
-              : _waypointContent(AppColors.cyan),
-        ),
-      ),
-    ]);
-  }
-
-  Widget _waypointContent(Color timeColor) {
-    final isMeal = _isLunch || _isDinner;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(wp['name'] ?? '',
-          style: TextStyle(
-            color: isMeal ? _accent : AppColors.white,
-            fontWeight: FontWeight.w700, fontSize: 14)),
-      if (wp['note'] != null) ...[
-        const SizedBox(height: 4),
-        Text(wp['note'], style: const TextStyle(color: AppColors.grey, fontSize: 12, height: 1.4)),
-      ],
-      const SizedBox(height: 6),
-      Row(children: [
-        if (wp['estimated_arrival_time'] != null) ...[
-          _TimeBadge(label: 'route_result.arrival'.tr(args: [wp['estimated_arrival_time']]), color: timeColor),
-          const SizedBox(width: 6),
-        ] else if ((wp['estimated_minutes_from_start'] ?? 0) > 0) ...[
-          _TimeBadge(label: 'route_result.minutes_from_start'.tr(args: ['${wp["estimated_minutes_from_start"]}']), color: AppColors.grey),
-          const SizedBox(width: 6),
-        ],
-        _WeatherIcon(weather: weather),
-      ]),
-    ]);
-  }
-}
-
-class _MealStopRow extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String location;
-  final String suggestion;
-  final String? time;
-  final String label;
-  const _MealStopRow({required this.icon, required this.color, required this.location,
-      required this.suggestion, required this.label, this.time});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Column(children: [
-        Container(width: 36, height: 36,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: color.withOpacity(0.4), blurRadius: 8, spreadRadius: 2)]),
-          child: Center(child: Icon(icon, color: Colors.white, size: 18))),
-        Container(width: 2, height: 50, color: AppColors.greyDark),
-      ]),
-      const SizedBox(width: 12),
-      Expanded(child: Padding(
-        padding: const EdgeInsets.only(top: 4, bottom: 16),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.4)),
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 14)),
-              if (time != null) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.access_time, color: color, size: 11),
-                    const SizedBox(width: 3),
-                    Text(time!, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
-                  ]),
-                ),
-              ],
-            ]),
-            if (location.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(location, style: const TextStyle(color: AppColors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-            ],
-            if (suggestion.isNotEmpty) ...[
-              const SizedBox(height: 2),
-              Text(suggestion, style: const TextStyle(color: AppColors.grey, fontSize: 12)),
-            ],
-          ]),
-        ),
-      )),
-    ]);
-  }
-}
-
-class _FuelStopRow extends StatelessWidget {
-  final num km;
-  final int stopNumber;
-  final int total;
-  const _FuelStopRow({required this.km, required this.stopNumber, required this.total});
-
-  @override
-  Widget build(BuildContext context) {
-    final label = total > 1
-        ? 'route_result.refuel_at'.tr(args: ['$km']) + ' ($stopNumber/$total)'
-        : 'route_result.refuel_at'.tr(args: ['$km']);
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Column(children: [
-        Container(width: 32, height: 32,
-          decoration: BoxDecoration(
-            color: AppColors.gold.withOpacity(0.15),
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.gold),
-          ),
-          child: Center(child: total > 1
-              ? Text('$stopNumber⛽', style: const TextStyle(color: AppColors.gold, fontSize: 11, fontWeight: FontWeight.w800))
-              : const Icon(Icons.local_gas_station, color: AppColors.gold, size: 16))),
-        Container(width: 2, height: 40, color: AppColors.greyDark),
-      ]),
-      const SizedBox(width: 12),
-      Expanded(child: Padding(
-        padding: const EdgeInsets.only(top: 4, bottom: 16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Icon(Icons.local_gas_station, color: AppColors.gold, size: 14),
-            const SizedBox(width: 4),
-            Text(label, style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 13)),
-          ]),
-          const Text('⛽ Busca gasolinera cerca', style: TextStyle(color: AppColors.grey, fontSize: 12)),
-        ]),
-      )),
-    ]);
-  }
-}
-
-class _TimeBadge extends StatelessWidget {
-  final String label;
-  final Color color;
-  const _TimeBadge({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.3))),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.access_time, color: color, size: 12),
-        const SizedBox(width: 4),
-        Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
-      ]),
     );
   }
 }

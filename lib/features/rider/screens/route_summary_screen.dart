@@ -119,6 +119,13 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
   Widget build(BuildContext context) {
     final km = (widget.tracking['distance_km'] as num?)?.toDouble() ?? 0;
     final seconds = (widget.tracking['duration_seconds'] as num?)?.toInt() ?? 0;
+
+    // Tiempo rodando de verdad, sin las paradas. Es lo que sustituye al botón
+    // de pausa: el motero no pulsa nada y el servidor separa los dos tiempos.
+    //
+    // Puede venir null en trackings anteriores a este campo: en ese caso se
+    // enseña solo el tiempo total, en vez de un "0h 00m" que parecería un error.
+    final movingSeconds = (widget.tracking['moving_seconds'] as num?)?.toInt();
     final speed = (widget.tracking['avg_speed_kmh'] as num?)?.toDouble() ?? 0;
     final gaps = (widget.tracking['gps_gaps'] as num?)?.toInt() ?? 0;
     final rejected = widget.tracking['rejected_reason'];
@@ -162,6 +169,13 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
             Row(children: [
               _Stat(label: 'summary.time'.tr(), value: _formatDuration(seconds)),
               const SizedBox(width: 12),
+              if (movingSeconds != null) ...[
+                _Stat(
+                  label: 'summary.moving_time'.tr(),
+                  value: _formatDuration(movingSeconds),
+                ),
+                const SizedBox(width: 12),
+              ],
               _Stat(label: 'summary.avg_speed'.tr(), value: '${speed.toStringAsFixed(0)} km/h'),
             ]),
 

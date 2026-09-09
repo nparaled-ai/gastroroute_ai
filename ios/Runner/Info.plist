@@ -66,5 +66,34 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	<!-- Ubicacion.
+	     Sin esta clave iOS no deja ni pedir el permiso: la app CRASHEA al
+	     llamar a requestPermission. El texto lo lee el motero en el dialogo
+	     del sistema, asi que explica el porque, no el que.
+
+	     Se pide solo "mientras se usa", igual que en Android: NO se pide
+	     ubicacion permanente (NSLocationAlwaysAndWhenInUseUsageDescription),
+	     por la misma decision de evitar la revision de las tiendas. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Para grabar el recorrido de tus rutas y detectar los puntos de interés por los que pasas.</string>
+
+	<!-- Grabacion en segundo plano.
+	     Es el equivalente iOS del servicio en primer plano de Android. Con
+	     "mientras se usa" + este modo, iOS sigue entregando posiciones con la
+	     app en segundo plano y muestra la barra azul avisando al motero. Sin
+	     esto, la grabacion se para al bloquear el movil. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
+
+	<!-- Foto de perfil. Mismo motivo: sin estas claves, el selector de
+	     imagenes crashea en iOS. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Para hacerte una foto de perfil.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Para elegir tu foto de perfil de la galería.</string>
 </dict>
 </plist>

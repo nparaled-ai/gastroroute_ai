@@ -50,6 +50,22 @@ class _RouteMapImageState extends State<RouteMapImage> {
     });
   }
 
+  /// Abre la imagen a pantalla completa, con zoom de pellizco.
+  ///
+  /// Es una imagen fija, así que ampliar mucho la pixela: sirve para verla
+  /// más grande, no para descubrir detalle que no está. Para eso está el
+  /// botón de abrir en Google Maps que ya tiene la pantalla.
+  void _openFullScreen() {
+    final image = _image;
+    if (image == null) return;
+
+    Navigator.of(context).push(PageRouteBuilder(
+      opaque: false,
+      barrierColor: Colors.black87,
+      pageBuilder: (_, __, ___) => _FullScreenMap(image: image),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -71,7 +87,33 @@ class _RouteMapImageState extends State<RouteMapImage> {
                   ? const Center(
                       child: CircularProgressIndicator(color: AppColors.orange))
                   : _image != null
-                      ? Image.memory(_image!, fit: BoxFit.cover)
+                      ? Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.memory(_image!, fit: BoxFit.cover),
+                            // Toda la imagen es pulsable, pero sin el icono no
+                            // se adivina que se puede ampliar.
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(onTap: _openFullScreen),
+                            ),
+                            Positioned(
+                              right: 8,
+                              bottom: 8,
+                              child: IgnorePointer(
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.background.withValues(alpha: 0.7),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(Icons.zoom_out_map,
+                                      color: AppColors.white, size: 18),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
                       : _unavailable(),
             ),
           ),
@@ -94,6 +136,46 @@ class _RouteMapImageState extends State<RouteMapImage> {
             onPressed: _load,
             child: Text('common.retry'.tr(),
                 style: const TextStyle(color: AppColors.orange, fontSize: 12)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Visor a pantalla completa del mapa, con zoom de pellizco y desplazamiento.
+class _FullScreenMap extends StatelessWidget {
+  final Uint8List image;
+
+  const _FullScreenMap({required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          // Tocar fuera de la imagen cierra el visor.
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              behavior: HitTestBehavior.opaque,
+            ),
+          ),
+          Center(
+            child: InteractiveViewer(
+              minScale: 1,
+              maxScale: 5,
+              child: Image.memory(image, fit: BoxFit.contain),
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            right: 8,
+            child: IconButton(
+              icon: const Icon(Icons.close, color: AppColors.white, size: 28),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
           ),
         ],
       ),

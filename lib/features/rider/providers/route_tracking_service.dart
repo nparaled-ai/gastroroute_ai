@@ -29,6 +29,7 @@ class RouteTrackingService {
         'route_id': routeId,
         'started_manually': manual,
       });
+
       return {'tracking': Map<String, dynamic>.from(response.data)};
     } on DioException catch (e) {
       return {'error': e.response?.data['message'] ?? 'Error al iniciar el tracking.'};

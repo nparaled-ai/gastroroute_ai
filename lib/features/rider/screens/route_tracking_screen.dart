@@ -23,22 +23,10 @@ class RouteTrackingScreen extends StatefulWidget {
 }
 
 class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
-  /// Radio alrededor del destino para considerar que se ha llegado.
-  static const double _arrivalRadiusM = 500;
-
-  /// Tiempo dentro del radio antes de preguntar. Evita el falso positivo de
-  /// pasar cerca del destino sin haber terminado.
-  static const Duration _arrivalDwell = Duration(minutes: 3);
-
-  /// En rutas circulares el origen es el destino, así que además se exige
-  /// haber consumido este porcentaje del tiempo estimado.
-  static const double _circularMinProgress = 0.8;
-
   late final StreamSubscription<TrackingState> _sub;
   Timer? _ticker;
 
   TrackingState _state = const TrackingState();
-  DateTime? _insideSince;
   bool _arrivalAsked = false;
   bool _finishing = false;
 
@@ -73,43 +61,17 @@ class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
   // Detección de llegada
   // ---------------------------------------------------------------------
 
+  /// La detección vive en RouteTrackingManager, no aquí.
+  ///
+  /// Antes esta pantalla tenía la suya propia, y tenía dos problemas: solo
+  /// funcionaba con la pantalla abierta —justo cuando menos falta hace, porque
+  /// el motero va conduciendo con el móvil guardado— y leía las coordenadas
+  /// con `as num?`, que sobre el texto que manda el servidor daba siempre null.
+  /// En circulares, además, no hay destino, así que no detectaba nada nunca.
   void _checkArrival(TrackingState s) {
-    if (_arrivalAsked || _finishing || s.lastPoint == null) return;
-
-    final destLat = (_route['destination_lat'] as num?)?.toDouble();
-    final destLng = (_route['destination_lng'] as num?)?.toDouble();
-    if (destLat == null || destLng == null) return;
-
-    final distance = RouteTrackingManager.haversine(
-      s.lastPoint![0].toDouble(), s.lastPoint![1].toDouble(),
-      destLat, destLng,
-    );
-
-    if (distance > _arrivalRadiusM) {
-      _insideSince = null;
-      return;
-    }
-
-    // En circular, el destino coincide con el origen: sin este freno saltaría
-    // nada más arrancar.
-    if (_route['route_type'] == 'circular' && !_pastCircularThreshold()) {
-      return;
-    }
-
-    _insideSince ??= DateTime.now();
-
-    if (DateTime.now().difference(_insideSince!) >= _arrivalDwell) {
-      _arrivalAsked = true;
-      _askArrival();
-    }
-  }
-
-  bool _pastCircularThreshold() {
-    final estimated = (_route['duration_minutes'] as num?)?.toInt();
-    if (estimated == null || estimated <= 0) return true;
-
-    final elapsedMin = _state.elapsed.inMinutes;
-    return elapsedMin >= estimated * _circularMinProgress;
+    if (!s.arrived || _arrivalAsked || _finishing) return;
+    _arrivalAsked = true;
+    _askArrival();
   }
 
   Future<void> _askArrival() async {
@@ -137,11 +99,10 @@ class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
 
     if (finish == true) {
       await _finish();
-    } else {
-      // Si decide seguir, no se vuelve a preguntar hasta que salga del radio.
-      _insideSince = null;
-      _arrivalAsked = false;
     }
+    // Si decide seguir, no se le vuelve a preguntar: el gestor solo marca la
+    // llegada una vez por ruta, y volver a insistir mientras aparca sería
+    // molesto. Le queda el botón de finalizar.
   }
 
   // ---------------------------------------------------------------------

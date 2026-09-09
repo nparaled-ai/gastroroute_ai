@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -19,7 +20,100 @@ class RouteWaypointsView extends StatelessWidget {
     this.showDinner = true,
   });
 
-  List get _waypoints => route['waypoints'] ?? [];
+  /// Waypoints listos para pintar, con la salida y la llegada reales.
+  ///
+  /// El array que llega del servidor NO incluye origen ni destino en las rutas
+  /// generadas con IA: el backend los quita a propósito para que Google no
+  /// pase dos veces por el mismo punto. Este widget marcaba el primer y el
+  /// último elemento como salida y llegada, así que en esas rutas anunciaba
+  /// que salías del primer punto intermedio: con origen en Sariñena, decía que
+  /// la ruta empezaba en los Mallos de Riglos, que están a 45 minutos.
+  ///
+  /// En las rutas importadas de GPX el origen sí venía incluido, por eso el
+  /// fallo solo se veía en las de IA.
+  List get _waypoints {
+    final raw = List.from(route['waypoints'] ?? []);
+
+    final originLat = _toDouble(route['origin_lat']);
+    final originLng = _toDouble(route['origin_lng']);
+
+    if (originLat == null || originLng == null) return raw;
+
+    final destLat = _toDouble(route['destination_lat']) ?? originLat;
+    final destLng = _toDouble(route['destination_lng']) ?? originLng;
+
+    // Se descartan los intermedios que coincidan con la salida o la llegada,
+    // para no repetirlos al añadirlas explícitamente.
+    final middle = raw.where((wp) {
+      final lat = _toDouble(wp['lat']);
+      final lng = _toDouble(wp['lng']);
+      if (lat == null || lng == null) return true;
+      return !_samePlace(lat, lng, originLat, originLng) &&
+             !_samePlace(lat, lng, destLat, destLng);
+    }).toList();
+
+    final totalMins = ((route['duration_minutes'] ?? 0) as num).toInt();
+
+    // La hora de salida y la de llegada se calculan aquí: los puntos
+    // intermedios la traen del servidor, pero estos dos los construimos
+    // nosotros y sin ella la fila se quedaba sin hora.
+    final departure = route['departure_time']?.toString();
+
+    return [
+      {
+        'lat': originLat,
+        'lng': originLng,
+        'name': route['origin'] ?? '',
+        'estimated_minutes_from_start': 0,
+        if (departure != null) 'estimated_arrival_time': departure,
+      },
+      ...middle,
+      {
+        'lat': destLat,
+        'lng': destLng,
+        'name': route['destination'] ?? route['origin'] ?? '',
+        'estimated_minutes_from_start': totalMins,
+        if (departure != null)
+          'estimated_arrival_time': _addMinutes(departure, totalMins),
+      },
+    ];
+  }
+
+  /// Suma minutos a una hora "HH:mm". Devuelve null si no se puede leer.
+  static String? _addMinutes(String? time, int minutes) {
+    if (time == null) return null;
+
+    final parts = time.split(':');
+    if (parts.length < 2) return null;
+
+    final h = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    if (h == null || m == null) return null;
+
+    // El módulo mantiene la hora dentro del día si la ruta cruza medianoche.
+    final total = (h * 60 + m + minutes) % (24 * 60);
+
+    return '${(total ~/ 60).toString().padLeft(2, '0')}'
+        ':${(total % 60).toString().padLeft(2, '0')}';
+  }
+
+  /// Convierte a double lo que llegue del JSON.
+  ///
+  /// Las coordenadas vienen como CADENA, no como número: en el backend están
+  /// declaradas como decimal:7 y Laravel las serializa entre comillas. Un
+  /// `as num?` sobre ellas lanza una excepción de tipo y deja la pantalla en
+  /// gris. Se acepta cualquiera de las dos formas por si el casting cambia.
+  static double? _toDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString());
+  }
+
+  /// Dos coordenadas a menos de ~300 m se consideran el mismo sitio.
+  static bool _samePlace(double lat1, double lng1, double lat2, double lng2) {
+    const marginDegrees = 0.003;
+    return (lat1 - lat2).abs() < marginDegrees && (lng1 - lng2).abs() < marginDegrees;
+  }
   Map<String, dynamic>? get _lunchStop  => showLunch  ? route['lunch_stop']  : null;
   Map<String, dynamic>? get _dinnerStop => showDinner ? route['dinner_stop'] : null;
 
@@ -86,7 +180,8 @@ class RouteWaypointsView extends StatelessWidget {
           items.add(_MealStopRow(
             icon: Icons.restaurant_outlined, color: AppColors.orange,
             location: _lunchStop!['location'] ?? '', suggestion: _lunchStop!['suggestion'] ?? '',
-            time: _lunchStop!['estimated_time'], label: 'Parada para almorzar',
+            time: _lunchStop!['estimated_time'],
+            label: 'route_result.lunch_stop'.tr(),
           ));
         }
       }
@@ -100,7 +195,8 @@ class RouteWaypointsView extends StatelessWidget {
           items.add(_MealStopRow(
             icon: Icons.dinner_dining, color: AppColors.cyan,
             location: _dinnerStop!['location'] ?? '', suggestion: _dinnerStop!['suggestion'] ?? '',
-            time: _dinnerStop!['estimated_time'], label: 'Parada para comer',
+            time: _dinnerStop!['estimated_time'],
+            label: 'route_result.dinner_stop'.tr(),
           ));
         }
       }
@@ -123,7 +219,8 @@ class RouteWaypointsView extends StatelessWidget {
       items.insert(li > 0 ? li : 0, _MealStopRow(
         icon: Icons.restaurant_outlined, color: AppColors.orange,
         location: _lunchStop!['location'] ?? '', suggestion: _lunchStop!['suggestion'] ?? '',
-        time: _lunchStop!['estimated_time'], label: 'Parada para almorzar',
+        time: _lunchStop!['estimated_time'],
+        label: 'route_result.lunch_stop'.tr(),
       ));
     }
     if (!dinnerInserted && _dinnerStop != null) {
@@ -131,7 +228,8 @@ class RouteWaypointsView extends StatelessWidget {
       items.insert(li > 0 ? li : 0, _MealStopRow(
         icon: Icons.dinner_dining, color: AppColors.cyan,
         location: _dinnerStop!['location'] ?? '', suggestion: _dinnerStop!['suggestion'] ?? '',
-        time: _dinnerStop!['estimated_time'], label: 'Parada para comer',
+        time: _dinnerStop!['estimated_time'],
+        label: 'route_result.dinner_stop'.tr(),
       ));
     }
 
@@ -222,10 +320,22 @@ class _WaypointRow extends StatelessWidget {
       ],
       const SizedBox(height: 6),
       Row(children: [
+        // En el primer punto la hora es la de salida, no la de llegada.
         if (wp['estimated_arrival_time'] != null)
-          _TimeBadge(label: 'Llegada: ${wp['estimated_arrival_time']}', color: timeColor)
+          _TimeBadge(
+            label: isFirst
+                ? 'route_detail.departure_at'.tr(
+                    namedArgs: {'time': '${wp['estimated_arrival_time']}'})
+                : 'route_detail.arrival_at'.tr(
+                    namedArgs: {'time': '${wp['estimated_arrival_time']}'}),
+            color: timeColor,
+          )
         else if ((wp['estimated_minutes_from_start'] ?? 0) > 0)
-          _TimeBadge(label: '+${wp['estimated_minutes_from_start']} min', color: AppColors.grey),
+          _TimeBadge(
+              label: 'route_detail.minutes_short'.tr(namedArgs: {
+                'minutes': '${wp['estimated_minutes_from_start']}'
+              }),
+              color: AppColors.grey),
         if (weather != null) ...[
           const SizedBox(width: 6),
           _WeatherBadge(weather: weather),
@@ -265,7 +375,8 @@ class _FuelStopRow extends StatelessWidget {
         padding: const EdgeInsets.only(top: 4, bottom: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label, style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 13)),
-          const Text('Busca gasolinera cerca', style: TextStyle(color: AppColors.grey, fontSize: 12)),
+          Text('route_detail.find_fuel_nearby'.tr(),
+              style: const TextStyle(color: AppColors.grey, fontSize: 12)),
         ]),
       )),
     ]);

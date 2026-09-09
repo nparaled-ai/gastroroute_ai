@@ -15,9 +15,16 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <!-- NO se pide SCHEDULE_EXACT_ALARM: Google lo trata como permiso
-         restringido y complica la distribucion. La notificacion de salida no
-         necesita precision al minuto, asi que se programa de forma inexacta. -->
+    <!-- NO se piden permisos de alarma exacta (USE_EXACT_ALARM /
+         SCHEDULE_EXACT_ALARM). Se llegaron a pedir, para el aviso de salida,
+         y se quitaron al comprobar en dispositivo que no bastaban: en MIUI,
+         una app que el motero ha cerrado no revive con el broadcast de la
+         alarma. La alarma disparaba puntual al milisegundo y el proceso ni se
+         levantaba, justo en el escenario real — movil bloqueado, app cerrada.
+
+         El aviso lo manda ahora el servidor por push
+         (routes:send-departure-reminders), que ademas funciona con la app
+         desinstalada, sobrevive al cambio de telefono y vale igual para iOS. -->
 
     <queries>
         <intent>

@@ -10,7 +10,7 @@ import '../providers/route_service.dart';
 import '../providers/rider_profile_service.dart';
 import '../providers/route_tracking_service.dart';
 import '../../../core/services/route_tracking_manager.dart';
-import '../../../core/services/route_reminder_service.dart';
+import '../../../core/services/push_notification_service.dart';
 import '../providers/achievement_service.dart';
 
 class RiderHomeScreen extends StatefulWidget {
@@ -35,25 +35,24 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
     _loadProfile();
     _loadNotifications();
     _recoverTracking();
-    _syncRouteReminders();
+    _openRouteFromPush();
   }
 
-  /// Reprograma los avisos de salida de las rutas guardadas.
+  /// Abre la ruta del push que arrancó la app, si lo hubo.
   ///
-  /// Se hace al entrar en la pantalla principal para que recoja los cambios de
-  /// fecha y las rutas borradas sin necesidad de engancharse a cada pantalla.
-  Future<void> _syncRouteReminders() async {
-    final result = await RouteService.getMyRoutes();
+  /// Se hace aquí y no en PushNotificationService porque aquel corre antes de
+  /// `runApp`: navegar desde ahí no hace nada. Al llegar a esta pantalla ya hay
+  /// sesión resuelta y Navigator montado, que es lo que hace falta.
+  ///
+  /// El postFrameCallback espera a que el primer frame esté pintado; sin él la
+  /// navegación se lanzaría mientras esta misma pantalla se está construyendo.
+  void _openRouteFromPush() {
+    final routeId = PushNotificationService.consumePendingRoute();
+    if (routeId == null) return;
 
-    // Solo las que tienen fecha por delante: las propias próximas y las
-    // compartidas a las que el motero se ha unido.
-    final upcoming = result['upcoming'] as List? ?? [];
-    final received = result['received'] as List? ?? [];
-
-    await RouteReminderService.sync([
-      ...upcoming.map((r) => Map<String, dynamic>.from(r as Map)),
-      ...received.map((r) => Map<String, dynamic>.from(r as Map)),
-    ]);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.push('/rider/routes/$routeId');
+    });
   }
 
   /// Recupera una ruta que quedó grabándose (app cerrada por el sistema,

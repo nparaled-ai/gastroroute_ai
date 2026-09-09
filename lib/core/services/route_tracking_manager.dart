@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,13 +28,52 @@ class RouteTrackingManager {
   static const _kTrackingId   = 'tracking_id';
   static const _kRouteId      = 'tracking_route_id';
   static const _kStartedAt    = 'tracking_started_at';
+  static const _kTargetLat    = 'tracking_target_lat';
+  static const _kTargetLng    = 'tracking_target_lng';
+  static const _kHasLeft      = 'tracking_has_left';
+  static const _kArrivalDone  = 'tracking_arrival_done';
+
+  /// Radio alrededor del destino para dar la ruta por terminada.
+  static const double _arrivalRadiusM = 300;
+
+  /// Hay que quedarse dentro del radio este tiempo antes de avisar.
+  ///
+  /// Sin esto, pasar por delante del destino a mitad de ruta —o rodear la
+  /// manzana buscando aparcamiento— dispararía el aviso.
+  static const _arrivalDwell = Duration(minutes: 3);
+
+  /// Hay que haberse alejado al menos esto del destino antes de que la
+  /// detección se arme.
+  ///
+  /// Es imprescindible en rutas circulares, donde el destino ES el origen: sin
+  /// este guardado, al arrancar ya estarías "en el destino" y te preguntaría
+  /// si finalizas nada más salir de casa.
+  static const double _arrivalArmAfterM = 2000;
 
   /// Precisión peor que esta y el punto se descarta. Mismo umbral que aplica
   /// el servidor: sin él, el ruido del GPS infla los kilómetros estando parado.
-  static const double _maxAccuracyM = 50;
+  ///
+  /// Estaba en 50 m y se bajó tras medirlo: un punto con ±50 m de error no
+  /// dice dónde estás, y era el que alimentaba los kilómetros fantasma.
+  static const double _maxAccuracyM = 25;
 
-  /// Desplazamiento mínimo entre puntos. Evita acumular ruido en semáforos.
-  static const int _minDistanceM = 10;
+  /// Desplazamiento mínimo entre puntos, en metros.
+  ///
+  /// Es un SUELO, no el umbral definitivo: el que se aplica de verdad es el
+  /// mayor entre este valor y la precisión del propio punto (ver
+  /// [_noiseFloorFor]). Con un umbral fijo de 10 m se estaba midiendo con más
+  /// finura que la que tiene el dato, y cualquier salto del GPS pasaba el
+  /// filtro. Medido con el móvil quieto encima de la mesa: 10 puntos, 0,1 km
+  /// de recorrido inventado y 2-4 km/h de velocidad fantasma.
+  static const double _minDistanceM = 15;
+
+  /// Umbral real de movimiento para un punto: nunca por debajo de su error.
+  static double _noiseFloorFor(double accuracy) =>
+      accuracy > _minDistanceM ? accuracy : _minDistanceM;
+
+  /// Mismo valor que [_minDistanceM], como entero, para el filtro de
+  /// geolocator, que lo exige en una expresión constante.
+  static const int _gpsFilterM = 15;
 
   /// Cada cuánto se refresca el texto de la notificación persistente.
   static const _notificationInterval = Duration(seconds: 10);
@@ -48,6 +89,19 @@ class RouteTrackingManager {
   DateTime? _startedAt;
 
   double _distanceM = 0;
+
+  /// Punto donde acaba la ruta: el destino, o el origen si es circular.
+  double? _targetLat;
+  double? _targetLng;
+
+  /// Si ya se ha salido de la zona del destino. Ver [_arrivalArmAfterM].
+  bool _hasLeft = false;
+
+  /// Desde cuándo se está dentro del radio de llegada, o null si se está fuera.
+  DateTime? _nearSince;
+
+  /// Para no repetir el aviso de llegada en la misma ruta.
+  bool _arrivalNotified = false;
 
   final _stateController = StreamController<TrackingState>.broadcast();
   Stream<TrackingState> get stream => _stateController.stream;
@@ -65,6 +119,7 @@ class RouteTrackingManager {
         distanceKm: _distanceM / 1000,
         pointsCount: _track.length,
         lastPoint: _track.isEmpty ? null : _track.last,
+        arrived: _arrivalNotified,
       );
 
   /// Comprueba y solicita el permiso de ubicación.
@@ -167,12 +222,26 @@ class RouteTrackingManager {
   }
 
   /// Arranca el tracking. [trackingId] es el id devuelto por el servidor.
-  Future<void> start({required int trackingId, required int routeId}) async {
+  ///
+  /// [targetLat]/[targetLng] son el punto donde acaba la ruta: el destino, o
+  /// el origen si es circular. Si no se pasan, no hay detección de llegada y
+  /// el motero tendrá que finalizar a mano.
+  Future<void> start({
+    required int trackingId,
+    required int routeId,
+    double? targetLat,
+    double? targetLng,
+  }) async {
     if (_positionSub != null) await stop();
 
     _trackingId = trackingId;
     _routeId    = routeId;
     _startedAt  = DateTime.now();
+    _targetLat  = targetLat;
+    _targetLng  = targetLng;
+    _hasLeft    = false;
+    _nearSince  = null;
+    _arrivalNotified = false;
     _track.clear();
     _distanceM = 0;
 
@@ -210,6 +279,15 @@ class RouteTrackingManager {
 
     _distanceM = _recalculateDistance();
 
+    // Estado de la detección de llegada, para que sobreviva a un cierre de la
+    // app: sin esto, al recuperar una ruta ya avanzada se perdería el "ya me
+    // he alejado" y la llegada no se detectaría.
+    _targetLat = prefs.getDouble(_kTargetLat);
+    _targetLng = prefs.getDouble(_kTargetLng);
+    _hasLeft   = prefs.getBool(_kHasLeft) ?? false;
+    _arrivalNotified = prefs.getBool(_kArrivalDone) ?? false;
+    _nearSince = null;
+
     await _startForegroundService();
     _listen();
     _stateController.add(state);
@@ -227,9 +305,21 @@ class RouteTrackingManager {
     _trackingId = null;
     _routeId    = null;
     _startedAt  = null;
+    _targetLat  = null;
+    _targetLng  = null;
+    _hasLeft    = false;
+    _nearSince  = null;
+    _arrivalNotified = false;
     _track.clear();
     _distanceM = 0;
     _lastNotificationUpdate = null;
+
+    // Si la ruta se cierra antes de que el motero toque el aviso de llegada,
+    // ese aviso se queda colgado en la bandeja apuntando a una ruta que ya no
+    // existe.
+    try {
+      await FlutterLocalNotificationsPlugin().cancel(_arrivalNotificationId);
+    } catch (_) {}
 
     await _clearPersisted();
     _stateController.add(state);
@@ -239,11 +329,39 @@ class RouteTrackingManager {
 
   void _listen() {
     _positionSub = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.best,
-        distanceFilter: _minDistanceM,
-      ),
+      locationSettings: _locationSettings(),
     ).listen(_onPosition, onError: (e) => debugPrint('Tracking GPS: $e'));
+  }
+
+  /// Ajustes del GPS, distintos en cada plataforma.
+  ///
+  /// En Android el proceso lo mantiene vivo el servicio en primer plano. En
+  /// iOS no existe tal cosa: hay que pedir explícitamente que se sigan
+  /// entregando posiciones en segundo plano, o el sistema suspende la app al
+  /// bloquear el móvil y la ruta se queda a medias. Con permiso "mientras se
+  /// usa" iOS lo permite, a cambio de mostrar la barra azul al motero —
+  /// que además es honesto: se le está avisando de que se le graba.
+  static LocationSettings _locationSettings() {
+    // Suelo: el filtro fino, que además mira la precisión de cada punto, se
+    // aplica en _onPosition.
+    if (Platform.isIOS || Platform.isMacOS) {
+      return AppleSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: _gpsFilterM,
+        allowBackgroundLocationUpdates: true,
+        showBackgroundLocationIndicator: true,
+        // iOS pausa por su cuenta cuando cree que no te mueves, y al hacerlo
+        // deja de entregar posiciones sin avisar. En una ruta con paradas
+        // largas eso corta la grabación sin que el motero lo sepa.
+        pauseLocationUpdatesAutomatically: false,
+        activityType: ActivityType.otherNavigation,
+      );
+    }
+
+    return const LocationSettings(
+      accuracy: LocationAccuracy.best,
+      distanceFilter: _gpsFilterM,
+    );
   }
 
   Future<void> _onPosition(Position position) async {
@@ -263,9 +381,22 @@ class RouteTrackingManager {
         position.latitude, position.longitude,
       );
 
-      // El distanceFilter de geolocator ya filtra, pero el stream puede emitir
-      // igualmente puntos muy juntos si mejora la precisión.
-      if (d < _minDistanceM) return;
+      // Deriva del GPS: si el salto no supera el error del propio punto, no
+      // hay forma de distinguir movimiento de ruido, así que se descarta el
+      // punto entero.
+      //
+      // Antes el umbral era fijo (10 m) y se aceptaban puntos de hasta ±50 m,
+      // o sea que se medía con más finura que la del dato. Con el móvil quieto
+      // encima de la mesa el recorrido crecía ~0,1 km cada 2 minutos: en una
+      // ruta de 8 horas son más de 20 km inventados, que además contarían para
+      // los logros y para los límites del antitrampa.
+      final floor = _noiseFloorFor(
+        position.accuracy > last[3].toDouble()
+            ? position.accuracy
+            : last[3].toDouble(),
+      );
+
+      if (d < floor) return;
 
       _distanceM += d;
     }
@@ -273,6 +404,7 @@ class RouteTrackingManager {
     _track.add(point);
 
     await _persist();
+    await _checkArrival(position);
     await _updateForegroundService();
     _stateController.add(state);
   }
@@ -296,6 +428,10 @@ class RouteTrackingManager {
     if (_startedAt != null) {
       await prefs.setInt(_kStartedAt, _startedAt!.millisecondsSinceEpoch);
     }
+    if (_targetLat != null) await prefs.setDouble(_kTargetLat, _targetLat!);
+    if (_targetLng != null) await prefs.setDouble(_kTargetLng, _targetLng!);
+    await prefs.setBool(_kHasLeft, _hasLeft);
+    await prefs.setBool(_kArrivalDone, _arrivalNotified);
   }
 
   Future<void> _clearPersisted() async {
@@ -304,7 +440,92 @@ class RouteTrackingManager {
     await prefs.remove(_kTrackingId);
     await prefs.remove(_kRouteId);
     await prefs.remove(_kStartedAt);
+    await prefs.remove(_kTargetLat);
+    await prefs.remove(_kTargetLng);
+    await prefs.remove(_kHasLeft);
+    await prefs.remove(_kArrivalDone);
   }
+
+  /// Mira si el motero ha llegado al final de la ruta y, si es así, le avisa.
+  ///
+  /// El aviso NO cierra la ruta solo: abre la app para que el motero confirme.
+  /// Es a propósito — al finalizar se muestra el resumen con los POIs
+  /// detectados y los logros conseguidos, y cerrarla en silencio desde la
+  /// pantalla de bloqueo le haría perderse justo eso.
+  Future<void> _checkArrival(Position position) async {
+    if (_arrivalNotified) return;
+    if (_targetLat == null || _targetLng == null) return;
+
+    final d = haversine(
+      position.latitude, position.longitude, _targetLat!, _targetLng!,
+    );
+
+    // Primero hay que alejarse: en una circular el destino es el origen, así
+    // que al arrancar ya se está "llegando".
+    if (!_hasLeft) {
+      if (d > _arrivalArmAfterM) {
+        _hasLeft = true;
+        await _persist();
+      }
+      return;
+    }
+
+    if (d > _arrivalRadiusM) {
+      _nearSince = null;
+      return;
+    }
+
+    // Dentro del radio: hay que quedarse un rato para descartar que sea un
+    // simple paso por delante.
+    _nearSince ??= DateTime.now();
+    if (DateTime.now().difference(_nearSince!) < _arrivalDwell) return;
+
+    _arrivalNotified = true;
+    await _persist();
+    await _notifyArrival();
+  }
+
+  Future<void> _notifyArrival() async {
+    try {
+      final fln = FlutterLocalNotificationsPlugin();
+
+      await fln
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(_arrivalChannel);
+
+      await fln.show(
+        _arrivalNotificationId,
+        'tracking.arrival_title'.tr(),
+        'tracking.arrival_body'.tr(),
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _arrivalChannel.id,
+            _arrivalChannel.name,
+            channelDescription: _arrivalChannel.description,
+            importance: Importance.high,
+            priority: Priority.high,
+            sound: _arrivalChannel.sound,
+          ),
+          iOS: const DarwinNotificationDetails(sound: 'sound_moto.mp3'),
+        ),
+        payload: 'tracking',
+      );
+    } catch (e) {
+      // Que falle el aviso no puede tumbar la grabación, que es lo importante.
+      debugPrint('Aviso de llegada no mostrado: $e');
+    }
+  }
+
+  static const _arrivalNotificationId = 910001;
+
+  static const _arrivalChannel = AndroidNotificationChannel(
+    'route_arrival',
+    'Llegada a destino',
+    description: 'Aviso al llegar al final de una ruta que estás grabando.',
+    importance: Importance.high,
+    sound: RawResourceAndroidNotificationSound('sound_moto'),
+  );
 
   /// Distancia en metros entre dos coordenadas.
   static double haversine(double lat1, double lng1, double lat2, double lng2) {
@@ -330,6 +551,13 @@ class TrackingState {
   final int pointsCount;
   final List<num>? lastPoint;
 
+  /// El gestor ha detectado que se ha llegado al final de la ruta.
+  ///
+  /// La detección vive solo en RouteTrackingManager, no en la pantalla: tiene
+  /// que funcionar con la app cerrada, que es cuando de verdad hace falta.
+  /// La pantalla, si está abierta, se limita a reaccionar a esta bandera.
+  final bool arrived;
+
   const TrackingState({
     this.trackingId,
     this.routeId,
@@ -337,6 +565,7 @@ class TrackingState {
     this.distanceKm = 0,
     this.pointsCount = 0,
     this.lastPoint,
+    this.arrived = false,
   });
 
   bool get isActive => trackingId != null;
