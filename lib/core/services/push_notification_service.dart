@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../features/rider/providers/app_notification_service.dart';
 import '../router.dart';
@@ -25,6 +26,7 @@ class PushNotificationService {
   /// Al pulsar una notificación local (app en primer plano).
   static void _onNotificationTapped(NotificationResponse response) {
     final payload = response.payload;
+    debugPrint('[push] toque con app en PRIMER PLANO, payload=$payload');
     if (payload == null) return;
 
     // Aviso de llegada a destino: lleva a la ruta en curso, que es donde está
@@ -62,6 +64,7 @@ class PushNotificationService {
   /// botón de iniciar el tracking — y es justo lo que le estás pidiendo que
   /// haga con el aviso de salida.
   static void _openRoute(int? routeId) {
+    debugPrint('[push] _openRoute($routeId)');
     if (routeId == null) return;
     router.push('/rider/routes/$routeId');
   }
@@ -96,7 +99,10 @@ class PushNotificationService {
     );
 
     // Al tocar un push que llega con la app en segundo plano.
-    FirebaseMessaging.onMessageOpenedApp.listen((m) => _openRoute(_routeIdOf(m)));
+    FirebaseMessaging.onMessageOpenedApp.listen((m) {
+      debugPrint('[push] toque con app en SEGUNDO PLANO, data=${m.data}');
+      _openRoute(_routeIdOf(m));
+    });
 
     // Y el mismo caso con la app cerrada del todo: el push que la arrancó no
     // pasa por onMessageOpenedApp, hay que preguntarlo explícitamente. Es el
@@ -105,6 +111,8 @@ class PushNotificationService {
     //
     // Aquí NO se navega: esto corre antes de runApp. Solo se anota.
     final initial = await _messaging.getInitialMessage();
+    debugPrint('[push] arranque: getInitialMessage='
+        '${initial == null ? "null (no se abrio desde un push)" : "data=${initial.data}"}');
     if (initial != null) _pendingRouteId = _routeIdOf(initial);
 
     // Mensaje en primer plano → mostrar notificación local

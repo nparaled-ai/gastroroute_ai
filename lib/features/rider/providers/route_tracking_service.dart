@@ -16,8 +16,16 @@ class RouteTrackingService {
   static Future<Map<String, dynamic>?> getActive() async {
     try {
       final response = await ApiClient.dio.get('/rider/trackings/active');
-      if (response.data == null) return null;
-      return Map<String, dynamic>.from(response.data);
+
+      // Sin tracking activo el servidor responde 204 sin cuerpo. Antes
+      // respondía {} (Laravel convierte json(null) en un objeto vacío), y eso
+      // no es null: se tomaba por un tracking, se leía tracking['id'] como int
+      // y la recuperación reventaba. Se exige que traiga id para darlo por
+      // bueno, venga lo que venga del servidor.
+      final data = response.data;
+      if (data is! Map || data['id'] == null) return null;
+
+      return Map<String, dynamic>.from(data);
     } catch (_) {
       return null;
     }

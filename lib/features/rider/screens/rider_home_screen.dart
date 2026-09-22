@@ -48,6 +48,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
   /// navegación se lanzaría mientras esta misma pantalla se está construyendo.
   void _openRouteFromPush() {
     final routeId = PushNotificationService.consumePendingRoute();
+    debugPrint('[push] Inicio recoge ruta pendiente: $routeId');
     if (routeId == null) return;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
