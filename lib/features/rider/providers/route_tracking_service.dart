@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../core/api/api_client.dart';
 
 /// Llamadas a la API de tracking de rutas.
@@ -59,12 +60,23 @@ class RouteTrackingService {
     }
   }
 
-  static Future<bool> discard(int trackingId) async {
+  /// Descarta un tracking. Devuelve null si el servidor lo confirma, o el
+  /// motivo del fallo.
+  ///
+  /// Antes devolvía un bool que nadie comprobaba y se tragaba el error: si la
+  /// petición no llegaba (sin cobertura, o el móvil aún sin Wi-Fi tras
+  /// desbloquearlo), la app volvía a Inicio como si hubiera ido bien, mientras
+  /// el servidor seguía con el tracking abierto. A las 24h el cierre
+  /// automático lo habría convertido en una ruta "rodada" de 0 km.
+  static Future<String?> discard(int trackingId) async {
     try {
       await ApiClient.dio.post('/rider/trackings/$trackingId/discard');
-      return true;
-    } catch (_) {
-      return false;
+      return null;
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map ? (e.response!.data as Map)['message'] : null;
+      return msg?.toString() ?? 'common.connection_error'.tr();
+    } catch (e) {
+      return '$e';
     }
   }
 

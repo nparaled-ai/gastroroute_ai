@@ -50,6 +50,7 @@
         "welcome_male": "Bem-vindo, motard!",
         "welcome_female": "Bem-vinda, motarda!",
         "subtitle": "A sua aventura começa aqui",
+        "departing_today": "Hoje sais de rota às {time}",
         "create_route": "Criar rota",
         "create_route_desc": "Gere com IA, Google Maps ou GPX",
         "my_routes": "As Minhas Rotas",
@@ -253,7 +254,8 @@
         "delete": "Eliminar",
         "delete_all_confirm": "Eliminar todas as notificações?",
         "deleted": "Notificação eliminada",
-        "deleted_all": "Todas as notificações eliminadas"
+        "deleted_all": "Todas as notificações eliminadas",
+        "open_failed": "Não foi possível abrir o resumo dessa rota."
     },
     "forgot_password": {
         "title": "Esqueceu a palavra-passe?",
@@ -379,6 +381,9 @@
         "departing_body": "Estás no ponto de partida e está na hora. Começo a gravar o teu percurso?",
         "start_now": "Começar",
         "not_now": "Agora não",
+        "finish_failed": "Não foi possível guardar a rota. O teu percurso está seguro no telemóvel: volta a tocar em Terminar quando tiveres rede.",
+        "too_short_failed": "Não foi gravado percurso suficiente para guardar esta rota. Volta a tocar em Terminar quando tiveres rede.",
+        "discard_failed": "Não foi possível descartar a rota. Tenta de novo quando tiveres rede.",
         "background_hint": "Podes fechar a app: a rota continua a ser gravada. Se o telemóvel reiniciar, é recuperada ao voltares a abrir.",
         "arrival_title": "Chegaste ao teu destino?",
         "arrival_body": "Parece que estás no ponto de destino da rota.",

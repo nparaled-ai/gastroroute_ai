@@ -109,15 +109,41 @@ class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
   // Finalizar / descartar
   // ---------------------------------------------------------------------
 
+  /// Finaliza la ruta.
+  ///
+  /// El track NO se borra hasta que el servidor lo confirma. Antes se llamaba
+  /// a stop(), que lo borraba todo, antes de subir: si la subida fallaba —sin
+  /// cobertura al final de una ruta de montaña, lo más probable del mundo—
+  /// el motero reintentaba con un track ya vacío, caía en "demasiado corta",
+  /// se descartaba, y perdía la ruta entera con sus POIs y sus logros.
+  ///
+  /// Ahora un fallo deja todo como estaba y el reintento sube el mismo track.
+  /// Si la app muere entre medias, el track sigue en disco y se recupera al
+  /// volver a abrirla.
   Future<void> _finish() async {
     if (_finishing) return;
     setState(() => _finishing = true);
 
     final trackingId = widget.tracking['id'] as int;
-    final track = await RouteTrackingManager.instance.stop();
+    final track = await RouteTrackingManager.instance.pauseRecording();
 
+    // Sin recorrido que guardar: se descarta en vez de finalizar.
     if (track.length < 2) {
-      await RouteTrackingService.discard(trackingId);
+      final error = await RouteTrackingService.discard(trackingId);
+      if (!mounted) return;
+
+      if (error != null) {
+        // El motero pulsó Finalizar, no Descartar: el mensaje no puede hablar
+        // de descartar, que es lo que la app decide por dentro al no haber
+        // recorrido. Leer "no se pudo descartar tu ruta" tras darle a finalizar
+        // asusta, porque parece que se la van a borrar.
+        debugPrint('[tracking] descarte por ruta corta falló: $error');
+        setState(() => _finishing = false);
+        _showMessage('tracking.too_short_failed'.tr());
+        return;
+      }
+
+      await RouteTrackingManager.instance.clear();
       if (!mounted) return;
       _showMessage('tracking.too_short'.tr());
       context.go('/rider/home');
@@ -128,10 +154,17 @@ class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
     if (!mounted) return;
 
     if (result['error'] != null) {
+      // El detalle técnico va al log, no a la pantalla: al motero no le sirve
+      // "Error de conexión." cuando el mensaje ya le dice que es la cobertura.
+      debugPrint('[tracking] finalizar falló: ${result['error']}');
       setState(() => _finishing = false);
-      _showMessage(result['error']);
+      _showMessage('tracking.finish_failed'.tr());
       return;
     }
+
+    // Solo ahora, con la ruta ya en el servidor, se borra la copia local.
+    await RouteTrackingManager.instance.clear();
+    if (!mounted) return;
 
     // Al resumen, que es donde se ven los km reales y los POIs detectados.
     context.go('/rider/summary', extra: result['tracking']);
@@ -163,16 +196,36 @@ class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
 
     if (discard != true) return;
 
-    await RouteTrackingManager.instance.stop();
-    await RouteTrackingService.discard(widget.tracking['id'] as int);
+    // Mismo criterio que al finalizar: no se borra nada hasta que el servidor
+    // confirma. Antes se ignoraba el resultado y, si la petición no llegaba,
+    // la app daba la ruta por descartada mientras el servidor la seguía
+    // teniendo abierta.
+    await RouteTrackingManager.instance.pauseRecording();
+    final error = await RouteTrackingService.discard(widget.tracking['id'] as int);
+    if (!mounted) return;
 
+    if (error != null) {
+      debugPrint('[tracking] descartar falló: $error');
+      _showMessage('tracking.discard_failed'.tr());
+      return;
+    }
+
+    await RouteTrackingManager.instance.clear();
     if (!mounted) return;
     context.go('/rider/home');
   }
 
+  /// Mensaje emergente.
+  ///
+  /// El color lo pone el tema (ver snackBarTheme): las pantallas ya no fijan
+  /// el fondo, porque hacerlo dejaba el texto oscuro sobre oscuro.
+  ///
+  /// Seis segundos en vez de los cuatro por defecto: los avisos de aquí son
+  /// instrucciones de dos líneas —qué ha pasado y qué hacer— y con el móvil en
+  /// la mano, en marcha, cuatro segundos no dan para leerlas.
   void _showMessage(String text) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(text), backgroundColor: AppColors.surface),
+      SnackBar(content: Text(text), duration: const Duration(seconds: 6)),
     );
   }
 

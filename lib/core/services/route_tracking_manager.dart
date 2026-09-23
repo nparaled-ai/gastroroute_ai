@@ -296,11 +296,38 @@ class RouteTrackingManager {
 
   /// Detiene la escucha del GPS y devuelve el track acumulado.
   Future<List<List<num>>> stop() async {
+    final result = await pauseRecording();
+    await clear();
+    return result;
+  }
+
+  /// Deja de grabar, pero CONSERVA el track, en memoria y en disco.
+  ///
+  /// Es lo que hay que usar al finalizar o descartar, en vez de [stop]: el
+  /// track solo se borra ([clear]) cuando el servidor confirma que lo tiene.
+  ///
+  /// Antes se llamaba a stop(), que borraba todo, ANTES de subir. Si la
+  /// subida fallaba —y al final de una ruta de montaña, sin cobertura, es lo
+  /// más probable— el motero reintentaba y stop() le devolvía un track vacío;
+  /// eso caía en "ruta demasiado corta", se descartaba, y la ruta entera se
+  /// perdía con sus POIs y sus logros.
+  ///
+  /// Se puede llamar varias veces: si ya no se grababa, solo devuelve el track.
+  Future<List<List<num>>> pauseRecording() async {
     await _positionSub?.cancel();
     _positionSub = null;
     await _stopForegroundService();
+    return List<List<num>>.from(_track);
+  }
 
-    final result = List<List<num>>.from(_track);
+  /// Borra todo el estado del tracking, en memoria y en disco.
+  ///
+  /// Solo debe llamarse cuando el servidor ya tiene la ruta (finalizada o
+  /// descartada). Si se llama antes y la subida falla, el track se pierde.
+  Future<void> clear() async {
+    await _positionSub?.cancel();
+    _positionSub = null;
+    await _stopForegroundService();
 
     _trackingId = null;
     _routeId    = null;
@@ -323,8 +350,6 @@ class RouteTrackingManager {
 
     await _clearPersisted();
     _stateController.add(state);
-
-    return result;
   }
 
   void _listen() {

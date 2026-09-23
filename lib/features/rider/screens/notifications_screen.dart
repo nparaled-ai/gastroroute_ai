@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/app_notification_service.dart';
+import '../providers/route_tracking_service.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -88,6 +89,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'route_shared':    return Icons.route;
       case 'route_join':      return Icons.check_circle_outline;
       case 'route_declined':  return Icons.cancel_outlined;
+      case 'route_departure': return Icons.alarm;
+      case 'tracking_auto_closed': return Icons.flag_outlined;
       default:                return Icons.notifications_outlined;
     }
   }
@@ -100,6 +103,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'route_shared':    return AppColors.cyan;
       case 'route_join':      return AppColors.gold;
       case 'route_declined':  return AppColors.error;
+      case 'route_departure': return AppColors.orange;
+      case 'tracking_auto_closed': return AppColors.gold;
       default:                return AppColors.grey;
     }
   }
@@ -116,16 +121,51 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return '${dt.day}/${dt.month}/${dt.year}';
   }
 
-  void _onTap(Map<String, dynamic> n) {
+  /// A dónde lleva cada notificación al tocarla.
+  ///
+  /// Si aquí falta un tipo, la notificación se queda muerta: se ve en la lista
+  /// pero no hace nada al pulsarla, sin ningún aviso. Al añadir un tipo nuevo
+  /// en el servidor hay que darlo de alta también aquí y en [_iconFor] y
+  /// [_colorFor], o sale con la campana gris genérica.
+  Future<void> _onTap(Map<String, dynamic> n) async {
     final type = n['type'] as String? ?? '';
     final data = n['data'];
     final Map<String, dynamic> extra = data is Map ? Map<String, dynamic>.from(data) : {};
 
     if (type == 'friend_request' || type == 'friend_accepted' || type == 'friend_rejected') {
       context.push('/rider/friends');
-    } else if ((type == 'route_shared' || type == 'route_join' || type == 'route_declined') &&
-        extra['route_id'] != null) {
+      return;
+    }
+
+    // Todo lo que apunta a una ruta abre su detalle, incluido el aviso de
+    // salida, que es donde está el botón de iniciar el tracking.
+    if (extra['route_id'] != null &&
+        (type == 'route_shared' ||
+            type == 'route_join' ||
+            type == 'route_declined' ||
+            type == 'route_departure')) {
       context.push('/rider/routes/${extra['route_id']}');
+      return;
+    }
+
+    // Ruta cerrada sola a las 24h: lleva a su resumen. El resumen necesita los
+    // datos del tracking, así que hay que pedirlos antes de navegar.
+    if (type == 'tracking_auto_closed' && extra['tracking_id'] != null) {
+      final id = int.tryParse('${extra['tracking_id']}');
+      if (id == null) return;
+
+      final summary = await RouteTrackingService.summary(id);
+      if (!mounted) return;
+
+      if (summary == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('notifications.open_failed'.tr()),
+          backgroundColor: AppColors.error,
+        ));
+        return;
+      }
+
+      context.push('/rider/summary', extra: summary);
     }
   }
 

@@ -28,6 +28,21 @@ class AppTheme {
     textTheme: GoogleFonts.exoTextTheme(
       ThemeData.dark().textTheme,
     ),
+    // Mensajes emergentes (SnackBar).
+    //
+    // Sin esto, Material pinta el texto con onInverseSurface, que en un tema
+    // oscuro es OSCURO, mientras las pantallas les pasan un fondo oscuro
+    // (AppColors.surface). El resultado era un emergente aparentemente vacío:
+    // el mensaje estaba ahí, pero negro sobre negro. Se detectó porque un
+    // aviso de error al finalizar una ruta salía en blanco.
+    //
+    // Fijar el color aquí lo arregla en toda la app de una vez, incluidos los
+    // que llevan fondo rojo o verde propio.
+    snackBarTheme: const SnackBarThemeData(
+      backgroundColor: AppColors.card,
+      contentTextStyle: TextStyle(color: AppColors.white, fontSize: 14),
+      actionTextColor: AppColors.orange,
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.surface,

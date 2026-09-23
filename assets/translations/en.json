@@ -50,6 +50,7 @@
         "welcome_male": "Welcome, rider!",
         "welcome_female": "Welcome, rider!",
         "subtitle": "Your adventure starts here",
+        "departing_today": "You're riding today at {time}",
         "create_route": "Create route",
         "create_route_desc": "Generate with AI, Google Maps or GPX",
         "my_routes": "My Routes",
@@ -253,7 +254,8 @@
         "delete": "Delete",
         "delete_all_confirm": "Delete all notifications?",
         "deleted": "Notification deleted",
-        "deleted_all": "All notifications deleted"
+        "deleted_all": "All notifications deleted",
+        "open_failed": "Couldn't open that route summary."
     },
     "forgot_password": {
         "title": "Forgot your password?",
@@ -379,6 +381,9 @@
         "departing_body": "You're at the start point and it's time. Shall I start recording your ride?",
         "start_now": "Start",
         "not_now": "Not now",
+        "finish_failed": "Couldn't save the route. Your ride is safe on your phone: tap Finish again when you have coverage.",
+        "too_short_failed": "Not enough of the ride was recorded to save this route. Tap Finish again when you have coverage.",
+        "discard_failed": "Couldn't discard the route. Try again when you have coverage.",
         "background_hint": "You can close the app: the route keeps recording. If your phone restarts, it is recovered when you reopen it.",
         "arrival_title": "Have you reached your destination?",
         "arrival_body": "It looks like you are at the route destination.",

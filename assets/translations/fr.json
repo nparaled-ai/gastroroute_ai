@@ -50,6 +50,7 @@
         "welcome_male": "Bienvenue, motard!",
         "welcome_female": "Bienvenue, motarde!",
         "subtitle": "Votre aventure commence ici",
+        "departing_today": "Vous partez aujourd'hui à {time}",
         "create_route": "Créer un itinéraire",
         "create_route_desc": "Générez avec l'IA, Google Maps ou GPX",
         "my_routes": "Mes Itinéraires",
@@ -253,7 +254,8 @@
         "delete": "Supprimer",
         "delete_all_confirm": "Supprimer toutes les notifications ?",
         "deleted": "Notification supprimée",
-        "deleted_all": "Toutes les notifications supprimées"
+        "deleted_all": "Toutes les notifications supprimées",
+        "open_failed": "Impossible d'ouvrir le résumé de cet itinéraire."
     },
     "forgot_password": {
         "title": "Mot de passe oublié ?",
@@ -379,6 +381,9 @@
         "departing_body": "Vous êtes au point de départ et c'est l'heure. Je commence à enregistrer votre parcours ?",
         "start_now": "Commencer",
         "not_now": "Pas maintenant",
+        "finish_failed": "Impossible d'enregistrer l'itinéraire. Votre parcours est en sécurité sur votre téléphone : appuyez à nouveau sur Terminer quand vous aurez du réseau.",
+        "too_short_failed": "Pas assez de parcours enregistré pour sauvegarder cet itinéraire. Appuyez à nouveau sur Terminer quand vous aurez du réseau.",
+        "discard_failed": "Impossible d'annuler l'itinéraire. Réessayez quand vous aurez du réseau.",
         "background_hint": "Vous pouvez fermer l'application : l'itinéraire continue d'être enregistré. Si le téléphone redémarre, il est récupéré à la réouverture.",
         "arrival_title": "Êtes-vous arrivé à destination ?",
         "arrival_body": "Il semble que vous soyez au point d'arrivée de l'itinéraire.",

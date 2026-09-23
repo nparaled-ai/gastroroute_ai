@@ -50,6 +50,7 @@
         "welcome_male": "Willkommen, Fahrer!",
         "welcome_female": "Willkommen, Fahrerin!",
         "subtitle": "Ihr Abenteuer beginnt hier",
+        "departing_today": "Heute fährst du um {time} los",
         "create_route": "Route erstellen",
         "create_route_desc": "Mit KI, Google Maps oder GPX generieren",
         "my_routes": "Meine Routen",
@@ -253,7 +254,8 @@
         "delete": "Löschen",
         "delete_all_confirm": "Alle Benachrichtigungen löschen?",
         "deleted": "Benachrichtigung gelöscht",
-        "deleted_all": "Alle Benachrichtigungen gelöscht"
+        "deleted_all": "Alle Benachrichtigungen gelöscht",
+        "open_failed": "Die Routenübersicht konnte nicht geöffnet werden."
     },
     "forgot_password": {
         "title": "Passwort vergessen?",
@@ -379,6 +381,9 @@
         "departing_body": "Du bist am Startpunkt und es ist so weit. Soll ich deine Fahrt aufzeichnen?",
         "start_now": "Starten",
         "not_now": "Jetzt nicht",
+        "finish_failed": "Die Route konnte nicht gespeichert werden. Deine Fahrt ist sicher auf dem Handy gespeichert: Tippe erneut auf Beenden, sobald du Empfang hast.",
+        "too_short_failed": "Es wurde zu wenig Strecke aufgezeichnet, um diese Route zu speichern. Tippe erneut auf Beenden, sobald du Empfang hast.",
+        "discard_failed": "Die Route konnte nicht verworfen werden. Versuche es erneut, sobald du Empfang hast.",
         "background_hint": "Du kannst die App schließen: Die Route wird weiter aufgezeichnet. Nach einem Neustart des Handys wird sie beim Öffnen wiederhergestellt.",
         "arrival_title": "Bist du am Ziel angekommen?",
         "arrival_body": "Es sieht so aus, als wärst du am Zielpunkt der Route.",

@@ -50,6 +50,7 @@
         "welcome_male": "¡Bienvenido, motero!",
         "welcome_female": "¡Bienvenida, motera!",
         "subtitle": "Tu aventura comienza aquí",
+        "departing_today": "Hoy sales de ruta a las {time}",
         "create_route": "Crear ruta",
         "create_route_desc": "Genera con IA, Google Maps o GPX",
         "my_routes": "Mis Rutas",
@@ -253,7 +254,8 @@
         "delete": "Eliminar",
         "delete_all_confirm": "¿Eliminar todas las notificaciones?",
         "deleted": "Notificación eliminada",
-        "deleted_all": "Todas las notificaciones eliminadas"
+        "deleted_all": "Todas las notificaciones eliminadas",
+        "open_failed": "No se pudo abrir el resumen de esa ruta."
     },
     "forgot_password": {
         "title": "¿Olvidaste tu contraseña?",
@@ -379,6 +381,9 @@
         "departing_body": "Estás en el punto de salida y es la hora. ¿Empiezo a grabar tu recorrido?",
         "start_now": "Empezar",
         "not_now": "Ahora no",
+        "finish_failed": "No se pudo guardar la ruta. Tu recorrido está a salvo en el móvil: vuelve a pulsar Finalizar cuando tengas cobertura.",
+        "too_short_failed": "No se ha grabado recorrido suficiente para guardar esta ruta. Vuelve a pulsar Finalizar cuando tengas cobertura.",
+        "discard_failed": "No se pudo descartar la ruta. Vuelve a intentarlo cuando tengas cobertura.",
         "background_hint": "Puedes cerrar la app: la ruta se sigue grabando. Si el móvil se reinicia, se recupera al volver a abrirla.",
         "arrival_title": "¿Has llegado a tu destino?",
         "arrival_body": "Parece que estás en el punto de destino de la ruta.",

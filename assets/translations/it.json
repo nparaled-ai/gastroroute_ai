@@ -50,6 +50,7 @@
         "welcome_male": "Benvenuto, motociclista!",
         "welcome_female": "Benvenuta, motociclista!",
         "subtitle": "La tua avventura inizia qui",
+        "departing_today": "Oggi parti alle {time}",
         "create_route": "Crea percorso",
         "create_route_desc": "Genera con IA, Google Maps o GPX",
         "my_routes": "I Miei Percorsi",
@@ -253,7 +254,8 @@
         "delete": "Elimina",
         "delete_all_confirm": "Eliminare tutte le notifiche?",
         "deleted": "Notifica eliminata",
-        "deleted_all": "Tutte le notifiche eliminate"
+        "deleted_all": "Tutte le notifiche eliminate",
+        "open_failed": "Impossibile aprire il riepilogo di quel percorso."
     },
     "forgot_password": {
         "title": "Hai dimenticato la password?",
@@ -379,6 +381,9 @@
         "departing_body": "Sei al punto di partenza ed è l'ora. Inizio a registrare il tuo percorso?",
         "start_now": "Inizia",
         "not_now": "Non ora",
+        "finish_failed": "Impossibile salvare il percorso. Il tuo giro è al sicuro sul telefono: premi di nuovo Termina quando avrai copertura.",
+        "too_short_failed": "Non è stato registrato abbastanza percorso per salvare questo giro. Premi di nuovo Termina quando avrai copertura.",
+        "discard_failed": "Impossibile scartare il percorso. Riprova quando avrai copertura.",
         "background_hint": "Puoi chiudere l'app: il percorso continua a registrarsi. Se il telefono si riavvia, viene recuperato alla riapertura.",
         "arrival_title": "Sei arrivato a destinazione?",
         "arrival_body": "Sembra che tu sia al punto di arrivo del percorso.",

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/api/auth_service.dart';
@@ -27,6 +30,20 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
   int _unreadNotifications = 0;
   int _pendingAchievements  = 0;
   String? _nickname;
+
+  /// Ruta que sale ahora desde donde estás, o null. Ver [_checkDeparture].
+  Map<String, dynamic>? _departingRoute;
+
+  StreamSubscription<TrackingState>? _trackingSub;
+
+  /// Ventana alrededor de la hora de salida, igual que en el detalle:
+  /// generosa por detrás, porque salir con retraso es lo normal.
+  static const _windowBefore = Duration(minutes: 30);
+  static const _windowAfter  = Duration(hours: 2);
+
+  /// Distancia máxima al origen. Amplia: el punto de salida real suele ser el
+  /// bar o la gasolinera de al lado, no la coordenada exacta.
+  static const double _nearOriginM = 1000;
   String? _gender;
 
   @override
@@ -36,6 +53,114 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
     _loadNotifications();
     _recoverTracking();
     _openRouteFromPush();
+    _checkDeparture();
+
+    // La tarjeta desaparece en cuanto arranca una grabación, venga de donde
+    // venga: de la propia tarjeta, del detalle de la ruta o de recuperar una
+    // interrumpida.
+    //
+    // Sin esto la tarjeta solo se calculaba al crear la pantalla, así que al
+    // volver a Inicio con la ruta ya grabándose seguía ofreciendo empezarla.
+    _trackingSub = RouteTrackingManager.instance.stream.listen((s) {
+      if (!mounted) return;
+      if (s.isActive && _departingRoute != null) {
+        setState(() => _departingRoute = null);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _trackingSub?.cancel();
+    super.dispose();
+  }
+
+  /// Busca una ruta que salga ahora desde donde estás, para ofrecerla arriba.
+  ///
+  /// Mismas condiciones que el diálogo del detalle: dentro de la ventana de
+  /// salida, a menos de 1 km del origen y con el permiso de ubicación ya
+  /// concedido. Aquí NO se pide el permiso: si no lo hay, no se ofrece nada.
+  ///
+  /// Se hace también desde Inicio porque si el motero abre la app y se queda
+  /// aquí, antes no se enteraba de nada y tenía que ir a buscar la ruta.
+  ///
+  /// Es una tarjeta y no un diálogo a propósito: no interrumpe, y sigue ahí
+  /// si no le hace caso a la primera.
+  Future<void> _checkDeparture() async {
+    if (RouteTrackingManager.instance.isTracking) return;
+
+    final permission = await Geolocator.checkPermission();
+    if (permission != LocationPermission.always &&
+        permission != LocationPermission.whileInUse) {
+      return;
+    }
+
+    final result = await RouteService.getMyRoutes();
+    final upcoming = result['upcoming'] as List? ?? [];
+    if (upcoming.isEmpty || !mounted) return;
+
+    final now = DateTime.now();
+
+    // Candidatas: las que están en su ventana de salida.
+    final candidates = upcoming
+        .map((r) => Map<String, dynamic>.from(r as Map))
+        .where((r) {
+          final departure = _departureOf(r);
+          if (departure == null) return false;
+          return now.isAfter(departure.subtract(_windowBefore)) &&
+              now.isBefore(departure.add(_windowAfter));
+        })
+        .toList();
+
+    if (candidates.isEmpty) return;
+
+    Position position;
+    try {
+      position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+      ).timeout(const Duration(seconds: 8));
+    } catch (_) {
+      return;
+    }
+
+    if (!mounted) return;
+
+    for (final route in candidates) {
+      final lat = _coord(route['origin_lat']);
+      final lng = _coord(route['origin_lng']);
+      if (lat == null || lng == null) continue;
+
+      final metres = RouteTrackingManager.haversine(
+        position.latitude, position.longitude, lat, lng,
+      );
+
+      if (metres <= _nearOriginM) {
+        setState(() => _departingRoute = route);
+        return;
+      }
+    }
+  }
+
+  /// Combina `departure_date` y `departure_time`, que llegan como texto.
+  static DateTime? _departureOf(Map<String, dynamic> route) {
+    final date = route['departure_date']?.toString();
+    if (date == null || date.isEmpty) return null;
+
+    final day = DateTime.tryParse(date);
+    if (day == null) return null;
+
+    final parts = (route['departure_time']?.toString() ?? '').split(':');
+    final hour = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 9 : 9;
+    final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+
+    return DateTime(day.year, day.month, day.day, hour, minute);
+  }
+
+  /// Coordenada del servidor a double: llega como TEXTO por el cast decimal:7.
+  static double? _coord(dynamic v) {
+    if (v == null) return null;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString());
   }
 
   /// Abre la ruta del push que arrancó la app, si lo hubo.
@@ -244,6 +369,20 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
             const SizedBox(height: 4),
             Text('home.subtitle'.tr(),
                 style: const TextStyle(color: AppColors.grey, fontSize: 14)),
+
+            // Tarjeta de salida: solo aparece si hoy sales de ruta y estás en
+            // el punto de salida. Ver _checkDeparture.
+            if (_departingRoute != null) ...[
+              const SizedBox(height: 24),
+              _DepartureCard(
+                title: '${_departingRoute!['title'] ?? ''}',
+                time: '${_departingRoute!['departure_time'] ?? ''}',
+                onStart: () => context.push(
+                  '/rider/routes/${_departingRoute!['id']}',
+                ),
+              ),
+            ],
+
             const SizedBox(height: 32),
 
             _QuickAccessCard(
@@ -315,6 +454,71 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Aviso de que sales de ruta ahora, en la pantalla principal.
+///
+/// Es una tarjeta y no un diálogo: no interrumpe lo que el motero estuviera
+/// haciendo y, si no le hace caso a la primera, sigue ahí.
+class _DepartureCard extends StatelessWidget {
+  final String title;
+  final String time;
+  final VoidCallback onStart;
+
+  const _DepartureCard({
+    required this.title,
+    required this.time,
+    required this.onStart,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.orange.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.orange),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            const Icon(Icons.two_wheeler, color: AppColors.orange, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'home.departing_today'.tr(namedArgs: {'time': time}),
+                style: const TextStyle(
+                    color: AppColors.orange,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14),
+              ),
+            ),
+          ]),
+          const SizedBox(height: 6),
+          Text(title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: AppColors.white, fontSize: 15)),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: onStart,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.orange,
+              minimumSize: const Size(double.infinity, 44),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child: Text('tracking.start_now'.tr(),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w700)),
+          ),
+        ],
       ),
     );
   }

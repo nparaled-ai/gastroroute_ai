@@ -173,6 +173,22 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
 
     if (!mounted) return;
 
+    // Se vuelven a comprobar las condiciones DESPUÉS de esperar al GPS.
+    //
+    // Entre la comprobación de arriba y este punto pasan hasta 8 segundos, y
+    // en ese hueco el motero puede haber pulsado ya «Iniciar ruta». Ocurrió:
+    // el diálogo salía encima de «Ruta en curso» y, al aceptarlo, arrancaba
+    // una SEGUNDA grabación sobre la que ya estaba en marcha.
+    //
+    // La comprobación de ModalRoute evita además que el diálogo aparezca
+    // sobre otra pantalla: showDialog lo pinta por encima de todo aunque esta
+    // ya no sea la pantalla visible.
+    if (_startOffered ||
+        RouteTrackingManager.instance.isTracking ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+
     final metres = RouteTrackingManager.haversine(
       position.latitude, position.longitude, originLat, originLng,
     );
