@@ -32,6 +32,7 @@ class RouteTrackingManager {
   static const _kTargetLng    = 'tracking_target_lng';
   static const _kHasLeft      = 'tracking_has_left';
   static const _kArrivalDone  = 'tracking_arrival_done';
+  static const _kData         = 'tracking_data';
 
   /// Radio alrededor del destino para dar la ruta por terminada.
   static const double _arrivalRadiusM = 300;
@@ -88,6 +89,15 @@ class RouteTrackingManager {
   int? _routeId;
   DateTime? _startedAt;
 
+  /// El tracking tal y como lo devolvió el servidor, con su ruta dentro.
+  ///
+  /// Se guarda aquí porque la pantalla de ruta en curso lo necesita para
+  /// pintarse, y a ella se llega desde la barra inferior, que puede pulsarse
+  /// en mitad de la sierra sin cobertura. Si hubiera que pedirlo al servidor
+  /// en ese momento, la barra no llevaría a ningún sitio justo cuando más
+  /// falta hace.
+  Map<String, dynamic>? _data;
+
   double _distanceM = 0;
 
   /// Punto donde acaba la ruta: el destino, o el origen si es circular.
@@ -111,6 +121,9 @@ class RouteTrackingManager {
   int? get routeId => _routeId;
   DateTime? get startedAt => _startedAt;
   List<List<num>> get track => List.unmodifiable(_track);
+
+  /// Datos del tracking en curso, para abrir su pantalla. Ver [_data].
+  Map<String, dynamic>? get data => _data;
 
   TrackingState get state => TrackingState(
         trackingId: _trackingId,
@@ -226,9 +239,12 @@ class RouteTrackingManager {
   /// [targetLat]/[targetLng] son el punto donde acaba la ruta: el destino, o
   /// el origen si es circular. Si no se pasan, no hay detección de llegada y
   /// el motero tendrá que finalizar a mano.
+  /// [data] es el tracking que devolvió el servidor, con su ruta dentro. Ver
+  /// [_data]: es lo que permite abrir la pantalla de ruta sin cobertura.
   Future<void> start({
     required int trackingId,
     required int routeId,
+    Map<String, dynamic>? data,
     double? targetLat,
     double? targetLng,
   }) async {
@@ -236,6 +252,7 @@ class RouteTrackingManager {
 
     _trackingId = trackingId;
     _routeId    = routeId;
+    _data       = data;
     _startedAt  = DateTime.now();
     _targetLat  = targetLat;
     _targetLng  = targetLng;
@@ -255,7 +272,11 @@ class RouteTrackingManager {
   ///
   /// Devuelve false si no había nada guardado, o si lo guardado corresponde a
   /// otro tracking distinto del que el servidor da por activo.
-  Future<bool> resume({required int trackingId, required int routeId}) async {
+  Future<bool> resume({
+    required int trackingId,
+    required int routeId,
+    Map<String, dynamic>? data,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
 
     if (prefs.getInt(_kTrackingId) != trackingId) return false;
@@ -271,6 +292,10 @@ class RouteTrackingManager {
 
     _trackingId = trackingId;
     _routeId    = routeId;
+
+    // Si quien recupera trae los datos frescos del servidor, mandan esos; si
+    // no (sin cobertura), se usan los que se guardaron al arrancar.
+    _data = data ?? _readPersistedData(prefs);
 
     final startedMs = prefs.getInt(_kStartedAt);
     _startedAt = startedMs != null
@@ -331,6 +356,7 @@ class RouteTrackingManager {
 
     _trackingId = null;
     _routeId    = null;
+    _data       = null;
     _startedAt  = null;
     _targetLat  = null;
     _targetLng  = null;
@@ -457,6 +483,19 @@ class RouteTrackingManager {
     if (_targetLng != null) await prefs.setDouble(_kTargetLng, _targetLng!);
     await prefs.setBool(_kHasLeft, _hasLeft);
     await prefs.setBool(_kArrivalDone, _arrivalNotified);
+    if (_data != null) await prefs.setString(_kData, jsonEncode(_data));
+  }
+
+  /// Lee el tracking guardado. Devuelve null si no hay o si está corrupto: es
+  /// un dato de conveniencia, nunca una razón para no recuperar la grabación.
+  Map<String, dynamic>? _readPersistedData(SharedPreferences prefs) {
+    final raw = prefs.getString(_kData);
+    if (raw == null) return null;
+    try {
+      return Map<String, dynamic>.from(jsonDecode(raw) as Map);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> _clearPersisted() async {
@@ -469,6 +508,7 @@ class RouteTrackingManager {
     await prefs.remove(_kTargetLng);
     await prefs.remove(_kHasLeft);
     await prefs.remove(_kArrivalDone);
+    await prefs.remove(_kData);
   }
 
   /// Mira si el motero ha llegado al final de la ruta y, si es así, le avisa.

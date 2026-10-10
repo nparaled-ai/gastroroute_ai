@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/storage/auth_storage.dart';
+import '../core/services/route_tracking_manager.dart';
 import '../features/auth/screens/splash_screen.dart';
 import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/register_screen.dart';
@@ -108,9 +109,20 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/rider/tracking',
-      builder: (context, state) => RouteTrackingScreen(
-        tracking: state.extra as Map<String, dynamic>,
-      ),
+      builder: (context, state) {
+        // Si se llega sin datos —un enlace directo a esta ruta, o un arranque
+        // de la app sobre esta pantalla— se usa el tracking guardado en el
+        // gestor. El `as Map<String, dynamic>` a secas reventaba con null.
+        final extra = state.extra;
+        final tracking = extra is Map<String, dynamic>
+            ? extra
+            : RouteTrackingManager.instance.data;
+
+        // Y si tampoco hay nada guardado, no hay ruta que enseñar.
+        if (tracking == null) return const RiderHomeScreen();
+
+        return RouteTrackingScreen(tracking: tracking);
+      },
     ),
     GoRoute(
       path: '/rider/summary',

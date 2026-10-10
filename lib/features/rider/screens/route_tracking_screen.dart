@@ -240,24 +240,32 @@ class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      // Salir con "atrás" no debe cortar el tracking: sigue rodando.
-      canPop: false,
-      child: Scaffold(
+    // Salir de esta pantalla no corta el tracking: sigue grabando, y la barra
+    // inferior (ActiveTrackingBar) deja volver desde cualquier sitio con un
+    // toque.
+    //
+    // Antes el "atrás" estaba bloqueado con PopScope(canPop: false) y no había
+    // flecha: la única salida era la X de arriba, que descarta la ruta. Se
+    // entraba aquí por el salto automático, así que tenía cierta lógica, pero
+    // con la barra ya no: cerrar una pantalla no puede significar tirar la ruta
+    // a la basura. La X se ha quitado y descartar está abajo, en su sitio,
+    // escrito con palabras.
+    return Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
           backgroundColor: AppColors.surface,
           elevation: 0,
-          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: AppColors.white),
+            // Si no hay nada debajo —se ha entrado desde una notificación, que
+            // abre esta pantalla directa— la flecha no puede quedarse muerta:
+            // lleva a Inicio, donde ya está la barra para volver.
+            onPressed: () => Navigator.of(context).canPop()
+                ? Navigator.of(context).pop()
+                : context.go('/rider/home'),
+          ),
           title: Text('tracking.in_progress'.tr(),
               style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.close, color: AppColors.grey),
-              tooltip: 'tracking.discard'.tr(),
-              onPressed: _finishing ? null : _confirmDiscard,
-            ),
-          ],
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -348,14 +356,29 @@ class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
+
+              // Descartar: en texto y en segundo plano visual, no como un
+              // icono en la esquina. Es la acción que tira el recorrido, y
+              // tiene que costar más leerla que pulsarla por error.
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: _finishing ? null : _confirmDiscard,
+                  icon: const Icon(Icons.delete_outline,
+                      color: AppColors.grey, size: 18),
+                  label: Text('tracking.discard'.tr(),
+                      style: const TextStyle(color: AppColors.grey)),
+                ),
+              ),
+
+              const SizedBox(height: 4),
 
               Text('tracking.background_hint'.tr(),
                   style: const TextStyle(color: AppColors.grey, fontSize: 11, height: 1.5)),
             ],
           ),
         ),
-      ),
     );
   }
 }

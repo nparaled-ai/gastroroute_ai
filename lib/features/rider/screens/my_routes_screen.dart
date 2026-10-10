@@ -27,11 +27,23 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
 
   bool _loading = true;
 
+  /// Rodadas de hoy, para el número de la pestaña.
+  int get _riddenToday {
+    final now = DateTime.now();
+    return _ridden.where((r) {
+      final started = DateTime.tryParse('${r['started_at']}')?.toLocal();
+      if (started == null) return false;
+      return started.year == now.year &&
+          started.month == now.month &&
+          started.day == now.day;
+    }).length;
+  }
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    // El botón de crear ruta se oculta en Rodadas, así que hay que repintar
+    // El botón de crear ruta solo sale en Previstas, así que hay que repintar
     // al cambiar de pestaña.
     _tabController.addListener(() => setState(() {}));
     routeListRefresh.addListener(_loadRoutes);
@@ -129,22 +141,9 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                 activeColor: AppColors.cyan,
               ),
             ),
-            Tab(
-              child: _TabLabel(
-                icon: '🏍️',
-                label: 'my_routes.ridden'.tr(),
-                count: _ridden.length,
-                activeColor: AppColors.orange,
-              ),
-            ),
-            Tab(
-              child: _TabLabel(
-                icon: '📚',
-                label: 'my_routes.not_done'.tr(),
-                count: _notDone.length,
-                activeColor: AppColors.grey,
-              ),
-            ),
+            // Recibidas va la segunda: son invitaciones que esperan respuesta,
+            // lo único de esta pantalla que reclama algo del motero. Detrás
+            // quedan las dos de historia.
             Tab(
               child: _TabLabel(
                 icon: '📨',
@@ -152,6 +151,27 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                 count: _received.length,
                 activeColor: AppColors.orange,
                 highlight: _received.isNotEmpty,
+              ),
+            ),
+            Tab(
+              child: _TabLabel(
+                icon: '🏍️',
+                label: 'my_routes.ridden'.tr(),
+                // Solo las de HOY. El total crecía sin parar —"Rodadas (57)"
+                // dentro de un año— y un número en una pestaña debería señalar
+                // algo que atender, no llevar el inventario.
+                count: _riddenToday,
+                activeColor: AppColors.orange,
+              ),
+            ),
+            Tab(
+              child: _TabLabel(
+                icon: '📚',
+                label: 'my_routes.not_done'.tr(),
+                // Sin número, por lo mismo: aquí tampoco hay nada que atender,
+                // solo rutas que se quedaron atrás.
+                count: 0,
+                activeColor: AppColors.grey,
               ),
             ),
           ],
@@ -171,9 +191,31 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                     _loadRoutes();
                   },
                 ),
+                // El orden debe coincidir con el de las pestañas de arriba:
+                // Previstas · Recibidas · Rodadas · No realizadas.
+                _RouteList(
+                  routes: _received,
+                  empty: 'my_routes.empty_received'.tr(),
+                  emptyIcon: Icons.mail_outline,
+                  onTap: (r) async {
+                    await context.push('/rider/routes/${r['id']}');
+                    _loadRoutes();
+                  },
+                ),
                 _RiddenList(
                   rides: _ridden,
-                  onTap: _openRide,
+                  // Tocar la tarjeta abre LA RUTA, igual que en las otras
+                  // pestañas: desde ahí están Repetir, los waypoints y el
+                  // mapa. El botón abre el resumen de esa rodada concreta.
+                  // Antes ambos gestos llevaban al resumen y no había forma
+                  // de volver a la ruta.
+                  onOpenRoute: (ride) async {
+                    final routeId = ride['route_id'];
+                    if (routeId == null) return;
+                    await context.push('/rider/routes/$routeId');
+                    _loadRoutes();
+                  },
+                  onOpenSummary: _openRide,
                 ),
                 _RouteList(
                   routes: _notDone,
@@ -184,19 +226,14 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
                     _loadRoutes();
                   },
                 ),
-                _RouteList(
-                  routes: _received,
-                  empty: 'my_routes.empty_received'.tr(),
-                  emptyIcon: Icons.mail_outline,
-                  onTap: (r) async {
-                    await context.push('/rider/routes/${r['id']}');
-                    _loadRoutes();
-                  },
-                ),
               ],
             ),
-      floatingActionButton: _tabController.index == 1
-          // En Rodadas no tiene sentido "crear ruta": ahí solo hay historia.
+      // Crear ruta solo en Previstas.
+      //
+      // Es la única pestaña donde encaja: las otras tres son historia
+      // (Rodadas, No realizadas) o cosas de otros (Recibidas), y ofrecer ahí
+      // "nueva ruta" no viene a cuento.
+      floatingActionButton: _tabController.index != 0
           ? null
           : FloatingActionButton.extended(
               onPressed: () => context.push('/rider/create-route'),
@@ -700,11 +737,64 @@ class _Chip extends StatelessWidget {
 /// A diferencia de las demás pestañas, aquí cada entrada es un TRACKING, no
 /// una ruta: repetir la misma ruta tres veces son tres entradas, porque cada
 /// salida tiene sus kilómetros, sus POIs y su recorrido.
-class _RiddenList extends StatelessWidget {
+class _RiddenList extends StatefulWidget {
   final List<Map<String, dynamic>> rides;
-  final Future<void> Function(Map<String, dynamic>) onTap;
 
-  const _RiddenList({required this.rides, required this.onTap});
+  /// Tocar la tarjeta: abre la ruta. El botón: abre el resumen.
+  final Future<void> Function(Map<String, dynamic>) onOpenRoute;
+  final Future<void> Function(Map<String, dynamic>) onOpenSummary;
+
+  const _RiddenList({
+    required this.rides,
+    required this.onOpenRoute,
+    required this.onOpenSummary,
+  });
+
+  @override
+  State<_RiddenList> createState() => _RiddenListState();
+}
+
+class _RiddenListState extends State<_RiddenList> {
+  final _searchController = TextEditingController();
+  String _search = '';
+
+  /// Periodo: null = todas, o el número de días hacia atrás.
+  ///
+  /// Aquí el filtro útil es el tiempo, no la dificultad: las rodadas se
+  /// buscan por "cuándo la hice", y la lista crece sin parar.
+  int? _days;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Map<String, dynamic>> get _filtered {
+    final q = _search.toLowerCase();
+    final limit = _days == null
+        ? null
+        : DateTime.now().subtract(Duration(days: _days!));
+
+    return widget.rides.where((ride) {
+      final route = Map<String, dynamic>.from(ride['route'] ?? {});
+
+      if (q.isNotEmpty) {
+        final title  = '${route['title'] ?? ''}'.toLowerCase();
+        final origin = '${route['origin'] ?? ''}'.toLowerCase();
+        if (!title.contains(q) && !origin.contains(q)) return false;
+      }
+
+      if (limit != null) {
+        final started = DateTime.tryParse('${ride['started_at']}')?.toLocal();
+        if (started == null || started.isBefore(limit)) return false;
+      }
+
+      return true;
+    }).toList();
+  }
+
+  bool get _hasFilters => _search.isNotEmpty || _days != null;
 
   String _formatDate(String? iso) {
     final date = iso == null ? null : DateTime.tryParse(iso);
@@ -719,21 +809,87 @@ class _RiddenList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (rides.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.two_wheeler, color: AppColors.grey, size: 48),
-            const SizedBox(height: 16),
-            Text('my_routes.empty_ridden'.tr(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
-          ]),
-        ),
-      );
-    }
+    final filtered = _filtered;
 
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        child: TextField(
+          controller: _searchController,
+          style: const TextStyle(color: AppColors.white, fontSize: 14),
+          onChanged: (v) => setState(() => _search = v),
+          decoration: InputDecoration(
+            hintText: 'my_routes.search_hint'.tr(),
+            hintStyle: const TextStyle(color: AppColors.grey, fontSize: 13),
+            prefixIcon: const Icon(Icons.search, color: AppColors.grey, size: 20),
+            suffixIcon: _search.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear, color: AppColors.grey, size: 18),
+                    onPressed: () => setState(() {
+                      _search = '';
+                      _searchController.clear();
+                    }),
+                  )
+                : null,
+            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          ),
+        ),
+      ),
+
+      SizedBox(
+        height: 44,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          children: [
+            _FilterChip(
+                label: 'my_routes.period_month'.tr(),
+                active: _days == 30,
+                color: AppColors.orange,
+                onTap: () => setState(() => _days = _days == 30 ? null : 30)),
+            _FilterChip(
+                label: 'my_routes.period_year'.tr(),
+                active: _days == 365,
+                color: AppColors.cyan,
+                onTap: () => setState(() => _days = _days == 365 ? null : 365)),
+            if (_hasFilters)
+              _FilterChip(
+                  label: 'my_routes.filter_clear'.tr(),
+                  active: false,
+                  color: AppColors.grey,
+                  onTap: () => setState(() {
+                        _search = '';
+                        _searchController.clear();
+                        _days = null;
+                      })),
+          ],
+        ),
+      ),
+
+      Expanded(
+        child: filtered.isEmpty
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.two_wheeler, color: AppColors.grey, size: 48),
+                    const SizedBox(height: 16),
+                    Text(
+                        _hasFilters
+                            ? 'my_routes.empty_filters'.tr()
+                            : 'my_routes.empty_ridden'.tr(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: AppColors.grey, fontSize: 14, height: 1.5)),
+                  ]),
+                ),
+              )
+            : _buildList(filtered),
+      ),
+    ]);
+  }
+
+  Widget _buildList(List<Map<String, dynamic>> rides) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: rides.length,
@@ -765,7 +921,9 @@ class _RiddenList extends StatelessWidget {
         final pois = (ride['visited_pois_count'] as num?)?.toInt() ?? 0;
         final achievements = (ride['achievements_count'] as num?)?.toInt() ?? 0;
 
-        return Container(
+        return GestureDetector(
+          onTap: () => widget.onOpenRoute(ride),
+          child: Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
             color: AppColors.surface,
@@ -901,7 +1059,7 @@ class _RiddenList extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () => onTap(ride),
+                    onPressed: () => widget.onOpenSummary(ride),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.orange,
                       minimumSize: const Size(0, 44),
@@ -916,6 +1074,7 @@ class _RiddenList extends StatelessWidget {
               ]),
             ),
           ]),
+          ),
         );
       },
     );

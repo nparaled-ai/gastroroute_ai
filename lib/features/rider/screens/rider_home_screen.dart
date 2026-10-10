@@ -191,14 +191,45 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
     final recovered = await RouteTrackingManager.instance.resume(
       trackingId: tracking['id'] as int,
       routeId: tracking['route_id'] as int,
+      data: tracking,
     );
 
-    if (!recovered || !mounted) return;
+    if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('tracking.resumed'.tr()),
-      backgroundColor: AppColors.surface,
-    ));
+    // El servidor dice que hay una ruta grabándose, pero en este móvil no está
+    // su recorrido. Pasa si se reinstaló la app, se borraron sus datos o se
+    // empezó la ruta en otro móvil. Eso SÍ hay que decirlo: la ruta se queda
+    // abierta en el servidor y, como no hay nada que recuperar, la barra
+    // inferior no va a aparecer para avisar.
+    if (!recovered) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('tracking.resume_failed'.tr()),
+        backgroundColor: AppColors.error,
+        duration: const Duration(seconds: 8),
+        action: SnackBarAction(
+          label: 'tracking.resume_failed_action'.tr(),
+          textColor: AppColors.white,
+          onPressed: () =>
+              context.push('/rider/routes/${tracking['route_id']}'),
+        ),
+      ));
+      return;
+    }
+
+    // Cuando se recupera bien no se dice nada: la barra inferior ya enseña
+    // que hay una ruta grabándose, con sus kilómetros. Un aviso encima sobra.
+    //
+    // Antes se saltaba SIEMPRE a la pantalla de ruta en curso, y era un
+    // estorbo: durante una ruta el motero abre la app para cualquier cosa —en
+    // la moto basta con que arranque sola la app del fabricante para que la
+    // nuestra pase a segundo plano y haya que volver a entrar— y se le
+    // empujaba a una pantalla que encima tenía que cerrar.
+    //
+    // Ahora el acceso lo da la barra inferior, visible en toda la app
+    // (ActiveTrackingBar). El salto se reserva para cuando hay algo que
+    // decidir: que la llegada al destino ya esté detectada y espere
+    // confirmación.
+    if (!RouteTrackingManager.instance.state.arrived) return;
 
     context.push('/rider/tracking', extra: tracking);
   }

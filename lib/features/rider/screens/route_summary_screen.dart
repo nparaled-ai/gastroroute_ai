@@ -127,6 +127,18 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
     // enseña solo el tiempo total, en vez de un "0h 00m" que parecería un error.
     final movingSeconds = (widget.tracking['moving_seconds'] as num?)?.toInt();
     final speed = (widget.tracking['avg_speed_kmh'] as num?)?.toDouble() ?? 0;
+
+    // La media se calcula sobre el tiempo EN MOVIMIENTO, igual que en la
+    // pestaña de rodadas: con el tiempo total, una parada larga para comer
+    // la hunde y deja de contar cómo se rodó. El tiempo parado no se esconde,
+    // se ve restando "En movimiento" del "Tiempo" que hay al lado.
+    //
+    // Si el tracking es anterior a moving_seconds se usa la media que ya
+    // calculó el servidor, para no inventar un número distinto.
+    final effectiveSeconds = movingSeconds ?? seconds;
+    final speedKmh =
+        effectiveSeconds > 0 ? km / (effectiveSeconds / 3600) : speed;
+
     final gaps = (widget.tracking['gps_gaps'] as num?)?.toInt() ?? 0;
     final rejected = widget.tracking['rejected_reason'];
 
@@ -176,7 +188,9 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
                 ),
                 const SizedBox(width: 12),
               ],
-              _Stat(label: 'summary.avg_speed'.tr(), value: '${speed.toStringAsFixed(0)} km/h'),
+              _Stat(
+                  label: 'summary.avg_speed'.tr(),
+                  value: '${speedKmh.toStringAsFixed(0)} km/h'),
             ]),
 
             if (rejected != null) ...[

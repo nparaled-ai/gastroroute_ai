@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import '../providers/route_share_service.dart';
 import '../providers/friendship_service.dart';
 import '../providers/route_tracking_service.dart';
 import '../../../core/services/route_tracking_manager.dart';
+import '../../../core/services/battery_optimization.dart';
 
 class RouteDetailScreen extends StatefulWidget {
   final int routeId;
@@ -57,10 +59,26 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   bool _publishing = false;
   Map<String, dynamic>? _currentWeather;
 
+  /// Para repintar los botones cuando arranca o termina una grabación.
+  ///
+  /// La ruta puede finalizarse o descartarse desde otra pantalla, y entonces
+  /// esta tiene que volver a ofrecer "Iniciar ruta" sin recargar nada.
+  StreamSubscription<TrackingState>? _trackingSub;
+
   @override
   void initState() {
     super.initState();
     _loadRoute();
+
+    _trackingSub = RouteTrackingManager.instance.stream.listen((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _trackingSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _downloadGpx() async {
@@ -134,6 +152,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
 
     // Ya se está grabando algo: no hay nada que ofrecer.
     if (RouteTrackingManager.instance.isTracking) return;
+
+    // Ni tampoco si esta ruta ya se rodó.
+    if (_hasBeenRidden) return;
 
     // Solo tiene sentido en rutas que el motero va a hacer.
     if (!_isOwner && !_isJoined) return;
@@ -542,16 +563,30 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     final endLat = _coord(_route!['destination_lat']) ?? _coord(_route!['origin_lat']);
     final endLng = _coord(_route!['destination_lng']) ?? _coord(_route!['origin_lng']);
 
+    // La ruta se mete en los datos del tracking para que la barra inferior
+    // pueda abrir la pantalla de ruta en curso sin pedir nada al servidor:
+    // esa barra se pulsa en mitad de la sierra, sin cobertura.
+    final trackingData = <String, dynamic>{
+      ...tracking,
+      'route': tracking['route'] ?? _route,
+    };
+
     await RouteTrackingManager.instance.start(
       trackingId: tracking['id'] as int,
       routeId: _route!['id'] as int,
+      data: trackingData,
       targetLat: endLat,
       targetLng: endLng,
     );
 
     if (!mounted) return;
     setState(() => _startingTracking = false);
-    context.push('/rider/tracking', extra: tracking);
+
+    // Aviso del ahorro de batería: una sola vez, y solo si hace falta. No
+    // bloquea — la ruta ya está grabándose.
+    unawaited(BatteryOptimization.warnIfNeeded(context));
+
+    context.push('/rider/tracking', extra: trackingData);
   }
 
   /// Coordenada del servidor a double, venga como número o como texto.
@@ -645,13 +680,30 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
 
   int? get _fuelRangeKm => _route?['fuel_range_km'] as int?;
 
-  bool get _isFuture =>
-      _route?['departure_date'] != null &&
-      DateTime.tryParse(_route!['departure_date'])?.isAfter(DateTime.now()) == true;
+  // Había aquí un `_isFuture` con el mismo fallo que `_isPast`: comparaba la
+  // fecha a las 00:00 contra el instante actual, así que la ruta de hoy no era
+  // ni futura ni presente. Se ha quitado; donde se usaba ahora va `!_isPast`.
 
-  bool get _isPast =>
-      _route?['departure_date'] != null &&
-      DateTime.tryParse(_route!['departure_date'])?.isBefore(DateTime.now()) == true;
+  /// ¿La fecha de la ruta ya pasó?
+  ///
+  /// Se compara por DÍA, no por instante. `departure_date` es solo la fecha
+  /// ("2026-10-10"), así que se parsea como las 00:00 de ese día: comparar eso
+  /// con `DateTime.now()` hacía que la ruta de HOY contara como pasada desde
+  /// que amanecía. Dos efectos, y el segundo era el gordo:
+  ///  - "Repetir" aparecía en la ruta de hoy todo el día, incluso rodándola.
+  ///  - El clima está detrás de `!_isPast`, así que la ruta de hoy no enseñaba
+  ///    el tiempo. El día que más importa.
+  bool get _isPast {
+    final raw = _route?['departure_date'];
+    if (raw == null) return false;
+
+    final date = DateTime.tryParse(raw.toString());
+    if (date == null) return false;
+
+    final now = DateTime.now();
+    return DateTime(date.year, date.month, date.day)
+        .isBefore(DateTime(now.year, now.month, now.day));
+  }
 
   /// ¿Se puede reprogramar esta ruta?
   ///
@@ -682,7 +734,53 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   /// una salida con la fecha de hoy: la ruta pasaría a Rodadas y perderías la
   /// planificación sin quererlo. En las pasadas tampoco, porque para eso está
   /// Repetir, que crea una copia con fecha nueva.
-  bool get _canStartTracking => _isToday && (_isOwner || _isJoined);
+  /// Y que no se haya rodado ya.
+  ///
+  /// Sin esa condición, una ruta ya hecha seguía ofreciendo "Iniciar ruta" el
+  /// resto del día: se entraba desde el aviso de salida, que sigue en la
+  /// bandeja, y la app invitaba a grabarla otra vez. Para volver a hacerla
+  /// está "Repetir", que crea una ruta nueva con su fecha.
+  ///
+  /// Las descartadas no cuentan como rodadas, así que si el motero descartó
+  /// una grabación sí puede volver a empezar.
+  /// Y que no haya ya una grabación en marcha, de esta ruta o de otra.
+  ///
+  /// Sin esta condición el botón "Iniciar ruta" seguía ahí con una ruta
+  /// grabándose, y pulsarlo era destructivo sin avisar: el servidor marca como
+  /// descartado el tracking anterior al abrir uno nuevo
+  /// (`RouteTrackingController::start`). O sea que entrar en una ruta de
+  /// Previstas y pulsar por curiosidad te tiraba la ruta que estabas rodando.
+  bool get _canStartTracking =>
+      _isToday &&
+      (_isOwner || _isJoined) &&
+      !_hasBeenRidden &&
+      !RouteTrackingManager.instance.isTracking;
+
+  /// Se está grabando precisamente esta ruta.
+  bool get _isTrackingThisRoute =>
+      RouteTrackingManager.instance.isTracking &&
+      _route != null &&
+      RouteTrackingManager.instance.routeId == _route!['id'];
+
+  /// Se está grabando otra ruta distinta de esta.
+  bool get _isTrackingOtherRoute =>
+      RouteTrackingManager.instance.isTracking && !_isTrackingThisRoute;
+
+  /// Abre la pantalla de la ruta que se está grabando.
+  void _openTracking() {
+    final data = RouteTrackingManager.instance.data;
+    if (data != null) {
+      context.push('/rider/tracking', extra: data);
+      return;
+    }
+
+    // Sin los datos guardados no se puede pintar esa pantalla. Es raro, pero
+    // mejor decirlo que dejar un botón que no hace nada.
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('tracking.resume_failed'.tr()),
+      backgroundColor: AppColors.error,
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -842,6 +940,69 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       const SizedBox(height: 10),
                     ],
 
+                    // ── Ya se está grabando ESTA ruta ─────────────────
+                    // En vez de "Iniciar", que la volvería a empezar, se
+                    // ofrece volver a la grabación en marcha.
+                    if (_isTrackingThisRoute) ...[
+                      ElevatedButton(
+                        onPressed: _openTracking,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.orange,
+                          minimumSize: const Size(double.infinity, 52),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.fiber_manual_record,
+                                  color: Colors.white, size: 14),
+                              const SizedBox(width: 8),
+                              Text('tracking.view_in_progress'.tr(),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700)),
+                            ]),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+
+                    // ── Se está grabando OTRA ruta ────────────────────
+                    // Aquí no se puede empezar: el servidor descartaría la
+                    // que está en marcha. Se explica y se da la salida.
+                    if (_isTrackingOtherRoute && _isToday && !_hasBeenRidden) ...[
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.greyDark),
+                        ),
+                        child: Row(children: [
+                          const Icon(Icons.info_outline,
+                              color: AppColors.grey, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text('tracking.other_in_progress'.tr(),
+                                style: const TextStyle(
+                                    color: AppColors.grey,
+                                    fontSize: 12,
+                                    height: 1.4)),
+                          ),
+                        ]),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          onPressed: _openTracking,
+                          child: Text('tracking.view_in_progress'.tr(),
+                              style: const TextStyle(color: AppColors.orange)),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+
                     // ── Botón Google Maps ─────────────────────────────
                     ElevatedButton(
                       onPressed: _openMaps,
@@ -988,11 +1149,23 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                         ]),
                     ],
 
-                    // ── Compartir (cualquier ruta propia aún privada) ──
-                    // Ya no se exige que sea futura: compartir una ruta es
-                    // compartir el recorrido, no la fecha, y una ruta buena
-                    // sigue siendo buena aunque no llegaras a hacerla.
-                    if (_isOwner && _route!['visibility'] == 'private') ...[
+                    // ── Compartir (ruta propia y privada, aún por hacer) ──
+                    // Lo que hace este botón es mandar INVITACIONES para
+                    // unirse a la ruta. Eso solo tiene sentido en una ruta que
+                    // todavía no ha ocurrido: a una que va rodando, que ya
+                    // terminó o cuya fecha pasó, no se une nadie.
+                    //
+                    // Antes se permitía en rutas pasadas, con el criterio de
+                    // que "compartir una ruta es compartir el recorrido, no la
+                    // fecha". Decisión del usuario (2026-10-10): no. Enseñar
+                    // el recorrido de una ruta hecha para que otros la repitan
+                    // es otra cosa distinta, y tiene su propio sitio: el
+                    // catálogo de rutas públicas, que está pendiente.
+                    if (_isOwner &&
+                        _route!['visibility'] == 'private' &&
+                        !_isTrackingThisRoute &&
+                        !_hasBeenRidden &&
+                        !_isPast) ...[
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: _publishing ? null : _showShareDialog,
@@ -1196,8 +1369,13 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
               ),
             ]),
           ])),
-          // Botón refrescar clima (solo en rutas futuras)
-          if (_isFuture)
+          // Botón refrescar clima: en cualquier ruta que no haya pasado.
+          //
+          // Estaba condicionado a `_isFuture`, que para la ruta de HOY es
+          // falso (compara la fecha a las 00:00 contra ahora). Justo el día de
+          // la ruta, que es cuando refrescar el tiempo sirve de algo, no había
+          // botón.
+          if (!_isPast)
             GestureDetector(
               onTap: _refreshingWeather ? null : _refreshWeather,
               child: Container(
