@@ -1096,7 +1096,14 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                               ),
                             ),
                           // Si está apuntado en ruta de amigos → "No puedo ir"
-                          if (_isJoined && _route!['visibility'] == 'friends')
+                          //
+                          // Salvo que ya la esté rodando o la haya rodado: a
+                          // esas alturas "no puedo ir" no describe nada. Ya
+                          // fuiste.
+                          if (_isJoined &&
+                              _route!['visibility'] == 'friends' &&
+                              !_isTrackingThisRoute &&
+                              !_hasBeenRidden)
                             Expanded(
                               child: OutlinedButton(
                                 onPressed: _decline,

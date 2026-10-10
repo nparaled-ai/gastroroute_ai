@@ -65,7 +65,12 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
       if (!mounted) return;
       if (s.isActive && _departingRoute != null) {
         setState(() => _departingRoute = null);
+        return;
       }
+      // Repintar también al terminar una grabación: si no, la pantalla se
+      // queda con la tarjeta escondida por el filtro del build hasta que algo
+      // más la obligue a reconstruirse.
+      setState(() {});
     });
   }
 
@@ -135,6 +140,13 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
       );
 
       if (metres <= _nearOriginM) {
+        // Se vuelve a mirar AQUÍ, no solo al entrar: entre medias hay tres
+        // esperas (permiso, rutas, GPS: hasta 8 s) y _recoverTracking() corre
+        // en paralelo. La comprobación de arriba se hacía cuando el servidor
+        // aún no había contestado, así que la tarjeta aparecía invitando a
+        // empezar una ruta que ya se estaba grabando.
+        if (RouteTrackingManager.instance.isTracking) return;
+
         setState(() => _departingRoute = route);
         return;
       }
@@ -412,7 +424,11 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
 
             // Tarjeta de salida: solo aparece si hoy sales de ruta y estás en
             // el punto de salida. Ver _checkDeparture.
-            if (_departingRoute != null) ...[
+            // La condición de grabando se repite aquí, aunque _checkDeparture
+            // ya la mire: es el último filtro antes de pintar, y es el único
+            // que no depende de en qué orden hayan terminado las esperas.
+            if (_departingRoute != null &&
+                !RouteTrackingManager.instance.isTracking) ...[
               const SizedBox(height: 24),
               _DepartureCard(
                 title: '${_departingRoute!['title'] ?? ''}',
