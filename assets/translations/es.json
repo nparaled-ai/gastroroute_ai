@@ -314,6 +314,13 @@
         "empty_not_done": "No tienes rutas pendientes de hacer.",
         "not_counted": "No cuenta para tus logros: {reason}",
         "auto_closed": "Cerrada automáticamente a las 24 h",
+        "status_ridden": "Rodada",
+        "status_not_counted": "No contó",
+        "moving": "En movimiento",
+        "avg_speed": "Vel. media",
+        "pois": "Puntos",
+        "achievements": "Logros",
+        "view_summary": "Ver resumen",
         "source_ai": "IA",
         "source_maps": "Maps",
         "source_gpx": "GPX"

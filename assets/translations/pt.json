@@ -314,6 +314,13 @@
         "empty_not_done": "Não tens rotas por realizar.",
         "not_counted": "Não conta para as tuas conquistas: {reason}",
         "auto_closed": "Fechada automaticamente às 24 h",
+        "status_ridden": "Percorrida",
+        "status_not_counted": "Não contou",
+        "moving": "Em movimento",
+        "avg_speed": "Vel. média",
+        "pois": "Pontos",
+        "achievements": "Conquistas",
+        "view_summary": "Ver resumo",
         "source_ai": "IA",
         "source_maps": "Maps",
         "source_gpx": "GPX"

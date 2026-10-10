@@ -750,89 +750,204 @@ class _RiddenList extends StatelessWidget {
         final autoClosed = ride['status'] == 'auto_closed';
         final accent = rejected ? AppColors.error : AppColors.orange;
 
-        return GestureDetector(
-          onTap: () => onTap(ride),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: rejected ? AppColors.error.withValues(alpha: 0.4) : AppColors.greyDark),
-            ),
-            child: Row(children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(rejected ? Icons.block : Icons.two_wheeler,
-                    color: accent, size: 22),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(route['title']?.toString() ?? '',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: AppColors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 3),
-                  Text(_formatDate(ride['started_at'] as String?),
-                      style: const TextStyle(color: AppColors.grey, fontSize: 11)),
-                  const SizedBox(height: 6),
-                  Row(children: [
-                    _RideChip(text: '${km.toStringAsFixed(1)} km', color: accent),
-                    const SizedBox(width: 6),
-                    _RideChip(text: _formatDuration(seconds), color: AppColors.grey),
-                    const SizedBox(width: 6),
-                    _RideChip(
-                        text: '${speed.toStringAsFixed(0)} km/h', color: AppColors.grey),
-                  ]),
-                  if (rejected && ride['rejected_reason'] != null) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      'my_routes.not_counted'.tr(
-                          namedArgs: {'reason': ride['rejected_reason'].toString()}),
-                      style: const TextStyle(
-                          color: AppColors.error, fontSize: 10, height: 1.3),
-                    ),
-                  ],
-                  if (autoClosed) ...[
-                    const SizedBox(height: 6),
-                    Text('my_routes.auto_closed'.tr(),
-                        style: const TextStyle(color: AppColors.gold, fontSize: 10)),
-                  ],
-                ]),
-              ),
-              const Icon(Icons.chevron_right, color: AppColors.grey, size: 20),
-            ]),
+        // Tiempo en movimiento, sin las paradas. Las rodadas anteriores a que
+        // existiera este dato no lo traen: ahí se cae al tiempo total.
+        final movingSeconds = (ride['moving_seconds'] as num?)?.toInt();
+        final effective = movingSeconds ?? seconds;
+
+        // La media se calcula sobre el tiempo EN MOVIMIENTO, no sobre el
+        // total. Con el total, una parada larga para comer la hunde: los
+        // mismos 86 km en 4 h dan 21 km/h, que no dice nada de cómo se rodó,
+        // solo de cuánto se paró. Las dos duraciones se enseñan juntas, así
+        // que el tiempo parado no se oculta: se ve restando una de otra.
+        final speedKmh = effective > 0 ? km / (effective / 3600) : speed;
+
+        final pois = (ride['visited_pois_count'] as num?)?.toInt() ?? 0;
+        final achievements = (ride['achievements_count'] as num?)?.toInt() ?? 0;
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+                color: rejected ? AppColors.error.withValues(alpha: 0.4) : AppColors.greyDark),
           ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // Barra superior con la fecha, como en el resto de pestañas.
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.cyan.withValues(alpha: 0.1),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+              ),
+              child: Row(children: [
+                const Icon(Icons.event_available, color: AppColors.cyan, size: 14),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(_formatDate(ride['started_at'] as String?),
+                      style: const TextStyle(
+                          color: AppColors.cyan,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13)),
+                ),
+              ]),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Expanded(
+                    child: Text(route['title']?.toString() ?? 'my_routes.no_title'.tr(),
+                        style: const TextStyle(
+                            color: AppColors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15)),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: accent.withValues(alpha: 0.35)),
+                    ),
+                    child: Text(
+                        rejected
+                            ? 'my_routes.status_not_counted'.tr()
+                            : 'my_routes.status_ridden'.tr(),
+                        style: TextStyle(
+                            color: accent, fontSize: 10, fontWeight: FontWeight.w600)),
+                  ),
+                ]),
+                const SizedBox(height: 10),
+
+                Wrap(spacing: 8, runSpacing: 8, children: [
+                  _Chip(Icons.route, '${km.toStringAsFixed(1)} km', AppColors.orange),
+                  _Chip(Icons.access_time, _formatDuration(seconds), AppColors.cyan),
+                  if (route['difficulty'] != null)
+                    _Chip(Icons.terrain, route['difficulty'].toString(), AppColors.gold),
+                  _SourceChip(source: route['source_type']?.toString()),
+                ]),
+                const SizedBox(height: 8),
+
+                if (route['moto_info'] != null)
+                  Row(children: [
+                    const Icon(Icons.two_wheeler, color: AppColors.grey, size: 14),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim()
+                            + ' · ${route['moto_info']['engine_cc']} cc',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                      ),
+                    ),
+                  ]),
+                const SizedBox(height: 6),
+                Row(children: [
+                  const Icon(Icons.location_on_outlined, color: AppColors.grey, size: 14),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(route['origin']?.toString() ?? '',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+                  ),
+                ]),
+
+                // Lo que distingue a una rodada de una ruta planificada: lo
+                // que pasó de verdad.
+                const SizedBox(height: 12),
+                const Divider(color: AppColors.greyDark, height: 1),
+                const SizedBox(height: 12),
+                Row(children: [
+                  _RideStat(
+                    label: 'my_routes.moving'.tr(),
+                    value: _formatDuration(effective),
+                  ),
+                  _RideStat(
+                    label: 'my_routes.avg_speed'.tr(),
+                    value: '${speedKmh.toStringAsFixed(0)} km/h',
+                  ),
+                  _RideStat(
+                    label: 'my_routes.pois'.tr(),
+                    value: '$pois',
+                  ),
+                  _RideStat(
+                    label: 'my_routes.achievements'.tr(),
+                    value: '$achievements',
+                    color: achievements > 0 ? AppColors.gold : null,
+                  ),
+                ]),
+
+                if (rejected && ride['rejected_reason'] != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'my_routes.not_counted'.tr(
+                        namedArgs: {'reason': ride['rejected_reason'].toString()}),
+                    style: const TextStyle(
+                        color: AppColors.error, fontSize: 11, height: 1.3),
+                  ),
+                ],
+                if (autoClosed) ...[
+                  const SizedBox(height: 10),
+                  Text('my_routes.auto_closed'.tr(),
+                      style: const TextStyle(color: AppColors.gold, fontSize: 11)),
+                ],
+
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => onTap(ride),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.orange,
+                      minimumSize: const Size(0, 44),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: Text('my_routes.view_summary'.tr(),
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ]),
+            ),
+          ]),
         );
       },
     );
   }
 }
 
-class _RideChip extends StatelessWidget {
-  final String text;
-  final Color color;
+/// Un dato de la rodada: etiqueta pequeña arriba y valor debajo.
+///
+/// Los cuatro reparten el ancho a partes iguales para que queden alineados
+/// entre tarjetas, aunque los valores midan distinto.
+class _RideStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color? color;
 
-  const _RideChip({required this.text, required this.color});
+  const _RideStat({required this.label, required this.value, this.color});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(text,
-          style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w600)),
+    return Expanded(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: AppColors.grey, fontSize: 10)),
+        const SizedBox(height: 2),
+        Text(value,
+            style: TextStyle(
+                color: color ?? AppColors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600)),
+      ]),
     );
   }
 }

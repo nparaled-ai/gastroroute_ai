@@ -314,6 +314,13 @@
         "empty_not_done": "Du hast keine ausstehenden Routen.",
         "not_counted": "Zählt nicht für deine Erfolge: {reason}",
         "auto_closed": "Nach 24 Std. automatisch geschlossen",
+        "status_ridden": "Gefahren",
+        "status_not_counted": "Zählt nicht",
+        "moving": "In Bewegung",
+        "avg_speed": "Ø Tempo",
+        "pois": "Punkte",
+        "achievements": "Erfolge",
+        "view_summary": "Übersicht ansehen",
         "source_ai": "KI",
         "source_maps": "Maps",
         "source_gpx": "GPX"

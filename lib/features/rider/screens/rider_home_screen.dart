@@ -332,8 +332,17 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      // Desplazable: la columna era fija y, al añadir la tarjeta de salida,
+      // los accesos de abajo (logros, amigos) se salían de la pantalla y no
+      // había forma de llegar a ellos. Tampoco cabían ya en pantallas
+      // pequeñas ni con el tamaño de letra del sistema aumentado.
+      body: SingleChildScrollView(
+        // El margen inferior suma el alto de la barra de navegación del
+        // sistema: sin eso la última tarjeta queda medio tapada por los
+        // botones del móvil al llegar al final del desplazamiento.
+        padding: EdgeInsets.fromLTRB(
+          24, 24, 24, 32 + MediaQuery.of(context).padding.bottom,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

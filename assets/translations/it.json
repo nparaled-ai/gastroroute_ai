@@ -314,6 +314,13 @@
         "empty_not_done": "Non hai percorsi in sospeso.",
         "not_counted": "Non conta per i tuoi traguardi: {reason}",
         "auto_closed": "Chiuso automaticamente dopo 24 h",
+        "status_ridden": "Percorsa",
+        "status_not_counted": "Non conta",
+        "moving": "In movimento",
+        "avg_speed": "Vel. media",
+        "pois": "Punti",
+        "achievements": "Obiettivi",
+        "view_summary": "Vedi riepilogo",
         "source_ai": "IA",
         "source_maps": "Maps",
         "source_gpx": "GPX"

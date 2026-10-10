@@ -314,6 +314,13 @@
         "empty_not_done": "Vous n'avez aucun itinéraire non effectué.",
         "not_counted": "Ne compte pas pour vos trophées : {reason}",
         "auto_closed": "Clôturé automatiquement après 24 h",
+        "status_ridden": "Parcourue",
+        "status_not_counted": "Non comptée",
+        "moving": "En mouvement",
+        "avg_speed": "Vit. moyenne",
+        "pois": "Points",
+        "achievements": "Succès",
+        "view_summary": "Voir le résumé",
         "source_ai": "IA",
         "source_maps": "Maps",
         "source_gpx": "GPX"

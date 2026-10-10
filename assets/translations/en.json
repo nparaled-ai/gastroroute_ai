@@ -314,6 +314,13 @@
         "empty_not_done": "You have no routes left undone.",
         "not_counted": "Does not count towards your achievements: {reason}",
         "auto_closed": "Closed automatically after 24 h",
+        "status_ridden": "Ridden",
+        "status_not_counted": "Didn't count",
+        "moving": "Moving",
+        "avg_speed": "Avg. speed",
+        "pois": "Points",
+        "achievements": "Achievements",
+        "view_summary": "View summary",
         "source_ai": "AI",
         "source_maps": "Maps",
         "source_gpx": "GPX"
