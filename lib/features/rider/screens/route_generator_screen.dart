@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/rider_profile_service.dart';
 import '../providers/route_service.dart';
+import 'poi_picker_screen.dart';
 
 class RouteGeneratorScreen extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -29,6 +31,28 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   int? _selectedMotoId;
   String _preference  = 'mixto';
   String _difficulty  = 'moderada';
+
+  /// Cuántas paradas con desvío acepta: ninguna, pocas o muchas.
+  ///
+  /// "Pocas" por defecto: quien no toca esto quiere rodar, con un par de
+  /// sitios que merezcan la pena, no una visita guiada. Los puertos y
+  /// desfiladeros no cuentan aquí — se visitan al pasar.
+  String _poiStops    = 'pocas';
+
+  /// POIs de nuestra tabla que el motero ha elegido a mano. Obligatorios.
+  ///
+  /// Se guardan enteros, no solo los ids, para poder enseñar sus nombres aquí
+  /// y para que el selector pueda listarlos aunque el filtro activo los deje
+  /// fuera al volver a entrar.
+  List<Map<String, dynamic>> _selectedPois = [];
+
+  /// Filtros del selector, para encontrarlo como lo dejaste.
+  String? _poiCategory;
+  String? _poiQuery;
+  int? _poiRadiusKm;
+
+  List<int> get _selectedPoiIds =>
+      _selectedPois.map((p) => p['id'] as int).toList();
   bool   _circular    = true;
   bool   _avoidHighways = true;
   int    _hours       = 4;
@@ -77,6 +101,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       _circular           = data['circular'] ?? true;
       _avoidHighways      = data['avoid_highways'] ?? true;
       _preference         = data['preference'] ?? 'mixto';
+      _poiStops           = data['poi_stops'] ?? 'pocas';
+      _selectedPois       = List<Map<String, dynamic>>.from(data['pois_elegidos'] ?? []);
       _difficulty         = data['difficulty'] ?? 'moderada';
       _durationMode       = data['duration_mode'] ?? 'hours';
       _hours              = (data['hours'] ?? 4) is double
@@ -135,6 +161,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     _lunchTimeController.dispose();
     _dinnerTimeController.dispose();
     for (final c in _customPointControllers) c.dispose();
+    for (final t in _searchDebounce.values) t.cancel();
     super.dispose();
   }
 
@@ -199,9 +226,22 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     }
   }
 
-  Future<void> _searchOrigin(String query) async {
-    setState(() { _originValidated = false; _originSuggestions = []; });
-    if (query.length < 3) return;
+  void _searchOrigin(String query) {
+    if (_originValidated) {
+      setState(() => _originValidated = false);
+    }
+
+    if (query.length < 3) {
+      if (_originSuggestions.isNotEmpty) {
+        setState(() => _originSuggestions = []);
+      }
+      return;
+    }
+
+    _debounced('origin', () => _fetchOrigin(query));
+  }
+
+  Future<void> _fetchOrigin(String query) async {
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
         'q': query, 'lang': 'es',
@@ -220,9 +260,48 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     } catch (_) {}
   }
 
-  Future<void> _searchDestination(String query) async {
-    setState(() { _destinationValidated = false; _destinationSuggestions = []; });
-    if (query.length < 3) return;
+  /// Temporizadores de los buscadores de lugares, uno por campo.
+  ///
+  /// Sin esto se pedían sugerencias a Google EN CADA TECLA: escribir
+  /// "Santander" eran siete llamadas, cada una ida y vuelta al servidor. Se
+  /// notaba al escribir y además Places Autocomplete es de lo más caro de la
+  /// API. Ahora se espera a que el motero pare.
+  final Map<String, Timer> _searchDebounce = {};
+
+  void _debounced(String field, VoidCallback action) {
+    _searchDebounce[field]?.cancel();
+    _searchDebounce[field] =
+        Timer(const Duration(milliseconds: 400), action);
+  }
+
+  /// El reseteo es inmediato y solo se retrasa la llamada: así el campo
+  /// responde al instante aunque la búsqueda tarde.
+  /// Al teclear NO se repinta nada: ni se borran las sugerencias ni se toca
+  /// el estado.
+  ///
+  /// Cada `setState` aquí reconstruye la pantalla entera, que pasa de 1.500
+  /// líneas de widgets, y eso es lo que hacía que el teclado fuera a tirones.
+  /// El primer intento —borrar sugerencias solo si las había— no arregló gran
+  /// cosa: en cuanto aparecen, cada tecla siguiente las borraba otra vez.
+  ///
+  /// Así que se dejan a la vista hasta que llegan las nuevas. Además de ser
+  /// más rápido se ve mejor: la lista no parpadea entre letra y letra.
+  void _searchDestination(String query) {
+    if (_destinationValidated) {
+      setState(() => _destinationValidated = false);
+    }
+
+    if (query.length < 3) {
+      if (_destinationSuggestions.isNotEmpty) {
+        setState(() => _destinationSuggestions = []);
+      }
+      return;
+    }
+
+    _debounced('destination', () => _fetchDestination(query));
+  }
+
+  Future<void> _fetchDestination(String query) async {
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
         'q': query, 'lang': 'es',
@@ -252,14 +331,28 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
 
   double _toRad(double deg) => deg * pi / 180;
 
-  Future<void> _searchPoint(int index, String query) async {
+  void _searchPoint(int index, String query) {
     if (index >= _pointSuggestions.length) return;
-    setState(() {
-      _pointValidated[index] = false;
-      _pointCoords[index] = null;
-      _pointSuggestions[index] = [];
-    });
-    if (query.length < 3) return;
+
+    if (_pointValidated[index] || _pointCoords[index] != null) {
+      setState(() {
+        _pointValidated[index] = false;
+        _pointCoords[index] = null;
+      });
+    }
+
+    if (query.length < 3) {
+      if (_pointSuggestions[index].isNotEmpty) {
+        setState(() => _pointSuggestions[index] = []);
+      }
+      return;
+    }
+
+    _debounced('point$index', () => _fetchPoint(index, query));
+  }
+
+  Future<void> _fetchPoint(int index, String query) async {
+    if (index >= _pointSuggestions.length) return;
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
         'q': query, 'lang': 'es', 'poi': '1',
@@ -429,6 +522,61 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     }
   }
 
+  /// Abre el selector de POIs de nuestra base de datos.
+  ///
+  /// Hace falta el origen: sin él no hay desde dónde medir distancias, y es
+  /// mejor decirlo que abrir una pantalla vacía.
+  Future<void> _openPoiPicker() async {
+    final origin = _originController.text.trim();
+    final destination = _destinationController.text.trim();
+
+    if (origin.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('poi_picker.need_origin'.tr()),
+        backgroundColor: AppColors.error,
+      ));
+      return;
+    }
+
+    // En una ruta con destino los puntos no están en un círculo alrededor de
+    // la salida, sino a lo largo del trayecto. Sin saber adónde vas no hay
+    // trayecto, así que no hay nada que enseñar.
+    if (!_circular && destination.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('poi_picker.need_destination'.tr()),
+        backgroundColor: AppColors.error,
+      ));
+      return;
+    }
+
+    final result = await Navigator.of(context).push<Map<String, dynamic>>(
+      MaterialPageRoute(
+        builder: (_) => PoiPickerScreen(
+          origin: origin,
+          destination: _circular ? null : destination,
+          // Solo se pasan los km si el motero eligió ese modo: así el servidor
+          // acota el radio a lo que de verdad cabe en su ruta.
+          km: _durationMode == 'km' ? _km : null,
+          circular: _circular,
+          selected: _selectedPois,
+          initialCategory: _poiCategory,
+          initialQuery: _poiQuery,
+          initialRadiusKm: _poiRadiusKm,
+        ),
+      ),
+    );
+
+    if (result == null || !mounted) return;
+
+    setState(() {
+      _selectedPois =
+          List<Map<String, dynamic>>.from(result['pois'] ?? const []);
+      _poiCategory = result['category'];
+      _poiQuery = result['query'];
+      _poiRadiusKm = result['radius_km'];
+    });
+  }
+
   Future<void> _generate() async {
     if (_selectedMotoId == null) {
       setState(() => _error = 'planner.moto_required'.tr());
@@ -507,6 +655,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       'avoid_highways':       _avoidHighways,
       'preference':           _preference,
       'difficulty':           _difficulty,
+      'poi_stops':            _poiStops,
+      if (_selectedPoiIds.isNotEmpty) 'poi_ids': _selectedPoiIds,
       'duration_mode':        _durationMode,
       'hours':                _durationMode == 'hours' ? _hours : null,
       'km':                   _durationMode == 'km'    ? _km    : null,
@@ -543,6 +693,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       'avoid_highways': _avoidHighways,
       'preference':     _preference,
       'difficulty':     _difficulty,
+      'poi_stops':      _poiStops,
+      'poi_ids':        _selectedPoiIds,
       'duration_mode':  _durationMode,
       'hours':          _hours,
       'km':             _km,
@@ -1119,6 +1271,102 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     const SizedBox(width: 8),
                     _OptionChip(label: 'planner.hard'.tr(),     selected: _difficulty == 'exigente',  onTap: () => setState(() => _difficulty = 'exigente')),
                   ]),
+
+                  const SizedBox(height: 20),
+
+                  // 9a. Paradas de interés
+                  //
+                  // Los puertos, desfiladeros y parques naturales NO cuentan
+                  // aquí: se visitan al pasar, sin desviarse ni parar. Esto
+                  // regula solo las paradas de verdad — miradores, monumentos,
+                  // pueblos — que son las que cuestan kilómetros y tiempo.
+                  Text('planner.poi_stops'.tr(),
+                      style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                  const SizedBox(height: 4),
+                  Text('planner.poi_stops_help'.tr(),
+                      style: const TextStyle(color: AppColors.grey, fontSize: 11, height: 1.3)),
+                  const SizedBox(height: 8),
+                  Row(children: [
+                    _OptionChip(
+                        label: 'planner.poi_stops_none'.tr(),
+                        selected: _poiStops == 'ninguna',
+                        onTap: () => setState(() => _poiStops = 'ninguna')),
+                    const SizedBox(width: 8),
+                    _OptionChip(
+                        label: 'planner.poi_stops_few'.tr(),
+                        selected: _poiStops == 'pocas',
+                        onTap: () => setState(() => _poiStops = 'pocas')),
+                    const SizedBox(width: 8),
+                    _OptionChip(
+                        label: 'planner.poi_stops_many'.tr(),
+                        selected: _poiStops == 'muchas',
+                        onTap: () => setState(() => _poiStops = 'muchas')),
+                  ]),
+
+                  const SizedBox(height: 12),
+
+                  // Elegir POIs concretos de nuestra base de datos.
+                  //
+                  // Va justo debajo del selector de paradas porque son lo
+                  // mismo visto de otra forma: ahí dices CUÁNTAS quieres, aquí
+                  // CUÁLES. Y los que elijas a mano son obligatorios.
+                  OutlinedButton.icon(
+                    onPressed: _openPoiPicker,
+                    icon: const Icon(Icons.place_outlined,
+                        color: AppColors.cyan, size: 18),
+                    label: Text(
+                      _selectedPois.isEmpty
+                          ? 'poi_picker.choose'.tr()
+                          : 'poi_picker.chosen'.plural(_selectedPois.length),
+                      style: const TextStyle(color: AppColors.cyan),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 46),
+                      side: const BorderSide(color: AppColors.cyan),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+
+                  // Los nombres de los elegidos, debajo del botón.
+                  //
+                  // "3 puntos elegidos" no dice nada: desde esta pantalla no
+                  // hay forma de saber cuáles son sin volver a entrar. Cada
+                  // uno se puede quitar aquí mismo.
+                  if (_selectedPois.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: _selectedPois.map((poi) {
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedPois.remove(poi)),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.cyan.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Row(mainAxisSize: MainAxisSize.min, children: [
+                              Text('${poi['name']}',
+                                  style: const TextStyle(
+                                      color: AppColors.cyan, fontSize: 11)),
+                              const SizedBox(width: 6),
+                              const Icon(Icons.close,
+                                  color: AppColors.cyan, size: 13),
+                            ]),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 6),
+                    // Que se vea POR QUÉ la ruta no traerá sitios de propina:
+                    // elegir a mano desactiva los que añade la IA.
+                    Text('poi_picker.manual_note'.tr(),
+                        style: const TextStyle(
+                            color: AppColors.grey, fontSize: 10, height: 1.3)),
+                  ],
 
                   const SizedBox(height: 20),
 

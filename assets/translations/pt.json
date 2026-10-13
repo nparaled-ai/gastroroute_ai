@@ -166,6 +166,11 @@
         "duration": "Duração",
         "hours_available": "Horas disponíveis: {} h",
         "preference": "Preferência",
+        "poi_stops": "Pontos de interesse",
+        "poi_stops_help": "Portos de montanha e desfiladeiros vão sempre: a estrada já passa por eles. Isto limita os que obrigam a desviar.",
+        "poi_stops_none": "Nenhum",
+        "poi_stops_few": "Poucos",
+        "poi_stops_many": "Muitos",
         "curves": "🌀 Curvas",
         "landscape": "🏔️ Paisagem",
         "mixed": "⚖️ Misto",
@@ -207,6 +212,7 @@
         "dinner_stop": "Paragem para jantar",
         "hotels": "Alojamento sugerido",
         "open_maps": "ABRIR NO GOOGLE MAPS",
+        "maps_unavailable": "Não foi possível abrir esta rota no Google Maps.",
         "share": "PARTILHAR ROTA",
         "share_title": "Partilhar rota",
         "share_friends": "Partilhar com amigos",
@@ -538,6 +544,7 @@
         "weather_forecast_notice": "Previsão meteorológica para a data da rota",
         "shared": "Rota partilhada!",
         "open_maps": "Abrir no Google Maps",
+        "maps_unavailable": "Não foi possível abrir esta rota no Google Maps.",
         "download_gpx": "Descarregar GPX",
         "share_route": "Partilhar rota",
         "departure_time": "Partida: {time}",
@@ -558,5 +565,53 @@
         "deselect_all": "Retirar todos",
         "save_for_me": "Guardar para mim",
         "save_for_me_desc": "Só tu a podes ver. Vai aparecer em As Minhas Rotas."
+    },
+    "poi_picker": {
+        "title": "Pontos de interesse",
+        "choose": "Escolher pontos de interesse",
+        "chosen": {
+            "one": "{} ponto escolhido",
+            "other": "{} pontos escolhidos"
+        },
+        "done": "Pronto",
+        "map_title": "Pontos da zona",
+        "radius_note": "Só se mostram os pontos a menos de {km} km da partida: são os que cabem numa rota de {route} km.",
+        "pass_through": "De passagem",
+        "needs_stop": "Desvio",
+        "km_warning": {
+            "one": "Escolheste {} ponto que obriga a desviar: a rota vai ser um pouco mais longa do que pediste.",
+            "other": "Escolheste {} pontos que obrigam a desviar: a rota vai ser mais longa do que pediste."
+        },
+        "max_reached": {
+            "one": "No máximo {} ponto obrigatório.",
+            "other": "No máximo {} pontos obrigatórios."
+        },
+        "need_origin": "Escreve primeiro o ponto de partida.",
+        "empty": "Não há pontos de interesse catalogados nesta zona.",
+        "no_detours": "Pediste nenhum desvio, por isso só podes escolher pontos de passagem.",
+        "search_hint": "Procurar por nome…",
+        "radius_label": "Distância desde a partida",
+        "corridor_label": "Quanto te desvias da rota",
+        "type_label": "Tipo",
+        "all": "Todos",
+        "on_route": "Ao km {at} · a {off} km da rota",
+        "on_map": "{shown} de {total} no mapa",
+        "need_destination": "Escreve primeiro o destino.",
+        "cat_puerto_montana": "Portos",
+        "cat_mirador": "Miradouros",
+        "cat_monumento": "Monumentos",
+        "cat_monumento_natural": "Natureza",
+        "cat_embalse": "Barragens",
+        "cat_desfiladero": "Desfiladeiros",
+        "cat_parque_natural": "Parques",
+        "cat_pueblo_historico": "Aldeias",
+        "estimate": "Com estes pontos a rota terá cerca de {km} km (pediste {target}).",
+        "estimate_plain": "Com estes pontos a rota terá cerca de {km} km.",
+        "chosen_header": {
+            "one": "Escolhido",
+            "other": "Escolhidos ({})"
+        },
+        "manual_note": "Ao escolheres pontos à mão, a IA não acrescenta outros.",
+        "recommended": "Recomendado para a tua rota: {km} km"
     }
 }

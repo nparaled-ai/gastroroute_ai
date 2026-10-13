@@ -516,12 +516,59 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   }
 
   Future<void> _openMaps() async {
-    final url = _route?['google_maps_url'];
-    if (url == null) return;
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final uri = _mapsUri();
+
+    // Antes era `if (url == null) return;`: el boton no fallaba, simplemente
+    // no hacia nada. Y `google_maps_url` esta a NULL en todas las rutas que no
+    // pasaron por getDirections, asi que no hacer nada era lo habitual.
+    if (uri == null || !await canLaunchUrl(uri)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('route_detail.maps_unavailable'.tr()),
+        backgroundColor: AppColors.error,
+      ));
+      return;
     }
+
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  /// URL de Google Maps para esta ruta.
+  ///
+  /// Se prefiere la que guardó el servidor, porque lleva los `place_id` y Maps
+  /// clava los sitios. Pero solo existe en las rutas que pasaron por
+  /// `GoogleMapsService::getDirections`; las demás la tienen a NULL. En ese
+  /// caso se construye aquí con las coordenadas, que siempre están.
+  Uri? _mapsUri() {
+    final stored = _route?['google_maps_url'];
+    if (stored is String && stored.isNotEmpty) return Uri.tryParse(stored);
+
+    final oLat = _coord(_route?['origin_lat']);
+    final oLng = _coord(_route?['origin_lng']);
+    if (oLat == null || oLng == null) return null;
+
+    // En las circulares no hay destino: se vuelve al origen.
+    final dLat = _coord(_route?['destination_lat']) ?? oLat;
+    final dLng = _coord(_route?['destination_lng']) ?? oLng;
+
+    // El esquema de URL de Maps admite 9 puntos intermedios como máximo.
+    final wps = <String>[];
+    for (final wp in (_route?['waypoints'] as List? ?? const [])) {
+      if (wp is! Map) continue;
+      final lat = _coord(wp['lat']);
+      final lng = _coord(wp['lng']);
+      if (lat == null || lng == null) continue;
+      wps.add('$lat,$lng');
+      if (wps.length == 9) break;
+    }
+
+    return Uri.parse(
+      'https://www.google.com/maps/dir/?api=1'
+      '&origin=$oLat,$oLng'
+      '&destination=$dLat,$dLng'
+      '${wps.isEmpty ? '' : '&waypoints=${wps.join('|')}'}'
+      '&travelmode=driving',
+    );
   }
 
   /// Arranca el tracking GPS de esta ruta y abre la pantalla "Ruta en curso".

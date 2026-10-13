@@ -166,6 +166,11 @@
         "duration": "Durée",
         "hours_available": "Heures disponibles: {} h",
         "preference": "Préférence",
+        "poi_stops": "Points d'intérêt",
+        "poi_stops_help": "Les cols et les gorges sont toujours inclus : la route y passe déjà. Ceci limite ceux qui obligent à faire un détour.",
+        "poi_stops_none": "Aucun",
+        "poi_stops_few": "Quelques-uns",
+        "poi_stops_many": "Beaucoup",
         "curves": "🌀 Virages",
         "landscape": "🏔️ Paysage",
         "mixed": "⚖️ Mixte",
@@ -207,6 +212,7 @@
         "dinner_stop": "Arrêt dîner",
         "hotels": "Hébergement suggéré",
         "open_maps": "OUVRIR DANS GOOGLE MAPS",
+        "maps_unavailable": "Impossible d'ouvrir cet itinéraire dans Google Maps.",
         "share": "PARTAGER L'ITINÉRAIRE",
         "share_title": "Partager l'itinéraire",
         "share_friends": "Partager avec des amis",
@@ -538,6 +544,7 @@
         "weather_forecast_notice": "Prévisions météo pour la date de l'itinéraire",
         "shared": "Itinéraire partagé !",
         "open_maps": "Ouvrir dans Google Maps",
+        "maps_unavailable": "Impossible d'ouvrir cet itinéraire dans Google Maps.",
         "download_gpx": "Télécharger le GPX",
         "share_route": "Partager l'itinéraire",
         "departure_time": "Départ : {time}",
@@ -558,5 +565,53 @@
         "deselect_all": "Tout retirer",
         "save_for_me": "Garder pour moi",
         "save_for_me_desc": "Vous seul pouvez le voir. Il apparaîtra dans Mes itinéraires."
+    },
+    "poi_picker": {
+        "title": "Points d'intérêt",
+        "choose": "Choisir des points d'intérêt",
+        "chosen": {
+            "one": "{} point choisi",
+            "other": "{} points choisis"
+        },
+        "done": "Terminé",
+        "map_title": "Points de la zone",
+        "radius_note": "Seuls les points à moins de {km} km du départ sont affichés : ce sont ceux qui tiennent dans un itinéraire de {route} km.",
+        "pass_through": "Sur la route",
+        "needs_stop": "Détour",
+        "km_warning": {
+            "one": "Tu as choisi {} point qui oblige à faire un détour : l'itinéraire sera un peu plus long que demandé.",
+            "other": "Tu as choisi {} points qui obligent à faire un détour : l'itinéraire sera plus long que demandé."
+        },
+        "max_reached": {
+            "one": "Au maximum {} point obligatoire.",
+            "other": "Au maximum {} points obligatoires."
+        },
+        "need_origin": "Saisis d'abord le point de départ.",
+        "empty": "Aucun point d'intérêt répertorié dans cette zone.",
+        "no_detours": "Tu as demandé aucun détour, donc tu ne peux choisir que des points sur la route.",
+        "search_hint": "Rechercher par nom…",
+        "radius_label": "Distance depuis le départ",
+        "corridor_label": "Écart maximum par rapport à l'itinéraire",
+        "type_label": "Type",
+        "all": "Tous",
+        "on_route": "Au km {at} · à {off} km de l'itinéraire",
+        "on_map": "{shown} sur {total} sur la carte",
+        "need_destination": "Saisis d'abord la destination.",
+        "cat_puerto_montana": "Cols",
+        "cat_mirador": "Points de vue",
+        "cat_monumento": "Monuments",
+        "cat_monumento_natural": "Nature",
+        "cat_embalse": "Barrages",
+        "cat_desfiladero": "Gorges",
+        "cat_parque_natural": "Parcs",
+        "cat_pueblo_historico": "Villages",
+        "estimate": "Avec ces points l'itinéraire fera environ {km} km (tu en demandais {target}).",
+        "estimate_plain": "Avec ces points l'itinéraire fera environ {km} km.",
+        "chosen_header": {
+            "one": "Choisi",
+            "other": "Choisis ({})"
+        },
+        "manual_note": "Quand tu choisis toi-même, l'IA n'ajoute aucun point de son côté.",
+        "recommended": "Recommandé pour ton itinéraire : {km} km"
     }
 }

@@ -166,6 +166,11 @@
         "duration": "Dauer",
         "hours_available": "Verfügbare Stunden: {} h",
         "preference": "Präferenz",
+        "poi_stops": "Sehenswürdigkeiten",
+        "poi_stops_help": "Pässe und Schluchten sind immer dabei: die Straße führt ohnehin hindurch. Das hier begrenzt die, für die man einen Umweg fahren muss.",
+        "poi_stops_none": "Keine",
+        "poi_stops_few": "Wenige",
+        "poi_stops_many": "Viele",
         "curves": "🌀 Kurven",
         "landscape": "🏔️ Landschaft",
         "mixed": "⚖️ Gemischt",
@@ -207,6 +212,7 @@
         "dinner_stop": "Abendessen-Stopp",
         "hotels": "Empfohlene Unterkunft",
         "open_maps": "IN GOOGLE MAPS ÖFFNEN",
+        "maps_unavailable": "Diese Route konnte nicht in Google Maps geöffnet werden.",
         "share": "ROUTE TEILEN",
         "share_title": "Route teilen",
         "share_friends": "Mit Freunden teilen",
@@ -538,6 +544,7 @@
         "weather_forecast_notice": "Wettervorhersage für das Datum der Route",
         "shared": "Route geteilt!",
         "open_maps": "In Google Maps öffnen",
+        "maps_unavailable": "Diese Route konnte nicht in Google Maps geöffnet werden.",
         "download_gpx": "GPX herunterladen",
         "share_route": "Route teilen",
         "departure_time": "Abfahrt: {time}",
@@ -558,5 +565,53 @@
         "deselect_all": "Alle entfernen",
         "save_for_me": "Für mich speichern",
         "save_for_me_desc": "Nur du kannst sie sehen. Sie erscheint in Meine Routen."
+    },
+    "poi_picker": {
+        "title": "Sehenswürdigkeiten",
+        "choose": "Sehenswürdigkeiten auswählen",
+        "chosen": {
+            "one": "{} Punkt gewählt",
+            "other": "{} Punkte gewählt"
+        },
+        "done": "Fertig",
+        "map_title": "Punkte in der Gegend",
+        "radius_note": "Es werden nur Punkte innerhalb von {km} km vom Start gezeigt: genau die passen in eine Route von {route} km.",
+        "pass_through": "Am Weg",
+        "needs_stop": "Umweg",
+        "km_warning": {
+            "one": "Du hast {} Punkt mit Umweg gewählt: die Route wird etwas länger als gewünscht.",
+            "other": "Du hast {} Punkte mit Umweg gewählt: die Route wird länger als gewünscht."
+        },
+        "max_reached": {
+            "one": "Höchstens {} Pflichtpunkt.",
+            "other": "Höchstens {} Pflichtpunkte."
+        },
+        "need_origin": "Gib zuerst den Startpunkt ein.",
+        "empty": "In dieser Gegend sind keine Sehenswürdigkeiten erfasst.",
+        "no_detours": "Du hast keine Umwege gewählt, also kannst du nur Punkte am Weg auswählen.",
+        "search_hint": "Nach Namen suchen…",
+        "radius_label": "Entfernung vom Start",
+        "corridor_label": "Wie weit du von der Route abweichst",
+        "type_label": "Typ",
+        "all": "Alle",
+        "on_route": "Bei km {at} · {off} km abseits der Route",
+        "on_map": "{shown} von {total} auf der Karte",
+        "need_destination": "Gib zuerst das Ziel ein.",
+        "cat_puerto_montana": "Pässe",
+        "cat_mirador": "Aussichtspunkte",
+        "cat_monumento": "Denkmäler",
+        "cat_monumento_natural": "Natur",
+        "cat_embalse": "Stauseen",
+        "cat_desfiladero": "Schluchten",
+        "cat_parque_natural": "Parks",
+        "cat_pueblo_historico": "Dörfer",
+        "estimate": "Mit diesen Punkten wird die Route etwa {km} km lang (du wolltest {target}).",
+        "estimate_plain": "Mit diesen Punkten wird die Route etwa {km} km lang.",
+        "chosen_header": {
+            "one": "Gewählt",
+            "other": "Gewählt ({})"
+        },
+        "manual_note": "Wenn du selbst Punkte wählst, fügt die KI keine eigenen hinzu.",
+        "recommended": "Empfohlen für deine Route: {km} km"
     }
 }

@@ -166,6 +166,11 @@
         "duration": "Duración",
         "hours_available": "Horas disponibles: {} h",
         "preference": "Preferencia",
+        "poi_stops": "Puntos de interés",
+        "poi_stops_help": "Los puertos y desfiladeros van siempre: la carretera ya pasa por ellos. Esto regula los que obligan a desviarse.",
+        "poi_stops_none": "Ninguno",
+        "poi_stops_few": "Pocos",
+        "poi_stops_many": "Muchos",
         "curves": "🌀 Curvas",
         "landscape": "🏔️ Paisaje",
         "mixed": "⚖️ Mixto",
@@ -207,6 +212,7 @@
         "dinner_stop": "Parada para comer",
         "hotels": "Alojamiento sugerido",
         "open_maps": "ABRIR EN GOOGLE MAPS",
+        "maps_unavailable": "No se pudo abrir Google Maps con esta ruta.",
         "share": "COMPARTIR RUTA",
         "share_title": "Compartir ruta",
         "share_friends": "Compartir con amigos",
@@ -538,6 +544,7 @@
         "weather_forecast_notice": "Previsión meteorológica para la fecha de la ruta",
         "shared": "¡Ruta compartida!",
         "open_maps": "Abrir en Google Maps",
+        "maps_unavailable": "No se pudo abrir Google Maps con esta ruta.",
         "download_gpx": "Descargar GPX",
         "share_route": "Compartir ruta",
         "departure_time": "Salida: {time}",
@@ -558,5 +565,53 @@
         "deselect_all": "Quitar todos",
         "save_for_me": "Guardar para mí",
         "save_for_me_desc": "Solo tú puedes verla. Aparecerá en Mis Rutas."
+    },
+    "poi_picker": {
+        "title": "Puntos de interés",
+        "choose": "Elegir puntos de interés",
+        "chosen": {
+            "one": "{} punto elegido",
+            "other": "{} puntos elegidos"
+        },
+        "done": "Listo",
+        "map_title": "Puntos de la zona",
+        "radius_note": "Solo se muestran los que están a menos de {km} km de la salida, que son los que caben en una ruta de {route} km.",
+        "pass_through": "De paso",
+        "needs_stop": "Desvío",
+        "km_warning": {
+            "one": "Has elegido {} punto que obliga a desviarse: la ruta será algo más larga de lo pedido.",
+            "other": "Has elegido {} puntos que obligan a desviarse: la ruta será más larga de lo pedido."
+        },
+        "max_reached": {
+            "one": "Máximo {} punto obligatorio.",
+            "other": "Máximo {} puntos obligatorios."
+        },
+        "need_origin": "Escribe primero el punto de salida.",
+        "empty": "No hay puntos de interés catalogados en esta zona.",
+        "no_detours": "Has pedido ninguna ruta con desvío, así que solo puedes elegir puntos de paso.",
+        "search_hint": "Buscar por nombre…",
+        "radius_label": "Distancia desde la salida",
+        "corridor_label": "Cuánto te dejas desviar de la ruta",
+        "type_label": "Tipo",
+        "all": "Todos",
+        "on_route": "En el km {at} · a {off} km de la ruta",
+        "on_map": "{shown} de {total} en el mapa",
+        "need_destination": "Escribe primero el destino.",
+        "cat_puerto_montana": "Puertos",
+        "cat_mirador": "Miradores",
+        "cat_monumento": "Monumentos",
+        "cat_monumento_natural": "Naturaleza",
+        "cat_embalse": "Embalses",
+        "cat_desfiladero": "Desfiladeros",
+        "cat_parque_natural": "Parques",
+        "cat_pueblo_historico": "Pueblos",
+        "estimate": "Con estos puntos la ruta será de unos {km} km (pediste {target}).",
+        "estimate_plain": "Con estos puntos la ruta será de unos {km} km.",
+        "chosen_header": {
+            "one": "Elegido",
+            "other": "Elegidos ({})"
+        },
+        "manual_note": "Al elegir puntos a mano, la IA no añade otros por su cuenta.",
+        "recommended": "Recomendado para tu ruta: {km} km"
     }
 }

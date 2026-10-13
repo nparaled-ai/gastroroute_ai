@@ -166,6 +166,11 @@
         "duration": "Durata",
         "hours_available": "Ore disponibili: {} h",
         "preference": "Preferenza",
+        "poi_stops": "Punti di interesse",
+        "poi_stops_help": "Passi e gole ci sono sempre: la strada ci passa già. Questo limita quelli che obbligano a deviare.",
+        "poi_stops_none": "Nessuno",
+        "poi_stops_few": "Pochi",
+        "poi_stops_many": "Molti",
         "curves": "🌀 Curve",
         "landscape": "🏔️ Paesaggio",
         "mixed": "⚖️ Misto",
@@ -207,6 +212,7 @@
         "dinner_stop": "Sosta cena",
         "hotels": "Alloggio suggerito",
         "open_maps": "APRI IN GOOGLE MAPS",
+        "maps_unavailable": "Non è stato possibile aprire questo percorso in Google Maps.",
         "share": "CONDIVIDI PERCORSO",
         "share_title": "Condividi percorso",
         "share_friends": "Condividi con amici",
@@ -538,6 +544,7 @@
         "weather_forecast_notice": "Previsioni meteo per la data del percorso",
         "shared": "Percorso condiviso!",
         "open_maps": "Apri in Google Maps",
+        "maps_unavailable": "Non è stato possibile aprire questo percorso in Google Maps.",
         "download_gpx": "Scarica GPX",
         "share_route": "Condividi percorso",
         "departure_time": "Partenza: {time}",
@@ -558,5 +565,53 @@
         "deselect_all": "Rimuovi tutti",
         "save_for_me": "Salva per me",
         "save_for_me_desc": "Solo tu puoi vederlo. Apparirà in I miei percorsi."
+    },
+    "poi_picker": {
+        "title": "Punti di interesse",
+        "choose": "Scegli punti di interesse",
+        "chosen": {
+            "one": "{} punto scelto",
+            "other": "{} punti scelti"
+        },
+        "done": "Fatto",
+        "map_title": "Punti della zona",
+        "radius_note": "Si mostrano solo i punti entro {km} km dalla partenza: sono quelli che ci stanno in un percorso di {route} km.",
+        "pass_through": "Di passaggio",
+        "needs_stop": "Deviazione",
+        "km_warning": {
+            "one": "Hai scelto {} punto che richiede una deviazione: il percorso sarà un po' più lungo del richiesto.",
+            "other": "Hai scelto {} punti che richiedono una deviazione: il percorso sarà più lungo del richiesto."
+        },
+        "max_reached": {
+            "one": "Al massimo {} punto obbligatorio.",
+            "other": "Al massimo {} punti obbligatori."
+        },
+        "need_origin": "Scrivi prima il punto di partenza.",
+        "empty": "Non ci sono punti di interesse catalogati in questa zona.",
+        "no_detours": "Hai chiesto nessuna deviazione, quindi puoi scegliere solo punti di passaggio.",
+        "search_hint": "Cerca per nome…",
+        "radius_label": "Distanza dalla partenza",
+        "corridor_label": "Quanto ti allontani dal percorso",
+        "type_label": "Tipo",
+        "all": "Tutti",
+        "on_route": "Al km {at} · a {off} km dal percorso",
+        "on_map": "{shown} di {total} sulla mappa",
+        "need_destination": "Scrivi prima la destinazione.",
+        "cat_puerto_montana": "Passi",
+        "cat_mirador": "Punti panoramici",
+        "cat_monumento": "Monumenti",
+        "cat_monumento_natural": "Natura",
+        "cat_embalse": "Dighe",
+        "cat_desfiladero": "Gole",
+        "cat_parque_natural": "Parchi",
+        "cat_pueblo_historico": "Borghi",
+        "estimate": "Con questi punti il percorso sarà di circa {km} km (ne hai chiesti {target}).",
+        "estimate_plain": "Con questi punti il percorso sarà di circa {km} km.",
+        "chosen_header": {
+            "one": "Scelto",
+            "other": "Scelti ({})"
+        },
+        "manual_note": "Se scegli i punti tu, l'IA non ne aggiunge altri.",
+        "recommended": "Consigliato per il tuo percorso: {km} km"
     }
 }

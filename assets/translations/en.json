@@ -166,6 +166,11 @@
         "duration": "Duration",
         "hours_available": "Available hours: {} h",
         "preference": "Preference",
+        "poi_stops": "Points of interest",
+        "poi_stops_help": "Mountain passes and gorges are always included: the road already goes through them. This limits the ones that need a detour.",
+        "poi_stops_none": "None",
+        "poi_stops_few": "A few",
+        "poi_stops_many": "Many",
         "curves": "🌀 Curves",
         "landscape": "🏔️ Landscape",
         "mixed": "⚖️ Mixed",
@@ -207,6 +212,7 @@
         "dinner_stop": "Dinner stop",
         "hotels": "Suggested accommodation",
         "open_maps": "OPEN IN GOOGLE MAPS",
+        "maps_unavailable": "Could not open this route in Google Maps.",
         "share": "SHARE ROUTE",
         "share_title": "Share route",
         "share_friends": "Share with friends",
@@ -538,6 +544,7 @@
         "weather_forecast_notice": "Weather forecast for the route date",
         "shared": "Route shared!",
         "open_maps": "Open in Google Maps",
+        "maps_unavailable": "Could not open this route in Google Maps.",
         "download_gpx": "Download GPX",
         "share_route": "Share route",
         "departure_time": "Departure: {time}",
@@ -558,5 +565,53 @@
         "deselect_all": "Clear all",
         "save_for_me": "Save for myself",
         "save_for_me_desc": "Only you can see it. It will appear in My Routes."
+    },
+    "poi_picker": {
+        "title": "Points of interest",
+        "choose": "Choose points of interest",
+        "chosen": {
+            "one": "{} point chosen",
+            "other": "{} points chosen"
+        },
+        "done": "Done",
+        "map_title": "Points in the area",
+        "radius_note": "Only points within {km} km of the start are shown: those are the ones that fit in a {route} km route.",
+        "pass_through": "On the way",
+        "needs_stop": "Detour",
+        "km_warning": {
+            "one": "You chose {} point that needs a detour: the route will be a bit longer than requested.",
+            "other": "You chose {} points that need a detour: the route will be longer than requested."
+        },
+        "max_reached": {
+            "one": "At most {} required point.",
+            "other": "At most {} required points."
+        },
+        "need_origin": "Enter the starting point first.",
+        "empty": "No points of interest listed in this area.",
+        "no_detours": "You asked for no detours, so you can only choose pass-through points.",
+        "search_hint": "Search by name…",
+        "radius_label": "Distance from the start",
+        "corridor_label": "How far off the route you will go",
+        "type_label": "Type",
+        "all": "All",
+        "on_route": "At km {at} · {off} km off the route",
+        "on_map": "{shown} of {total} on the map",
+        "need_destination": "Enter the destination first.",
+        "cat_puerto_montana": "Passes",
+        "cat_mirador": "Viewpoints",
+        "cat_monumento": "Monuments",
+        "cat_monumento_natural": "Nature",
+        "cat_embalse": "Reservoirs",
+        "cat_desfiladero": "Gorges",
+        "cat_parque_natural": "Parks",
+        "cat_pueblo_historico": "Villages",
+        "estimate": "With these points the route will be about {km} km (you asked for {target}).",
+        "estimate_plain": "With these points the route will be about {km} km.",
+        "chosen_header": {
+            "one": "Chosen",
+            "other": "Chosen ({})"
+        },
+        "manual_note": "When you pick points yourself, the AI adds none of its own.",
+        "recommended": "Recommended for your route: {km} km"
     }
 }

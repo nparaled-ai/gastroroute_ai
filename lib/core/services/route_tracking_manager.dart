@@ -34,14 +34,26 @@ class RouteTrackingManager {
   static const _kArrivalDone  = 'tracking_arrival_done';
   static const _kData         = 'tracking_data';
 
+  // ── Umbrales de la detección de llegada ────────────────────────────────
+  //
+  // En compilación de depuración son mucho más pequeños, para poder probar la
+  // llegada sin hacer la ruta entera: con los de verdad hay que alejarse 2 km
+  // y volver. `kDebugMode` lo decide el compilador, así que en el APK de
+  // release estos valores NI SIQUIERA EXISTEN: no hay forma de activarlos
+  // desde fuera ni de que se cuelen en producción por descuido.
+  //
+  // Para probar en depuración: alejarse unos 100 m del punto de salida,
+  // volver, y quedarse 20 segundos a menos de 60 m.
+
   /// Radio alrededor del destino para dar la ruta por terminada.
-  static const double _arrivalRadiusM = 300;
+  static double get _arrivalRadiusM => kDebugMode ? 60 : 300;
 
   /// Hay que quedarse dentro del radio este tiempo antes de avisar.
   ///
   /// Sin esto, pasar por delante del destino a mitad de ruta —o rodear la
   /// manzana buscando aparcamiento— dispararía el aviso.
-  static const _arrivalDwell = Duration(minutes: 3);
+  static Duration get _arrivalDwell =>
+      kDebugMode ? const Duration(seconds: 20) : const Duration(minutes: 3);
 
   /// Hay que haberse alejado al menos esto del destino antes de que la
   /// detección se arme.
@@ -49,7 +61,7 @@ class RouteTrackingManager {
   /// Es imprescindible en rutas circulares, donde el destino ES el origen: sin
   /// este guardado, al arrancar ya estarías "en el destino" y te preguntaría
   /// si finalizas nada más salir de casa.
-  static const double _arrivalArmAfterM = 2000;
+  static double get _arrivalArmAfterM => kDebugMode ? 100 : 2000;
 
   /// Precisión peor que esta y el punto se descarta. Mismo umbral que aplica
   /// el servidor: sin él, el ruido del GPS infla los kilómetros estando parado.
@@ -548,6 +560,25 @@ class RouteTrackingManager {
     _arrivalNotified = true;
     await _persist();
     await _notifyArrival();
+  }
+
+  /// Fuerza el aviso de llegada, como si se hubiera detectado el destino.
+  ///
+  /// Solo para probar: la detección real necesita alejarse del destino y
+  /// volver, que en una ruta de verdad son horas. Esto recorre exactamente el
+  /// mismo camino que la detección automática —misma marca, misma
+  /// notificación, mismo aviso por el stream— así que lo que se prueba es la
+  /// cadena entera, no un atajo.
+  ///
+  /// No hace nada fuera de depuración.
+  Future<void> debugForceArrival() async {
+    if (!kDebugMode) return;
+    if (_trackingId == null || _arrivalNotified) return;
+
+    _arrivalNotified = true;
+    await _persist();
+    await _notifyArrival();
+    _stateController.add(state);
   }
 
   Future<void> _notifyArrival() async {

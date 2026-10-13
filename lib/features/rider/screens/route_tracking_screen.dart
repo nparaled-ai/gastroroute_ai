@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -287,15 +288,25 @@ class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
 
               const SizedBox(height: 28),
 
-              // Kilómetros: el dato protagonista
+              // Kilómetros: el dato protagonista.
+              //
+              // En depuración, una pulsación larga sobre la cifra fuerza el
+              // aviso de llegada: probarlo de verdad son horas de ruta. En
+              // release el gesto no existe (kDebugMode lo resuelve el
+              // compilador).
               Center(
-                child: Column(children: [
-                  Text(_state.distanceKm.toStringAsFixed(1),
-                      style: const TextStyle(
-                          color: AppColors.orange, fontSize: 64, fontWeight: FontWeight.w700, height: 1)),
-                  Text('tracking.km'.tr(),
-                      style: const TextStyle(color: AppColors.grey, fontSize: 14)),
-                ]),
+                child: GestureDetector(
+                  onLongPress: kDebugMode
+                      ? () => RouteTrackingManager.instance.debugForceArrival()
+                      : null,
+                  child: Column(children: [
+                    Text(_state.distanceKm.toStringAsFixed(1),
+                        style: const TextStyle(
+                            color: AppColors.orange, fontSize: 64, fontWeight: FontWeight.w700, height: 1)),
+                    Text('tracking.km'.tr(),
+                        style: const TextStyle(color: AppColors.grey, fontSize: 14)),
+                  ]),
+                ),
               ),
 
               const SizedBox(height: 28),
