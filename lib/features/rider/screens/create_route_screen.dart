@@ -98,7 +98,10 @@ class _CreateRouteScreenState extends State<CreateRouteScreen> {
             title: 'create_route.ai_title'.tr(),
             desc: 'create_route.ai_desc'.tr(),
             tags: ['create_route.ai_tag1'.tr(), 'create_route.ai_tag2'.tr()],
-            onTap: () => _requireMoto(() => context.push('/rider/route-generator')),
+            // El asistente es ahora la puerta de la IA. El formulario sigue
+            // ahí, detrás de "Prefiero rellenarlo a mano": funciona y hay gente
+            // que prefiere los botones.
+            onTap: () => _requireMoto(() => context.push('/rider/route-assistant')),
           ),
           const SizedBox(height: 16),
 

@@ -14,6 +14,7 @@ import '../features/rider/screens/rider_edit_profile_screen.dart';
 import '../features/rider/screens/rider_motos_screen.dart';
 import '../features/rider/screens/rider_moto_form_screen.dart';
 import '../features/rider/screens/create_route_screen.dart';
+import '../features/rider/screens/route_assistant_screen.dart';
 import '../features/rider/screens/route_generator_screen.dart';
 import '../features/rider/screens/route_import_screen.dart';
 import '../features/rider/screens/route_import_gpx_screen.dart';
@@ -177,6 +178,11 @@ final router = GoRouter(
     GoRoute(
       path: '/rider/create-route',
       builder: (context, state) => const CreateRouteScreen(),
+    ),
+    // Asistente: una frase en vez de un formulario de veintitantos campos.
+    GoRoute(
+      path: '/rider/route-assistant',
+      builder: (context, state) => const RouteAssistantScreen(),
     ),
     GoRoute(
       path: '/rider/route-generator',
