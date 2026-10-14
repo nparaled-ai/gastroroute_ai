@@ -640,7 +640,7 @@
         "unclear": "No he entendido qué ruta quieres. Prueba a decirlo de otra forma, o rellénalo a mano.",
         "multi_day": "De momento solo puedo con rutas de un día. Para varios días, rellénalo a mano.",
         "empty": "Escribe qué ruta quieres.",
-        "f_origin": "Salida",
+        "f_origin": "Punto de salida",
         "f_destination": "Destino",
         "f_circular": "Tipo de ruta",
         "f_departure_date": "Fecha",
@@ -676,6 +676,20 @@
         "l_where": "Por dónde",
         "l_where_v": "por el Pirineo · hasta Santander",
         "l_roads": "Vías",
-        "l_roads_v": "sin autopistas (por defecto se evitan)"
+        "l_roads_v": "sin autopistas (por defecto se evitan)",
+        "missing_origin": "¿Desde dónde sales? Dime el bar, la gasolinera o el pueblo.",
+        "missing_destination": "¿Hasta dónde vas? La ruta no es circular.",
+        "missing_moto_id": "¿Con qué moto?",
+        "undefined": "Sin definir",
+        "v_no_lunch": "Sin parada para almorzar",
+        "v_no_dinner": "Sin parada para comer",
+        "v_duration_ai": "Lo decide la IA",
+        "d_km": "Kilómetros",
+        "d_hours": "Horas",
+        "d_ai": "Que decida la IA",
+        "range_km": "Entre {min} y {max} km",
+        "range_hours": "Entre {min} y {max} horas",
+        "range_needed": "Escribe un número",
+        "missing_departure_time": "¿A qué hora sales?"
     }
 }

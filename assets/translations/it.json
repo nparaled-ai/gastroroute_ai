@@ -640,7 +640,7 @@
         "unclear": "Non ho capito che giro vuoi. Prova a dirlo in altro modo, o compilalo a mano.",
         "multi_day": "Per ora posso solo giri di un giorno. Per più giorni, compilalo a mano.",
         "empty": "Scrivi che giro vuoi.",
-        "f_origin": "Partenza",
+        "f_origin": "Punto di partenza",
         "f_destination": "Destinazione",
         "f_circular": "Tipo di percorso",
         "f_departure_date": "Data",
@@ -676,6 +676,20 @@
         "l_where": "Dove",
         "l_where_v": "dalle parti dei Pirenei · fino a Santander",
         "l_roads": "Strade",
-        "l_roads_v": "senza autostrade (evitate di default)"
+        "l_roads_v": "senza autostrade (evitate di default)",
+        "missing_origin": "Da dove parti? Un bar, un distributore o un paese.",
+        "missing_destination": "Fino a dove vai? Il percorso non è circolare.",
+        "missing_moto_id": "Con quale moto?",
+        "undefined": "Non definito",
+        "v_no_lunch": "Senza sosta per pranzo",
+        "v_no_dinner": "Senza sosta per cena",
+        "v_duration_ai": "Decide l'IA",
+        "d_km": "Chilometri",
+        "d_hours": "Ore",
+        "d_ai": "Che decida l'IA",
+        "range_km": "Tra {min} e {max} km",
+        "range_hours": "Tra {min} e {max} ore",
+        "range_needed": "Scrivi un numero",
+        "missing_departure_time": "A che ora parti?"
     }
 }

@@ -640,7 +640,7 @@
         "unclear": "Não percebi que rota queres. Tenta dizer de outra forma, ou preenche à mão.",
         "multi_day": "Para já só consigo rotas de um dia. Para vários dias, preenche à mão.",
         "empty": "Escreve que rota queres.",
-        "f_origin": "Partida",
+        "f_origin": "Ponto de partida",
         "f_destination": "Destino",
         "f_circular": "Tipo de rota",
         "f_departure_date": "Data",
@@ -676,6 +676,20 @@
         "l_where": "Por onde",
         "l_where_v": "pelos Pirenéus · até Santander",
         "l_roads": "Vias",
-        "l_roads_v": "sem autoestradas (evitadas por omissão)"
+        "l_roads_v": "sem autoestradas (evitadas por omissão)",
+        "missing_origin": "De onde sais? Um bar, uma bomba ou uma aldeia.",
+        "missing_destination": "Até onde vais? A rota não é circular.",
+        "missing_moto_id": "Com que mota?",
+        "undefined": "Por definir",
+        "v_no_lunch": "Sem paragem para almoçar",
+        "v_no_dinner": "Sem paragem para jantar",
+        "v_duration_ai": "Decide a IA",
+        "d_km": "Quilómetros",
+        "d_hours": "Horas",
+        "d_ai": "Deixar a IA decidir",
+        "range_km": "Entre {min} e {max} km",
+        "range_hours": "Entre {min} e {max} horas",
+        "range_needed": "Escreve um número",
+        "missing_departure_time": "A que horas sais?"
     }
 }

@@ -640,7 +640,7 @@
         "unclear": "Ich habe nicht verstanden, welche Tour du willst. Sag es anders oder fülle es selbst aus.",
         "multi_day": "Momentan kann ich nur Tagestouren. Für mehrere Tage fülle es selbst aus.",
         "empty": "Schreib, welche Tour du willst.",
-        "f_origin": "Start",
+        "f_origin": "Startpunkt",
         "f_destination": "Ziel",
         "f_circular": "Routentyp",
         "f_departure_date": "Datum",
@@ -676,6 +676,20 @@
         "l_where": "Wo",
         "l_where_v": "rund um die Pyrenäen · bis Santander",
         "l_roads": "Wege",
-        "l_roads_v": "keine Autobahnen (werden standardmäßig gemieden)"
+        "l_roads_v": "keine Autobahnen (werden standardmäßig gemieden)",
+        "missing_origin": "Wo startest du? Eine Bar, eine Tankstelle oder ein Dorf.",
+        "missing_destination": "Wohin geht es? Die Route ist kein Rundkurs.",
+        "missing_moto_id": "Mit welchem Motorrad?",
+        "undefined": "Nicht festgelegt",
+        "v_no_lunch": "Ohne Mittagspause",
+        "v_no_dinner": "Ohne Abendpause",
+        "v_duration_ai": "Die KI entscheidet",
+        "d_km": "Kilometer",
+        "d_hours": "Stunden",
+        "d_ai": "Die KI entscheiden lassen",
+        "range_km": "Zwischen {min} und {max} km",
+        "range_hours": "Zwischen {min} und {max} Stunden",
+        "range_needed": "Gib eine Zahl ein",
+        "missing_departure_time": "Wann startest du?"
     }
 }

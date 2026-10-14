@@ -640,7 +640,7 @@
         "unclear": "I did not understand what ride you want. Try saying it another way, or fill it in yourself.",
         "multi_day": "For now I can only do one-day rides. For several days, fill it in yourself.",
         "empty": "Write what ride you want.",
-        "f_origin": "Start",
+        "f_origin": "Starting point",
         "f_destination": "Destination",
         "f_circular": "Route type",
         "f_departure_date": "Date",
@@ -676,6 +676,20 @@
         "l_where": "Where",
         "l_where_v": "around the Pyrenees · to Santander",
         "l_roads": "Roads",
-        "l_roads_v": "no motorways (avoided by default)"
+        "l_roads_v": "no motorways (avoided by default)",
+        "missing_origin": "Where do you set off from? A bar, a petrol station or a town.",
+        "missing_destination": "Where are you heading? The route is not a loop.",
+        "missing_moto_id": "Which bike?",
+        "undefined": "Not set",
+        "v_no_lunch": "No lunch stop",
+        "v_no_dinner": "No dinner stop",
+        "v_duration_ai": "Let the AI decide",
+        "d_km": "Kilometres",
+        "d_hours": "Hours",
+        "d_ai": "Let the AI decide",
+        "range_km": "Between {min} and {max} km",
+        "range_hours": "Between {min} and {max} hours",
+        "range_needed": "Enter a number",
+        "missing_departure_time": "What time do you set off?"
     }
 }

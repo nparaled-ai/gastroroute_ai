@@ -640,7 +640,7 @@
         "unclear": "Je n'ai pas compris quel itinéraire tu veux. Essaie autrement, ou remplis-le toi-même.",
         "multi_day": "Pour l'instant je ne fais que des sorties d'une journée. Pour plusieurs jours, remplis-le toi-même.",
         "empty": "Écris quel itinéraire tu veux.",
-        "f_origin": "Départ",
+        "f_origin": "Point de départ",
         "f_destination": "Destination",
         "f_circular": "Type d'itinéraire",
         "f_departure_date": "Date",
@@ -676,6 +676,20 @@
         "l_where": "Par où",
         "l_where_v": "du côté des Pyrénées · jusqu'à Santander",
         "l_roads": "Voies",
-        "l_roads_v": "sans autoroutes (évitées par défaut)"
+        "l_roads_v": "sans autoroutes (évitées par défaut)",
+        "missing_origin": "D'où pars-tu ? Un bar, une station-service ou un village.",
+        "missing_destination": "Jusqu'où vas-tu ? L'itinéraire n'est pas une boucle.",
+        "missing_moto_id": "Avec quelle moto ?",
+        "undefined": "Non défini",
+        "v_no_lunch": "Sans arrêt déjeuner",
+        "v_no_dinner": "Sans arrêt dîner",
+        "v_duration_ai": "L'IA décide",
+        "d_km": "Kilomètres",
+        "d_hours": "Heures",
+        "d_ai": "Laisser l'IA décider",
+        "range_km": "Entre {min} et {max} km",
+        "range_hours": "Entre {min} et {max} heures",
+        "range_needed": "Saisis un nombre",
+        "missing_departure_time": "À quelle heure pars-tu ?"
     }
 }

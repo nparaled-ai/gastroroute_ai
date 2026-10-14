@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
+import '../providers/rider_profile_service.dart';
 import '../providers/route_service.dart';
 
 /// Segunda pantalla del asistente: lo que he entendido, antes de generar.
@@ -49,27 +50,99 @@ class _RouteAssistantReviewScreenState
     'days', 'suggest_gas_stations', 'moto', 'understood', 'multi_day',
   };
 
-  /// Orden en el que se leen bien, no el que trae el JSON.
+  /// Todo lo que se enseña, en el orden en que se lee bien.
+  ///
+  /// La lista es FIJA: nada aparece ni desaparece al tocar algo. Antes se
+  /// ocultaban los campos vacíos y eso descolocaba la pantalla a cada cambio —
+  /// y en el peor caso te dejaba sin la fila que acababas de tocar.
   static const _order = [
     'origin', 'destination', 'circular', 'departure_date', 'departure_time',
-    'km', 'hours', 'duration_mode', 'zone_hint', 'preference', 'difficulty',
-    'avoid_highways', 'suggest_lunch', 'suggest_dinner', 'moto_id',
+    'duration', 'preference', 'difficulty', 'avoid_highways',
+    'suggest_lunch', 'suggest_dinner', 'moto_id', 'zone_hint',
   ];
 
-  List<String> get _missing =>
-      List<String>.from(widget.interpretation['missing'] ?? [])
-          .where((k) => _isEmpty(_fields[k]))
-          .toList();
+  /// Las motos del motero, para poder cambiarla sin salir de aquí.
+  List<Map<String, dynamic>> _motos = [];
 
-  bool _isEmpty(dynamic v) => v == null || v == '' || v == false;
+  /// Lo que falta, recalculado en cada pintada.
+  ///
+  /// Antes se tomaba tal cual la lista que mandó el servidor al interpretar la
+  /// frase, y eso se rompía en cuanto el motero tocaba algo: al cambiar a "con
+  /// destino", el destino no se pedía —no estaba en aquella lista— y se podía
+  /// generar una ruta con destino sin destino, con el botón activado y sin que
+  /// la fila apareciera siquiera, porque estaba vacía.
+  List<String> get _missing {
+    final required = <String>[
+      'origin',
+      'moto_id',
+      if (_fields['circular'] != true) 'destination',
+    ];
 
-  List<String> _visible(List<String> keys) {
-    final shown = keys
-        .where((k) => !_hidden.contains(k) && !_isEmpty(_fields[k]))
-        .toSet();
-
-    return _order.where(shown.contains).toList();
+    return required.where((k) => _isEmpty(_fields[k])).toList();
   }
+
+  /// Campos donde `false` SIGNIFICA algo y hay que enseñarlo igual.
+  ///
+  /// `circular: false` es "con destino" y `avoid_highways: false` es "autovías
+  /// permitidas": dos cosas que el motero ha elegido, no huecos. En cambio
+  /// `suggest_lunch: false` es que no para a comer, y de eso no hay nada que
+  /// decir.
+  ///
+  /// Tratarlos a todos igual hacía que la fila de circular DESAPARECIERA al
+  /// cambiarla a "con destino", dejándote sin forma de volver atrás.
+  static const _falseIsMeaningful = {'circular', 'avoid_highways'};
+
+  bool _isEmptyFor(String key, dynamic v) =>
+      v == null || v == '' || (v == false && !_falseIsMeaningful.contains(key));
+
+  bool _isEmpty(dynamic v) => v == null || v == '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMotos();
+  }
+
+  Future<void> _loadMotos() async {
+    final result = await RiderProfileService.getMotos();
+    if (!mounted || result['motos'] == null) return;
+    setState(() => _motos = List<Map<String, dynamic>>.from(result['motos']));
+  }
+
+  /// Si la fila tiene sentido en esta ruta.
+  ///
+  /// Lo único que se esconde es lo que no aplica: el destino en una circular, y
+  /// la zona solo si la mencionó. Todo lo demás está siempre, con valor o sin
+  /// él.
+  bool _applies(String key) => switch (key) {
+        'destination' => _fields['circular'] != true,
+        'zone_hint' => !_isEmpty(_fields['zone_hint']),
+        _ => !_hidden.contains(key),
+      };
+
+  /// Las filas que van en cada bloque.
+  ///
+  /// Lo que falta va arriba del todo; el resto se reparte entre lo que dijo el
+  /// motero y lo que se supuso por él.
+  List<String> _rowsOf(String block) {
+    return _order.where((k) {
+      if (!_applies(k)) return false;
+
+      final missing = _missing.contains(k);
+      if (block == 'missing') return missing;
+      if (missing) return false;
+
+      final said = _said.contains(k) || (k == 'duration' && _durationSaid);
+      return block == 'said' ? said : !said;
+    }).toList();
+  }
+
+  /// La duración es una fila que resume tres campos (modo, km y horas), así
+  /// que su origen se mira en los tres.
+  bool get _durationSaid =>
+      _said.contains('km') ||
+      _said.contains('hours') ||
+      _said.contains('duration_mode');
 
   /// Al corregir un campo pasa de "supuesto" a "dicho": ya no lo decidió la
   /// app, lo decidió el motero.
@@ -83,9 +156,9 @@ class _RouteAssistantReviewScreenState
 
   @override
   Widget build(BuildContext context) {
-    final said = _visible(_said);
-    final assumed = _visible(_assumed);
-    final missing = _missing;
+    final said = _rowsOf('said');
+    final assumed = _rowsOf('assumed');
+    final missing = _rowsOf('missing');
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -107,6 +180,8 @@ class _RouteAssistantReviewScreenState
         children: [
           if (missing.isNotEmpty) ...[
             for (final key in missing) _buildMissing(key),
+            const SizedBox(height: 6),
+            _group(missing, missing: true),
             const SizedBox(height: 14),
           ],
 
@@ -183,7 +258,9 @@ class _RouteAssistantReviewScreenState
         ]),
       );
 
-  Widget _group(List<String> keys, {bool assumed = false}) => Container(
+  Widget _group(List<String> keys,
+          {bool assumed = false, bool missing = false}) =>
+      Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(10),
@@ -196,16 +273,20 @@ class _RouteAssistantReviewScreenState
         child: Column(
           children: [
             for (var i = 0; i < keys.length; i++)
-              _row(keys[i], assumed: assumed, last: i == keys.length - 1),
+              _row(keys[i],
+                  assumed: assumed,
+                  missing: missing,
+                  last: i == keys.length - 1),
           ],
         ),
       );
 
-  Widget _row(String key, {required bool assumed, required bool last}) {
+  Widget _row(String key,
+      {required bool assumed, required bool last, bool missing = false}) {
     return InkWell(
       onTap: () => _edit(key),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           border: last
               ? null
@@ -216,16 +297,42 @@ class _RouteAssistantReviewScreenState
           Icon(_iconFor(key), color: AppColors.grey, size: 17),
           const SizedBox(width: 11),
           Expanded(
-            child: Text(_valueFor(key),
-                style: TextStyle(
-                    color: assumed ? AppColors.grey : AppColors.white,
-                    fontSize: 13)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // La etiqueta siempre visible: sin ella, "Circular" o "09:00"
+                // sueltos no dicen de qué campo son.
+                Text(_labelFor(key),
+                    style: const TextStyle(
+                        color: AppColors.grey, fontSize: 10.5)),
+                const SizedBox(height: 2),
+                Text(_valueFor(key),
+                    style: TextStyle(
+                        color: missing
+                            ? AppColors.grey
+                            : (assumed ? AppColors.grey : AppColors.white),
+                        fontSize: 13,
+                        fontStyle:
+                            missing ? FontStyle.italic : FontStyle.normal)),
+              ],
+            ),
           ),
-          const Icon(Icons.edit_outlined, color: AppColors.greyDark, size: 16),
+          // Verde si está resuelto, rojo si falta. De un vistazo se ve qué
+          // queda por tocar sin leer una línea.
+          Icon(
+            missing ? Icons.cancel_outlined : Icons.check_circle_outline,
+            color: missing ? AppColors.error : Colors.green,
+            size: 18,
+          ),
         ]),
       ),
     );
   }
+
+  String _labelFor(String key) => switch (key) {
+        'duration' => 'assistant.f_km'.tr(),
+        _ => 'assistant.f_$key'.tr(),
+      };
 
   Widget _buildMissing(String key) => GestureDetector(
         onTap: () => _edit(key),
@@ -241,10 +348,12 @@ class _RouteAssistantReviewScreenState
             const Icon(Icons.error_outline, color: AppColors.orange, size: 18),
             const SizedBox(width: 10),
             Expanded(
+              // Una pregunta concreta por cada dato, no un genérico "falta un
+              // dato: salida" — que se leía como la HORA de salida: el motero
+              // ponía la hora, el aviso seguía ahí, y no había forma de
+              // entender por qué.
               child: Text(
-                'assistant.missing'.tr(namedArgs: {
-                  'what': 'assistant.f_$key'.tr().toLowerCase(),
-                }),
+                _missingText(key),
                 style: const TextStyle(
                     color: AppColors.orange, fontSize: 12, height: 1.4),
               ),
@@ -253,6 +362,17 @@ class _RouteAssistantReviewScreenState
           ]),
         ),
       );
+
+  /// El texto del aviso, con respaldo por si algún día falta un campo nuevo.
+  String _missingText(String key) {
+    final specific = 'assistant.missing_$key';
+    final text = specific.tr();
+
+    return text == specific
+        ? 'assistant.missing'.tr(
+            namedArgs: {'what': 'assistant.f_$key'.tr().toLowerCase()})
+        : text;
+  }
 
   // ─── Cómo se lee cada campo ──────────────────────────────────────────
 
@@ -275,6 +395,10 @@ class _RouteAssistantReviewScreenState
   String _valueFor(String key) {
     final v = _fields[key];
 
+    if (key != 'duration' && _isEmptyFor(key, v) && _missing.contains(key)) {
+      return 'assistant.undefined'.tr();
+    }
+
     return switch (key) {
       'circular' => v == true
           ? 'assistant.v_circular'.tr()
@@ -282,16 +406,42 @@ class _RouteAssistantReviewScreenState
       'avoid_highways' => v == true
           ? 'assistant.v_avoid'.tr()
           : 'assistant.v_highways'.tr(),
-      'suggest_lunch' => 'assistant.v_lunch'.tr(),
-      'suggest_dinner' => 'assistant.v_dinner'.tr(),
-      'km' => '$v km',
-      'hours' => '$v h',
-      'duration_mode' => '${'assistant.f_hours'.tr()}: $v',
+      // Un "no" también se enseña: que NO pares a comer es una decisión, y si
+      // la fila desapareciera no habría forma de activarla.
+      'suggest_lunch' =>
+        v == true ? 'assistant.v_lunch'.tr() : 'assistant.v_no_lunch'.tr(),
+      'suggest_dinner' =>
+        v == true ? 'assistant.v_dinner'.tr() : 'assistant.v_no_dinner'.tr(),
+      'duration' => _durationText,
       'preference' => 'planner.${_prefKey(v)}'.tr(),
       'difficulty' => 'planner.${_diffKey(v)}'.tr(),
-      'moto_id' => _motoName ?? 'assistant.f_moto_id'.tr(),
+      'moto_id' => _motoName,
       _ => '$v',
     };
+  }
+
+  /// Una sola fila para los tres campos que dicen lo mismo.
+  ///
+  /// El motero piensa "cuánto quiero rodar", no "modo de duración más valor".
+  String get _durationText {
+    final mode = _fields['duration_mode'];
+
+    if (mode == 'km' && _fields['km'] != null) return '${_fields['km']} km';
+    if (mode == 'hours' && _fields['hours'] != null) {
+      return '${_fields['hours']} h';
+    }
+
+    return 'assistant.v_duration_ai'.tr();
+  }
+
+  String get _motoName {
+    final moto = _motos.firstWhere(
+      (m) => m['id'] == _fields['moto_id'],
+      orElse: () => const {},
+    );
+
+    if (moto.isEmpty) return 'assistant.undefined'.tr();
+    return '${moto['brand'] ?? ''} ${moto['model'] ?? ''}'.trim();
   }
 
   String _prefKey(dynamic v) => switch (v) {
@@ -305,8 +455,6 @@ class _RouteAssistantReviewScreenState
         'exigente' => 'hard',
         _ => 'moderate',
       };
-
-  String? _motoName;
 
   // ─── Corregir ────────────────────────────────────────────────────────
 
@@ -325,24 +473,318 @@ class _RouteAssistantReviewScreenState
       case 'departure_time':
         await _editTime();
       case 'circular':
-        _set('circular', !(_fields['circular'] == true));
+        // Una hoja con las dos opciones a la vista, no un interruptor a
+        // ciegas: tocar una fila y que cambie sola no deja ver entre qué
+        // estás eligiendo, aunque solo haya dos cosas.
+        final picked = await _editBool('circular',
+            'assistant.v_circular'.tr(), 'assistant.v_destination'.tr());
+        if (picked == null) return;
+
+        final circular = picked;
+
+        if (circular) {
+          // Una circular no tiene destino: dejarlo puesto lo enseñaria en la
+          // lista y se mandaria al servidor, que lo ignora. Confunde para nada.
+          setState(() {
+            _fields.remove('destination');
+            _said.remove('destination');
+            _assumed.remove('destination');
+          });
+        } else if (_isEmpty(_fields['destination'])) {
+          // Acaba de decir que va a algun sitio: lo logico es preguntarle
+          // adonde ahora, no dejarselo como un aviso mas que resolver luego.
+          await _editPlace('destination');
+        }
       case 'avoid_highways':
-        _set('avoid_highways', !(_fields['avoid_highways'] == true));
+        await _editBool(key, 'assistant.v_avoid'.tr(),
+            'assistant.v_highways'.tr(), apply: true);
       case 'suggest_lunch':
-        _set('suggest_lunch', !(_fields['suggest_lunch'] == true));
+        await _editBool(key, 'assistant.v_lunch'.tr(),
+            'assistant.v_no_lunch'.tr(), apply: true);
       case 'suggest_dinner':
-        _set('suggest_dinner', !(_fields['suggest_dinner'] == true));
+        await _editBool(key, 'assistant.v_dinner'.tr(),
+            'assistant.v_no_dinner'.tr(), apply: true);
       case 'preference':
         await _editChoice(key, const ['curvas', 'paisaje', 'mixto'],
             (v) => 'planner.${_prefKey(v)}'.tr());
       case 'difficulty':
         await _editChoice(key, const ['tranquila', 'moderada', 'exigente'],
             (v) => 'planner.${_diffKey(v)}'.tr());
-      default:
-        // Lo que no tiene editor propio se corrige en el formulario completo,
-        // que ya los tiene todos. Mejor eso que catorce pantallas nuevas.
-        await _openFullForm();
+      case 'duration':
+        await _editDuration();
+      case 'moto_id':
+        await _editMoto();
+      case 'zone_hint':
+        await _editText(key);
     }
+  }
+
+  /// Límites que acepta el generador. Los mismos que valida el servidor: si
+  /// aquí dejáramos pasar 4.000 km, el error llegaría al final y sin explicar.
+  static const _minKm = 50;
+  static const _maxKm = 800;
+  static const _minHours = 1;
+  static const _maxHours = 24;
+
+  String _rangeHint(String mode) => mode == 'km'
+      ? 'assistant.range_km'.tr(
+          namedArgs: {'min': '$_minKm', 'max': '$_maxKm'})
+      : 'assistant.range_hours'.tr(
+          namedArgs: {'min': '$_minHours', 'max': '$_maxHours'});
+
+  String? _rangeError(String mode, String text) {
+    if (mode == 'ai') return null;
+
+    final value = int.tryParse(text.trim());
+    if (value == null) return 'assistant.range_needed'.tr();
+
+    final min = mode == 'km' ? _minKm : _minHours;
+    final max = mode == 'km' ? _maxKm : _maxHours;
+
+    return (value < min || value > max) ? _rangeHint(mode) : null;
+  }
+
+  /// Elegir entre dos opciones, con las dos a la vista.
+  ///
+  /// Nada de interruptores silenciosos: tocar una fila y que cambie sola no
+  /// deja ver entre qué estás eligiendo. Devuelve null si se cierra sin elegir.
+  Future<bool?> _editBool(
+    String key,
+    String labelTrue,
+    String labelFalse, {
+    bool apply = false,
+  }) async {
+    final picked = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+      builder: (ctx) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(_labelFor(key),
+                  style: const TextStyle(
+                      color: AppColors.grey,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600)),
+            ),
+          ),
+          for (final option in [true, false])
+            ListTile(
+              title: Text(option ? labelTrue : labelFalse,
+                  style: const TextStyle(color: AppColors.white, fontSize: 14)),
+              trailing: (_fields[key] == true) == option
+                  ? const Icon(Icons.check, color: AppColors.orange)
+                  : null,
+              onTap: () => Navigator.pop(ctx, option),
+            ),
+        ]),
+      ),
+    );
+
+    if (picked != null && apply) _set(key, picked);
+    return picked;
+  }
+
+  /// Cuánto quiere rodar: por kilómetros, por horas, o que lo decida la IA.
+  Future<void> _editDuration() async {
+    final controller = TextEditingController(
+      text: '${_fields['duration_mode'] == 'km' ? _fields['km'] ?? '' : _fields['hours'] ?? ''}',
+    );
+    var mode = '${_fields['duration_mode'] ?? 'ai'}';
+
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => Padding(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: SafeArea(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(children: [
+                  for (final m in const ['km', 'hours', 'ai'])
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: GestureDetector(
+                          onTap: () => setSheet(() => mode = m),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: mode == m
+                                  ? AppColors.orange
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(9),
+                              border: Border.all(
+                                  color: mode == m
+                                      ? AppColors.orange
+                                      : AppColors.greyDark),
+                            ),
+                            child: Text('assistant.d_$m'.tr(),
+                                style: TextStyle(
+                                    color: mode == m
+                                        ? AppColors.background
+                                        : AppColors.grey,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600)),
+                          ),
+                        ),
+                      ),
+                    ),
+                ]),
+              ),
+              if (mode != 'ai')
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: TextField(
+                    controller: controller,
+                    keyboardType: TextInputType.number,
+                    autofocus: true,
+                    onChanged: (_) => setSheet(() {}),
+                    style: const TextStyle(
+                        color: AppColors.white, fontSize: 15),
+                    decoration: InputDecoration(
+                      suffixText: mode == 'km' ? 'km' : 'h',
+                      suffixStyle: const TextStyle(color: AppColors.grey),
+                      // Los límites a la vista desde el principio: enterarse
+                      // de que 4.000 km no vale al darle a generar, con un
+                      // error del servidor, es la peor forma de saberlo.
+                      helperText: _rangeHint(mode),
+                      helperStyle:
+                          const TextStyle(color: AppColors.grey, fontSize: 11),
+                      errorText: _rangeError(mode, controller.text),
+                      filled: true,
+                      fillColor: AppColors.background,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(9),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: ElevatedButton(
+                  onPressed: _rangeError(mode, controller.text) != null
+                      ? null
+                      : () => Navigator.pop(ctx, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.orange,
+                    minimumSize: const Size(double.infinity, 46),
+                  ),
+                  child: Text('common.save'.tr(),
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w700)),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+
+    if (saved != true) return;
+
+    final value = int.tryParse(controller.text.trim());
+
+    setState(() {
+      _fields['duration_mode'] = mode;
+      _fields['km'] = mode == 'km' ? value : null;
+      _fields['hours'] = mode == 'hours' ? value : null;
+    });
+
+    // La fila de duración resume tres campos: basta con marcar uno.
+    _set('duration_mode', mode);
+  }
+
+  Future<void> _editMoto() async {
+    if (_motos.isEmpty) return;
+
+    final picked = await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: _motos
+              .map((m) => ListTile(
+                    leading: const Icon(Icons.two_wheeler,
+                        color: AppColors.grey, size: 20),
+                    title: Text('${m['brand']} ${m['model']}',
+                        style: const TextStyle(color: AppColors.white)),
+                    trailing: _fields['moto_id'] == m['id']
+                        ? const Icon(Icons.check, color: AppColors.orange)
+                        : null,
+                    onTap: () => Navigator.pop(ctx, m['id'] as int),
+                  ))
+              .toList(),
+        ),
+      ),
+    );
+
+    if (picked != null) _set('moto_id', picked);
+  }
+
+  Future<void> _editText(String key) async {
+    final controller = TextEditingController(text: '${_fields[key] ?? ''}');
+
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              TextField(
+                controller: controller,
+                autofocus: true,
+                style: const TextStyle(color: AppColors.white, fontSize: 15),
+                decoration: InputDecoration(
+                  labelText: _labelFor(key),
+                  labelStyle: const TextStyle(color: AppColors.grey),
+                  filled: true,
+                  fillColor: AppColors.background,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(9),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.orange,
+                  minimumSize: const Size(double.infinity, 46),
+                ),
+                child: Text('common.save'.tr(),
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w700)),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+
+    if (saved == true) _set(key, controller.text.trim());
   }
 
   Future<void> _editPlace(String key) async {
