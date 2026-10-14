@@ -30,6 +30,9 @@ class _RouteAssistantScreenState extends State<RouteAssistantScreen> {
   String? _zone;
   String? _error;
 
+  /// La leyenda arranca cerrada. Ver el comentario donde se pinta.
+  bool _legendOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -234,7 +237,96 @@ class _RouteAssistantScreenState extends State<RouteAssistantScreen> {
                 .toList(),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
+
+          // Qué entiende el asistente.
+          //
+          // Los ejemplos enseñan UNA frase; esto enseña el VOCABULARIO, que es
+          // lo que de verdad quita el miedo a la caja en blanco. Y las
+          // palabras en claro no son decorativas: "curvas", "tranquila" o
+          // "almorzar" son literalmente los valores que reconoce el
+          // intérprete, así que esto es el diccionario real, no una ayuda
+          // genérica.
+          //
+          // Plegada por defecto: ocho filas más tres ejemplos empujaban el
+          // botón de Continuar a dos pantallas de distancia. Quien necesite el
+          // diccionario lo abre; quien ya sabe qué pedir, ni lo ve.
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: () => setState(() => _legendOpen = !_legendOpen),
+                  borderRadius: BorderRadius.circular(11),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(13, 12, 13, 12),
+                    child: Row(children: [
+                      const Icon(Icons.info_outline,
+                          color: AppColors.cyan, size: 15),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text('assistant.legend_title'.tr(),
+                            style: const TextStyle(
+                                color: AppColors.cyan,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700)),
+                      ),
+                      Icon(
+                        _legendOpen ? Icons.expand_less : Icons.expand_more,
+                        color: AppColors.cyan,
+                        size: 19,
+                      ),
+                    ]),
+                  ),
+                ),
+                if (_legendOpen) ...[
+                const Divider(
+                    color: AppColors.greyDark, height: 1, indent: 13, endIndent: 13),
+                for (final row in const [
+                  ['l_when', 'l_when_v'],
+                  ['l_how_much', 'l_how_much_v'],
+                  ['l_road', 'l_road_v'],
+                  ['l_pace', 'l_pace_v'],
+                  ['l_stops', 'l_stops_v'],
+                  ['l_start', 'l_start_v'],
+                  ['l_where', 'l_where_v'],
+                  ['l_roads', 'l_roads_v'],
+                ])
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(13, 7, 13, 7),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 76,
+                          child: Text('assistant.${row[0]}'.tr(),
+                              style: const TextStyle(
+                                  color: AppColors.white,
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600)),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text('assistant.${row[1]}'.tr(),
+                              style: const TextStyle(
+                                  color: AppColors.grey,
+                                  fontSize: 11.5,
+                                  height: 1.5)),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 6),
+                ],
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
 
           ElevatedButton(
             onPressed: _loading ? null : _continue,
