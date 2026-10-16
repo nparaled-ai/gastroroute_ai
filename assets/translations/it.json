@@ -690,6 +690,12 @@
         "range_km": "Tra {min} e {max} km",
         "range_hours": "Tra {min} e {max} ore",
         "range_needed": "Scrivi un numero",
-        "missing_departure_time": "A che ora parti?"
+        "missing_departure_time": "A che ora parti?",
+        "step_route": "Il percorso",
+        "step_of": "Passo {n} di 2",
+        "f_duration": "Quanto voglio guidare",
+        "row_missing": "Manca — tocca per inserirlo",
+        "tag_assumed": "presunto",
+        "blocked_many": "Mancano ancora {n} dati"
     }
 }

@@ -690,6 +690,12 @@
         "range_km": "Between {min} and {max} km",
         "range_hours": "Between {min} and {max} hours",
         "range_needed": "Enter a number",
-        "missing_departure_time": "What time do you set off?"
+        "missing_departure_time": "What time do you set off?",
+        "step_route": "The route",
+        "step_of": "Step {n} of 2",
+        "f_duration": "How far I want to ride",
+        "row_missing": "Missing — tap to set it",
+        "tag_assumed": "assumed",
+        "blocked_many": "{n} details still missing"
     }
 }

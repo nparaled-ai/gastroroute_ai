@@ -690,6 +690,12 @@
         "range_km": "Entre {min} y {max} km",
         "range_hours": "Entre {min} y {max} horas",
         "range_needed": "Escribe un número",
-        "missing_departure_time": "¿A qué hora sales?"
+        "missing_departure_time": "¿A qué hora sales?",
+        "step_route": "La ruta",
+        "step_of": "Paso {n} de 2",
+        "f_duration": "Cuánto quiero rodar",
+        "row_missing": "Falta — toca para ponerlo",
+        "tag_assumed": "supuesto",
+        "blocked_many": "Faltan {n} datos por poner"
     }
 }

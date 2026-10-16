@@ -690,6 +690,12 @@
         "range_km": "Zwischen {min} und {max} km",
         "range_hours": "Zwischen {min} und {max} Stunden",
         "range_needed": "Gib eine Zahl ein",
-        "missing_departure_time": "Wann startest du?"
+        "missing_departure_time": "Wann startest du?",
+        "step_route": "Die Route",
+        "step_of": "Schritt {n} von 2",
+        "f_duration": "Wie weit ich fahren will",
+        "row_missing": "Fehlt — zum Festlegen tippen",
+        "tag_assumed": "angenommen",
+        "blocked_many": "Es fehlen noch {n} Angaben"
     }
 }

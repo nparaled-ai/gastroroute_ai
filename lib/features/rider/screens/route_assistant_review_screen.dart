@@ -8,15 +8,26 @@ import '../../../core/theme/app_theme.dart';
 import '../providers/rider_profile_service.dart';
 import '../providers/route_service.dart';
 
-/// Segunda pantalla del asistente: lo que he entendido, antes de generar.
+/// Cómo está cada fila del resumen.
 ///
-/// Lo que decide si esto funciona es la separación en dos bloques: **lo que el
-/// motero dijo** y **lo que se ha supuesto por él**. Un resumen de siete líneas
-/// iguales se lee en diagonal; separándolas, la vista se va sola a lo que no
-/// eligió, que es justo donde puede estar el error.
+/// [said] lo dijo el motero, [assumed] lo puso la app por él, [missing] no lo
+/// tiene nadie y sin ello no hay ruta.
+enum _Mark { said, assumed, missing }
+
+/// Segunda pantalla del asistente: la ruta, antes de afinarla.
 ///
-/// Lo que falta no se adivina: se pide arriba y el botón de generar está
-/// apagado hasta completarlo. El origen nunca se inventa.
+/// Una sola lista en orden fijo con lo que define la ruta. Lo que la afina
+/// —puntos de interés, paradas, autovías— va en la pantalla siguiente.
+///
+/// Lo que decide si esto funciona es la marca de cada fila: verde lo que dijo
+/// el motero, ámbar lo que puso la app por él, rojo lo que falta. Antes eso se
+/// resolvía repartiendo las filas en tres bloques, y el efecto era el
+/// contrario: la misma fila saltaba de sitio según lo que hubieras escrito en
+/// la frase, y el aviso de lo que faltaba vivía arriba, lejos de la fila que lo
+/// causaba.
+///
+/// Lo que falta no se adivina ni se rellena solo: se pinta en rojo en su propia
+/// fila y el botón no deja pasar. El origen nunca se inventa.
 class RouteAssistantReviewScreen extends StatefulWidget {
   /// La frase original. Se guarda con la ruta y viaja a la IA como contexto.
   final String request;
@@ -36,29 +47,34 @@ class RouteAssistantReviewScreen extends StatefulWidget {
 
 class _RouteAssistantReviewScreenState
     extends State<RouteAssistantReviewScreen> {
-  late Map<String, dynamic> _fields =
+  late final Map<String, dynamic> _fields =
       Map<String, dynamic>.from(widget.interpretation['fields'] ?? {});
-  late List<String> _said =
+  late final List<String> _said =
       List<String>.from(widget.interpretation['said'] ?? []);
-  late List<String> _assumed =
+  late final List<String> _assumed =
       List<String>.from(widget.interpretation['assumed'] ?? []);
 
   bool _generating = false;
 
-  /// Campos que no se enseñan: o son detalle interno, o se deciden solos.
+  /// Campos que no se enseñan aquí: o son detalle interno, o se deciden solos,
+  /// o van en la pantalla siguiente (paradas, puntos de interés, autovías).
   static const _hidden = {
     'days', 'suggest_gas_stations', 'moto', 'understood', 'multi_day',
   };
 
-  /// Todo lo que se enseña, en el orden en que se lee bien.
+  /// Lo que define la ruta, en el orden en que se lee bien.
   ///
-  /// La lista es FIJA: nada aparece ni desaparece al tocar algo. Antes se
-  /// ocultaban los campos vacíos y eso descolocaba la pantalla a cada cambio —
-  /// y en el peor caso te dejaba sin la fila que acababas de tocar.
+  /// De dónde sales → qué forma tiene → cuándo → cuánto → cómo → con qué. Lo
+  /// que la afina (puntos de interés, paradas, autovías) va en la pantalla
+  /// siguiente: esto es lo que no puede faltar.
+  ///
+  /// La lista es FIJA y el orden no depende de lo que dijera la frase. Antes
+  /// las filas se repartían en tres bloques según de dónde saliera el dato, así
+  /// que la misma fila cambiaba de sitio según lo que escribieras — y una
+  /// pantalla cuyo orden se mueve no se lee, se descifra.
   static const _order = [
-    'origin', 'destination', 'circular', 'departure_date', 'departure_time',
-    'duration', 'preference', 'difficulty', 'avoid_highways',
-    'suggest_lunch', 'suggest_dinner', 'moto_id', 'zone_hint',
+    'origin', 'circular', 'destination', 'departure_date', 'departure_time',
+    'duration', 'difficulty', 'preference', 'moto_id',
   ];
 
   /// Las motos del motero, para poder cambiarla sin salir de aquí.
@@ -71,14 +87,39 @@ class _RouteAssistantReviewScreenState
   /// destino", el destino no se pedía —no estaba en aquella lista— y se podía
   /// generar una ruta con destino sin destino, con el botón activado y sin que
   /// la fila apareciera siquiera, porque estaba vacía.
+  ///
+  /// La HORA estaba fuera de esta lista y ese olvido se veía en la pantalla:
+  /// salía una fila "Hora: null" con el visto bueno verde. Que la marca salga
+  /// de aquí y no de una lista aparte es lo que evita que vuelva a pasar.
   List<String> get _missing {
     final required = <String>[
       'origin',
+      'departure_date',
+      'departure_time',
       'moto_id',
       if (_fields['circular'] != true) 'destination',
     ];
 
     return required.where((k) => _isEmpty(_fields[k])).toList();
+  }
+
+  /// En qué estado está una fila. Son tres, no dos.
+  ///
+  /// Con solo "bien / falta", todo lo que la app decidió por su cuenta salía
+  /// con el visto verde, como si lo hubiera elegido el motero. El ámbar dice
+  /// "esto lo he puesto yo, míralo": es la diferencia entre un resumen que se
+  /// revisa y uno que se pasa de largo.
+  _Mark _markOf(String key) {
+    if (_missing.contains(key)) return _Mark.missing;
+
+    // Con una sola moto no hay nada que revisar: es la única que puede ser.
+    // Pedirle al motero que compruebe un dato que no puede cambiar es ruido, y
+    // el ámbar deja de significar algo si se reparte a campos sin alternativa.
+    // Con varias, la propuesta va en ámbar aunque acierte: ahí sí hay elección.
+    if (key == 'moto_id' && _motos.length == 1) return _Mark.said;
+
+    final said = key == 'duration' ? _durationSaid : _said.contains(key);
+    return said ? _Mark.said : _Mark.assumed;
   }
 
   /// Campos donde `false` SIGNIFICA algo y hay que enseñarlo igual.
@@ -120,22 +161,8 @@ class _RouteAssistantReviewScreenState
         _ => !_hidden.contains(key),
       };
 
-  /// Las filas que van en cada bloque.
-  ///
-  /// Lo que falta va arriba del todo; el resto se reparte entre lo que dijo el
-  /// motero y lo que se supuso por él.
-  List<String> _rowsOf(String block) {
-    return _order.where((k) {
-      if (!_applies(k)) return false;
-
-      final missing = _missing.contains(k);
-      if (block == 'missing') return missing;
-      if (missing) return false;
-
-      final said = _said.contains(k) || (k == 'duration' && _durationSaid);
-      return block == 'said' ? said : !said;
-    }).toList();
-  }
+  /// Las filas que se pintan, en el orden fijo de [_order].
+  List<String> get _rows => _order.where(_applies).toList();
 
   /// La duración es una fila que resume tres campos (modo, km y horas), así
   /// que su origen se mira en los tres.
@@ -156,9 +183,8 @@ class _RouteAssistantReviewScreenState
 
   @override
   Widget build(BuildContext context) {
-    final said = _rowsOf('said');
-    final assumed = _rowsOf('assumed');
-    final missing = _rowsOf('missing');
+    final rows = _rows;
+    final missing = _missing;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -170,42 +196,40 @@ class _RouteAssistantReviewScreenState
           // Volver atrás devuelve a la frase, con lo escrito, para retocarla.
           onPressed: () => Navigator.pop(context, true),
         ),
-        title: Text('assistant.review_title'.tr(),
-            style: const TextStyle(
-                color: AppColors.white, fontWeight: FontWeight.w700)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('assistant.step_route'.tr(),
+                style: const TextStyle(
+                    color: AppColors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700)),
+            Text('assistant.step_of'.tr(namedArgs: {'n': '1'}),
+                style: const TextStyle(color: AppColors.grey, fontSize: 10.5)),
+          ],
+        ),
       ),
       body: ListView(
         padding: EdgeInsets.fromLTRB(
             16, 14, 16, 24 + MediaQuery.of(context).padding.bottom),
         children: [
-          if (missing.isNotEmpty) ...[
-            for (final key in missing) _buildMissing(key),
-            const SizedBox(height: 6),
-            _group(missing, missing: true),
-            const SizedBox(height: 14),
-          ],
-
-          if (said.isNotEmpty) ...[
-            _label('assistant.said'.tr()),
-            _group(said),
-            const SizedBox(height: 14),
-          ],
-
-          if (assumed.isNotEmpty) ...[
-            _label('assistant.assumed'.tr(), hint: 'assistant.assumed_hint'.tr()),
-            _group(assumed, assumed: true),
-            const SizedBox(height: 14),
-          ],
-
-          // Lo fino va detrás de esto, no al mismo nivel que los kilómetros.
-          TextButton.icon(
-            onPressed: _openFullForm,
-            icon: const Icon(Icons.tune, color: AppColors.cyan, size: 17),
-            label: Text('assistant.more'.tr(),
-                style: const TextStyle(color: AppColors.cyan, fontSize: 12)),
+          // Una sola tarjeta: el orden es el mismo pase lo que pase.
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                for (var i = 0; i < rows.length; i++)
+                  _row(rows[i], last: i == rows.length - 1),
+              ],
+            ),
           ),
 
-          const SizedBox(height: 6),
+          const SizedBox(height: 18),
 
           ElevatedButton(
             onPressed: (missing.isEmpty && !_generating) ? _generate : null,
@@ -222,79 +246,76 @@ class _RouteAssistantReviewScreenState
                     height: 20,
                     child: CircularProgressIndicator(
                         strokeWidth: 2, color: Colors.white))
-                : Text('assistant.generate'.tr(),
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700)),
+                // El botón apagado dice POR QUÉ lo está. Un botón gris y un
+                // aviso lejos, arriba del todo, obligan a buscar la relación
+                // entre las dos cosas.
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (missing.isNotEmpty) ...[
+                        const Icon(Icons.cancel_outlined,
+                            color: AppColors.error, size: 17),
+                        const SizedBox(width: 7),
+                      ],
+                      Text(
+                        missing.isEmpty
+                            ? 'assistant.continue'.tr()
+                            : _blockedText(missing),
+                        style: TextStyle(
+                            color: missing.isEmpty
+                                ? Colors.white
+                                : AppColors.grey,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
           ),
-
-          if (missing.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Center(
-              child: Text('assistant.generate_blocked'.tr(),
-                  style: const TextStyle(color: AppColors.grey, fontSize: 11)),
-            ),
-          ],
         ],
       ),
     );
   }
 
-  Widget _label(String text, {String? hint}) => Padding(
-        padding: const EdgeInsets.only(bottom: 7, left: 2),
-        child: Row(children: [
-          Text(text,
-              style: const TextStyle(
-                  color: AppColors.grey,
-                  fontSize: 10.5,
-                  letterSpacing: 0.6,
-                  fontWeight: FontWeight.w600)),
-          if (hint != null) ...[
-            const SizedBox(width: 6),
-            Text(hint,
-                style: const TextStyle(color: AppColors.greyDark, fontSize: 10.5)),
-          ],
-        ]),
-      );
+  /// Por qué no se puede continuar. Con un solo dato se dice cuál es: "faltan
+  /// datos" obliga a repasar la lista entera para encontrarlo.
+  String _blockedText(List<String> missing) => missing.length == 1
+      ? 'assistant.missing'.tr(
+          namedArgs: {'what': _labelFor(missing.first).toLowerCase()})
+      : 'assistant.blocked_many'.tr(
+          namedArgs: {'n': '${missing.length}'});
 
-  Widget _group(List<String> keys,
-          {bool assumed = false, bool missing = false}) =>
-      Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(10),
-          // La barra lateral marca el bloque de lo supuesto de un vistazo.
-          border: assumed
-              ? const Border(
-                  left: BorderSide(color: AppColors.greyDark, width: 3))
-              : null,
-        ),
-        child: Column(
-          children: [
-            for (var i = 0; i < keys.length; i++)
-              _row(keys[i],
-                  assumed: assumed,
-                  missing: missing,
-                  last: i == keys.length - 1),
-          ],
-        ),
-      );
+  Widget _row(String key, {required bool last}) {
+    final mark = _markOf(key);
+    final missing = mark == _Mark.missing;
 
-  Widget _row(String key,
-      {required bool assumed, required bool last, bool missing = false}) {
+    final (markIcon, markColor) = switch (mark) {
+      _Mark.said => (Icons.check_circle_outline, Colors.green),
+      _Mark.assumed => (Icons.help_outline, AppColors.orange),
+      _Mark.missing => (Icons.cancel_outlined, AppColors.error),
+    };
+
     return InkWell(
       onTap: () => _edit(key),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          border: last
-              ? null
-              : const Border(
-                  bottom: BorderSide(color: AppColors.greyDark, width: 0.5)),
+          // La fila que falta se pinta entera, no solo su marca: es lo primero
+          // que encuentra la vista al bajar por la lista.
+          color: missing
+              ? AppColors.error.withValues(alpha: 0.10)
+              : Colors.transparent,
+          border: Border(
+            left: missing
+                ? const BorderSide(color: AppColors.error, width: 3)
+                : BorderSide.none,
+            bottom: last
+                ? BorderSide.none
+                : const BorderSide(color: AppColors.greyDark, width: 0.5),
+          ),
         ),
-        child: Row(children: [
-          Icon(_iconFor(key), color: AppColors.grey, size: 17),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Icon(_iconFor(key),
+              color: missing ? AppColors.error : AppColors.grey, size: 17),
           const SizedBox(width: 11),
           Expanded(
             child: Column(
@@ -303,76 +324,93 @@ class _RouteAssistantReviewScreenState
                 // La etiqueta siempre visible: sin ella, "Circular" o "09:00"
                 // sueltos no dicen de qué campo son.
                 Text(_labelFor(key),
-                    style: const TextStyle(
-                        color: AppColors.grey, fontSize: 10.5)),
-                const SizedBox(height: 2),
-                Text(_valueFor(key),
                     style: TextStyle(
-                        color: missing
-                            ? AppColors.grey
-                            : (assumed ? AppColors.grey : AppColors.white),
-                        fontSize: 13,
-                        fontStyle:
-                            missing ? FontStyle.italic : FontStyle.normal)),
+                        color: missing ? AppColors.error : AppColors.grey,
+                        fontSize: 10.5)),
+                const SizedBox(height: 2),
+                if (key == 'duration')
+                  _durationChips()
+                else
+                  Row(children: [
+                    Flexible(
+                      child: Text(_valueFor(key),
+                          style: TextStyle(
+                              color: switch (mark) {
+                                _Mark.said => AppColors.white,
+                                _Mark.assumed => AppColors.grey,
+                                _Mark.missing => AppColors.error,
+                              },
+                              fontSize: 13)),
+                    ),
+                    // "supuesto" escrito, no solo un color: el color se ve de
+                    // lejos, la palabra se entiende sin aprenderse el código.
+                    if (mark == _Mark.assumed) ...[
+                      const SizedBox(width: 6),
+                      Text('· ${'assistant.tag_assumed'.tr()}',
+                          style: const TextStyle(
+                              color: AppColors.greyDark, fontSize: 10.5)),
+                    ],
+                  ]),
               ],
             ),
           ),
-          // Verde si está resuelto, rojo si falta. De un vistazo se ve qué
-          // queda por tocar sin leer una línea.
-          Icon(
-            missing ? Icons.cancel_outlined : Icons.check_circle_outline,
-            color: missing ? AppColors.error : Colors.green,
-            size: 18,
-          ),
+          const SizedBox(width: 8),
+          Icon(markIcon, color: markColor, size: 18),
         ]),
       ),
     );
   }
 
-  String _labelFor(String key) => switch (key) {
-        'duration' => 'assistant.f_km'.tr(),
-        _ => 'assistant.f_$key'.tr(),
-      };
+  /// Los tres modos de duración, a la vista y tocables.
+  ///
+  /// Eran tres campos sueltos (`duration_mode`, `km`, `hours`) y para enterarse
+  /// de que existe "que lo decida la IA" había que abrir una hoja. Puestos en
+  /// fila se ve en qué modo estás sin tocar nada.
+  Widget _durationChips() {
+    final mode = '${_fields['duration_mode'] ?? 'ai'}';
 
-  Widget _buildMissing(String key) => GestureDetector(
-        onTap: () => _edit(key),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.orange.withValues(alpha: 0.5)),
-          ),
-          child: Row(children: [
-            const Icon(Icons.error_outline, color: AppColors.orange, size: 18),
-            const SizedBox(width: 10),
-            Expanded(
-              // Una pregunta concreta por cada dato, no un genérico "falta un
-              // dato: salida" — que se leía como la HORA de salida: el motero
-              // ponía la hora, el aviso seguía ahí, y no había forma de
-              // entender por qué.
-              child: Text(
-                _missingText(key),
-                style: const TextStyle(
-                    color: AppColors.orange, fontSize: 12, height: 1.4),
+    return Padding(
+      padding: const EdgeInsets.only(top: 3),
+      child: Row(
+        children: [
+          for (final m in const ['km', 'hours', 'ai'])
+            Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: GestureDetector(
+                onTap: () => _pickDurationMode(m),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: mode == m ? AppColors.orange : Colors.transparent,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                        color:
+                            mode == m ? AppColors.orange : AppColors.greyDark),
+                  ),
+                  child: Text(
+                    // El modo activo enseña su valor ("150 km"), los otros su
+                    // nombre: así se lee de un vistazo cuánto vas a rodar.
+                    mode == m ? _durationText : 'assistant.d_$m'.tr(),
+                    style: TextStyle(
+                        color: mode == m
+                            ? AppColors.background
+                            : AppColors.grey,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.orange, size: 18),
-          ]),
-        ),
-      );
-
-  /// El texto del aviso, con respaldo por si algún día falta un campo nuevo.
-  String _missingText(String key) {
-    final specific = 'assistant.missing_$key';
-    final text = specific.tr();
-
-    return text == specific
-        ? 'assistant.missing'.tr(
-            namedArgs: {'what': 'assistant.f_$key'.tr().toLowerCase()})
-        : text;
+        ],
+      ),
+    );
   }
+
+  String _labelFor(String key) => switch (key) {
+        'duration' => 'assistant.f_duration'.tr(),
+        _ => 'assistant.f_$key'.tr(),
+      };
 
   // ─── Cómo se lee cada campo ──────────────────────────────────────────
 
@@ -395,9 +433,15 @@ class _RouteAssistantReviewScreenState
   String _valueFor(String key) {
     final v = _fields[key];
 
-    if (key != 'duration' && _isEmptyFor(key, v) && _missing.contains(key)) {
-      return 'assistant.undefined'.tr();
+    // Lo que falta lo dice la propia fila, e invita a tocarla. Un "Sin definir"
+    // suelto no dice que se pueda arreglar ahí mismo.
+    if (key != 'duration' && _missing.contains(key)) {
+      return 'assistant.row_missing'.tr();
     }
+
+    // Red de seguridad: un campo vacío que no esté en la lista de obligatorios
+    // imprimía literalmente "null" en la pantalla.
+    if (_isEmptyFor(key, v) && v == null) return 'assistant.undefined'.tr();
 
     return switch (key) {
       'circular' => v == true
@@ -481,6 +525,13 @@ class _RouteAssistantReviewScreenState
         if (picked == null) return;
 
         final circular = picked;
+
+        // Guardar la elección. Faltaba: la hoja se abría, elegías "con
+        // destino", se cerraba y la fila seguía diciendo "Circular" — porque
+        // `_editBool` solo aplica el valor cuando se le pide, y aquí no se le
+        // pedía. Lo demás (quitar el destino, o preguntarlo) ya funcionaba, así
+        // que parecía que la pantalla ignoraba el toque.
+        _set('circular', circular);
 
         if (circular) {
           // Una circular no tiene destino: dejarlo puesto lo enseñaria en la
@@ -589,12 +640,32 @@ class _RouteAssistantReviewScreenState
     return picked;
   }
 
+  /// Tocar un modo desde la propia fila.
+  ///
+  /// "Que decida la IA" no necesita teclear nada, así que se aplica y punto;
+  /// los otros dos piden un número y abren la hoja ya en ese modo. Abrir una
+  /// hoja para que te diga que no hay nada que rellenar sobra.
+  Future<void> _pickDurationMode(String mode) async {
+    if (mode == 'ai') {
+      setState(() {
+        _fields['duration_mode'] = 'ai';
+        _fields['km'] = null;
+        _fields['hours'] = null;
+      });
+      _set('duration_mode', 'ai');
+      return;
+    }
+
+    await _editDuration(initialMode: mode);
+  }
+
   /// Cuánto quiere rodar: por kilómetros, por horas, o que lo decida la IA.
-  Future<void> _editDuration() async {
+  Future<void> _editDuration({String? initialMode}) async {
+    var mode = initialMode ?? '${_fields['duration_mode'] ?? 'ai'}';
+
     final controller = TextEditingController(
-      text: '${_fields['duration_mode'] == 'km' ? _fields['km'] ?? '' : _fields['hours'] ?? ''}',
+      text: '${mode == 'km' ? _fields['km'] ?? '' : mode == 'hours' ? _fields['hours'] ?? '' : ''}',
     );
-    var mode = '${_fields['duration_mode'] ?? 'ai'}';
 
     final saved = await showModalBottomSheet<bool>(
       context: context,
@@ -856,15 +927,6 @@ class _RouteAssistantReviewScreenState
     );
 
     if (picked != null) _set(key, picked);
-  }
-
-  /// El formulario de siempre, relleno con lo entendido.
-  Future<void> _openFullForm() async {
-    if (!mounted) return;
-    context.pushReplacement('/rider/route-generator', extra: {
-      ..._fields,
-      'ai_request': widget.request,
-    });
   }
 
   // ─── Generar ─────────────────────────────────────────────────────────
