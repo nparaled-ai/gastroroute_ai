@@ -42,6 +42,13 @@
         android:label="GAStroRouteAI"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- Clave del mapa para elegir el punto de salida o el destino.
+             El valor sale de MAPS_API_KEY en android/local.properties, que git
+             ignora; ver build.gradle.kts. Si falta, el mapa se ve gris y el
+             resto de la app funciona igual. -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

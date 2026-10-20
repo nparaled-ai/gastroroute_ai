@@ -55,4 +55,22 @@ class RouteAssistantService {
       return null;
     }
   }
+
+  /// Las zonas de su entorno, para ofrecerlas como dirección de la ruta.
+  ///
+  /// Son las mismas de `zone`, pero varias y sin repetir: tres destacados del
+  /// Pirineo dan "Pirineo Aragonés" una vez, no tres. Lista vacía si no hay
+  /// ninguna cerca, y entonces solo quedan "que decida la IA" y escribirla.
+  static Future<List<String>> zones(double lat, double lng) async {
+    try {
+      final response = await ApiClient.dio.get(
+        '/rider/routes/assistant-zone',
+        queryParameters: {'lat': lat, 'lng': lng},
+      );
+
+      return List<String>.from(response.data['zones'] ?? const []);
+    } catch (_) {
+      return const [];
+    }
+  }
 }

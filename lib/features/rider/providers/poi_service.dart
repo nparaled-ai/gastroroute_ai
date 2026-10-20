@@ -24,6 +24,7 @@ class PoiService {
     int? radiusKm,
     String? category,
     String? query,
+    String? zoneHint,
   }) async {
     try {
       final response = await ApiClient.dio.get(
@@ -37,6 +38,7 @@ class PoiService {
           if (radiusKm != null) 'radius_km': radiusKm,
           if (category != null) 'category': category,
           if (query != null && query.isNotEmpty) 'q': query,
+          if (zoneHint != null && zoneHint.isNotEmpty) 'zone_hint': zoneHint,
         },
       );
 
@@ -71,6 +73,7 @@ class PoiService {
     int? radiusKm,
     String? category,
     String? query,
+    String? zoneHint,
     List<int> selected = const [],
   }) async {
     try {
@@ -85,6 +88,7 @@ class PoiService {
           if (radiusKm != null) 'radius_km': radiusKm,
           if (category != null) 'category': category,
           if (query != null && query.isNotEmpty) 'q': query,
+          if (zoneHint != null && zoneHint.isNotEmpty) 'zone_hint': zoneHint,
           if (selected.isNotEmpty) 'selected[]': selected,
         },
         options: Options(responseType: ResponseType.bytes),

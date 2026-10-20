@@ -1,12 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
 
-import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/rider_profile_service.dart';
-import '../providers/route_service.dart';
+import '../../../widgets/place_sheet.dart';
+import 'route_assistant_refine_screen.dart';
 
 /// Cómo está cada fila del resumen.
 ///
@@ -54,7 +53,6 @@ class _RouteAssistantReviewScreenState
   late final List<String> _assumed =
       List<String>.from(widget.interpretation['assumed'] ?? []);
 
-  bool _generating = false;
 
   /// Campos que no se enseñan aquí: o son detalle interno, o se deciden solos,
   /// o van en la pantalla siguiente (paradas, puntos de interés, autovías).
@@ -232,7 +230,7 @@ class _RouteAssistantReviewScreenState
           const SizedBox(height: 18),
 
           ElevatedButton(
-            onPressed: (missing.isEmpty && !_generating) ? _generate : null,
+            onPressed: missing.isEmpty ? _continue : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.orange,
               disabledBackgroundColor: AppColors.greyDark,
@@ -240,36 +238,28 @@ class _RouteAssistantReviewScreenState
               shape:
                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: _generating
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white))
-                // El botón apagado dice POR QUÉ lo está. Un botón gris y un
-                // aviso lejos, arriba del todo, obligan a buscar la relación
-                // entre las dos cosas.
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (missing.isNotEmpty) ...[
-                        const Icon(Icons.cancel_outlined,
-                            color: AppColors.error, size: 17),
-                        const SizedBox(width: 7),
-                      ],
-                      Text(
-                        missing.isEmpty
-                            ? 'assistant.continue'.tr()
-                            : _blockedText(missing),
-                        style: TextStyle(
-                            color: missing.isEmpty
-                                ? Colors.white
-                                : AppColors.grey,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
+            // El botón apagado dice POR QUÉ lo está. Un botón gris y un aviso
+            // lejos, arriba del todo, obligan a buscar la relación entre las
+            // dos cosas.
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (missing.isNotEmpty) ...[
+                  const Icon(Icons.cancel_outlined,
+                      color: AppColors.error, size: 17),
+                  const SizedBox(width: 7),
+                ],
+                Text(
+                  missing.isEmpty
+                      ? 'assistant.continue'.tr()
+                      : _blockedText(missing),
+                  style: TextStyle(
+                      color: missing.isEmpty ? Colors.white : AppColors.grey,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -330,7 +320,7 @@ class _RouteAssistantReviewScreenState
                 const SizedBox(height: 2),
                 if (key == 'duration')
                   _durationChips()
-                else
+                else ...[
                   Row(children: [
                     Flexible(
                       child: Text(_valueFor(key),
@@ -351,6 +341,23 @@ class _RouteAssistantReviewScreenState
                               color: AppColors.greyDark, fontSize: 10.5)),
                     ],
                   ]),
+
+                  // La dirección completa del sitio elegido, debajo y en
+                  // pequeño. El nombre corto no basta para saber si la
+                  // gasolinera es la de la entrada del pueblo o la de la
+                  // salida, y el punto de salida de una quedada tiene que
+                  // quedar claro para todos.
+                  if (_addressOf(key) != null) ...[
+                    const SizedBox(height: 2),
+                    Text(_addressOf(key)!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: AppColors.greyDark,
+                            fontSize: 10.5,
+                            height: 1.25)),
+                  ],
+                ],
               ],
             ),
           ),
@@ -538,6 +545,8 @@ class _RouteAssistantReviewScreenState
           // lista y se mandaria al servidor, que lo ignora. Confunde para nada.
           setState(() {
             _fields.remove('destination');
+            _fields.remove('destination_lat');
+            _fields.remove('destination_lng');
             _said.remove('destination');
             _assumed.remove('destination');
           });
@@ -859,17 +868,63 @@ class _RouteAssistantReviewScreenState
   }
 
   Future<void> _editPlace(String key) async {
+    final current = _coordsOf(key);
+
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       backgroundColor: AppColors.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
-      builder: (_) => _PlaceSheet(title: 'assistant.f_$key'.tr()),
+      builder: (_) =>
+          PlaceSheet(title: 'assistant.f_$key'.tr(), initial: current),
     );
 
-    if (result != null) _set(key, result['description']);
+    if (result == null) return;
+
+    // Guardar la coordenada, no solo el nombre. El servidor geocodifica el
+    // texto cuando no le llegan coordenadas, así que mandar solo "Gasolinera
+    // de Sariñena" tiraría el punto exacto que el motero acaba de elegir.
+    //
+    // Si el sitio viene sin coordenadas, se borran las que hubiera: dejarlas
+    // puestas ataría el nombre nuevo al punto viejo, que es peor que no tener
+    // ninguna.
+    setState(() {
+      _fields['${key}_lat'] = _toDouble(result['lat']);
+      _fields['${key}_lng'] = _toDouble(result['lng']);
+      // La dirección completa se guarda para enseñarla bajo el nombre. No
+      // viaja al servidor: es solo para que el motero reconozca el sitio.
+      _fields['${key}_address'] = result['address'];
+    });
+
+    _set(key, result['description']);
   }
+
+  /// La dirección completa del sitio, si se eligió en el mapa o buscándolo.
+  ///
+  /// Solo para los dos campos de lugar: en los demás no significa nada.
+  String? _addressOf(String key) {
+    if (key != 'origin' && key != 'destination') return null;
+
+    final v = _fields['${key}_address'];
+    return (v is String && v.trim().isNotEmpty) ? v : null;
+  }
+
+  /// Las coordenadas guardadas de un campo de lugar, si las tiene.
+  LatLng? _coordsOf(String key) {
+    final lat = _toDouble(_fields['${key}_lat']);
+    final lng = _toDouble(_fields['${key}_lng']);
+
+    return (lat == null || lng == null) ? null : LatLng(lat, lng);
+  }
+
+  /// El servidor manda los números como `num` y la búsqueda a veces como
+  /// cadena, según la fuente.
+  double? _toDouble(dynamic v) => switch (v) {
+        num n => n.toDouble(),
+        String s => double.tryParse(s),
+        _ => null,
+      };
 
   Future<void> _editDate() async {
     final current = DateTime.tryParse('${_fields['departure_date']}');
@@ -929,192 +984,28 @@ class _RouteAssistantReviewScreenState
     if (picked != null) _set(key, picked);
   }
 
-  // ─── Generar ─────────────────────────────────────────────────────────
+  // ─── Continuar ───────────────────────────────────────────────────────
 
-  Future<void> _generate() async {
-    setState(() => _generating = true);
-
-    final payload = Map<String, dynamic>.from(_fields)
-      ..removeWhere((k, v) => v == null || _hidden.contains(k) && k != 'days')
-      // La frase viaja con la petición: se guarda con la ruta y le da a la IA
-      // el contexto que no cabe en ningún campo ("por el Pirineo").
-      ..['ai_request'] = widget.request;
-
-    final result = await RouteService.generateRoute(payload);
-    if (!mounted) return;
-
-    setState(() => _generating = false);
-
-    if (result['error'] != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(result['error']),
-        backgroundColor: AppColors.error,
-      ));
-      return;
-    }
-
-    context.pushReplacement('/rider/route-result', extra: result['result']);
-  }
-}
-
-/// Hoja para elegir un lugar: mi ubicación, o buscar uno concreto.
-class _PlaceSheet extends StatefulWidget {
-  final String title;
-
-  const _PlaceSheet({required this.title});
-
-  @override
-  State<_PlaceSheet> createState() => _PlaceSheetState();
-}
-
-class _PlaceSheetState extends State<_PlaceSheet> {
-  final _controller = TextEditingController();
-
-  List<Map<String, dynamic>> _results = [];
-  bool _loading = false;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Future<void> _search(String query) async {
-    if (query.trim().length < 3) return;
-    setState(() => _loading = true);
-
-    try {
-      // poi=1 para que devuelva también gasolineras y bares: en una ruta en
-      // grupo se queda en un sitio concreto, no en "Jaca".
-      final response = await ApiClient.dio.get('/location/search',
-          queryParameters: {'q': query, 'lang': 'es', 'poi': '1'});
-
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _results = List<Map<String, dynamic>>.from(
-            (response.data as List? ?? []).map((p) => {
-                  'description': p['description'],
-                  'lat': p['lat'],
-                  'lng': p['lng'],
-                }));
-      });
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _useMyLocation() async {
-    final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      await Geolocator.requestPermission();
-    }
-
-    try {
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
-      );
-
-      final response = await ApiClient.dio.get('/location/search',
-          queryParameters: {
-            'q': '${position.latitude},${position.longitude}',
-            'reverse': '1',
-            'lang': 'es',
-          });
-
-      final data = response.data as List? ?? [];
-      if (!mounted || data.isEmpty) return;
-
-      Navigator.pop(context, {'description': data.first['description']});
-    } catch (_) {}
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Row(children: [
-                Expanded(
-                  child: Text(widget.title,
-                      style: const TextStyle(
-                          color: AppColors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700)),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.grey),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ]),
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.my_location, color: AppColors.cyan),
-              title: Text('planner.use_my_location'.tr(),
-                  style: const TextStyle(color: AppColors.cyan, fontSize: 14)),
-              onTap: _useMyLocation,
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
-                controller: _controller,
-                autofocus: true,
-                onSubmitted: _search,
-                onChanged: (q) {
-                  if (q.trim().length >= 3) _search(q);
-                },
-                style: const TextStyle(color: AppColors.white, fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'planner.search_place'.tr(),
-                  hintStyle:
-                      const TextStyle(color: AppColors.grey, fontSize: 13),
-                  prefixIcon:
-                      const Icon(Icons.search, color: AppColors.grey, size: 19),
-                  filled: true,
-                  fillColor: AppColors.background,
-                  isDense: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(9),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-            ),
-
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(color: AppColors.orange),
-              ),
-
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 280),
-              child: ListView(
-                shrinkWrap: true,
-                children: _results
-                    .map((r) => ListTile(
-                          dense: true,
-                          leading: const Icon(Icons.place_outlined,
-                              color: AppColors.grey, size: 18),
-                          title: Text('${r['description']}',
-                              style: const TextStyle(
-                                  color: AppColors.white, fontSize: 13)),
-                          onTap: () => Navigator.pop(context, r),
-                        ))
-                    .toList(),
-              ),
-            ),
-          ],
+  /// Pasa a afinar la ruta. Aquí no se genera nada.
+  ///
+  /// Se navega con `push`, no con `pushReplacement`: desde la pantalla de
+  /// afinar se tiene que poder volver a corregir la hora o el destino sin
+  /// perder lo escrito.
+  void _continue() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => RouteAssistantRefineScreen(
+          request: widget.request,
+          fields: Map<String, dynamic>.from(_fields),
+          // Lo que se toque allí se guarda aquí al volver. Si no, ir a
+          // corregir la hora borraba la dirección y los puntos elegidos.
+          onBack: (updated) {
+            if (!mounted) return;
+            setState(() => _fields.addAll(updated));
+          },
         ),
       ),
     );
   }
 }
+

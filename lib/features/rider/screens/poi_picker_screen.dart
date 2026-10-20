@@ -47,6 +47,11 @@ class PoiPickerScreen extends StatefulWidget {
   final String? initialQuery;
   final int? initialRadiusKm;
 
+  /// Hacia donde quiere tirar la ruta, si lo ha dicho. El servidor filtra los
+  /// candidatos a ese sector: con una direccion elegida, los puntos de la
+  /// direccion contraria no son candidatos, son ruido.
+  final String? zoneHint;
+
   const PoiPickerScreen({
     super.key,
     required this.origin,
@@ -57,6 +62,7 @@ class PoiPickerScreen extends StatefulWidget {
     this.initialCategory,
     this.initialQuery,
     this.initialRadiusKm,
+    this.zoneHint,
   });
 
   @override
@@ -129,6 +135,7 @@ class _PoiPickerScreenState extends State<PoiPickerScreen> {
       radiusKm: _radiusKm,
       category: _category,
       query: _searchController.text.trim(),
+      zoneHint: widget.zoneHint,
     );
 
     if (!mounted) return;
@@ -442,6 +449,7 @@ class _PoiPickerScreenState extends State<PoiPickerScreen> {
           query: _searchController.text.trim(),
           selected: _selectedIds.toList()..sort(),
           total: _pois.length,
+          zoneHint: widget.zoneHint,
         ),
 
         const SizedBox(height: 14),
@@ -718,6 +726,7 @@ class _SelectionMap extends StatefulWidget {
   final String query;
   final List<int> selected;
   final int total;
+  final String? zoneHint;
 
   const _SelectionMap({
     required this.origin,
@@ -729,6 +738,7 @@ class _SelectionMap extends StatefulWidget {
     required this.query,
     required this.selected,
     required this.total,
+    required this.zoneHint,
   });
 
   @override
@@ -784,6 +794,7 @@ class _SelectionMapState extends State<_SelectionMap> {
       category: widget.category,
       query: widget.query,
       selected: widget.selected,
+      zoneHint: widget.zoneHint,
     );
 
     if (!mounted) return;
