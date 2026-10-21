@@ -276,6 +276,73 @@ class _RouteAssistantRefineScreenState
     return minimo > pedidos * 1.1 ? minimo.round() : null;
   }
 
+  // ─── A qué hora llegarías ────────────────────────────────────────────
+
+  /// Velocidad media en carretera secundaria, según el ritmo.
+  ///
+  /// Son los mismos números que usa el prompt del generador, y están medidos
+  /// sobre carretera secundaria: no son la velocidad del velocímetro, son la
+  /// media real con curvas, pueblos y adelantamientos.
+  int get _avgSpeedKmh {
+    final base = switch ('${_fields['difficulty'] ?? 'moderada'}') {
+      'exigente' => 45,
+      'tranquila' => 55,
+      _ => 50,
+    };
+
+    // Con autovías permitidas se avanza bastante más. Evitarlas —que es lo
+    // que viene puesto— es lo que convierte 200 km en cuatro horas.
+    return _fields['avoid_highways'] == false ? (base * 1.35).round() : base;
+  }
+
+  /// Los kilómetros con los que contar para estimar la hora de llegada.
+  ///
+  /// Con destino hay un suelo que no se puede bajar: lo que mide ir de un
+  /// sitio a otro. Da igual que la ruta sea "la que decida la IA", de Huesca a
+  /// Santillana no se llega en 200 km.
+  double? get _kmForArrival {
+    final pedidos = _fields['duration_mode'] == 'km'
+        ? _toDouble(_fields['km'])
+        : null;
+
+    final oLat = _toDouble(_fields['origin_lat']);
+    final oLng = _toDouble(_fields['origin_lng']);
+    final dLat = _toDouble(_fields['destination_lat']);
+    final dLng = _toDouble(_fields['destination_lng']);
+
+    double? minimo;
+    if (!_circular && oLat != null && oLng != null && dLat != null && dLng != null) {
+      // 1,3 es el rodeo típico de la carretera sobre la línea recta, el mismo
+      // factor que usa el selector de puntos de interés.
+      minimo = _haversineKm(oLat, oLng, dLat, dLng) * 1.3;
+    }
+
+    if (pedidos == null && minimo == null) return null;
+    if (pedidos == null) return minimo;
+    if (minimo == null) return pedidos;
+
+    return math.max(pedidos, minimo);
+  }
+
+  /// A qué hora llegarías, en minutos desde medianoche. Puede pasar de 1440.
+  int? get _arrival {
+    final km = _kmForArrival;
+    final out = _departure;
+    if (km == null || out == null) return null;
+
+    var minutes = (km / _avgSpeedKmh * 60).round();
+
+    // Las paradas cuentan: media hora el almuerzo, una la comida. Son las que
+    // usa el generador.
+    if (_fields['suggest_lunch'] == true) minutes += 30;
+    if (_fields['suggest_dinner'] == true) minutes += 60;
+
+    return out + minutes;
+  }
+
+  /// A partir de esta hora se llega de noche buena parte del año.
+  static const _lateArrival = 21 * 60;
+
   double _haversineKm(double lat1, double lng1, double lat2, double lng2) {
     final dLat = (lat2 - lat1) * math.pi / 180;
     final dLng = (lng2 - lng1) * math.pi / 180;
@@ -376,6 +443,13 @@ class _RouteAssistantRefineScreenState
 
           _label('refine.rest'.tr()),
           _restCard(),
+
+          // Va aquí, al final, porque depende de todo lo de arriba: los
+          // kilómetros, el ritmo, si se evitan autovías y las paradas.
+          if ((_arrival ?? 0) >= _lateArrival) ...[
+            const SizedBox(height: 6),
+            _lateWarning(_arrival!),
+          ],
 
           if (_suggestedDinner != null) ...[
             const SizedBox(height: 6),
@@ -775,6 +849,45 @@ class _RouteAssistantRefineScreenState
           ),
         ]),
       );
+
+  /// Vas a llegar de noche.
+  ///
+  /// No bloquea: puede que sea justo lo que quiere. Pero saliendo a las 14:00
+  /// hacia un destino a 480 km se llega pasada la medianoche, y eso no se ve
+  /// en ninguna parte hasta que la ruta está generada y es tarde para cambiar
+  /// de idea.
+  Widget _lateWarning(int arrival) {
+    final km = _kmForArrival!.round();
+    final pasaDeMedianoche = arrival >= 24 * 60;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: AppColors.orange.withValues(alpha: 0.10),
+        border:
+            const Border(left: BorderSide(color: AppColors.orange, width: 3)),
+      ),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Icon(pasaDeMedianoche ? Icons.nightlight_round : Icons.wb_twilight,
+            color: AppColors.orange, size: 15),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            'refine.late_arrival'.tr(namedArgs: {
+              'departure': '${_fields['departure_time'] ?? ''}',
+              'arrival': _hhmm(arrival % (24 * 60)),
+              'km': '$km',
+              'roads': _fields['avoid_highways'] == false
+                  ? 'refine.roads_highways'.tr()
+                  : 'refine.roads_secondary'.tr(),
+            }),
+            style: const TextStyle(
+                color: AppColors.orange, fontSize: 10.5, height: 1.45),
+          ),
+        ),
+      ]),
+    );
+  }
 
   Widget _estimateWarning(int km) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),

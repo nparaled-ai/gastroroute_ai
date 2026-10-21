@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -30,32 +31,32 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
     _TutorialStep(
       icon: Icons.map_outlined,
       color: const Color(0xFF4285F4), // Google blue
-      title: 'Abre Google Maps',
-      description: 'Busca tu ruta en Google Maps con origen, destino y los puntos intermedios que quieras.',
-      tip: 'Puedes añadir hasta 9 paradas intermedias pulsando "Añadir parada".',
+      title: 'import.step1_title'.tr(),
+      description: 'import.step1_desc'.tr(),
+      tip: 'import.step1_tip'.tr(),
       illustration: _StepIllustration.googleMaps,
     ),
     _TutorialStep(
       icon: Icons.share_outlined,
       color: AppColors.orange,
-      title: 'Pulsa Compartir',
-      description: 'Una vez tengas la ruta lista, pulsa el botón "Compartir" en la parte inferior de la pantalla.',
-      tip: 'El botón de compartir tiene el icono típico de compartir (flecha hacia arriba).',
+      title: 'import.step2_title'.tr(),
+      description: 'import.step2_desc'.tr(),
+      tip: 'import.step2_tip'.tr(),
       illustration: _StepIllustration.shareButton,
     ),
     _TutorialStep(
       icon: Icons.link,
       color: AppColors.cyan,
-      title: 'Copia el enlace',
-      description: 'En el menú que aparece, selecciona "Copiar enlace". El enlace se guardará en tu portapapeles.',
-      tip: 'También puedes compartir directamente a GAStroRouteAI si aparece en las opciones.',
+      title: 'import.step3_title'.tr(),
+      description: 'import.step3_desc'.tr(),
+      tip: 'import.step3_tip'.tr(),
       illustration: _StepIllustration.copyLink,
     ),
     _TutorialStep(
       icon: Icons.download_outlined,
       color: Colors.green,
-      title: 'Pega el enlace aquí',
-      description: 'Vuelve a GAStroRouteAI y pega el enlace. Procesaremos la ruta y añadiremos tiempos, gasolineras y clima automáticamente.',
+      title: 'import.step4_title'.tr(),
+      description: 'import.step4_desc'.tr(),
       tip: null,
       illustration: _StepIllustration.pasteLink,
     ),
@@ -96,15 +97,15 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
   Future<void> _import() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      setState(() => _error = 'Pega el enlace de Google Maps.');
+      setState(() => _error = 'import.err_no_link'.tr());
       return;
     }
     if (_departureDate == null) {
-      setState(() => _error = 'Selecciona una fecha de salida.');
+      setState(() => _error = 'import.err_no_date'.tr());
       return;
     }
     if (!url.contains('google') && !url.contains('goo.gl') && !url.contains('maps')) {
-      setState(() => _error = 'El enlace no parece ser de Google Maps.');
+      setState(() => _error = 'import.err_bad_link'.tr());
       return;
     }
 
@@ -152,10 +153,10 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
+          icon: Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Importar desde Google Maps',
+        title: Text('import.title'.tr(),
             style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 16)),
       ),
       body: Column(children: [
@@ -203,7 +204,7 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
                           side: const BorderSide(color: AppColors.greyDark),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: const Text('Atrás', style: TextStyle(color: AppColors.grey)),
+                        child: Text('import.back'.tr(), style: TextStyle(color: AppColors.grey)),
                       ),
                     ),
                   if (_currentStep > 0) const SizedBox(width: 12),
@@ -217,7 +218,7 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Text(_currentStep == 0 ? 'Empezar' : 'Siguiente',
+                        Text(_currentStep == 0 ? 'import.start'.tr() : 'import.next'.tr(),
                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                         const SizedBox(width: 6),
                         const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
@@ -338,10 +339,10 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
   side: const BorderSide(color: Color(0xFF4285F4)),
   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   ),
-  child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+  child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
   Icon(Icons.open_in_new, color: Color(0xFF4285F4), size: 18),
   SizedBox(width: 8),
-  Text('Abrir Google Maps', style: TextStyle(color: Color(0xFF4285F4), fontWeight: FontWeight.w700)),
+  Text('import.open_maps'.tr(), style: TextStyle(color: Color(0xFF4285F4), fontWeight: FontWeight.w700)),
   ]),
   ),
   const SizedBox(height: 10),
@@ -408,10 +409,10 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
                     color: _departureDate != null ? AppColors.cyan : AppColors.greyDark),
               ),
               child: Row(children: [
-                const Icon(Icons.event, color: AppColors.cyan, size: 16),
+                Icon(Icons.event, color: AppColors.cyan, size: 16),
                 const SizedBox(width: 6),
                 Text(
-                  _departureDate ?? 'Fecha de salida',
+                  _departureDate ?? 'import.departure_date'.tr(),
                   style: TextStyle(
                     color: _departureDate != null ? AppColors.cyan : AppColors.grey,
                     fontSize: 12, fontWeight: FontWeight.w600,
@@ -443,7 +444,7 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
               border: Border.all(color: AppColors.greyDark),
             ),
             child: Row(children: [
-              const Icon(Icons.schedule, color: AppColors.orange, size: 16),
+              Icon(Icons.schedule, color: AppColors.orange, size: 16),
               const SizedBox(width: 6),
               Text(_departureTime,
                   style: const TextStyle(
@@ -472,7 +473,7 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
                   value: _motoId,
                   dropdownColor: AppColors.surface,
                   style: const TextStyle(color: AppColors.white, fontSize: 13),
-                  hint: const Text('Selecciona tu moto',
+                  hint: Text('import.pick_moto'.tr(),
                       style: TextStyle(color: AppColors.grey, fontSize: 13)),
                   items: _motos.map((m) => DropdownMenuItem<int>(
                     value: m['id'] as int,
@@ -487,7 +488,7 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
                 ),
               ),
             ),
-            const Text('para gasolineras',
+            Text('import.for_gas'.tr(),
                 style: TextStyle(color: AppColors.greyDark, fontSize: 11)),
           ]),
         ),
@@ -504,10 +505,10 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
         child: _loading
             ? const SizedBox(width: 22, height: 22,
                 child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-            : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Icon(Icons.download_outlined, color: Colors.white, size: 20),
                 SizedBox(width: 8),
-                Text('Importar ruta',
+                Text('import.import_route'.tr(),
                     style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
               ]),
       ),
@@ -570,9 +571,9 @@ class _GoogleMapsIllustration extends StatelessWidget {
                 boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8)],
               ),
               child: Row(children: [
-                const Icon(Icons.search, color: Color(0xFF4285F4), size: 18),
+                Icon(Icons.search, color: Color(0xFF4285F4), size: 18),
                 const SizedBox(width: 8),
-                const Text('Busca tu ruta...', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                Text('import.mock_search'.tr(), style: TextStyle(color: Colors.grey, fontSize: 13)),
               ]),
             ),
             const Spacer(),
@@ -585,12 +586,12 @@ class _GoogleMapsIllustration extends StatelessWidget {
                 boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8)],
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Mi ruta', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w700, fontSize: 14)),
+                Text('import.mock_my_route'.tr(), style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w700, fontSize: 14)),
                 const SizedBox(height: 6),
                 Row(children: [
                   Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFF34A853), shape: BoxShape.circle)),
                   const SizedBox(width: 6),
-                  const Text('Origen → Destino', style: TextStyle(color: Colors.black54, fontSize: 12)),
+                  Text('import.mock_origin_dest'.tr(), style: TextStyle(color: Colors.black54, fontSize: 12)),
                 ]),
                 const SizedBox(height: 8),
                 Row(children: const [
@@ -646,7 +647,7 @@ class _ShareButtonIllustration extends StatelessWidget {
               boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8)],
             ),
             child: Column(children: [
-              const Text('Ruta encontrada', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w700)),
+              Text('import.mock_found'.tr(), style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w700)),
               const SizedBox(height: 12),
               Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                 _GoogleMapButton(icon: Icons.directions, label: 'Inicio', color: const Color(0xFF4285F4)),
@@ -658,11 +659,11 @@ class _ShareButtonIllustration extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: const BoxDecoration(color: AppColors.orange, shape: BoxShape.circle),
-                      child: const Icon(Icons.touch_app, color: Colors.white, size: 10),
+                      child: Icon(Icons.touch_app, color: Colors.white, size: 10),
                     ),
                   ),
                 ]),
-                _GoogleMapButton(icon: Icons.bookmark_border, label: 'Guardar', color: Colors.grey),
+                _GoogleMapButton(icon: Icons.bookmark_border, label: 'import.mock_save'.tr(), color: Colors.grey),
               ]),
             ]),
           ),
@@ -711,7 +712,7 @@ class _CopyLinkIllustration extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('Compartir vía', style: TextStyle(color: Colors.white70, fontSize: 12)),
+              Text('import.mock_share_via'.tr(), style: TextStyle(color: Colors.white70, fontSize: 12)),
               const SizedBox(height: 12),
               Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                 _ShareOption(icon: Icons.message, label: 'Mensaje', color: Colors.green),
@@ -765,7 +766,7 @@ class _PasteLinkIllustration extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Icon(Icons.download_outlined, color: AppColors.orange, size: 48),
+          Icon(Icons.download_outlined, color: AppColors.orange, size: 48),
           const SizedBox(height: 16),
           // Campo simulado con enlace pegado
           Container(
@@ -787,20 +788,37 @@ class _PasteLinkIllustration extends StatelessWidget {
             ]),
           ),
           const SizedBox(height: 20),
-          // Resultado esperado
-          Row(children: [
-            _ResultChip(icon: Icons.route, label: '185 km', color: AppColors.orange),
-            const SizedBox(width: 8),
-            _ResultChip(icon: Icons.access_time, label: '2.5 h', color: AppColors.cyan),
-            const SizedBox(width: 8),
-            _ResultChip(icon: Icons.local_gas_station, label: 'Gasolineras', color: AppColors.gold),
-          ]),
-          const SizedBox(height: 8),
-          Row(children: [
-            _ResultChip(icon: Icons.wb_sunny_outlined, label: 'Clima', color: AppColors.gold),
-            const SizedBox(width: 8),
-            _ResultChip(icon: Icons.schedule, label: 'Horarios', color: Colors.green),
-          ]),
+
+          // Lo que se saca del enlace.
+          //
+          // Wrap y no dos Row fijas: con las filas escritas a mano, tres chips
+          // no caben a lo ancho y los dos de abajo se salían de la tarjeta. El
+          // Wrap los reparte según el ancho real, que además cambia con el
+          // idioma —"Gasolineras" mide una cosa y "Tankstellen" otra— y con el
+          // tamaño de letra que tenga puesto el motero en el móvil.
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _ResultChip(
+                  icon: Icons.route, label: '185 km', color: AppColors.orange),
+              _ResultChip(
+                  icon: Icons.access_time, label: '2.5 h', color: AppColors.cyan),
+              _ResultChip(
+                  icon: Icons.local_gas_station,
+                  label: 'import.chip_gas'.tr(),
+                  color: AppColors.gold),
+              _ResultChip(
+                  icon: Icons.wb_sunny_outlined,
+                  label: 'import.chip_weather'.tr(),
+                  color: AppColors.gold),
+              _ResultChip(
+                  icon: Icons.schedule,
+                  label: 'import.chip_times'.tr(),
+                  color: Colors.green),
+            ],
+          ),
         ]),
       ),
     );
