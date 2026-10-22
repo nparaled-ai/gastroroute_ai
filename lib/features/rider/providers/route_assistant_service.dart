@@ -14,11 +14,24 @@ class RouteAssistantService {
   /// Devuelve `understood: false` con un motivo cuando no hay que seguir: la
   /// frase no habla de una ruta, o pide un viaje de varios días, que de momento
   /// queda fuera.
-  static Future<Map<String, dynamic>> interpret(String text) async {
+  /// [lat] y [lng] son la posición del motero, si se tiene.
+  ///
+  /// Hacen falta para cuando dice que sale "desde casa": la IA no sabe dónde
+  /// vive, así que marca el campo y el servidor lo convierte en un sitio con
+  /// nombre. Sin posición, el origen se queda vacío y la pantalla lo pide en
+  /// rojo, que es lo correcto: inventarlo sería peor.
+  static Future<Map<String, dynamic>> interpret(
+    String text, {
+    double? lat,
+    double? lng,
+  }) async {
     try {
       final response = await ApiClient.dio.post(
         '/rider/routes/interpret',
-        data: {'text': text},
+        data: {
+          'text': text,
+          if (lat != null && lng != null) ...{'lat': lat, 'lng': lng},
+        },
       );
 
       return Map<String, dynamic>.from(response.data);

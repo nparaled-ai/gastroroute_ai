@@ -71,8 +71,8 @@ class _RouteAssistantReviewScreenState
   /// que la misma fila cambiaba de sitio según lo que escribieras — y una
   /// pantalla cuyo orden se mueve no se lee, se descifra.
   static const _order = [
-    'origin', 'circular', 'destination', 'departure_date', 'departure_time',
-    'duration', 'difficulty', 'preference', 'moto_id',
+    'origin', 'circular', 'destination', 'zone_hint', 'departure_date',
+    'departure_time', 'duration', 'difficulty', 'preference', 'moto_id',
   ];
 
   /// Las motos del motero, para poder cambiarla sin salir de aquí.

@@ -965,6 +965,7 @@ class _RouteAssistantRefineScreenState
             icon: Icons.restaurant_outlined,
             field: 'suggest_lunch',
             timeField: 'lunch_time',
+            placeField: 'lunch_place',
             label: 'assistant.f_suggest_lunch'.tr(),
             onText: 'assistant.v_lunch'.tr(),
             offText: 'assistant.v_no_lunch'.tr(),
@@ -973,6 +974,7 @@ class _RouteAssistantRefineScreenState
             icon: Icons.restaurant,
             field: 'suggest_dinner',
             timeField: 'dinner_time',
+            placeField: 'dinner_place',
             label: 'assistant.f_suggest_dinner'.tr(),
             onText: 'assistant.v_dinner'.tr(),
             offText: 'assistant.v_no_dinner'.tr(),
@@ -1021,31 +1023,62 @@ class _RouteAssistantRefineScreenState
     required String onText,
     required String offText,
 
+    required String placeField,
   }) {
     final on = _fields[field] == true;
     final time = '${_fields[timeField] ?? ''}';
+    final place = '${_fields[placeField] ?? ''}'.trim();
 
     // Saliendo a mediodía no hay almuerzo que valga.
     final allowed = field == 'suggest_lunch' ? _lunchMakesSense : true;
+
+    // Con el sitio elegido, la hora sobra: se para al llegar. Ponerle una hora
+    // fija a "almuerzo en Formigal" obliga a cuadrar dos cosas que ya están
+    // atadas entre sí, y la que manda es el sitio.
+    final valor = place.isNotEmpty
+        ? 'refine.meal_at'.tr(namedArgs: {'place': place})
+        : (time.isEmpty ? onText : '$onText · $time');
 
     return _switchRow(
       icon: icon,
       label: label,
       value: on && allowed,
       enabled: allowed,
-      // Con la parada puesta, tocar la fila cambia la HORA; el interruptor
-      // sigue siendo quien la quita. Tocar y que se apague sin querer, cuando
-      // lo que buscabas era corregir las 11:00, seria peor.
+      // Con la parada puesta, tocar la fila cambia el SITIO si lo hay, o la
+      // hora si no. El interruptor sigue siendo quien la quita: tocar y que se
+      // apague sin querer, cuando lo que buscabas era corregir el bar, sería
+      // peor.
       onTap: on
-          ? () => _askMealTime(timeField)
+          ? () => place.isNotEmpty
+              ? _askMealPlace(placeField)
+              : _askMealTime(timeField)
           : () => _toggleMeal(field, timeField),
       onSwitch: () => _toggleMeal(field, timeField),
-      onText: time.isEmpty ? onText : '$onText · $time',
+      onText: valor,
       offText: allowed
           ? offText
           : 'refine.lunch_too_late'
               .tr(namedArgs: {'time': '${_fields['departure_time'] ?? ''}'}),
     );
+  }
+
+  /// Cambiar el sitio de una parada, o quitarlo para que lo elija la app.
+  Future<void> _askMealPlace(String placeField) async {
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+      builder: (_) => PlaceSheet(title: 'refine.meal_place'.tr()),
+    );
+
+    if (result == null || !mounted) return;
+
+    final nombre = '${result['description']}'.trim();
+    if (nombre.isEmpty) return;
+
+    setState(() => _fields[placeField] = nombre);
   }
 
   void _toggleMeal(String field, String timeField) {

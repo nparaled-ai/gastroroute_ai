@@ -599,6 +599,8 @@
         "late_arrival": "En partant à {departure} tu arriverais vers {arrival} : environ {km} km {roads}.",
         "roads_secondary": "par routes secondaires",
         "roads_highways": "avec autoroutes",
+        "meal_at": "À {place}",
+        "meal_place": "Où tu t'arrêtes",
         "meal_gap_short": "Vérifie les heures des pauses",
         "meal_gap_fix": "Mettre le repas à {time}",
         "meal_gap": "Laisse au moins {hours} heures entre les deux pauses repas : collées, c'est s'asseoir deux fois de suite.",

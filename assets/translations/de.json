@@ -599,6 +599,8 @@
         "late_arrival": "Start um {departure}, Ankunft gegen {arrival}: rund {km} km {roads}.",
         "roads_secondary": "über Landstraßen",
         "roads_highways": "mit Autobahnen",
+        "meal_at": "In {place}",
+        "meal_place": "Wo du hältst",
         "meal_gap_short": "Prüfe die Zeiten der Pausen",
         "meal_gap_fix": "Essen auf {time} legen",
         "meal_gap": "Lass mindestens {hours} Stunden zwischen den beiden Esspausen: direkt hintereinander ist zweimal hinsetzen.",

@@ -599,6 +599,8 @@
         "late_arrival": "Saliendo a las {departure} llegarías sobre las {arrival}: son unos {km} km {roads}.",
         "roads_secondary": "por carreteras secundarias",
         "roads_highways": "con autovías",
+        "meal_at": "En {place}",
+        "meal_place": "Dónde paras",
         "meal_gap_short": "Revisa las horas de las paradas",
         "meal_gap_fix": "Poner la comida a las {time}",
         "meal_gap": "Deja al menos {hours} horas entre el almuerzo y la comida: tan pegadas, es sentarse dos veces seguidas.",

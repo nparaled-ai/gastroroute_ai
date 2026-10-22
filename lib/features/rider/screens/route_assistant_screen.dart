@@ -28,6 +28,14 @@ class _RouteAssistantScreenState extends State<RouteAssistantScreen> {
 
   bool _loading = false;
   String? _zone;
+
+  /// Dónde está el motero, si nos lo deja saber.
+  ///
+  /// Se guarda al cargar la zona para no volver a pedirla: sirve para cuando
+  /// dice que sale "desde casa", porque la IA no sabe dónde vive y el sitio lo
+  /// tiene que poner el GPS.
+  double? _lat;
+  double? _lng;
   String? _error;
 
   /// La leyenda arranca cerrada. Ver el comentario donde se pinta.
@@ -64,6 +72,9 @@ class _RouteAssistantScreenState extends State<RouteAssistantScreen> {
                 accuracy: LocationAccuracy.low),
           );
 
+      _lat = position.latitude;
+      _lng = position.longitude;
+
       final zone = await RouteAssistantService.zone(
           position.latitude, position.longitude);
 
@@ -95,7 +106,7 @@ class _RouteAssistantScreenState extends State<RouteAssistantScreen> {
       _error = null;
     });
 
-    final result = await RouteAssistantService.interpret(text);
+    final result = await RouteAssistantService.interpret(text, lat: _lat, lng: _lng);
     if (!mounted) return;
 
     setState(() => _loading = false);

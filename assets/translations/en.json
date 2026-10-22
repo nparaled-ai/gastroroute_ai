@@ -599,6 +599,8 @@
         "late_arrival": "Setting off at {departure} you would arrive around {arrival}: about {km} km {roads}.",
         "roads_secondary": "on back roads",
         "roads_highways": "using motorways",
+        "meal_at": "At {place}",
+        "meal_place": "Where you stop",
         "meal_gap_short": "Check the meal times",
         "meal_gap_fix": "Move the meal to {time}",
         "meal_gap": "Leave at least {hours} hours between the two meal stops: back to back, it is sitting down twice in a row.",
