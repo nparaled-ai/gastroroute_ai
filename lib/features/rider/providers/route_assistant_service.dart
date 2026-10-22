@@ -75,6 +75,7 @@ class RouteAssistantService {
         // encuadraba solo los hitos, dejando el punto de salida fuera de
         // pantalla: la ruta parecía empezar en mitad del campo.
         'origin': response.data['origin'],
+        'destination': response.data['destination'],
       };
     } on DioException catch (e) {
       return {
@@ -86,6 +87,31 @@ class RouteAssistantService {
         'options': const <Map<String, dynamic>>[],
         'error': 'errors.connection'.tr(),
       };
+    }
+  }
+
+  /// La ruta directa de A a B, sin pasar por la IA.
+  ///
+  /// Es el camino corto: lo que devuelve Google y punto. Tarda un segundo en
+  /// vez de los 20-90 de generar, no gasta cupo de rutas con IA —porque no la
+  /// usa— y sus kilómetros son los de verdad, no una estimación.
+  ///
+  /// El título viaja desde aquí porque la app es la que sabe en qué idioma va
+  /// el motero.
+  static Future<Map<String, dynamic>> direct(Map<String, dynamic> payload) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/rider/routes/direct',
+        data: payload,
+      );
+
+      return {'result': response.data};
+    } on DioException catch (e) {
+      return {
+        'error': e.response?.data?['message'] ?? 'errors.connection'.tr(),
+      };
+    } catch (_) {
+      return {'error': 'errors.connection'.tr()};
     }
   }
 

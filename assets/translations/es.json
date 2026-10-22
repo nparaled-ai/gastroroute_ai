@@ -788,6 +788,14 @@
         "options_show": "Ver en el mapa",
         "options_choose": "Elegir esta",
         "options_again": "Ninguna me convence, dame otras",
-        "options_none": "No he encontrado formas distintas de hacer esta ruta. Puedes generarla igual."
+        "options_none": "No he encontrado formas distintas de hacer esta ruta. Puedes generarla igual.",
+        "direct_roads_title": "De {from} a {to} por carretera",
+        "direct_roads_sub": "Sin autopistas, sin rodeos",
+        "direct_roads_why": "El camino corto por carreteras secundarias. Casi los mismos kilómetros que la autopista y entra en un día.",
+        "direct_fast_title": "De {from} a {to} por autopista",
+        "direct_fast_sub": "Para llegar cuanto antes",
+        "direct_fast_why": "La más rápida, pero es autopista: kilómetros rectos y poco más. Va aquí por si un día vas justo de tiempo.",
+        "direct_roads_desc": "Ruta directa por carreteras secundarias, sin paradas.",
+        "direct_fast_desc": "Ruta directa por autopista, sin paradas."
     }
 }

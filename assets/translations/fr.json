@@ -788,6 +788,14 @@
         "options_show": "Voir sur la carte",
         "options_choose": "Choisir celle-ci",
         "options_again": "Aucune ne me plaît, montre-m'en d'autres",
-        "options_none": "Je n'ai pas trouvé d'autres façons de faire cette route. Tu peux la générer quand même."
+        "options_none": "Je n'ai pas trouvé d'autres façons de faire cette route. Tu peux la générer quand même.",
+        "direct_roads_title": "De {from} à {to} par les routes",
+        "direct_roads_sub": "Sans autoroute, sans détour",
+        "direct_roads_why": "Le chemin court par les routes secondaires. Presque la même distance que l'autoroute et ça tient dans la journée.",
+        "direct_fast_title": "De {from} à {to} par l'autoroute",
+        "direct_fast_sub": "Pour arriver au plus vite",
+        "direct_fast_why": "La plus rapide, mais c'est de l'autoroute : des kilomètres tout droits et pas grand-chose d'autre. Elle est là au cas où tu sois juste en temps.",
+        "direct_roads_desc": "Itinéraire direct par routes secondaires, sans arrêts.",
+        "direct_fast_desc": "Itinéraire direct par autoroute, sans arrêts."
     }
 }

@@ -788,6 +788,14 @@
         "options_show": "Auf der Karte zeigen",
         "options_choose": "Diese nehmen",
         "options_again": "Keine passt, zeig mir andere",
-        "options_none": "Ich habe keine anderen Varianten gefunden. Du kannst die Tour trotzdem erstellen."
+        "options_none": "Ich habe keine anderen Varianten gefunden. Du kannst die Tour trotzdem erstellen.",
+        "direct_roads_title": "Von {from} nach {to} über Landstraßen",
+        "direct_roads_sub": "Keine Autobahn, keine Umwege",
+        "direct_roads_why": "Der kurze Weg über Landstraßen. Fast dieselbe Strecke wie die Autobahn und passt in einen Tag.",
+        "direct_fast_title": "Von {from} nach {to} über die Autobahn",
+        "direct_fast_sub": "Um schneller anzukommen",
+        "direct_fast_why": "Die schnellste, aber es ist Autobahn: gerade Kilometer und sonst wenig. Sie steht hier, falls du mal knapp in der Zeit bist.",
+        "direct_roads_desc": "Direkte Route über Landstraßen, ohne Stopps.",
+        "direct_fast_desc": "Direkte Route über die Autobahn, ohne Stopps."
     }
 }

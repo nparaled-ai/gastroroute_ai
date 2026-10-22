@@ -55,6 +55,10 @@ class _RouteAssistantOptionsScreenState
   /// Dónde sale, para que el encuadre incluya la salida y no solo los hitos.
   LatLng? _origin;
 
+  /// Y adónde va, cuando va a algún sitio. Las rutas directas no tienen hitos,
+  /// así que su línea en el mapa es la que une la salida con la llegada.
+  LatLng? _destination;
+
   bool _loading = true;
   bool _generating = false;
 
@@ -98,6 +102,11 @@ class _RouteAssistantOptionsScreenState
     if (!mounted) return;
 
     final origin = result['origin'];
+    final end = result['destination'];
+
+    LatLng? asPoint(dynamic p) => p == null
+        ? null
+        : LatLng((p['lat'] as num).toDouble(), (p['lng'] as num).toDouble());
 
     setState(() {
       _options = options;
@@ -105,12 +114,8 @@ class _RouteAssistantOptionsScreenState
       _error = result['error'];
       _loading = false;
       _highlighted = 0;
-      _origin = origin == null
-          ? null
-          : LatLng(
-              (origin['lat'] as num).toDouble(),
-              (origin['lng'] as num).toDouble(),
-            );
+      _origin = asPoint(origin);
+      _destination = asPoint(end);
     });
 
     if (options.isNotEmpty) _frame(0);
@@ -211,14 +216,23 @@ class _RouteAssistantOptionsScreenState
 
   // ─── El mapa ─────────────────────────────────────────────────────────
 
-  List<LatLng> _pointsOf(int index) => List<Map<String, dynamic>>.from(
-        _options[index]['points'] ?? const [],
-      )
-          .map((p) => LatLng(
-                (p['lat'] as num).toDouble(),
-                (p['lng'] as num).toDouble(),
-              ))
-          .toList();
+  List<LatLng> _pointsOf(int index) {
+    final points = List<Map<String, dynamic>>.from(
+      _options[index]['points'] ?? const [],
+    )
+        .map((p) => LatLng(
+              (p['lat'] as num).toDouble(),
+              (p['lng'] as num).toDouble(),
+            ))
+        .toList();
+
+    // Una ruta directa no tiene hitos a propósito: su dibujo es la línea entre
+    // la salida y la llegada. Sin esto, tocar "ver en el mapa" en la rápida no
+    // enseñaría nada.
+    if (points.isEmpty && _destination != null) return [_destination!];
+
+    return points;
+  }
 
   Set<Polyline> get _lines {
     final lines = <Polyline>{};
@@ -325,18 +339,15 @@ class _RouteAssistantOptionsScreenState
   Future<void> _choose(int? index) async {
     setState(() => _generating = true);
 
-    final names = index == null
-        ? const <String>[]
-        : List<Map<String, dynamic>>.from(_options[index]['points'] ?? const [])
-            .map((p) => '${p['name']}')
-            .toList();
+    final option = index == null ? null : _options[index];
+    final kind = '${option?['kind'] ?? 'scenic'}';
 
-    final payload = Map<String, dynamic>.from(widget.payload)
-      ..['ai_request'] = widget.request;
+    // La rápida y la directa no pasan por la IA: ya las ha trazado Google.
+    // Tardan un segundo en vez de minuto y medio y no gastan cupo.
+    final result = kind == 'scenic'
+        ? await _generateScenic(option)
+        : await _generateDirect(kind);
 
-    if (names.isNotEmpty) payload['suggested_points'] = names;
-
-    final result = await RouteService.generateRoute(payload);
     if (!mounted) return;
 
     setState(() => _generating = false);
@@ -350,6 +361,47 @@ class _RouteAssistantOptionsScreenState
     }
 
     context.push('/rider/route-result', extra: result['result']);
+  }
+
+  /// La ruta corta: la traza Google y se guarda tal cual.
+  Future<Map<String, dynamic>> _generateDirect(String kind) {
+    final p = widget.payload;
+
+    return RouteAssistantService.direct({
+      'origin': p['origin'],
+      'destination': p['destination'],
+      'moto_id': p['moto_id'],
+      // La rápida va por autopista; la otra, expresamente no.
+      'avoid_highways': kind == 'roads',
+      'title': _directTitle(kind),
+      'description': 'assistant.direct_${kind}_desc'.tr(),
+      if (p['difficulty'] != null) 'difficulty': p['difficulty'],
+      if (p['departure_date'] != null) 'departure_date': p['departure_date'],
+      if (p['departure_time'] != null) 'departure_time': p['departure_time'],
+      'ai_request': widget.request,
+    });
+  }
+
+  String _directTitle(String kind) => 'assistant.direct_${kind}_title'.tr(
+        namedArgs: {
+          'from': '${widget.payload['origin']}'.split(',').first.trim(),
+          'to': '${widget.payload['destination']}'.split(',').first.trim(),
+        },
+      );
+
+  Future<Map<String, dynamic>> _generateScenic(Map<String, dynamic>? option) async {
+    final names = option == null
+        ? const <String>[]
+        : List<Map<String, dynamic>>.from(option['points'] ?? const [])
+            .map((p) => '${p['name']}')
+            .toList();
+
+    final payload = Map<String, dynamic>.from(widget.payload)
+      ..['ai_request'] = widget.request;
+
+    if (names.isNotEmpty) payload['suggested_points'] = names;
+
+    return RouteService.generateRoute(payload);
   }
 
   // ─── Pintar ──────────────────────────────────────────────────────────
@@ -546,9 +598,23 @@ class _RouteAssistantOptionsScreenState
     final on = index == _highlighted;
     final recommended = option['recommended'] == true;
 
-    final names = List<Map<String, dynamic>>.from(option['points'] ?? const [])
-        .map((p) => '${p['name']}')
-        .join(' · ');
+    // La rápida y la directa no las ha pensado la IA: las ha trazado Google.
+    // Así que su nombre y su explicación los pone la app, en el idioma del
+    // motero, y sus kilómetros son exactos en vez de aproximados.
+    final kind = '${option['kind'] ?? 'scenic'}';
+    final direct = kind != 'scenic';
+
+    final title = direct ? _directTitle(kind) : '${option['name']}';
+
+    final names = direct
+        ? 'assistant.direct_${kind}_sub'.tr()
+        : List<Map<String, dynamic>>.from(option['points'] ?? const [])
+            .map((p) => '${p['name']}')
+            .join(' · ');
+
+    final hours = (option['minutes'] as num?) == null
+        ? null
+        : ((option['minutes'] as num) / 60).toStringAsFixed(1);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -583,7 +649,7 @@ class _RouteAssistantOptionsScreenState
               ),
             ] else
               Expanded(
-                child: Text('${option['name']}',
+                child: Text(title,
                     style: const TextStyle(
                         color: AppColors.white,
                         fontSize: 14.5,
@@ -593,7 +659,7 @@ class _RouteAssistantOptionsScreenState
 
           if (recommended) ...[
             const SizedBox(height: 5),
-            Text('${option['name']}',
+            Text(title,
                 style: const TextStyle(
                     color: AppColors.white,
                     fontSize: 14.5,
@@ -606,12 +672,25 @@ class _RouteAssistantOptionsScreenState
 
           const SizedBox(height: 8),
           Wrap(spacing: 5, runSpacing: 5, children: [
-            _chip('~${option['approx_km']} km'),
+            _chip(direct ? '${option['approx_km']} km' : '~${option['approx_km']} km'),
+            if (hours != null) _chip('$hours h'),
             for (final t in List<String>.from(option['traits'] ?? const []))
               _chip(t),
           ]),
 
-          if ('${option['why']}'.isNotEmpty) ...[
+          if (direct) ...[
+            const SizedBox(height: 9),
+            Container(
+              padding: const EdgeInsets.only(top: 8),
+              decoration: const BoxDecoration(
+                border: Border(
+                    top: BorderSide(color: AppColors.greyDark, width: 0.5)),
+              ),
+              child: Text('assistant.direct_${kind}_why'.tr(),
+                  style: const TextStyle(
+                      color: AppColors.grey, fontSize: 11.5, height: 1.45)),
+            ),
+          ] else if ('${option['why']}'.isNotEmpty) ...[
             const SizedBox(height: 9),
             Container(
               padding: const EdgeInsets.only(top: 8),

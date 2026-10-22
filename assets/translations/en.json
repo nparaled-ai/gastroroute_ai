@@ -788,6 +788,14 @@
         "options_show": "Show on map",
         "options_choose": "Pick this one",
         "options_again": "None of these, show me others",
-        "options_none": "I couldn't find different ways to ride this. You can still generate it."
+        "options_none": "I couldn't find different ways to ride this. You can still generate it.",
+        "direct_roads_title": "{from} to {to} on back roads",
+        "direct_roads_sub": "No motorways, no detours",
+        "direct_roads_why": "The short way on back roads. Nearly the same distance as the motorway and it fits in a day.",
+        "direct_fast_title": "{from} to {to} by motorway",
+        "direct_fast_sub": "To get there sooner",
+        "direct_fast_why": "The quickest, but it is motorway: straight miles and little else. It is here in case you are short on time.",
+        "direct_roads_desc": "Direct route on back roads, no stops.",
+        "direct_fast_desc": "Direct route by motorway, no stops."
     }
 }

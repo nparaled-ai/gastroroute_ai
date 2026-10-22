@@ -788,6 +788,14 @@
         "options_show": "Ver no mapa",
         "options_choose": "Escolher esta",
         "options_again": "Nenhuma me convence, mostra outras",
-        "options_none": "Não encontrei formas diferentes de fazer este percurso. Podes gerá-lo à mesma."
+        "options_none": "Não encontrei formas diferentes de fazer este percurso. Podes gerá-lo à mesma.",
+        "direct_roads_title": "De {from} a {to} por estrada",
+        "direct_roads_sub": "Sem autoestradas, sem desvios",
+        "direct_roads_why": "O caminho curto por estradas secundárias. Quase os mesmos quilómetros que a autoestrada e cabe num dia.",
+        "direct_fast_title": "De {from} a {to} por autoestrada",
+        "direct_fast_sub": "Para chegar mais cedo",
+        "direct_fast_why": "A mais rápida, mas é autoestrada: quilómetros a direito e pouco mais. Está aqui para quando tiveres o tempo contado.",
+        "direct_roads_desc": "Percurso direto por estradas secundárias, sem paragens.",
+        "direct_fast_desc": "Percurso direto por autoestrada, sem paragens."
     }
 }

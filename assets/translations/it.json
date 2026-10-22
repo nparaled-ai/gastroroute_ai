@@ -788,6 +788,14 @@
         "options_show": "Vedi sulla mappa",
         "options_choose": "Scegli questo",
         "options_again": "Nessuno mi convince, mostrane altri",
-        "options_none": "Non ho trovato modi diversi di fare questo giro. Puoi generarlo lo stesso."
+        "options_none": "Non ho trovato modi diversi di fare questo giro. Puoi generarlo lo stesso.",
+        "direct_roads_title": "Da {from} a {to} su strade secondarie",
+        "direct_roads_sub": "Niente autostrada, niente giri",
+        "direct_roads_why": "La via breve su strade secondarie. Quasi gli stessi chilometri dell'autostrada e ci sta in una giornata.",
+        "direct_fast_title": "Da {from} a {to} in autostrada",
+        "direct_fast_sub": "Per arrivare prima",
+        "direct_fast_why": "La più veloce, ma è autostrada: chilometri dritti e poco altro. Sta qui nel caso tu sia di corsa.",
+        "direct_roads_desc": "Percorso diretto su strade secondarie, senza soste.",
+        "direct_fast_desc": "Percorso diretto in autostrada, senza soste."
     }
 }
