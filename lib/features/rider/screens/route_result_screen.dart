@@ -658,14 +658,18 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                 route: _route,
                 weather: _weather,
                 aiSummary: _aiSummary,
-                showLunch: widget.result['form_data']?['suggest_lunch'] == true,
-                showDinner: widget.result['form_data']?['suggest_dinner'] == true,
+                // Si el servidor devolvió la parada, es que se pidió. Antes
+                // esto dependía de `form_data`, un bloque que solo rellena el
+                // formulario antiguo: generando desde el asistente la parada
+                // venía en la ruta y no se enseñaba en ninguna parte.
+                showLunch: _route['lunch_stop'] != null,
+                showDinner: _route['dinner_stop'] != null,
               ),
 
               const SizedBox(height: 24),
 
               // Almuerzo - solo si se pidió
-              if (_route['lunch_stop'] != null && (widget.result['form_data']?['suggest_lunch'] == true)) ...[
+              if (_route['lunch_stop'] != null) ...[
                 _SectionHeader(icon: Icons.restaurant_outlined,
                     label: 'route_result.lunch_stop'.tr(), color: AppColors.orange),
                 const SizedBox(height: 8),
@@ -677,7 +681,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               ],
 
               // Comer - solo si se pidió
-              if (_route['dinner_stop'] != null && (widget.result['form_data']?['suggest_dinner'] == true)) ...[
+              if (_route['dinner_stop'] != null) ...[
                 _SectionHeader(icon: Icons.dinner_dining,
                     label: 'route_result.dinner_stop'.tr(), color: AppColors.cyan),
                 const SizedBox(height: 8),
