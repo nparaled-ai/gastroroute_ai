@@ -312,9 +312,16 @@ class _RouteAssistantOptionsScreenState
 
   /// Generar la ruta de la propuesta elegida.
   ///
-  /// Sus hitos van como puntos de paso: es lo que convierte un titular en la
-  /// ruta que el motero ha visto en el mapa. Sin esto, elegir no serviría de
-  /// nada — se generaría cualquier otra cosa de la misma zona.
+  /// Sus hitos van como SUGERENCIA, no como obligación, y ahí está toda la
+  /// diferencia. Al principio viajaban como puntos obligatorios y eso rompía el
+  /// control de distancia del generador: lo obligatorio no se recorta nunca, y
+  /// el recorte se quedaba sin margen. Medido — una circular de 250 km salía en
+  /// 327 y 374 km, y un Zaragoza-Santander acababa en 678 km y 10,9 h cuando el
+  /// tope de un día son 600 y 10.
+  ///
+  /// Lo que el motero eligió es una ZONA, no cada pueblo de la tarjeta: si uno
+  /// obliga a pasarse de largo, es mejor dejarlo fuera que devolver una ruta
+  /// que no cabe en el día.
   Future<void> _choose(int? index) async {
     setState(() => _generating = true);
 
@@ -327,7 +334,7 @@ class _RouteAssistantOptionsScreenState
     final payload = Map<String, dynamic>.from(widget.payload)
       ..['ai_request'] = widget.request;
 
-    if (names.isNotEmpty) payload['custom_points'] = names;
+    if (names.isNotEmpty) payload['suggested_points'] = names;
 
     final result = await RouteService.generateRoute(payload);
     if (!mounted) return;
