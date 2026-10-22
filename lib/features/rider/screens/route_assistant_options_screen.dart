@@ -52,6 +52,9 @@ class _RouteAssistantOptionsScreenState
   String? _note;
   String? _error;
 
+  /// Dónde sale, para que el encuadre incluya la salida y no solo los hitos.
+  LatLng? _origin;
+
   bool _loading = true;
   bool _generating = false;
 
@@ -94,12 +97,20 @@ class _RouteAssistantOptionsScreenState
     await _buildPins(options.length);
     if (!mounted) return;
 
+    final origin = result['origin'];
+
     setState(() {
       _options = options;
       _note = result['note'];
       _error = result['error'];
       _loading = false;
       _highlighted = 0;
+      _origin = origin == null
+          ? null
+          : LatLng(
+              (origin['lat'] as num).toDouble(),
+              (origin['lng'] as num).toDouble(),
+            );
     });
 
     if (options.isNotEmpty) _frame(0);
@@ -120,31 +131,39 @@ class _RouteAssistantOptionsScreenState
     }
   }
 
+  /// Lo que mide la chincheta en pantalla, en puntos lógicos.
+  ///
+  /// El bitmap se dibuja multiplicado por la densidad del móvil y se le dice a
+  /// Google a qué densidad corresponde. Sin eso, el dibujo se escala otra vez y
+  /// en un móvil normal salen chinchetas del tamaño de un dedo: medido en el
+  /// emulador, tapaban media provincia.
+  static const _pinSize = 26.0;
+
   Future<BitmapDescriptor> _pin(String label, Color color) async {
-    const size = 72.0;
+    final dpr = WidgetsBinding.instance.platformDispatcher.views.first
+        .devicePixelRatio;
+
+    final size = _pinSize * dpr;
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
+    final center = Offset(size / 2, size / 2);
 
+    canvas.drawCircle(center, size / 2 - dpr, Paint()..color = color);
     canvas.drawCircle(
-      const Offset(size / 2, size / 2),
-      size / 2 - 3,
-      Paint()..color = color,
-    );
-    canvas.drawCircle(
-      const Offset(size / 2, size / 2),
-      size / 2 - 3,
+      center,
+      size / 2 - dpr,
       Paint()
-        ..color = Colors.black.withValues(alpha: 0.45)
+        ..color = Colors.black.withValues(alpha: 0.5)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 3,
+        ..strokeWidth = dpr,
     );
 
     final painter = TextPainter(
       text: TextSpan(
         text: label,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.black,
-          fontSize: 38,
+          fontSize: size * 0.56,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -157,13 +176,38 @@ class _RouteAssistantOptionsScreenState
     );
 
     final image = await recorder.endRecording().toImage(
-          size.toInt(),
-          size.toInt(),
+          size.round(),
+          size.round(),
         );
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
 
-    return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
+    return BitmapDescriptor.bytes(
+      bytes!.buffer.asUint8List(),
+      imagePixelRatio: dpr,
+    );
   }
+
+  /// El mapa, en oscuro como el resto de la app.
+  ///
+  /// Un mapa en claro dentro de una pantalla negra no es solo feo: deslumbra de
+  /// noche, que es justo cuando un motero mira el móvil con el casco puesto.
+  static const _darkMap = '''
+[{"elementType":"geometry","stylers":[{"color":"#242f3e"}]},
+{"elementType":"labels.text.stroke","stylers":[{"color":"#242f3e"}]},
+{"elementType":"labels.text.fill","stylers":[{"color":"#746855"}]},
+{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#d59563"}]},
+{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#d59563"}]},
+{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#263c3f"}]},
+{"featureType":"road","elementType":"geometry","stylers":[{"color":"#38414e"}]},
+{"featureType":"road","elementType":"geometry.stroke","stylers":[{"color":"#212a37"}]},
+{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#9ca5b3"}]},
+{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#746855"}]},
+{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#1f2835"}]},
+{"featureType":"road.highway","elementType":"labels.text.fill","stylers":[{"color":"#f3d19c"}]},
+{"featureType":"transit","stylers":[{"visibility":"off"}]},
+{"featureType":"water","elementType":"geometry","stylers":[{"color":"#17263c"}]},
+{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#515c6d"}]}]
+''';
 
   // ─── El mapa ─────────────────────────────────────────────────────────
 
@@ -179,8 +223,17 @@ class _RouteAssistantOptionsScreenState
   Set<Polyline> get _lines {
     final lines = <Polyline>{};
 
+    final circular = widget.payload['circular'] != false;
+
     for (var i = 0; i < _options.length; i++) {
-      final points = _pointsOf(i);
+      // El trazo arranca y acaba donde arranca y acaba la ruta. En una circular
+      // eso cierra el bucle; sin ello se veía una línea suelta entre dos
+      // pueblos que no explicaba nada.
+      final points = [
+        ?_origin,
+        ..._pointsOf(i),
+        if (_origin != null && circular) _origin!,
+      ];
       if (points.length < 2) continue;
 
       final on = i == _highlighted;
@@ -222,7 +275,9 @@ class _RouteAssistantOptionsScreenState
 
   /// Encuadra la propuesta elegida.
   Future<void> _frame(int index) async {
-    final points = _pointsOf(index);
+    // La salida entra en el encuadre: es el primer sitio que se busca al mirar
+    // el mapa, y dejándola fuera la ruta parecía empezar en mitad del campo.
+    final points = [..._pointsOf(index), ?_origin];
     if (points.isEmpty || _map == null) return;
 
     var south = points.first.latitude, north = points.first.latitude;
@@ -312,7 +367,7 @@ class _RouteAssistantOptionsScreenState
                     color: AppColors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w700)),
-            Text(_subtitle,
+            Text('${'assistant.step_of'.tr(namedArgs: {'n': '3'})} · $_subtitle',
                 style: const TextStyle(color: AppColors.grey, fontSize: 10.5)),
           ],
         ),
@@ -402,6 +457,7 @@ class _RouteAssistantOptionsScreenState
                     target: _pointsOf(0).first,
                     zoom: 8,
                   ),
+                  style: _darkMap,
                   onMapCreated: (c) {
                     _map = c;
                     _frame(_highlighted);

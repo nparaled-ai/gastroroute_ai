@@ -71,6 +71,10 @@ class RouteAssistantService {
               .map((o) => Map<String, dynamic>.from(o)),
         ),
         'note': response.data['note'],
+        // Dónde sale. Se quedaba fuera al reenviar la respuesta y el mapa
+        // encuadraba solo los hitos, dejando el punto de salida fuera de
+        // pantalla: la ruta parecía empezar en mitad del campo.
+        'origin': response.data['origin'],
       };
     } on DioException catch (e) {
       return {

@@ -570,7 +570,7 @@
     },
     "refine": {
         "title": "Rifinire il percorso",
-        "subtitle": "Passo 2 di 2 · tutto facoltativo",
+        "subtitle": "Passo 2 di 3 · tutto facoltativo",
         "direction": "DIREZIONE",
         "direction_label": "Verso dove vado",
         "direction_help": "Solo nei percorsi ad anello: le quattro direzioni valgono uguale, è questo che decide la rotta.",
@@ -773,7 +773,7 @@
         "range_needed": "Scrivi un numero",
         "missing_departure_time": "A che ora parti?",
         "step_route": "Il percorso",
-        "step_of": "Passo {n} di 2",
+        "step_of": "Passo {n} di 3",
         "f_duration": "Quanto voglio guidare",
         "row_missing": "Manca — tocca per inserirlo",
         "tag_assumed": "presunto",

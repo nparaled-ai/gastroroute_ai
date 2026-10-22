@@ -570,7 +570,7 @@
     },
     "refine": {
         "title": "Fine-tune the route",
-        "subtitle": "Step 2 of 2 · all optional",
+        "subtitle": "Step 2 of 3 · all optional",
         "direction": "DIRECTION",
         "direction_label": "Which way I head",
         "direction_help": "Loops only: all four directions fit equally well, so this is what sets the heading.",
@@ -773,7 +773,7 @@
         "range_needed": "Enter a number",
         "missing_departure_time": "What time do you set off?",
         "step_route": "The route",
-        "step_of": "Step {n} of 2",
+        "step_of": "Step {n} of 3",
         "f_duration": "How far I want to ride",
         "row_missing": "Missing — tap to set it",
         "tag_assumed": "assumed",

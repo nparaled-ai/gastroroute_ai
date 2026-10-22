@@ -570,7 +570,7 @@
     },
     "refine": {
         "title": "Afinar a rota",
-        "subtitle": "Passo 2 de 2 · tudo opcional",
+        "subtitle": "Passo 2 de 3 · tudo opcional",
         "direction": "DIREÇÃO",
         "direction_label": "Para onde sigo",
         "direction_help": "Só nas circulares: as quatro direções valem igual e é isto que define o rumo.",
@@ -773,7 +773,7 @@
         "range_needed": "Escreve um número",
         "missing_departure_time": "A que horas sais?",
         "step_route": "A rota",
-        "step_of": "Passo {n} de 2",
+        "step_of": "Passo {n} de 3",
         "f_duration": "Quanto quero rodar",
         "row_missing": "Falta — toca para definir",
         "tag_assumed": "suposto",

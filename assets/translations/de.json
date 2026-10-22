@@ -570,7 +570,7 @@
     },
     "refine": {
         "title": "Route verfeinern",
-        "subtitle": "Schritt 2 von 2 · alles optional",
+        "subtitle": "Schritt 2 von 3 · alles optional",
         "direction": "RICHTUNG",
         "direction_label": "Wohin es gehen soll",
         "direction_help": "Nur bei Rundkursen: alle vier Richtungen passen gleich gut, das hier legt den Kurs fest.",
@@ -773,7 +773,7 @@
         "range_needed": "Gib eine Zahl ein",
         "missing_departure_time": "Wann startest du?",
         "step_route": "Die Route",
-        "step_of": "Schritt {n} von 2",
+        "step_of": "Schritt {n} von 3",
         "f_duration": "Wie weit ich fahren will",
         "row_missing": "Fehlt — zum Festlegen tippen",
         "tag_assumed": "angenommen",

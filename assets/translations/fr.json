@@ -570,7 +570,7 @@
     },
     "refine": {
         "title": "Affiner l'itinéraire",
-        "subtitle": "Étape 2 sur 2 · tout est facultatif",
+        "subtitle": "Étape 2 sur 3 · tout est facultatif",
         "direction": "DIRECTION",
         "direction_label": "Vers où je pars",
         "direction_help": "Uniquement en boucle : les quatre directions se valent, c'est donc cela qui fixe le cap.",
@@ -773,7 +773,7 @@
         "range_needed": "Saisis un nombre",
         "missing_departure_time": "À quelle heure pars-tu ?",
         "step_route": "L'itinéraire",
-        "step_of": "Étape {n} sur 2",
+        "step_of": "Étape {n} sur 3",
         "f_duration": "Combien je veux rouler",
         "row_missing": "Manquant — touche pour le définir",
         "tag_assumed": "supposé",

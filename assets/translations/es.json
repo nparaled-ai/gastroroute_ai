@@ -570,7 +570,7 @@
     },
     "refine": {
         "title": "Afinar la ruta",
-        "subtitle": "Paso 2 de 2 · todo opcional",
+        "subtitle": "Paso 2 de 3 · todo opcional",
         "direction": "DIRECCIÓN",
         "direction_label": "Hacia dónde tiro",
         "direction_help": "Solo en circulares: las cuatro direcciones valen igual y esto decide el rumbo.",
@@ -773,7 +773,7 @@
         "range_needed": "Escribe un número",
         "missing_departure_time": "¿A qué hora sales?",
         "step_route": "La ruta",
-        "step_of": "Paso {n} de 2",
+        "step_of": "Paso {n} de 3",
         "f_duration": "Cuánto quiero rodar",
         "row_missing": "Falta — toca para ponerlo",
         "tag_assumed": "supuesto",
