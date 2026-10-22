@@ -777,6 +777,17 @@
         "f_duration": "How far I want to ride",
         "row_missing": "Missing — tap to set it",
         "tag_assumed": "assumed",
-        "blocked_many": "{n} details still missing"
+        "blocked_many": "{n} details still missing",
+        "options_title": "Ways to ride it",
+        "options_circular": "Loop from {from}",
+        "options_to": "To {to}",
+        "options_loading": "Looking for different ways to ride this…",
+        "options_generating": "Working out the route you picked…",
+        "options_sketch": "Rough line, not the final route",
+        "options_pick": "MY PICK",
+        "options_show": "Show on map",
+        "options_choose": "Pick this one",
+        "options_again": "None of these, show me others",
+        "options_none": "I couldn't find different ways to ride this. You can still generate it."
     }
 }

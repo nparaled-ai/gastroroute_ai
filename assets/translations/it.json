@@ -777,6 +777,17 @@
         "f_duration": "Quanto voglio guidare",
         "row_missing": "Manca — tocca per inserirlo",
         "tag_assumed": "presunto",
-        "blocked_many": "Mancano ancora {n} dati"
+        "blocked_many": "Mancano ancora {n} dati",
+        "options_title": "Modi di farla",
+        "options_circular": "Anello da {from}",
+        "options_to": "Fino a {to}",
+        "options_loading": "Sto cercando modi diversi di fare questo giro…",
+        "options_generating": "Sto tracciando il percorso che hai scelto…",
+        "options_sketch": "Tracciato indicativo, non il percorso finale",
+        "options_pick": "LA MIA SCELTA",
+        "options_show": "Vedi sulla mappa",
+        "options_choose": "Scegli questo",
+        "options_again": "Nessuno mi convince, mostrane altri",
+        "options_none": "Non ho trovato modi diversi di fare questo giro. Puoi generarlo lo stesso."
     }
 }

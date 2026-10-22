@@ -777,6 +777,17 @@
         "f_duration": "Wie weit ich fahren will",
         "row_missing": "Fehlt — zum Festlegen tippen",
         "tag_assumed": "angenommen",
-        "blocked_many": "Es fehlen noch {n} Angaben"
+        "blocked_many": "Es fehlen noch {n} Angaben",
+        "options_title": "Varianten der Tour",
+        "options_circular": "Rundtour ab {from}",
+        "options_to": "Bis {to}",
+        "options_loading": "Ich suche verschiedene Varianten für diese Tour…",
+        "options_generating": "Ich plane die Route, die du gewählt hast…",
+        "options_sketch": "Grobe Linie, nicht die endgültige Route",
+        "options_pick": "MEINE WAHL",
+        "options_show": "Auf der Karte zeigen",
+        "options_choose": "Diese nehmen",
+        "options_again": "Keine passt, zeig mir andere",
+        "options_none": "Ich habe keine anderen Varianten gefunden. Du kannst die Tour trotzdem erstellen."
     }
 }

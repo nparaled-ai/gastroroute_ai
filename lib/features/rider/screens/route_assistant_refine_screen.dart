@@ -2,14 +2,13 @@ import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/place_sheet.dart';
 import '../providers/rider_profile_service.dart';
 import '../providers/route_assistant_service.dart';
-import '../providers/route_service.dart';
 import 'poi_picker_screen.dart';
+import 'route_assistant_options_screen.dart';
 
 /// Tercera pantalla del asistente: afinar la ruta antes de generarla.
 ///
@@ -69,7 +68,6 @@ class _RouteAssistantRefineScreenState
   String? _poiQuery;
   int? _poiRadiusKm;
 
-  bool _generating = false;
 
   /// La moto elegida, para saber si se le puede calcular la autonomia.
   ///
@@ -459,8 +457,7 @@ class _RouteAssistantRefineScreenState
           const SizedBox(height: 18),
 
           ElevatedButton(
-            onPressed:
-                (_generating || _suggestedDinner != null) ? null : _generate,
+            onPressed: _suggestedDinner != null ? null : _generate,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.orange,
               disabledBackgroundColor: AppColors.greyDark,
@@ -468,18 +465,17 @@ class _RouteAssistantRefineScreenState
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
-            child: _generating
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white))
-                // Apagado dice por qué: un botón gris sin explicación obliga a
-                // buscar por la pantalla qué es lo que falla.
-                : Text(
+            // Ya no hay espera que enseñar aquí: la rueda vive ahora en la
+            // pantalla de las propuestas, que es la que llama al servidor.
+            //
+            // Apagado dice por qué: un botón gris sin explicación obliga a
+            // buscar por la pantalla qué es lo que falla.
+            child: Text(
                     _suggestedDinner != null
                         ? 'refine.meal_gap_short'.tr()
-                        : 'assistant.generate'.tr(),
+                        // Ya no genera: lleva a elegir entre varias formas de
+                        // hacerla, y se genera la elegida.
+                        : 'assistant.continue'.tr(),
                     style: TextStyle(
                         color: _suggestedDinner != null
                             ? AppColors.grey
@@ -1310,9 +1306,28 @@ class _RouteAssistantRefineScreenState
 
   // ─── Generar ─────────────────────────────────────────────────────────
 
+  /// Antes de generar, enseñar varias formas de hacerla.
+  ///
+  /// Generar es lo caro —hasta cinco intentos con sus llamadas a Google— y
+  /// hasta ahora se hacía a ciegas: si la ruta no gustaba, solo quedaba
+  /// regenerar y cruzar los dedos, sin poder decir "por ahí no". Pedir
+  /// titulares cuesta una llamada y ninguna a Google, así que se elige primero
+  /// la zona y solo después se calcula.
   Future<void> _generate() async {
-    setState(() => _generating = true);
+    final payload = _payload();
 
+    if (!mounted) return;
+
+    await Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => RouteAssistantOptionsScreen(
+        payload: payload,
+        request: widget.request,
+      ),
+    ));
+  }
+
+  /// Todo lo decidido, listo para el servidor.
+  Map<String, dynamic> _payload() {
     final payload = Map<String, dynamic>.from(_fields)
       ..removeWhere((k, v) =>
           v == null ||
@@ -1328,24 +1343,6 @@ class _RouteAssistantRefineScreenState
       payload['poi_ids'] = _pois.map((p) => p['id']).toList();
     }
 
-    final result = await RouteService.generateRoute(payload);
-    if (!mounted) return;
-
-    setState(() => _generating = false);
-
-    if (result['error'] != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(result['error']),
-        backgroundColor: AppColors.error,
-      ));
-      return;
-    }
-
-    // Se apila, no se sustituye: desde el resultado se tiene que poder volver
-    // aquí a retocar y generar otra vez, y encontrarlo todo como lo dejaste.
-    // Sustituyendo, la pantalla de afinar se destruía al generar y el botón de
-    // atrás te devolvía al resumen, perdiendo la dirección, los puntos
-    // elegidos y las paradas.
-    context.push('/rider/route-result', extra: result['result']);
+    return payload;
   }
 }

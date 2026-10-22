@@ -777,6 +777,17 @@
         "f_duration": "Combien je veux rouler",
         "row_missing": "Manquant — touche pour le définir",
         "tag_assumed": "supposé",
-        "blocked_many": "Il manque encore {n} informations"
+        "blocked_many": "Il manque encore {n} informations",
+        "options_title": "Façons de la faire",
+        "options_circular": "Boucle au départ de {from}",
+        "options_to": "Jusqu'à {to}",
+        "options_loading": "Je cherche différentes façons de faire cette route…",
+        "options_generating": "Je trace l'itinéraire que tu as choisi…",
+        "options_sketch": "Tracé approximatif, pas l'itinéraire final",
+        "options_pick": "MON CHOIX",
+        "options_show": "Voir sur la carte",
+        "options_choose": "Choisir celle-ci",
+        "options_again": "Aucune ne me plaît, montre-m'en d'autres",
+        "options_none": "Je n'ai pas trouvé d'autres façons de faire cette route. Tu peux la générer quand même."
     }
 }

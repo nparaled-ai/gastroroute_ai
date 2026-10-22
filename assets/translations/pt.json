@@ -777,6 +777,17 @@
         "f_duration": "Quanto quero rodar",
         "row_missing": "Falta — toca para definir",
         "tag_assumed": "suposto",
-        "blocked_many": "Faltam {n} dados por definir"
+        "blocked_many": "Faltam {n} dados por definir",
+        "options_title": "Formas de a fazer",
+        "options_circular": "Circular a partir de {from}",
+        "options_to": "Até {to}",
+        "options_loading": "A procurar formas diferentes de fazer este percurso…",
+        "options_generating": "A traçar o percurso que escolheste…",
+        "options_sketch": "Traçado aproximado, não o percurso final",
+        "options_pick": "A QUE EU ESCOLHIA",
+        "options_show": "Ver no mapa",
+        "options_choose": "Escolher esta",
+        "options_again": "Nenhuma me convence, mostra outras",
+        "options_none": "Não encontrei formas diferentes de fazer este percurso. Podes gerá-lo à mesma."
     }
 }

@@ -50,6 +50,41 @@ class RouteAssistantService {
     }
   }
 
+  /// Varias formas de hacer la misma ruta, en titulares.
+  ///
+  /// Es la fase barata: el servidor pregunta una vez a la IA y no toca Google,
+  /// así que pedir otras tres cuesta céntimos y no gasta cupo del motero. La
+  /// ruta de verdad se calcula después, solo con la que elija.
+  ///
+  /// Pueden venir menos de tres, o ninguna: con el destino puesto o con los
+  /// puntos ya elegidos a mano puede no haber tres formas distintas de verdad.
+  static Future<Map<String, dynamic>> options(Map<String, dynamic> payload) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/rider/routes/options',
+        data: payload,
+      );
+
+      return {
+        'options': List<Map<String, dynamic>>.from(
+          (response.data['options'] as List? ?? const [])
+              .map((o) => Map<String, dynamic>.from(o)),
+        ),
+        'note': response.data['note'],
+      };
+    } on DioException catch (e) {
+      return {
+        'options': const <Map<String, dynamic>>[],
+        'error': e.response?.data?['message'] ?? 'errors.connection'.tr(),
+      };
+    } catch (_) {
+      return {
+        'options': const <Map<String, dynamic>>[],
+        'error': 'errors.connection'.tr(),
+      };
+    }
+  }
+
   /// La zona del motero, para los ejemplos: "Pirineo Aragonés", "Sierra de
   /// Madrid"...
   ///

@@ -777,6 +777,17 @@
         "f_duration": "Cuánto quiero rodar",
         "row_missing": "Falta — toca para ponerlo",
         "tag_assumed": "supuesto",
-        "blocked_many": "Faltan {n} datos por poner"
+        "blocked_many": "Faltan {n} datos por poner",
+        "options_title": "Formas de hacerla",
+        "options_circular": "Circular desde {from}",
+        "options_to": "Hasta {to}",
+        "options_loading": "Buscando formas distintas de hacer esta ruta…",
+        "options_generating": "Trazando la ruta que has elegido…",
+        "options_sketch": "Trazo aproximado, no el recorrido final",
+        "options_pick": "LA QUE ELEGIRÍA",
+        "options_show": "Ver en el mapa",
+        "options_choose": "Elegir esta",
+        "options_again": "Ninguna me convence, dame otras",
+        "options_none": "No he encontrado formas distintas de hacer esta ruta. Puedes generarla igual."
     }
 }
