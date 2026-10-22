@@ -796,6 +796,7 @@
         "direct_fast_sub": "To get there sooner",
         "direct_fast_why": "The quickest, but it is motorway: straight miles and little else. It is here in case you are short on time.",
         "direct_roads_desc": "Direct route on back roads, no stops.",
-        "direct_fast_desc": "Direct route by motorway, no stops."
+        "direct_fast_desc": "Direct route by motorway, no stops.",
+        "direct_skips": "Skips the {n} places you picked"
     }
 }

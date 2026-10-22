@@ -686,9 +686,37 @@ class _RouteAssistantOptionsScreenState
                 border: Border(
                     top: BorderSide(color: AppColors.greyDark, width: 0.5)),
               ),
-              child: Text('assistant.direct_${kind}_why'.tr(),
-                  style: const TextStyle(
-                      color: AppColors.grey, fontSize: 11.5, height: 1.45)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('assistant.direct_${kind}_why'.tr(),
+                      style: const TextStyle(
+                          color: AppColors.grey, fontSize: 11.5, height: 1.45)),
+
+                  // Lo que esta ruta se deja por el camino. Si el motero ha
+                  // elegido sitios a mano y esta no pasa por ellos, hay que
+                  // decírselo aquí: darle una ruta que ignora en silencio lo
+                  // que acaba de pedir es lo único que no se puede hacer.
+                  if ((option['skips'] as num? ?? 0) > 0) ...[
+                    const SizedBox(height: 7),
+                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      const Icon(Icons.info_outline,
+                          color: AppColors.orange, size: 14),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'assistant.direct_skips'.tr(
+                              namedArgs: {'n': '${option['skips']}'}),
+                          style: const TextStyle(
+                              color: AppColors.orange,
+                              fontSize: 11.5,
+                              height: 1.4),
+                        ),
+                      ),
+                    ]),
+                  ],
+                ],
+              ),
             ),
           ] else if ('${option['why']}'.isNotEmpty) ...[
             const SizedBox(height: 9),

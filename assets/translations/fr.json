@@ -796,6 +796,7 @@
         "direct_fast_sub": "Pour arriver au plus vite",
         "direct_fast_why": "La plus rapide, mais c'est de l'autoroute : des kilomètres tout droits et pas grand-chose d'autre. Elle est là au cas où tu sois juste en temps.",
         "direct_roads_desc": "Itinéraire direct par routes secondaires, sans arrêts.",
-        "direct_fast_desc": "Itinéraire direct par autoroute, sans arrêts."
+        "direct_fast_desc": "Itinéraire direct par autoroute, sans arrêts.",
+        "direct_skips": "Ne passe pas par les {n} points que tu as choisis"
     }
 }

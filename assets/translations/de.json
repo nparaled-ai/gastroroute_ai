@@ -796,6 +796,7 @@
         "direct_fast_sub": "Um schneller anzukommen",
         "direct_fast_why": "Die schnellste, aber es ist Autobahn: gerade Kilometer und sonst wenig. Sie steht hier, falls du mal knapp in der Zeit bist.",
         "direct_roads_desc": "Direkte Route über Landstraßen, ohne Stopps.",
-        "direct_fast_desc": "Direkte Route über die Autobahn, ohne Stopps."
+        "direct_fast_desc": "Direkte Route über die Autobahn, ohne Stopps.",
+        "direct_skips": "Führt nicht an den {n} von dir gewählten Punkten vorbei"
     }
 }

@@ -796,6 +796,7 @@
         "direct_fast_sub": "Para llegar cuanto antes",
         "direct_fast_why": "La más rápida, pero es autopista: kilómetros rectos y poco más. Va aquí por si un día vas justo de tiempo.",
         "direct_roads_desc": "Ruta directa por carreteras secundarias, sin paradas.",
-        "direct_fast_desc": "Ruta directa por autopista, sin paradas."
+        "direct_fast_desc": "Ruta directa por autopista, sin paradas.",
+        "direct_skips": "No pasa por los {n} puntos que has elegido"
     }
 }
