@@ -168,7 +168,7 @@ class _PlanOption extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          color: available ? color : AppColors.greyDark,
+                          color: available ? color : AppColors.greyText,
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                         ),
@@ -185,7 +185,7 @@ class _PlanOption extends StatelessWidget {
                             badge!,
                             style: const TextStyle(
                                 color: AppColors.grey,
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w600),
                           ),
                         ),
@@ -196,7 +196,7 @@ class _PlanOption extends StatelessWidget {
                   Text(
                     desc,
                     style: TextStyle(
-                      color: available ? AppColors.grey : AppColors.greyDark,
+                      color: available ? AppColors.grey : AppColors.greyText,
                       fontSize: 13,
                       height: 1.4,
                     ),

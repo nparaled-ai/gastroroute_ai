@@ -401,7 +401,7 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
       const Icon(Icons.two_wheeler, color: AppColors.greyDark, size: 40),
       const SizedBox(height: 8),
       Text('motos.photo_add'.tr(),
-          style: const TextStyle(color: AppColors.greyDark, fontSize: 12)),
+          style: const TextStyle(color: AppColors.greyText, fontSize: 12)),
     ]);
   }
 

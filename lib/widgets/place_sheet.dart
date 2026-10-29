@@ -207,7 +207,7 @@ class _PlaceSheetState extends State<PlaceSheet> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                      color: AppColors.grey, fontSize: 10.5)),
+                                      color: AppColors.grey, fontSize: 12)),
                           onTap: () => Navigator.pop(context, r),
                         ))
                     .toList(),

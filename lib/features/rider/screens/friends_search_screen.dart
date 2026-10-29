@@ -283,7 +283,7 @@ class _SearchResultCard extends StatelessWidget {
                   _levelLabel(level),
                   style: TextStyle(
                     color: _levelColor(level),
-                    fontSize: 10,
+                    fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
                   ),

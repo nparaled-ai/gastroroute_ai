@@ -1365,7 +1365,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     // elegir a mano desactiva los que añade la IA.
                     Text('poi_picker.manual_note'.tr(),
                         style: const TextStyle(
-                            color: AppColors.grey, fontSize: 10, height: 1.3)),
+                            color: AppColors.grey, fontSize: 12, height: 1.3)),
                   ],
 
                   const SizedBox(height: 20),
@@ -1509,7 +1509,7 @@ class _DurationModeChip extends StatelessWidget {
             const SizedBox(height: 4),
             Text(label, textAlign: TextAlign.center,
                 style: TextStyle(color: selected ? color : AppColors.grey,
-                    fontSize: 10, fontWeight: selected ? FontWeight.w700 : FontWeight.normal)),
+                    fontSize: 12, fontWeight: selected ? FontWeight.w700 : FontWeight.normal)),
           ]),
         ),
       ),
@@ -1608,8 +1608,8 @@ class _ToggleOption extends StatelessWidget {
         Icon(icon, color: enabled ? color : AppColors.greyDark, size: 22),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: TextStyle(color: enabled ? AppColors.white : AppColors.greyDark, fontSize: 14, fontWeight: FontWeight.w600)),
-          Text(subtitle, style: TextStyle(color: enabled ? AppColors.grey : AppColors.greyDark, fontSize: 11)),
+          Text(label, style: TextStyle(color: enabled ? AppColors.white : AppColors.greyText, fontSize: 14, fontWeight: FontWeight.w600)),
+          Text(subtitle, style: TextStyle(color: enabled ? AppColors.grey : AppColors.greyText, fontSize: 11)),
         ])),
         Switch(value: value && enabled, onChanged: enabled ? onChanged : null,
             activeColor: color, inactiveThumbColor: AppColors.greyDark, inactiveTrackColor: AppColors.surface),

@@ -1692,7 +1692,7 @@ class _ParticipantRow extends StatelessWidget {
           child: Text(badgeText,
               style: TextStyle(
                   color: badgeColor,
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600)),
         ),
       ]),

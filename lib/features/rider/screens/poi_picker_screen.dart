@@ -629,7 +629,7 @@ class _PoiPickerScreenState extends State<PoiPickerScreen> {
                           : 'poi_picker.needs_stop'.tr(),
                       style: TextStyle(
                         color: passThrough ? Colors.green : AppColors.gold,
-                        fontSize: 10,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -641,7 +641,7 @@ class _PoiPickerScreenState extends State<PoiPickerScreen> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                          color: AppColors.grey, fontSize: 10, height: 1.3)),
+                          color: AppColors.grey, fontSize: 12, height: 1.3)),
                 ],
               ],
             ),
@@ -897,7 +897,7 @@ class _SelectionMapState extends State<_SelectionMap> {
                   'shown': '$_maxOnMap',
                   'total': '${widget.total}',
                 }),
-                style: const TextStyle(color: AppColors.grey, fontSize: 10),
+                style: const TextStyle(color: AppColors.grey, fontSize: 12),
               ),
             ),
           ),

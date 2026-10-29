@@ -204,7 +204,7 @@ class _RouteAssistantReviewScreenState
                     fontSize: 16,
                     fontWeight: FontWeight.w700)),
             Text('assistant.step_of'.tr(namedArgs: {'n': '1'}),
-                style: const TextStyle(color: AppColors.grey, fontSize: 10.5)),
+                style: const TextStyle(color: AppColors.grey, fontSize: 12)),
           ],
         ),
       ),
@@ -316,7 +316,7 @@ class _RouteAssistantReviewScreenState
                 Text(_labelFor(key),
                     style: TextStyle(
                         color: missing ? AppColors.error : AppColors.grey,
-                        fontSize: 10.5)),
+                        fontSize: 12)),
                 const SizedBox(height: 2),
                 if (key == 'duration')
                   _durationChips()
@@ -338,7 +338,7 @@ class _RouteAssistantReviewScreenState
                       const SizedBox(width: 6),
                       Text('· ${'assistant.tag_assumed'.tr()}',
                           style: const TextStyle(
-                              color: AppColors.greyDark, fontSize: 10.5)),
+                              color: AppColors.greyText, fontSize: 12)),
                     ],
                   ]),
 
@@ -353,8 +353,8 @@ class _RouteAssistantReviewScreenState
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                            color: AppColors.greyDark,
-                            fontSize: 10.5,
+                            color: AppColors.greyText,
+                            fontSize: 12,
                             height: 1.25)),
                   ],
                 ],

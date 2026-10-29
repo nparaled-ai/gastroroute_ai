@@ -280,7 +280,7 @@ class _TabLabel extends StatelessWidget {
           child: Text('$count',
               style: TextStyle(
                   color: highlight ? Colors.white : activeColor,
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: FontWeight.w700)),
         ),
       ],
@@ -630,7 +630,7 @@ class _RouteCard extends StatelessWidget {
                   child: Text(_statusLabel,
                       style: TextStyle(
                           color: _statusColor,
-                          fontSize: 10,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600)),
                 ),
               ]),
@@ -977,7 +977,7 @@ class _RiddenListState extends State<_RiddenList> {
                             ? 'my_routes.status_not_counted'.tr()
                             : 'my_routes.status_ridden'.tr(),
                         style: TextStyle(
-                            color: accent, fontSize: 10, fontWeight: FontWeight.w600)),
+                            color: accent, fontSize: 12, fontWeight: FontWeight.w600)),
                   ),
                 ]),
                 const SizedBox(height: 10),
@@ -1099,7 +1099,7 @@ class _RideStat extends StatelessWidget {
         Text(label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppColors.grey, fontSize: 10)),
+            style: const TextStyle(color: AppColors.grey, fontSize: 12)),
         const SizedBox(height: 2),
         Text(value,
             style: TextStyle(

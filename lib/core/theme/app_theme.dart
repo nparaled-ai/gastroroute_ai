@@ -11,6 +11,18 @@ class AppColors {
   static const white        = Color(0xFFFFFFFF);
   static const grey         = Color(0xFF888888);
   static const greyDark     = Color(0xFF444444);
+
+  /// El gris de los textos de ayuda.
+  ///
+  /// Existe porque greyDark no se podía leer: #444444 sobre el fondo de una
+  /// tarjeta (#1E1E1E) da un contraste de 1,7 a 1, cuando el mínimo para leer
+  /// texto son 4,5. No era letra pequeña, era letra invisible — el motero lo
+  /// dijo tal cual: "sigo sin leer la letra pequeña o igual es porque es un
+  /// gris muy claro". Este da 6,2 a 1.
+  ///
+  /// greyDark se queda para bordes, separadores y lo apagado, que es donde
+  /// tiene sentido que no se vea.
+  static const greyText     = Color(0xFFA0A0A0);
   static const error        = Color(0xFFFF4444);
 }
 

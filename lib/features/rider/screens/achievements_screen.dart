@@ -321,7 +321,7 @@ class _TierPill extends StatelessWidget {
             : 'achievements.tier_$tier'.tr().toUpperCase(),
         style: TextStyle(
           color: locked ? AppColors.grey : AchievementStyle.tierTextColor(tier),
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.5,
         ),
@@ -610,7 +610,7 @@ class _CategoryDetailSheet extends StatelessWidget {
                           Text(
                             'achievements.unlocked_on'.tr(
                                 namedArgs: {'date': _formatDate(t['unlocked_at'] as String?)}),
-                            style: TextStyle(color: tierColor, fontSize: 10),
+                            style: TextStyle(color: tierColor, fontSize: 12),
                           ),
                       ]),
                     ),

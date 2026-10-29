@@ -122,7 +122,7 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(color: AppColors.error, borderRadius: BorderRadius.circular(10)),
-                    child: Text('${_received.length}', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
+                    child: Text('${_received.length}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
                   ),
                 ],
               ]),
@@ -376,7 +376,7 @@ class _FriendCardWithActions extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: _levelColor(level).withOpacity(0.4)),
                     ),
-                    child: Text(_levelLabel(level), style: TextStyle(color: _levelColor(level), fontSize: 10, fontWeight: FontWeight.w700)),
+                    child: Text(_levelLabel(level), style: TextStyle(color: _levelColor(level), fontSize: 12, fontWeight: FontWeight.w700)),
                   ),
                 ]),
               ]),
@@ -505,7 +505,7 @@ class _FriendCard extends StatelessWidget {
                   _levelLabel(level),
                   style: TextStyle(
                     color: _levelColor(level),
-                    fontSize: 10,
+                    fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
                   ),

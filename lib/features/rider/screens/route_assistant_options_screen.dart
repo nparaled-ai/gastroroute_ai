@@ -65,6 +65,13 @@ class _RouteAssistantOptionsScreenState
   /// Cuál está resaltada en el mapa. Arranca en la recomendada.
   int _highlighted = 0;
 
+  /// Para poder subir la lista hasta el mapa.
+  ///
+  /// "Ver en el mapa" no hacía nada visible y el motivo era tonto: el mapa está
+  /// fijo arriba, y cuando bajas a leer la segunda o la tercera tarjeta ya no
+  /// está en pantalla. Se reencuadraba de verdad, pero nadie lo veía.
+  final _scroll = ScrollController();
+
   GoogleMapController? _map;
 
   /// Las chinchetas numeradas, dibujadas una vez y reutilizadas.
@@ -79,6 +86,7 @@ class _RouteAssistantOptionsScreenState
   @override
   void dispose() {
     _map?.dispose();
+    _scroll.dispose();
     super.dispose();
   }
 
@@ -91,12 +99,17 @@ class _RouteAssistantOptionsScreenState
     final result = await RouteAssistantService.options(widget.payload);
     if (!mounted) return;
 
-    final options = List<Map<String, dynamic>>.from(result['options'] ?? const []);
+    final options = List<Map<String, dynamic>>.from(
+      result['options'] ?? const [],
+    );
 
     // La recomendada primero: es la que se resalta y la que lleva el botón
     // encendido, así que tenerla arriba evita que el motero tenga que buscarla.
-    options.sort((a, b) =>
-        (b['recommended'] == true ? 1 : 0) - (a['recommended'] == true ? 1 : 0));
+    options.sort(
+      (a, b) =>
+          (b['recommended'] == true ? 1 : 0) -
+          (a['recommended'] == true ? 1 : 0),
+    );
 
     await _buildPins(options.length);
     if (!mounted) return;
@@ -127,7 +140,11 @@ class _RouteAssistantOptionsScreenState
   /// pintan a mano. Sin número, tres propuestas en el mismo mapa se convierten
   /// en una nube de puntos de la que no se saca el orden de la ruta.
   Future<void> _buildPins(int howMany) async {
-    for (var option = 0; option < howMany && option < _colors.length; option++) {
+    for (
+      var option = 0;
+      option < howMany && option < _colors.length;
+      option++
+    ) {
       for (var n = 1; n <= 9; n++) {
         final key = '$option-$n';
         if (_pins.containsKey(key)) continue;
@@ -145,8 +162,8 @@ class _RouteAssistantOptionsScreenState
   static const _pinSize = 26.0;
 
   Future<BitmapDescriptor> _pin(String label, Color color) async {
-    final dpr = WidgetsBinding.instance.platformDispatcher.views.first
-        .devicePixelRatio;
+    final dpr =
+        WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
 
     final size = _pinSize * dpr;
     final recorder = ui.PictureRecorder();
@@ -181,9 +198,9 @@ class _RouteAssistantOptionsScreenState
     );
 
     final image = await recorder.endRecording().toImage(
-          size.round(),
-          size.round(),
-        );
+      size.round(),
+      size.round(),
+    );
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
 
     return BitmapDescriptor.bytes(
@@ -217,14 +234,15 @@ class _RouteAssistantOptionsScreenState
   // ─── El mapa ─────────────────────────────────────────────────────────
 
   List<LatLng> _pointsOf(int index) {
-    final points = List<Map<String, dynamic>>.from(
-      _options[index]['points'] ?? const [],
-    )
-        .map((p) => LatLng(
-              (p['lat'] as num).toDouble(),
-              (p['lng'] as num).toDouble(),
-            ))
-        .toList();
+    final points =
+        List<Map<String, dynamic>>.from(_options[index]['points'] ?? const [])
+            .map(
+              (p) => LatLng(
+                (p['lat'] as num).toDouble(),
+                (p['lng'] as num).toDouble(),
+              ),
+            )
+            .toList();
 
     // Una ruta directa no tiene hitos a propósito: su dibujo es la línea entre
     // la salida y la llegada. Sin esto, tocar "ver en el mapa" en la rápida no
@@ -252,16 +270,18 @@ class _RouteAssistantOptionsScreenState
 
       final on = i == _highlighted;
 
-      lines.add(Polyline(
-        polylineId: PolylineId('o$i'),
-        points: points,
-        color: _colors[i % _colors.length].withValues(alpha: on ? 1 : 0.4),
-        width: on ? 5 : 3,
-        // Puntos, no línea continua. Esto NO es el recorrido: es por dónde va
-        // la idea. Con una línea maciza cualquiera la lee como la carretera, y
-        // al ampliar el mapa el aviso escrito deja de bastar.
-        patterns: [PatternItem.dash(26), PatternItem.gap(14)],
-      ));
+      lines.add(
+        Polyline(
+          polylineId: PolylineId('o$i'),
+          points: points,
+          color: _colors[i % _colors.length].withValues(alpha: on ? 1 : 0.4),
+          width: on ? 5 : 3,
+          // Puntos, no línea continua. Esto NO es el recorrido: es por dónde va
+          // la idea. Con una línea maciza cualquiera la lee como la carretera, y
+          // al ampliar el mapa el aviso escrito deja de bastar.
+          patterns: [PatternItem.dash(26), PatternItem.gap(14)],
+        ),
+      );
     }
 
     return lines;
@@ -276,12 +296,14 @@ class _RouteAssistantOptionsScreenState
     for (var i = 0; i < points.length; i++) {
       final pin = _pins['${_highlighted % _colors.length}-${i + 1}'];
 
-      markers.add(Marker(
-        markerId: MarkerId('p$i'),
-        position: points[i],
-        icon: pin ?? BitmapDescriptor.defaultMarker,
-        anchor: const Offset(0.5, 0.5),
-      ));
+      markers.add(
+        Marker(
+          markerId: MarkerId('p$i'),
+          position: points[i],
+          icon: pin ?? BitmapDescriptor.defaultMarker,
+          anchor: const Offset(0.5, 0.5),
+        ),
+      );
     }
 
     return markers;
@@ -308,18 +330,34 @@ class _RouteAssistantOptionsScreenState
     // degenerados y el mapa se va al zoom máximo, encima de un tejado.
     const pad = 0.08;
 
-    await _map!.animateCamera(CameraUpdate.newLatLngBounds(
-      LatLngBounds(
-        southwest: LatLng(south - pad, west - pad),
-        northeast: LatLng(north + pad, east + pad),
+    await _map!.animateCamera(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(south - pad, west - pad),
+          northeast: LatLng(north + pad, east + pad),
+        ),
+        48,
       ),
-      48,
-    ));
+    );
   }
 
-  void _highlight(int index) {
+  /// Resalta una propuesta y la encuadra en el mapa.
+  ///
+  /// [subirAlMapa] solo cuando se pulsa el botón: sin eso el botón parecía
+  /// roto, porque el mapa está fijo arriba y al leer la segunda tarjeta ya no
+  /// se ve. Tocando la TARJETA no se sube: ahí el motero está leyendo, y
+  /// moverle la lista bajo el dedo es peor que no enseñarle el mapa.
+  void _highlight(int index, {bool subirAlMapa = false}) {
     setState(() => _highlighted = index);
     _frame(index);
+
+    if (subirAlMapa && _scroll.hasClients && _scroll.offset > 0) {
+      _scroll.animateTo(
+        0,
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   // ─── Elegir ──────────────────────────────────────────────────────────
@@ -353,10 +391,12 @@ class _RouteAssistantOptionsScreenState
     setState(() => _generating = false);
 
     if (result['error'] != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(result['error']),
-        backgroundColor: AppColors.error,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['error']),
+          backgroundColor: AppColors.error,
+        ),
+      );
       return;
     }
 
@@ -383,18 +423,20 @@ class _RouteAssistantOptionsScreenState
   }
 
   String _directTitle(String kind) => 'assistant.direct_${kind}_title'.tr(
-        namedArgs: {
-          'from': '${widget.payload['origin']}'.split(',').first.trim(),
-          'to': '${widget.payload['destination']}'.split(',').first.trim(),
-        },
-      );
+    namedArgs: {
+      'from': '${widget.payload['origin']}'.split(',').first.trim(),
+      'to': '${widget.payload['destination']}'.split(',').first.trim(),
+    },
+  );
 
-  Future<Map<String, dynamic>> _generateScenic(Map<String, dynamic>? option) async {
+  Future<Map<String, dynamic>> _generateScenic(
+    Map<String, dynamic>? option,
+  ) async {
     final names = option == null
         ? const <String>[]
-        : List<Map<String, dynamic>>.from(option['points'] ?? const [])
-            .map((p) => '${p['name']}')
-            .toList();
+        : List<Map<String, dynamic>>.from(
+            option['points'] ?? const [],
+          ).map((p) => '${p['name']}').toList();
 
     final payload = Map<String, dynamic>.from(widget.payload)
       ..['ai_request'] = widget.request;
@@ -421,23 +463,28 @@ class _RouteAssistantOptionsScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('assistant.options_title'.tr(),
-                style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700)),
-            Text('${'assistant.step_of'.tr(namedArgs: {'n': '3'})} · $_subtitle',
-                style: const TextStyle(color: AppColors.grey, fontSize: 10.5)),
+            Text(
+              'assistant.options_title'.tr(),
+              style: const TextStyle(
+                color: AppColors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              '${'assistant.step_of'.tr(namedArgs: {'n': '3'})} · $_subtitle',
+              style: const TextStyle(color: AppColors.grey, fontSize: 12),
+            ),
           ],
         ),
       ),
       body: _loading
           ? _busy('assistant.options_loading'.tr())
           : _generating
-              ? _busy('assistant.options_generating'.tr())
-              : _options.isEmpty
-                  ? _empty()
-                  : _list(),
+          ? _busy('assistant.options_generating'.tr())
+          : _options.isEmpty
+          ? _empty()
+          : _list(),
     );
   }
 
@@ -447,150 +494,175 @@ class _RouteAssistantOptionsScreenState
 
     final where = circular
         ? 'assistant.options_circular'.tr(
-            namedArgs: {'from': '${widget.payload['origin']}'})
+            namedArgs: {'from': '${widget.payload['origin']}'},
+          )
         : 'assistant.options_to'.tr(
-            namedArgs: {'to': '${widget.payload['destination']}'});
+            namedArgs: {'to': '${widget.payload['destination']}'},
+          );
 
     return km == null ? where : '$where · ~$km km';
   }
 
   Widget _busy(String text) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(color: AppColors.orange),
-            const SizedBox(height: 18),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Text(text,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.grey, fontSize: 13)),
-            ),
-          ],
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const CircularProgressIndicator(color: AppColors.orange),
+        const SizedBox(height: 18),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.grey, fontSize: 13),
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
   Widget _empty() => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.map_outlined, color: AppColors.greyDark, size: 44),
-              const SizedBox(height: 14),
-              Text(_error ?? 'assistant.options_none'.tr(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      color: AppColors.grey, fontSize: 13, height: 1.5)),
-              const SizedBox(height: 20),
-              // Que no haya propuestas no puede dejar al motero encerrado: la
-              // ruta se genera igual, sin elegir zona.
-              ElevatedButton(
-                onPressed: () => _choose(null),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.orange,
-                  minimumSize: const Size(220, 46),
-                ),
-                child: Text('assistant.generate'.tr(),
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w700)),
-              ),
-              TextButton(
-                onPressed: _load,
-                child: Text('assistant.options_again'.tr(),
-                    style: const TextStyle(color: AppColors.cyan, fontSize: 12)),
-              ),
-            ],
-          ),
-        ),
-      );
-
-  Widget _list() => Column(
+    child: Padding(
+      padding: const EdgeInsets.all(28),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 212,
-            child: Stack(
-              children: [
-                GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: _pointsOf(0).first,
-                    zoom: 8,
-                  ),
-                  style: _darkMap,
-                  onMapCreated: (c) {
-                    _map = c;
-                    _frame(_highlighted);
-                  },
-                  polylines: _lines,
-                  markers: _markers,
-                  zoomControlsEnabled: false,
-                  mapToolbarEnabled: false,
-                  myLocationButtonEnabled: false,
-                  // El mapa es para mirar, no para manejar: los gestos aquí
-                  // pelean con el scroll de la lista.
-                  scrollGesturesEnabled: false,
-                  rotateGesturesEnabled: false,
-                ),
-
-                // El aviso va SOBRE el mapa, no al pie de la pantalla: es
-                // mirándolo cuando se confunde un trazo con una carretera.
-                Positioned(
-                  left: 10,
-                  bottom: 9,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.background.withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text('assistant.options_sketch'.tr(),
-                        style: const TextStyle(
-                            color: AppColors.grey, fontSize: 10.5)),
-                  ),
-                ),
-              ],
+          const Icon(Icons.map_outlined, color: AppColors.greyDark, size: 44),
+          const SizedBox(height: 14),
+          Text(
+            _error ?? 'assistant.options_none'.tr(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.grey,
+              fontSize: 13,
+              height: 1.5,
             ),
           ),
-
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.fromLTRB(
-                  14, 12, 14, 20 + MediaQuery.of(context).padding.bottom),
-              children: [
-                if (_note != null) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10, left: 2),
-                    child: Text(_note!,
-                        style: const TextStyle(
-                            color: AppColors.grey,
-                            fontSize: 11.5,
-                            height: 1.45)),
-                  ),
-                ],
-
-                for (var i = 0; i < _options.length; i++) _card(i),
-
-                const SizedBox(height: 2),
-
-                OutlinedButton.icon(
-                  onPressed: _load,
-                  icon: const Icon(Icons.refresh, color: AppColors.cyan, size: 16),
-                  label: Text('assistant.options_again'.tr(),
-                      style:
-                          const TextStyle(color: AppColors.cyan, fontSize: 12.5)),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.greyDark),
-                    minimumSize: const Size(double.infinity, 46),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-              ],
+          const SizedBox(height: 20),
+          // Que no haya propuestas no puede dejar al motero encerrado: la
+          // ruta se genera igual, sin elegir zona.
+          ElevatedButton(
+            onPressed: () => _choose(null),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.orange,
+              minimumSize: const Size(220, 46),
+            ),
+            child: Text(
+              'assistant.generate'.tr(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: _load,
+            child: Text(
+              'assistant.options_again'.tr(),
+              style: const TextStyle(color: AppColors.cyan, fontSize: 12),
             ),
           ),
         ],
-      );
+      ),
+    ),
+  );
+
+  Widget _list() => Column(
+    children: [
+      SizedBox(
+        height: 212,
+        child: Stack(
+          children: [
+            GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: _pointsOf(0).first,
+                zoom: 8,
+              ),
+              style: _darkMap,
+              onMapCreated: (c) {
+                _map = c;
+                _frame(_highlighted);
+              },
+              polylines: _lines,
+              markers: _markers,
+              zoomControlsEnabled: false,
+              mapToolbarEnabled: false,
+              myLocationButtonEnabled: false,
+              // El mapa es para mirar, no para manejar: los gestos aquí
+              // pelean con el scroll de la lista.
+              scrollGesturesEnabled: false,
+              rotateGesturesEnabled: false,
+            ),
+
+            // El aviso va SOBRE el mapa, no al pie de la pantalla: es
+            // mirándolo cuando se confunde un trazo con una carretera.
+            Positioned(
+              left: 10,
+              bottom: 9,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.background.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'assistant.options_sketch'.tr(),
+                  style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      Expanded(
+        child: ListView(
+          controller: _scroll,
+          padding: EdgeInsets.fromLTRB(
+            14,
+            12,
+            14,
+            20 + MediaQuery.of(context).padding.bottom,
+          ),
+          children: [
+            if (_note != null) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10, left: 2),
+                child: Text(
+                  _note!,
+                  style: const TextStyle(
+                    color: AppColors.grey,
+                    fontSize: 11.5,
+                    height: 1.45,
+                  ),
+                ),
+              ),
+            ],
+
+            for (var i = 0; i < _options.length; i++) _card(i),
+
+            const SizedBox(height: 2),
+
+            OutlinedButton.icon(
+              onPressed: _load,
+              icon: const Icon(Icons.refresh, color: AppColors.cyan, size: 16),
+              label: Text(
+                'assistant.options_again'.tr(),
+                style: const TextStyle(color: AppColors.cyan, fontSize: 12.5),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppColors.greyDark),
+                minimumSize: const Size(double.infinity, 46),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
 
   Widget _card(int index) {
     final option = _options[index];
@@ -608,180 +680,256 @@ class _RouteAssistantOptionsScreenState
 
     final names = direct
         ? 'assistant.direct_${kind}_sub'.tr()
-        : List<Map<String, dynamic>>.from(option['points'] ?? const [])
-            .map((p) => '${p['name']}')
-            .join(' · ');
+        : List<Map<String, dynamic>>.from(
+            option['points'] ?? const [],
+          ).map((p) => '${p['name']}').join(' · ');
 
     final hours = (option['minutes'] as num?) == null
         ? null
         : ((option['minutes'] as num) / 60).toStringAsFixed(1);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: on ? Border.all(color: color, width: 2) : null,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Container(
-              width: 9,
-              height: 9,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 8),
-            if (recommended) ...[
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(5),
+    // Tocar la tarjeta es lo mismo que "Ver en el mapa": es el gesto que sale
+    // solo cuando estás comparando tres, y tener que apuntar al botón pequeño
+    // para algo que no decide nada sobra.
+    return GestureDetector(
+      onTap: () => _highlight(index),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: on ? Border.all(color: color, width: 2) : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 9,
+                  height: 9,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-                child: Text('assistant.options_pick'.tr(),
-                    style: const TextStyle(
+                const SizedBox(width: 8),
+                if (recommended) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      'assistant.options_pick'.tr(),
+                      style: const TextStyle(
                         color: AppColors.background,
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700)),
-              ),
-            ] else
-              Expanded(
-                child: Text(title,
-                    style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ] else
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
                         color: AppColors.white,
                         fontSize: 14.5,
-                        fontWeight: FontWeight.w700)),
-              ),
-          ]),
-
-          if (recommended) ...[
-            const SizedBox(height: 5),
-            Text(title,
-                style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w700)),
-          ],
-
-          const SizedBox(height: 3),
-          Text(names,
-              style: const TextStyle(color: AppColors.grey, fontSize: 12)),
-
-          const SizedBox(height: 8),
-          Wrap(spacing: 5, runSpacing: 5, children: [
-            _chip(direct ? '${option['approx_km']} km' : '~${option['approx_km']} km'),
-            if (hours != null) _chip('$hours h'),
-            for (final t in List<String>.from(option['traits'] ?? const []))
-              _chip(t),
-          ]),
-
-          if (direct) ...[
-            const SizedBox(height: 9),
-            Container(
-              padding: const EdgeInsets.only(top: 8),
-              decoration: const BoxDecoration(
-                border: Border(
-                    top: BorderSide(color: AppColors.greyDark, width: 0.5)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('assistant.direct_${kind}_why'.tr(),
-                      style: const TextStyle(
-                          color: AppColors.grey, fontSize: 11.5, height: 1.45)),
-
-                  // Lo que esta ruta se deja por el camino. Si el motero ha
-                  // elegido sitios a mano y esta no pasa por ellos, hay que
-                  // decírselo aquí: darle una ruta que ignora en silencio lo
-                  // que acaba de pedir es lo único que no se puede hacer.
-                  if ((option['skips'] as num? ?? 0) > 0) ...[
-                    const SizedBox(height: 7),
-                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Icon(Icons.info_outline,
-                          color: AppColors.orange, size: 14),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          'assistant.direct_skips'.tr(
-                              namedArgs: {'n': '${option['skips']}'}),
-                          style: const TextStyle(
-                              color: AppColors.orange,
-                              fontSize: 11.5,
-                              height: 1.4),
-                        ),
+                        fontWeight: FontWeight.w700,
                       ),
-                    ]),
-                  ],
-                ],
-              ),
+                    ),
+                  ),
+              ],
             ),
-          ] else if ('${option['why']}'.isNotEmpty) ...[
-            const SizedBox(height: 9),
-            Container(
-              padding: const EdgeInsets.only(top: 8),
-              decoration: const BoxDecoration(
-                border: Border(
-                    top: BorderSide(color: AppColors.greyDark, width: 0.5)),
+
+            if (recommended) ...[
+              const SizedBox(height: 5),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              child: Text('${option['why']}',
+            ],
+
+            const SizedBox(height: 3),
+            Text(
+              names,
+              style: const TextStyle(color: AppColors.grey, fontSize: 12),
+            ),
+
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 5,
+              runSpacing: 5,
+              children: [
+                _chip(
+                  direct
+                      ? '${option['approx_km']} km'
+                      : '~${option['approx_km']} km',
+                ),
+                if (hours != null) _chip('$hours h'),
+                for (final t in List<String>.from(option['traits'] ?? const []))
+                  _chip(t),
+              ],
+            ),
+
+            if (direct) ...[
+              const SizedBox(height: 9),
+              Container(
+                padding: const EdgeInsets.only(top: 8),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: AppColors.greyDark, width: 0.5),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'assistant.direct_${kind}_why'.tr(),
+                      style: const TextStyle(
+                        color: AppColors.grey,
+                        fontSize: 11.5,
+                        height: 1.45,
+                      ),
+                    ),
+
+                    // Lo que esta ruta se deja por el camino. Si el motero ha
+                    // elegido sitios a mano y esta no pasa por ellos, hay que
+                    // decírselo aquí: darle una ruta que ignora en silencio lo
+                    // que acaba de pedir es lo único que no se puede hacer.
+                    if ((option['skips'] as num? ?? 0) > 0) ...[
+                      const SizedBox(height: 7),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.info_outline,
+                            color: AppColors.orange,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              'assistant.direct_skips'.tr(
+                                namedArgs: {'n': '${option['skips']}'},
+                              ),
+                              style: const TextStyle(
+                                color: AppColors.orange,
+                                fontSize: 11.5,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ] else if ('${option['why']}'.isNotEmpty) ...[
+              const SizedBox(height: 9),
+              Container(
+                padding: const EdgeInsets.only(top: 8),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: AppColors.greyDark, width: 0.5),
+                  ),
+                ),
+                child: Text(
+                  '${option['why']}',
                   style: const TextStyle(
-                      color: AppColors.grey, fontSize: 11.5, height: 1.45)),
+                    color: AppColors.grey,
+                    fontSize: 11.5,
+                    height: 1.45,
+                  ),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 10),
+
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _highlight(index, subirAlMapa: true),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.greyDark),
+                      minimumSize: const Size(0, 38),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                    ),
+                    child: Text(
+                      'assistant.options_show'.tr(),
+                      style: const TextStyle(
+                        color: AppColors.cyan,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _choose(index),
+                    style: ElevatedButton.styleFrom(
+                      // Relleno en la recomendada y contorno naranja en las demás.
+                      // Antes eran gris sobre gris, y el motero dijo que "no le
+                      // dejaba elegir las otras": no es que no funcionaran —están
+                      // conectadas desde el primer día—, es que parecían apagadas.
+                      backgroundColor: recommended
+                          ? AppColors.orange
+                          : AppColors.surface,
+                      side: recommended
+                          ? null
+                          : const BorderSide(
+                              color: AppColors.orange,
+                              width: 1.2,
+                            ),
+                      minimumSize: const Size(0, 38),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                    ),
+                    child: Text(
+                      'assistant.options_choose'.tr(),
+                      style: TextStyle(
+                        color: recommended ? Colors.white : AppColors.orange,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
-
-          const SizedBox(height: 10),
-
-          Row(children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => _highlight(index),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.greyDark),
-                  minimumSize: const Size(0, 38),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9)),
-                ),
-                child: Text('assistant.options_show'.tr(),
-                    style:
-                        const TextStyle(color: AppColors.cyan, fontSize: 11.5)),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () => _choose(index),
-                style: ElevatedButton.styleFrom(
-                  // Encendido solo en la recomendada: la pantalla sugiere, pero
-                  // elegir otra está a un toque igual.
-                  backgroundColor:
-                      recommended ? AppColors.orange : AppColors.greyDark,
-                  minimumSize: const Size(0, 38),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9)),
-                ),
-                child: Text('assistant.options_choose'.tr(),
-                    style: TextStyle(
-                        color: recommended ? Colors.white : AppColors.grey,
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w700)),
-              ),
-            ),
-          ]),
-        ],
+        ),
       ),
     );
   }
 
   Widget _chip(String text) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Text(text,
-            style: const TextStyle(color: AppColors.grey, fontSize: 11)),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+    decoration: BoxDecoration(
+      color: AppColors.background,
+      borderRadius: BorderRadius.circular(5),
+    ),
+    child: Text(
+      text,
+      style: const TextStyle(color: AppColors.grey, fontSize: 11),
+    ),
+  );
 }

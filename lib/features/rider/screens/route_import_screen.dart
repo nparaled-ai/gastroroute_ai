@@ -489,7 +489,7 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
               ),
             ),
             Text('import.for_gas'.tr(),
-                style: TextStyle(color: AppColors.greyDark, fontSize: 11)),
+                style: TextStyle(color: AppColors.greyText, fontSize: 11)),
           ]),
         ),
 
@@ -868,7 +868,7 @@ class _ShareOption extends StatelessWidget {
         child: Icon(icon, color: color, size: 24),
       ),
       const SizedBox(height: 4),
-      Text(label, style: TextStyle(color: color, fontSize: 10), textAlign: TextAlign.center),
+      Text(label, style: TextStyle(color: color, fontSize: 12), textAlign: TextAlign.center),
     ]);
   }
 }

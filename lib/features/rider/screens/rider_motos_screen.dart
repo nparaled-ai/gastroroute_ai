@@ -160,7 +160,7 @@ class _RiderMotosScreenState extends State<RiderMotosScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(color: AppColors.orange.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
                                 child: Text('motos.primary'.tr(),
-                                    style: const TextStyle(color: AppColors.orange, fontSize: 10, fontWeight: FontWeight.w700)),
+                                    style: const TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w700)),
                               ),
                             ],
                           ],

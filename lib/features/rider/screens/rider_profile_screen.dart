@@ -362,7 +362,7 @@ class _MotoCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text('motos.primary'.tr(),
-                            style: const TextStyle(color: AppColors.orange, fontSize: 10, fontWeight: FontWeight.w700)),
+                            style: const TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w700)),
                       ),
                     ],
                   ],

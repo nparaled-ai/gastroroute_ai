@@ -358,7 +358,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
                     child: Center(
                       child: Text(
                         _unreadNotifications > 9 ? '9+' : '$_unreadNotifications',
-                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
+                        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800),
                       ),
                     ),
                   ),

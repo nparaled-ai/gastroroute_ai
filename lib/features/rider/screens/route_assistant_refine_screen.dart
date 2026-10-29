@@ -49,8 +49,9 @@ class RouteAssistantRefineScreen extends StatefulWidget {
 
 class _RouteAssistantRefineScreenState
     extends State<RouteAssistantRefineScreen> {
-  late final Map<String, dynamic> _fields =
-      Map<String, dynamic>.from(widget.fields);
+  late final Map<String, dynamic> _fields = Map<String, dynamic>.from(
+    widget.fields,
+  );
 
   /// Las zonas de su entorno, para ofrecerlas como dirección.
   ///
@@ -67,7 +68,6 @@ class _RouteAssistantRefineScreenState
   String? _poiCategory;
   String? _poiQuery;
   int? _poiRadiusKm;
-
 
   /// La moto elegida, para saber si se le puede calcular la autonomia.
   ///
@@ -118,10 +118,12 @@ class _RouteAssistantRefineScreenState
 
     final motos = List<Map<String, dynamic>>.from(result['motos']);
 
-    setState(() => _moto = motos.firstWhere(
-          (m) => m['id'] == _fields['moto_id'],
-          orElse: () => const <String, dynamic>{},
-        ));
+    setState(
+      () => _moto = motos.firstWhere(
+        (m) => m['id'] == _fields['moto_id'],
+        orElse: () => const <String, dynamic>{},
+      ),
+    );
   }
 
   /// Si se le puede calcular la autonomía a esta moto.
@@ -163,7 +165,8 @@ class _RouteAssistantRefineScreenState
       backgroundColor: AppColors.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
       builder: (_) => PlaceSheet(title: 'refine.add_point'.tr()),
     );
 
@@ -188,8 +191,7 @@ class _RouteAssistantRefineScreenState
 
   void _removePoint(String name) {
     setState(() {
-      _fields['custom_points'] =
-          _customPoints.where((p) => p != name).toList();
+      _fields['custom_points'] = _customPoints.where((p) => p != name).toList();
       _fields['_point_coords'] = Map<String, dynamic>.from(_pointCoords)
         ..remove(name);
     });
@@ -309,7 +311,11 @@ class _RouteAssistantRefineScreenState
     final dLng = _toDouble(_fields['destination_lng']);
 
     double? minimo;
-    if (!_circular && oLat != null && oLng != null && dLat != null && dLng != null) {
+    if (!_circular &&
+        oLat != null &&
+        oLng != null &&
+        dLat != null &&
+        dLng != null) {
       // 1,3 es el rodeo típico de la carretera sobre la línea recta, el mismo
       // factor que usa el selector de puntos de interés.
       minimo = _haversineKm(oLat, oLng, dLat, dLng) * 1.3;
@@ -344,7 +350,8 @@ class _RouteAssistantRefineScreenState
   double _haversineKm(double lat1, double lng1, double lat2, double lng2) {
     final dLat = (lat2 - lat1) * math.pi / 180;
     final dLng = (lng2 - lng1) * math.pi / 180;
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(lat1 * math.pi / 180) *
             math.cos(lat2 * math.pi / 180) *
             math.sin(dLng / 2) *
@@ -354,10 +361,10 @@ class _RouteAssistantRefineScreenState
   }
 
   double? _toDouble(dynamic v) => switch (v) {
-        num n => n.toDouble(),
-        String s => double.tryParse(s),
-        _ => null,
-      };
+    num n => n.toDouble(),
+    String s => double.tryParse(s),
+    _ => null,
+  };
 
   // ─── Pintar ──────────────────────────────────────────────────────────
 
@@ -404,19 +411,28 @@ class _RouteAssistantRefineScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('refine.title'.tr(),
-                style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700)),
-            Text('refine.subtitle'.tr(),
-                style: const TextStyle(color: AppColors.grey, fontSize: 10.5)),
+            Text(
+              'refine.title'.tr(),
+              style: const TextStyle(
+                color: AppColors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              'refine.subtitle'.tr(),
+              style: const TextStyle(color: AppColors.grey, fontSize: 12),
+            ),
           ],
         ),
       ),
       body: ListView(
         padding: EdgeInsets.fromLTRB(
-            16, 14, 16, 24 + MediaQuery.of(context).padding.bottom),
+          16,
+          14,
+          16,
+          24 + MediaQuery.of(context).padding.bottom,
+        ),
         children: [
           // La dirección solo manda en las circulares.
           if (_circular) ...[
@@ -463,7 +479,8 @@ class _RouteAssistantRefineScreenState
               disabledBackgroundColor: AppColors.greyDark,
               minimumSize: const Size(double.infinity, 52),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             // Ya no hay espera que enseñar aquí: la rueda vive ahora en la
             // pantalla de las propuestas, que es la que llama al servidor.
@@ -471,41 +488,67 @@ class _RouteAssistantRefineScreenState
             // Apagado dice por qué: un botón gris sin explicación obliga a
             // buscar por la pantalla qué es lo que falla.
             child: Text(
-                    _suggestedDinner != null
-                        ? 'refine.meal_gap_short'.tr()
-                        // Ya no genera: lleva a elegir entre varias formas de
-                        // hacerla, y se genera la elegida.
-                        : 'assistant.continue'.tr(),
-                    style: TextStyle(
-                        color: _suggestedDinner != null
-                            ? AppColors.grey
-                            : Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700)),
+              _suggestedDinner != null
+                  ? 'refine.meal_gap_short'.tr()
+                  // Ya no genera: lleva a elegir entre varias formas de
+                  // hacerla, y se genera la elegida.
+                  : 'assistant.continue'.tr(),
+              style: TextStyle(
+                color: _suggestedDinner != null ? AppColors.grey : Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
+  static const _labelStyle = TextStyle(
+    color: AppColors.grey,
+    fontSize: 12,
+    letterSpacing: 0.6,
+    fontWeight: FontWeight.w600,
+  );
+
   Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 7, left: 2),
-        child: Text(text,
-            style: const TextStyle(
-                color: AppColors.grey,
-                fontSize: 10.5,
-                letterSpacing: 0.6,
-                fontWeight: FontWeight.w600)),
-      );
+    padding: const EdgeInsets.only(bottom: 7, left: 2),
+    child: text.contains('{app}')
+        ? RichText(
+            text: TextSpan(
+              style: _labelStyle,
+              children: [
+                TextSpan(text: text.split('{app}').first),
+                // El nombre con sus colores, los mismos de la pantalla de
+                // entrada: GAS naranja, troRoute blanco, AI cian.
+                const TextSpan(
+                  text: 'GAS',
+                  style: TextStyle(color: AppColors.orange),
+                ),
+                const TextSpan(
+                  text: 'troRoute',
+                  style: TextStyle(color: AppColors.white),
+                ),
+                const TextSpan(
+                  text: 'AI',
+                  style: TextStyle(color: AppColors.cyan),
+                ),
+                TextSpan(text: text.split('{app}').last),
+              ],
+            ),
+          )
+        : Text(text, style: _labelStyle),
+  );
 
   Widget _card({required Widget child}) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: child,
-      );
+    decoration: BoxDecoration(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    clipBehavior: Clip.antiAlias,
+    child: child,
+  );
 
   /// Si ya hay sitios elegidos, la dirección está decidida por ellos.
   ///
@@ -522,24 +565,33 @@ class _RouteAssistantRefineScreenState
     return _card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-        child: Row(children: [
-          const Icon(Icons.explore_outlined, color: AppColors.grey, size: 16),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('refine.direction_label'.tr(),
+        child: Row(
+          children: [
+            const Icon(Icons.explore_outlined, color: AppColors.grey, size: 16),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'refine.direction_label'.tr(),
+                    style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'refine.direction_by_points'.tr(
+                      namedArgs: {'place': first},
+                    ),
                     style: const TextStyle(
-                        color: AppColors.grey, fontSize: 10.5)),
-                const SizedBox(height: 2),
-                Text('refine.direction_by_points'.tr(namedArgs: {'place': first}),
-                    style: const TextStyle(
-                        color: AppColors.grey, fontSize: 12.5)),
-              ],
+                      color: AppColors.grey,
+                      fontSize: 12.5,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -556,30 +608,40 @@ class _RouteAssistantRefineScreenState
             // Con la etiqueta sola hay que deducir el valor del botón que esté
             // encendido. Puesto como las demás filas —etiqueta arriba, valor
             // debajo— se lee de un vistazo igual que en la pantalla anterior.
-            Row(children: [
-              const Icon(Icons.explore_outlined,
-                  color: AppColors.grey, size: 16),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('refine.direction_label'.tr(),
+            Row(
+              children: [
+                const Icon(
+                  Icons.explore_outlined,
+                  color: AppColors.grey,
+                  size: 16,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'refine.direction_label'.tr(),
                         style: const TextStyle(
-                            color: AppColors.grey, fontSize: 10.5)),
-                    const SizedBox(height: 2),
-                    Text(
-                      current.isEmpty ? 'refine.let_ai'.tr() : current,
-                      style: TextStyle(
+                          color: AppColors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        current.isEmpty ? 'refine.let_ai'.tr() : current,
+                        style: TextStyle(
                           color: current.isEmpty
                               ? AppColors.grey
                               : AppColors.white,
-                          fontSize: 13),
-                    ),
-                  ],
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ]),
+              ],
+            ),
             const SizedBox(height: 9),
             Wrap(
               spacing: 6,
@@ -588,17 +650,28 @@ class _RouteAssistantRefineScreenState
                 for (final zone in _zones)
                   _chip(zone, current == zone, () => _setZone(zone)),
                 // "Que decida la IA" es simplemente no mandar zona.
-                _chip('refine.let_ai'.tr(), current.isEmpty,
-                    () => _setZone(null)),
-                _chip('refine.other_zone'.tr(),
-                    current.isNotEmpty && !_zones.contains(current), _askZone,
-                    accent: true),
+                _chip(
+                  'refine.let_ai'.tr(),
+                  current.isEmpty,
+                  () => _setZone(null),
+                ),
+                _chip(
+                  'refine.other_zone'.tr(),
+                  current.isNotEmpty && !_zones.contains(current),
+                  _askZone,
+                  accent: true,
+                ),
               ],
             ),
             const SizedBox(height: 8),
-            Text('refine.direction_help'.tr(),
-                style: const TextStyle(
-                    color: AppColors.greyDark, fontSize: 10, height: 1.4)),
+            Text(
+              'refine.direction_help'.tr(),
+              style: const TextStyle(
+                color: AppColors.greyText,
+                fontSize: 12,
+                height: 1.4,
+              ),
+            ),
           ],
         ),
       ),
@@ -608,52 +681,63 @@ class _RouteAssistantRefineScreenState
   void _setZone(String? zone) => setState(() => _fields['zone_hint'] = zone);
 
   Future<void> _askZone() async {
-    final controller =
-        TextEditingController(text: '${_fields['zone_hint'] ?? ''}');
+    final controller = TextEditingController(
+      text: '${_fields['zone_hint'] ?? ''}',
+    );
 
     final saved = await showModalBottomSheet<bool>(
       context: context,
       backgroundColor: AppColors.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              TextField(
-                controller: controller,
-                autofocus: true,
-                textCapitalization: TextCapitalization.sentences,
-                style: const TextStyle(color: AppColors.white, fontSize: 15),
-                decoration: InputDecoration(
-                  labelText: 'refine.direction_label'.tr(),
-                  labelStyle: const TextStyle(color: AppColors.grey),
-                  hintText: 'refine.other_zone_hint'.tr(),
-                  hintStyle: const TextStyle(
-                      color: AppColors.greyDark, fontSize: 13),
-                  filled: true,
-                  fillColor: AppColors.background,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(9),
-                    borderSide: BorderSide.none,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.sentences,
+                  style: const TextStyle(color: AppColors.white, fontSize: 15),
+                  decoration: InputDecoration(
+                    labelText: 'refine.direction_label'.tr(),
+                    labelStyle: const TextStyle(color: AppColors.grey),
+                    hintText: 'refine.other_zone_hint'.tr(),
+                    hintStyle: const TextStyle(
+                      color: AppColors.greyText,
+                      fontSize: 13,
+                    ),
+                    filled: true,
+                    fillColor: AppColors.background,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(9),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.orange,
-                  minimumSize: const Size(double.infinity, 46),
-                ),
-                child: Text('common.save'.tr(),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.orange,
+                    minimumSize: const Size(double.infinity, 46),
+                  ),
+                  child: Text(
+                    'common.save'.tr(),
                     style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w700)),
-              ),
-            ]),
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -665,63 +749,69 @@ class _RouteAssistantRefineScreenState
     _setZone(text.isEmpty ? null : text);
   }
 
-  Widget _chip(String label, bool active, VoidCallback onTap,
-          {bool accent = false}) =>
-      GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: active ? AppColors.orange : Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(
-                color: active
-                    ? AppColors.orange
-                    : (accent ? AppColors.cyan : AppColors.greyDark)),
-          ),
-          child: Text(label,
-              style: TextStyle(
-                  color: active
-                      ? AppColors.background
-                      : (accent ? AppColors.cyan : AppColors.grey),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600)),
+  Widget _chip(
+    String label,
+    bool active,
+    VoidCallback onTap, {
+    bool accent = false,
+  }) => GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: active ? AppColors.orange : Colors.transparent,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: active
+              ? AppColors.orange
+              : (accent ? AppColors.cyan : AppColors.greyDark),
         ),
-      );
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: active
+              ? AppColors.background
+              : (accent ? AppColors.cyan : AppColors.grey),
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+  );
 
   Widget _pointsCard() {
     final points = _customPoints;
 
     return _card(
-      child: Column(children: [
-        for (final name in points)
-          _pointRow(
-            icon: Icons.chat_bubble_outline,
-            iconColor: AppColors.orange,
-            name: name,
-            note: _noteForCustom(name),
-            onRemove: () => _removePoint(name),
-          ),
+      child: Column(
+        children: [
+          for (final name in points)
+            _pointRow(
+              icon: Icons.chat_bubble_outline,
+              iconColor: AppColors.orange,
+              name: name,
+              note: _noteForCustom(name),
+              onRemove: () => _removePoint(name),
+            ),
 
-        for (final poi in _pois)
-          _pointRow(
-            icon: Icons.place_outlined,
-            iconColor: AppColors.cyan,
-            name: '${poi['name'] ?? ''}',
-            note: 'refine.from_map'.tr(),
-            onRemove: () => setState(() => _pois.remove(poi)),
+          // Los sitios elegidos en el mapa ya no salen aquí: están abajo, en el
+          // bloque de paradas, que es de donde se eligen. Aquí quedan los que
+          // escribe él.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            // El mapa ya no está aquí: se bajó al bloque de paradas, que es donde
+            // el motero está pensando en qué sitios quiere ver. Aquí quedan los
+            // sitios que escribe él.
+            child: Row(
+              children: [
+                if (_canAddCustom)
+                  _action(Icons.search, 'refine.search_place'.tr(), _addPoint),
+              ],
+            ),
           ),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Row(children: [
-            if (_canAddCustom)
-              _action(Icons.search, 'refine.search_place'.tr(), _addPoint),
-            if (_canAddCustom) const SizedBox(width: 18),
-            _action(Icons.map_outlined, 'refine.pick_on_map'.tr(), _openPicker),
-          ]),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 
@@ -753,51 +843,58 @@ class _RouteAssistantRefineScreenState
     required String name,
     required String note,
     required VoidCallback onRemove,
-  }) =>
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-        decoration: const BoxDecoration(
-          border:
-              Border(bottom: BorderSide(color: AppColors.greyDark, width: 0.5)),
+  }) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+    decoration: const BoxDecoration(
+      border: Border(bottom: BorderSide(color: AppColors.greyDark, width: 0.5)),
+    ),
+    child: Row(
+      children: [
+        Icon(icon, color: iconColor, size: 15),
+        const SizedBox(width: 11),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: AppColors.white, fontSize: 12.5),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                note,
+                style: const TextStyle(color: AppColors.greyText, fontSize: 12),
+              ),
+            ],
+          ),
         ),
-        child: Row(children: [
-          Icon(icon, color: iconColor, size: 15),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: AppColors.white, fontSize: 12.5)),
-                const SizedBox(height: 2),
-                Text(note,
-                    style: const TextStyle(
-                        color: AppColors.greyDark, fontSize: 10)),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.close, color: AppColors.grey, size: 16),
-            onPressed: onRemove,
-            visualDensity: VisualDensity.compact,
-            constraints: const BoxConstraints(),
-            padding: const EdgeInsets.all(6),
-          ),
-        ]),
-      );
+        IconButton(
+          icon: const Icon(Icons.close, color: AppColors.grey, size: 16),
+          onPressed: onRemove,
+          visualDensity: VisualDensity.compact,
+          constraints: const BoxConstraints(),
+          padding: const EdgeInsets.all(6),
+        ),
+      ],
+    ),
+  );
 
   Widget _action(IconData icon, String label, VoidCallback onTap) =>
       GestureDetector(
         onTap: onTap,
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, color: AppColors.cyan, size: 15),
-          const SizedBox(width: 6),
-          Text(label,
-              style: const TextStyle(color: AppColors.cyan, fontSize: 12)),
-        ]),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppColors.cyan, size: 15),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: const TextStyle(color: AppColors.cyan, fontSize: 12),
+            ),
+          ],
+        ),
       );
 
   /// Almuerzo y comida demasiado pegados.
@@ -806,45 +903,54 @@ class _RouteAssistantRefineScreenState
   /// un toque. Un aviso que te deja el problema para que lo resuelvas tú es la
   /// mitad del trabajo.
   Widget _mealGapWarning(int suggested) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-        decoration: BoxDecoration(
-          color: AppColors.error.withValues(alpha: 0.10),
-          border:
-              const Border(left: BorderSide(color: AppColors.error, width: 3)),
-        ),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Icon(Icons.error_outline, color: AppColors.error, size: 15),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'refine.meal_gap'.tr(namedArgs: {
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+    decoration: BoxDecoration(
+      color: AppColors.error.withValues(alpha: 0.10),
+      border: const Border(left: BorderSide(color: AppColors.error, width: 3)),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(Icons.error_outline, color: AppColors.error, size: 15),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'refine.meal_gap'.tr(
+                  namedArgs: {
                     'hours': '${_mealGapMinutes ~/ 60}',
                     'suggested': _hhmm(suggested),
-                  }),
-                  style: const TextStyle(
-                      color: AppColors.error, fontSize: 10.5, height: 1.45),
+                  },
                 ),
-                const SizedBox(height: 6),
-                GestureDetector(
-                  onTap: () => setState(
-                      () => _fields['dinner_time'] = _hhmm(suggested)),
-                  child: Text(
-                    'refine.meal_gap_fix'
-                        .tr(namedArgs: {'time': _hhmm(suggested)}),
-                    style: const TextStyle(
-                        color: AppColors.cyan,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  color: AppColors.error,
+                  fontSize: 12,
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: 6),
+              GestureDetector(
+                onTap: () =>
+                    setState(() => _fields['dinner_time'] = _hhmm(suggested)),
+                child: Text(
+                  'refine.meal_gap_fix'.tr(
+                    namedArgs: {'time': _hhmm(suggested)},
+                  ),
+                  style: const TextStyle(
+                    color: AppColors.cyan,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ]),
-      );
+        ),
+      ],
+    ),
+  );
 
   /// Vas a llegar de noche.
   ///
@@ -860,54 +966,76 @@ class _RouteAssistantRefineScreenState
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
       decoration: BoxDecoration(
         color: AppColors.orange.withValues(alpha: 0.10),
-        border:
-            const Border(left: BorderSide(color: AppColors.orange, width: 3)),
-      ),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Icon(pasaDeMedianoche ? Icons.nightlight_round : Icons.wb_twilight,
-            color: AppColors.orange, size: 15),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            'refine.late_arrival'.tr(namedArgs: {
-              'departure': '${_fields['departure_time'] ?? ''}',
-              'arrival': _hhmm(arrival % (24 * 60)),
-              'km': '$km',
-              'roads': _fields['avoid_highways'] == false
-                  ? 'refine.roads_highways'.tr()
-                  : 'refine.roads_secondary'.tr(),
-            }),
-            style: const TextStyle(
-                color: AppColors.orange, fontSize: 10.5, height: 1.45),
-          ),
+        border: const Border(
+          left: BorderSide(color: AppColors.orange, width: 3),
         ),
-      ]),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            pasaDeMedianoche ? Icons.nightlight_round : Icons.wb_twilight,
+            color: AppColors.orange,
+            size: 15,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'refine.late_arrival'.tr(
+                namedArgs: {
+                  'departure': '${_fields['departure_time'] ?? ''}',
+                  'arrival': _hhmm(arrival % (24 * 60)),
+                  'km': '$km',
+                  'roads': _fields['avoid_highways'] == false
+                      ? 'refine.roads_highways'.tr()
+                      : 'refine.roads_secondary'.tr(),
+                },
+              ),
+              style: const TextStyle(
+                color: AppColors.orange,
+                fontSize: 12,
+                height: 1.45,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _estimateWarning(int km) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-        decoration: BoxDecoration(
-          color: AppColors.orange.withValues(alpha: 0.10),
-          border: const Border(
-              left: BorderSide(color: AppColors.orange, width: 3)),
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+    decoration: BoxDecoration(
+      color: AppColors.orange.withValues(alpha: 0.10),
+      border: const Border(left: BorderSide(color: AppColors.orange, width: 3)),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(
+          Icons.warning_amber_rounded,
+          color: AppColors.orange,
+          size: 15,
         ),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Icon(Icons.warning_amber_rounded,
-              color: AppColors.orange, size: 15),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'refine.estimate_warning'.tr(namedArgs: {
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            'refine.estimate_warning'.tr(
+              namedArgs: {
                 'asked': '${_toDouble(_fields['km'])?.round() ?? 0}',
                 'estimated': '$km',
-              }),
-              style: const TextStyle(
-                  color: AppColors.orange, fontSize: 10.5, height: 1.45),
+              },
+            ),
+            style: const TextStyle(
+              color: AppColors.orange,
+              fontSize: 12,
+              height: 1.45,
             ),
           ),
-        ]),
-      );
+        ),
+      ],
+    ),
+  );
 
   Widget _poiStopsCard() {
     // Elegir a mano calla a la app: se decidió tras una prueba real en la que
@@ -917,93 +1045,140 @@ class _RouteAssistantRefineScreenState
     final current = '${_fields['poi_stops'] ?? 'pocas'}';
 
     return _card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Opacity(
-              opacity: blocked ? 0.45 : 1,
-              child: Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  for (final level in const ['ninguna', 'pocas', 'muchas', 'ai'])
-                    _chip(
-                      'refine.stops_$level'.tr(),
-                      !blocked && current == level,
-                      blocked
-                          ? () {}
-                          : () =>
-                              setState(() => _fields['poi_stops'] = level),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Los que ha elegido él, arriba del todo de este bloque: son el
+          // resultado de "elegir en el mapa" y es aquí donde los busca, no en
+          // el bloque de los sitios que escribe.
+          for (final poi in _pois)
+            _pointRow(
+              icon: Icons.place_outlined,
+              iconColor: AppColors.cyan,
+              name: '${poi['name'] ?? ''}',
+              note: 'refine.from_map'.tr(),
+              onRemove: () => setState(() => _pois.remove(poi)),
+            ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Opacity(
+                  opacity: blocked ? 0.45 : 1,
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      for (final level in const [
+                        'ninguna',
+                        'pocas',
+                        'muchas',
+                        'ai',
+                      ])
+                        _chip(
+                          'refine.stops_$level'.tr(),
+                          !blocked && current == level,
+                          blocked
+                              ? () {}
+                              : () => setState(
+                                  () => _fields['poi_stops'] = level,
+                                ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  blocked
+                      ? 'refine.stops_blocked'.tr(
+                          namedArgs: {'n': '${_pois.length}'},
+                        )
+                      : 'refine.stops_help'.tr(),
+                  style: const TextStyle(
+                    color: AppColors.greyText,
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
+
+                // Elegirlas él mismo. Está aquí y no arriba con los sitios que
+                // escribe porque es aquí donde está pensando en qué quiere ver: o
+                // dice cuántas pone la app, o las elige en el mapa.
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    _action(
+                      Icons.map_outlined,
+                      'refine.pick_on_map'.tr(),
+                      _openPicker,
                     ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              blocked
-                  ? 'refine.stops_blocked'
-                      .tr(namedArgs: {'n': '${_pois.length}'})
-                  : 'refine.stops_help'.tr(),
-              style: const TextStyle(
-                  color: AppColors.greyDark, fontSize: 10, height: 1.4),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _restCard() => _card(
-        child: Column(children: [
-          _mealRow(
-            icon: Icons.restaurant_outlined,
-            field: 'suggest_lunch',
-            timeField: 'lunch_time',
-            placeField: 'lunch_place',
-            label: 'assistant.f_suggest_lunch'.tr(),
-            onText: 'assistant.v_lunch'.tr(),
-            offText: 'assistant.v_no_lunch'.tr(),
+    child: Column(
+      children: [
+        _mealRow(
+          icon: Icons.restaurant_outlined,
+          field: 'suggest_lunch',
+          timeField: 'lunch_time',
+          placeField: 'lunch_place',
+          label: 'assistant.f_suggest_lunch'.tr(),
+          onText: 'assistant.v_lunch'.tr(),
+          offText: 'assistant.v_no_lunch'.tr(),
+        ),
+        _mealRow(
+          icon: Icons.restaurant,
+          field: 'suggest_dinner',
+          timeField: 'dinner_time',
+          placeField: 'dinner_place',
+          label: 'assistant.f_suggest_dinner'.tr(),
+          onText: 'assistant.v_dinner'.tr(),
+          offText: 'assistant.v_no_dinner'.tr(),
+        ),
+        _switchRow(
+          icon: Icons.alt_route,
+          label: 'assistant.f_avoid_highways'.tr(),
+          value: _fields['avoid_highways'] != false,
+          onTap: () => setState(
+            () => _fields['avoid_highways'] =
+                !(_fields['avoid_highways'] != false),
           ),
-          _mealRow(
-            icon: Icons.restaurant,
-            field: 'suggest_dinner',
-            timeField: 'dinner_time',
-            placeField: 'dinner_place',
-            label: 'assistant.f_suggest_dinner'.tr(),
-            onText: 'assistant.v_dinner'.tr(),
-            offText: 'assistant.v_no_dinner'.tr(),
-          ),
-          _switchRow(
-            icon: Icons.alt_route,
-            label: 'assistant.f_avoid_highways'.tr(),
-            value: _fields['avoid_highways'] != false,
-            onTap: () => setState(() => _fields['avoid_highways'] =
-                !(_fields['avoid_highways'] != false)),
-            onText: 'assistant.v_avoid'.tr(),
-            offText: 'assistant.v_highways'.tr(),
-          ),
+          onText: 'assistant.v_avoid'.tr(),
+          offText: 'assistant.v_highways'.tr(),
+        ),
 
-          // Las gasolineras solo se pueden calcular con el depósito y el
-          // consumo de la moto. Sin esos datos la fila se queda apagada y dice
-          // por qué, en vez de desaparecer: así se entiende que existe y qué
-          // falta para tenerla.
-          _switchRow(
-            icon: Icons.local_gas_station,
-            label: 'planner.gas_stations'.tr(),
-            value: _hasFuelData && _fields['suggest_gas_stations'] == true,
-            enabled: _hasFuelData,
-            onTap: () => setState(() => _fields['suggest_gas_stations'] =
-                !(_fields['suggest_gas_stations'] == true)),
-            onText: 'planner.gas_stations_desc'.tr(),
-            offText: _hasFuelData
-                ? 'refine.gas_off'.tr()
-                : 'planner.gas_stations_no_data'.tr(),
-            last: true,
+        // Las gasolineras solo se pueden calcular con el depósito y el
+        // consumo de la moto. Sin esos datos la fila se queda apagada y dice
+        // por qué, en vez de desaparecer: así se entiende que existe y qué
+        // falta para tenerla.
+        _switchRow(
+          icon: Icons.local_gas_station,
+          label: 'planner.gas_stations'.tr(),
+          value: _hasFuelData && _fields['suggest_gas_stations'] == true,
+          enabled: _hasFuelData,
+          onTap: () => setState(
+            () => _fields['suggest_gas_stations'] =
+                !(_fields['suggest_gas_stations'] == true),
           ),
-        ]),
-      );
+          onText: 'planner.gas_stations_desc'.tr(),
+          offText: _hasFuelData
+              ? 'refine.gas_off'.tr()
+              : 'planner.gas_stations_no_data'.tr(),
+          last: true,
+        ),
+      ],
+    ),
+  );
 
   /// Una parada para comer: el interruptor y, si está puesto, su hora.
   ///
@@ -1046,15 +1221,16 @@ class _RouteAssistantRefineScreenState
       // peor.
       onTap: on
           ? () => place.isNotEmpty
-              ? _askMealPlace(placeField)
-              : _askMealTime(timeField)
+                ? _askMealPlace(placeField)
+                : _askMealTime(timeField)
           : () => _toggleMeal(field, timeField),
       onSwitch: () => _toggleMeal(field, timeField),
       onText: valor,
       offText: allowed
           ? offText
-          : 'refine.lunch_too_late'
-              .tr(namedArgs: {'time': '${_fields['departure_time'] ?? ''}'}),
+          : 'refine.lunch_too_late'.tr(
+              namedArgs: {'time': '${_fields['departure_time'] ?? ''}'},
+            ),
     );
   }
 
@@ -1065,7 +1241,8 @@ class _RouteAssistantRefineScreenState
       backgroundColor: AppColors.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
       builder: (_) => PlaceSheet(title: 'refine.meal_place'.tr()),
     );
 
@@ -1091,7 +1268,8 @@ class _RouteAssistantRefineScreenState
     setState(() {
       _fields[field] = true;
       _fields[timeField] = _hhmm(
-          timeField == 'lunch_time' ? _defaultLunch : _defaultDinner);
+        timeField == 'lunch_time' ? _defaultLunch : _defaultDinner,
+      );
     });
   }
 
@@ -1211,38 +1389,48 @@ class _RouteAssistantRefineScreenState
       context: context,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
       builder: (ctx) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'refine.meal_time_title'.tr(namedArgs: {
-                  'from': _hhmm(window.from),
-                  'to': _hhmm(window.to),
-                }),
-                style: const TextStyle(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'refine.meal_time_title'.tr(
+                    namedArgs: {
+                      'from': _hhmm(window.from),
+                      'to': _hhmm(window.to),
+                    },
+                  ),
+                  style: const TextStyle(
                     color: AppColors.grey,
                     fontSize: 11,
-                    fontWeight: FontWeight.w600),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final m in options)
-                  _chip(_hhmm(m), current == _hhmm(m),
-                      () => Navigator.pop(ctx, m)),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final m in options)
+                    _chip(
+                      _hhmm(m),
+                      current == _hhmm(m),
+                      () => Navigator.pop(ctx, m),
+                    ),
+                ],
+              ),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
 
@@ -1262,47 +1450,52 @@ class _RouteAssistantRefineScreenState
     VoidCallback? onSwitch,
     bool enabled = true,
     bool last = false,
-  }) =>
-      InkWell(
-        onTap: enabled ? onTap : null,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            border: last
-                ? null
-                : const Border(
-                    bottom:
-                        BorderSide(color: AppColors.greyDark, width: 0.5)),
-          ),
-          child: Opacity(
-            opacity: enabled ? 1 : 0.5,
-            child: Row(children: [
-              Icon(icon, color: AppColors.grey, size: 16),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(label,
-                        style: const TextStyle(
-                            color: AppColors.grey, fontSize: 10.5)),
-                    const SizedBox(height: 2),
-                    Text(value ? onText : offText,
-                        style: const TextStyle(
-                            color: AppColors.white, fontSize: 12.5)),
-                  ],
-                ),
+  }) => InkWell(
+    onTap: enabled ? onTap : null,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        border: last
+            ? null
+            : const Border(
+                bottom: BorderSide(color: AppColors.greyDark, width: 0.5),
               ),
-              Switch(
-                value: value,
-                onChanged:
-                    enabled ? (_) => (onSwitch ?? onTap)() : null,
-                activeThumbColor: AppColors.orange,
+      ),
+      child: Opacity(
+        opacity: enabled ? 1 : 0.5,
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.grey, size: 16),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value ? onText : offText,
+                    style: const TextStyle(
+                      color: AppColors.white,
+                      fontSize: 12.5,
+                    ),
+                  ),
+                ],
               ),
-            ]),
-          ),
+            ),
+            Switch(
+              value: value,
+              onChanged: enabled ? (_) => (onSwitch ?? onTap)() : null,
+              activeThumbColor: AppColors.orange,
+            ),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 
   // ─── Generar ─────────────────────────────────────────────────────────
 
@@ -1318,24 +1511,28 @@ class _RouteAssistantRefineScreenState
 
     if (!mounted) return;
 
-    await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => RouteAssistantOptionsScreen(
-        payload: payload,
-        request: widget.request,
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => RouteAssistantOptionsScreen(
+          payload: payload,
+          request: widget.request,
+        ),
       ),
-    ));
+    );
   }
 
   /// Todo lo decidido, listo para el servidor.
   Map<String, dynamic> _payload() {
     final payload = Map<String, dynamic>.from(_fields)
-      ..removeWhere((k, v) =>
-          v == null ||
-          // Lo que empieza por _ es de la pantalla: coordenadas para estimar,
-          // POIs enteros para poder enseñarlos. Al servidor le van los ids.
-          k.startsWith('_') ||
-          k.endsWith('_address') ||
-          const {'days', 'moto', 'understood', 'multi_day'}.contains(k))
+      ..removeWhere(
+        (k, v) =>
+            v == null ||
+            // Lo que empieza por _ es de la pantalla: coordenadas para estimar,
+            // POIs enteros para poder enseñarlos. Al servidor le van los ids.
+            k.startsWith('_') ||
+            k.endsWith('_address') ||
+            const {'days', 'moto', 'understood', 'multi_day'}.contains(k),
+      )
       ..['ai_request'] = widget.request
       ..['days'] = 1;
 

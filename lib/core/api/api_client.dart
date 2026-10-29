@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 void Function()? onUnauthorized;
 
 class ApiClient {
-  static const String baseUrl = 'http://192.168.1.24:8000/api/v1';
+  static const String baseUrl = 'http://192.168.1.13:8000/api/v1';
 
   static final _storage = FlutterSecureStorage();
 

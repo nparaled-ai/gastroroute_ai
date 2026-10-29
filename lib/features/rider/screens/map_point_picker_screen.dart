@@ -221,7 +221,7 @@ class _MapPointPickerScreenState extends State<MapPointPickerScreen> {
               children: [
                 Text('map_picker.hint'.tr(),
                     style:
-                        const TextStyle(color: AppColors.grey, fontSize: 10.5)),
+                        const TextStyle(color: AppColors.grey, fontSize: 12)),
                 const SizedBox(height: 4),
                 // Alto fijo: sin él, la tarjeta crece y encoge con cada
                 // dirección y el botón de confirmar se mueve bajo el dedo.
@@ -240,7 +240,7 @@ class _MapPointPickerScreenState extends State<MapPointPickerScreen> {
                         child: _naming
                             ? Text('map_picker.naming'.tr(),
                                 style: const TextStyle(
-                                    color: AppColors.greyDark, fontSize: 13))
+                                    color: AppColors.greyText, fontSize: 13))
                             : Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -260,7 +260,7 @@ class _MapPointPickerScreenState extends State<MapPointPickerScreen> {
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                         color: AppColors.grey,
-                                        fontSize: 10.5,
+                                        fontSize: 12,
                                         height: 1.25),
                                   ),
                                 ],

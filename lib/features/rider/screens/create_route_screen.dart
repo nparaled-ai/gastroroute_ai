@@ -214,7 +214,7 @@ class _OptionCard extends StatelessWidget {
                     child: Text('create_route.coming_soon'.tr(),
                         style: const TextStyle(
                             color: AppColors.grey,
-                            fontSize: 10,
+                            fontSize: 12,
                             fontWeight: FontWeight.w600)),
                   ),
                 ],
