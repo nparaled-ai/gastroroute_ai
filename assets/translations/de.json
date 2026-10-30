@@ -142,7 +142,7 @@
         "title": "KI-Routenplaner",
         "ai_generated": "KI-generierte Route",
         "generate_timeout": "Die Route braucht zu lange. Versuche es erneut oder wähle eine kürzere Distanz.",
-        "routes_remaining": "{} kostenlose Routen diesen Monat",
+        "routes_remaining": "Dir bleiben noch {} KI-Routen",
         "what_plan": "Was möchten Sie planen?",
         "route": "Route",
         "route_desc": "Ein Tag Abenteuer",
@@ -212,6 +212,16 @@
         "gas_stops": "Tankstopps",
         "lunch_stop": "Mittagspause",
         "dinner_stop": "Abendessen-Stopp",
+        "no_lunch": {
+            "title": "Kein Mittagsstopp",
+            "early": "Diese Route ist um {} zurück, und du wolltest um {} essen. Fahr früher los oder frag nach einer längeren Route.",
+            "none": "Ich habe auf dieser Route keinen Mittagsstopp um {} gefunden."
+        },
+        "no_dinner": {
+            "title": "Kein Abendstopp",
+            "early": "Diese Route ist um {} zurück, und du wolltest um {} zu Abend essen. Fahr später los oder frag nach einer längeren Route.",
+            "none": "Ich habe auf dieser Route keinen Abendstopp um {} gefunden."
+        },
         "hotels": "Empfohlene Unterkunft",
         "open_maps": "IN GOOGLE MAPS ÖFFNEN",
         "maps_unavailable": "Diese Route konnte nicht in Google Maps geöffnet werden.",
@@ -242,7 +252,8 @@
         "riders_notified": {
             "one": "{} Biker benachrichtigt",
             "other": "{} Biker benachrichtigt"
-        }
+        },
+        "meal_detour": "Damit du essen kannst, fahren wir über {}, {} km Umweg. Die Streckenlänge enthält das schon."
     },
     "verify_email": {
         "title": "E-Mail bestätigen!",

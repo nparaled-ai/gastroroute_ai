@@ -142,7 +142,7 @@
         "title": "Planificateur IA",
         "ai_generated": "Itinéraire généré par IA",
         "generate_timeout": "L'itinéraire met trop de temps à se générer. Réessayez ou demandez une distance plus courte.",
-        "routes_remaining": "{} itinéraires gratuits restants ce mois",
+        "routes_remaining": "Il vous reste {} itinéraires IA",
         "what_plan": "Que voulez-vous planifier?",
         "route": "Itinéraire",
         "route_desc": "Une journée d'aventure",
@@ -212,6 +212,16 @@
         "gas_stops": "Arrêts ravitaillement",
         "lunch_stop": "Arrêt déjeuner",
         "dinner_stop": "Arrêt dîner",
+        "no_lunch": {
+            "title": "Pas d'arrêt déjeuner",
+            "early": "Cet itinéraire est de retour à {} et tu voulais déjeuner à {}. Pars plus tôt ou demande-le plus long.",
+            "none": "Je n'ai trouvé aucun arrêt déjeuner vers {} sur cet itinéraire."
+        },
+        "no_dinner": {
+            "title": "Pas d'arrêt dîner",
+            "early": "Cet itinéraire est de retour à {} et tu voulais dîner à {}. Pars plus tard ou demande-le plus long.",
+            "none": "Je n'ai trouvé aucun arrêt dîner vers {} sur cet itinéraire."
+        },
         "hotels": "Hébergement suggéré",
         "open_maps": "OUVRIR DANS GOOGLE MAPS",
         "maps_unavailable": "Impossible d'ouvrir cet itinéraire dans Google Maps.",
@@ -242,7 +252,8 @@
         "riders_notified": {
             "one": "{} motard averti",
             "other": "{} motards avertis"
-        }
+        },
+        "meal_detour": "Pour que vous puissiez manger, nous passons par {}, à {} km. La distance l'inclut déjà."
     },
     "verify_email": {
         "title": "Vérifiez votre email !",

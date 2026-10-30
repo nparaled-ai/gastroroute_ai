@@ -142,7 +142,7 @@
         "title": "AI Route Planner",
         "ai_generated": "AI Generated Route",
         "generate_timeout": "The route is taking too long to generate. Try again or ask for a shorter distance.",
-        "routes_remaining": "{} free routes remaining this month",
+        "routes_remaining": "You have {} AI routes left",
         "what_plan": "What do you want to plan?",
         "route": "Route",
         "route_desc": "One day of adventure",
@@ -212,6 +212,16 @@
         "gas_stops": "Refueling stops",
         "lunch_stop": "Lunch stop",
         "dinner_stop": "Dinner stop",
+        "no_lunch": {
+            "title": "No lunch stop",
+            "early": "This route is back by {} and you wanted lunch at {}. Set off earlier or ask for a longer one.",
+            "none": "I couldn't find a lunch stop near {} on this route."
+        },
+        "no_dinner": {
+            "title": "No dinner stop",
+            "early": "This route is back by {} and you wanted dinner at {}. Set off later or ask for a longer one.",
+            "none": "I couldn't find a dinner stop near {} on this route."
+        },
         "hotels": "Suggested accommodation",
         "open_maps": "OPEN IN GOOGLE MAPS",
         "maps_unavailable": "Could not open this route in Google Maps.",
@@ -242,7 +252,8 @@
         "riders_notified": {
             "one": "{} rider notified",
             "other": "{} riders notified"
-        }
+        },
+        "meal_detour": "So you can eat we take you to {}, {} km off route. The distance already includes it."
     },
     "verify_email": {
         "title": "Verify your email!",

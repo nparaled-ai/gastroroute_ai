@@ -142,7 +142,7 @@
         "title": "Pianificatore IA",
         "ai_generated": "Percorso generato da IA",
         "generate_timeout": "Il percorso sta impiegando troppo tempo. Riprova o richiedi una distanza minore.",
-        "routes_remaining": "{} percorsi gratuiti rimasti questo mese",
+        "routes_remaining": "Ti restano {} percorsi con IA",
         "what_plan": "Cosa vuoi pianificare?",
         "route": "Percorso",
         "route_desc": "Una giornata di avventura",
@@ -212,6 +212,16 @@
         "gas_stops": "Soste rifornimento",
         "lunch_stop": "Sosta pranzo",
         "dinner_stop": "Sosta cena",
+        "no_lunch": {
+            "title": "Nessuna sosta per il pranzo",
+            "early": "Questo percorso rientra alle {} e volevi pranzare alle {}. Parti prima o chiedine uno più lungo.",
+            "none": "Non ho trovato nessuna sosta per il pranzo verso le {} su questo percorso."
+        },
+        "no_dinner": {
+            "title": "Nessuna sosta per la cena",
+            "early": "Questo percorso rientra alle {} e volevi cenare alle {}. Parti più tardi o chiedine uno più lungo.",
+            "none": "Non ho trovato nessuna sosta per la cena verso le {} su questo percorso."
+        },
         "hotels": "Alloggio suggerito",
         "open_maps": "APRI IN GOOGLE MAPS",
         "maps_unavailable": "Non è stato possibile aprire questo percorso in Google Maps.",
@@ -242,7 +252,8 @@
         "riders_notified": {
             "one": "{} motociclista avvisato",
             "other": "{} motociclisti avvisati"
-        }
+        },
+        "meal_detour": "Per farti mangiare passiamo da {}, a {} km. I chilometri del percorso lo includono già."
     },
     "verify_email": {
         "title": "Verifica la tua email!",

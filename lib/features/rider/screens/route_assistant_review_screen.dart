@@ -997,6 +997,9 @@ class _RouteAssistantReviewScreenState
         builder: (_) => RouteAssistantRefineScreen(
           request: widget.request,
           fields: Map<String, dynamic>.from(_fields),
+          // A qué hora se come en el país por el que va la ruta. Lo manda el
+          // servidor, que tiene la tabla; aquí solo viaja.
+          mealWindows: widget.interpretation['meal_windows'] as Map<String, dynamic>?,
           // Lo que se toque allí se guarda aquí al volver. Si no, ir a
           // corregir la hora borraba la dirección y los puntos elegidos.
           onBack: (updated) {

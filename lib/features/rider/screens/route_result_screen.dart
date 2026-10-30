@@ -42,6 +42,61 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   int?  get _routesRemaining             => widget.result['routes_remaining'];
   int?  get _fuelRangeKm                 => widget.result['fuel_range_km'];
 
+  /// El aviso de "pediste parada y esta ruta no la lleva", con el motivo.
+  ///
+  /// El motivo lo calcula el servidor con las horas reales de Google y llega
+  /// como código (`vuelve_antes` / `sin_sitio`) más las dos horas; la frase se
+  /// escribe aquí, en el idioma del motero. Si no hay motivo, no hay aviso: la
+  /// lista va vacía y no ocupa nada.
+  List<Widget> _mealNotice(dynamic motivo, String clave, IconData icono, Color color) {
+    if (motivo == null) return const [];
+
+    final razon  = motivo['reason'] ?? 'sin_sitio';
+    final vuelve = motivo['back_at'];
+    final pedida = motivo['asked'] ?? '';
+
+    // Sin hora de vuelta no se puede decir que vuelve antes, aunque el
+    // servidor lo diga: se cae al motivo genérico.
+    final texto = (razon == 'vuelve_antes' && vuelve != null)
+        ? '$clave.early'.tr(args: [vuelve.toString(), pedida.toString()])
+        : '$clave.none'.tr(args: [pedida.toString()]);
+
+    return [
+      _SectionHeader(icon: icono, label: '$clave.title'.tr(), color: color),
+      const SizedBox(height: 8),
+      _SuggestionCard(icon: icono, title: texto, subtitle: '', color: color),
+      const SizedBox(height: 16),
+    ];
+  }
+
+  /// Si para poder comer la ruta se ha desviado a un pueblo, decirlo.
+  ///
+  /// Pasa cuando a la hora de comer la ruta solo pasa por puertos y miradores,
+  /// donde no hay un bar. El servidor busca el pueblo más cercano y lo mete en
+  /// el recorrido, así que la ruta sale algo más larga y hay que contarlo: se
+  /// enseña el número, como en el selector de puntos, porque "será más larga"
+  /// no le sirve de nada a nadie.
+  List<Widget> _detourNotice(String campo, IconData icono, Color color) {
+    final desvios = _aiSummary?['meal_detour'];
+    if (desvios is! List) return const [];
+
+    final mio = desvios.cast<Map>().where((d) => d['campo'] == campo).toList();
+    if (mio.isEmpty) return const [];
+
+    return [
+      _SuggestionCard(
+        icon: Icons.alt_route,
+        title: 'route_result.meal_detour'.tr(args: [
+          (mio.first['location'] ?? '').toString(),
+          (mio.first['km'] ?? 0).toString(),
+        ]),
+        subtitle: '',
+        color: color,
+      ),
+      const SizedBox(height: 16),
+    ];
+  }
+
   @override
   void initState() {
     super.initState();
@@ -678,7 +733,17 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                     subtitle: _route['lunch_stop']['suggestion'] ?? '',
                     badge: _route['lunch_stop']['estimated_time'], color: AppColors.orange),
                 const SizedBox(height: 16),
+                ..._detourNotice('lunch_stop', Icons.alt_route, AppColors.orange),
               ],
+
+              // Y si pidió parada y no hay, por qué no hay.
+              //
+              // Casi siempre es que la ruta vuelve antes de la hora de comer:
+              // cuatro horas saliendo a las nueve son las trece en casa. Sin
+              // decirlo, el motero marca "parar a almorzar" y no ve nada, que
+              // desde la ficha no se distingue de un olvido nuestro.
+              ..._mealNotice(_aiSummary?['lunch_skipped'],
+                  'route_result.no_lunch', Icons.no_meals_outlined, AppColors.orange),
 
               // Comer - solo si se pidió
               if (_route['dinner_stop'] != null) ...[
@@ -690,7 +755,11 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                     subtitle: _route['dinner_stop']['suggestion'] ?? '',
                     badge: _route['dinner_stop']['estimated_time'], color: AppColors.cyan),
                 const SizedBox(height: 16),
+                ..._detourNotice('dinner_stop', Icons.alt_route, AppColors.cyan),
               ],
+
+              ..._mealNotice(_aiSummary?['dinner_skipped'],
+                  'route_result.no_dinner', Icons.no_meals_outlined, AppColors.cyan),
 
               // Tags
               if (_route['tags'] != null && (_route['tags'] as List).isNotEmpty) ...[

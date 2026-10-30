@@ -35,11 +35,20 @@ class RouteAssistantRefineScreen extends StatefulWidget {
   /// pantalla anterior lo guarde y no se pierda al entrar otra vez.
   final void Function(Map<String, dynamic>)? onBack;
 
+  /// A qué hora se come en el país por el que va la ruta.
+  ///
+  /// Lo manda el servidor en la respuesta de interpretar, con la forma
+  /// `{lunch: {from, to, default}, dinner: {...}, gap_minutes}`. Antes estaba
+  /// escrito aquí —las horas de España para los seis idiomas— y en Francia a
+  /// las dos ya han cerrado las cocinas.
+  final Map<String, dynamic>? mealWindows;
+
   const RouteAssistantRefineScreen({
     super.key,
     required this.request,
     required this.fields,
     this.onBack,
+    this.mealWindows,
   });
 
   @override
@@ -1282,10 +1291,34 @@ class _RouteAssistantRefineScreenState
   /// la separación entre las dos paradas se garantiza sola —lo más pegadas
   /// que pueden quedar es almorzar a las 12:00 y comer a la 13:00—, así que
   /// no hace falta ninguna regla aparte.
-  static const _mealWindows = {
+  /// Las de España, para cuando el servidor no diga nada (sin origen todavía,
+  /// o una respuesta vieja de una versión anterior).
+  static const _mealWindowsES = {
     'lunch_time': (from: 9 * 60, to: 12 * 60),
     'dinner_time': (from: 13 * 60, to: 15 * 60),
   };
+
+  /// Las franjas que valen aquí: las del país de la ruta si el servidor las ha
+  /// mandado, y si no las de arriba.
+  Map<String, ({int from, int to})> get _mealWindows {
+    final w = widget.mealWindows;
+    if (w == null) return _mealWindowsES;
+
+    final lunch  = w['lunch'] as Map?;
+    final dinner = w['dinner'] as Map?;
+    if (lunch == null || dinner == null) return _mealWindowsES;
+
+    int? m(dynamic hhmm) => _minutesOf(hhmm?.toString());
+
+    final ld = m(lunch['from']), lh = m(lunch['to']);
+    final cd = m(dinner['from']), ch = m(dinner['to']);
+    if (ld == null || lh == null || cd == null || ch == null) return _mealWindowsES;
+
+    return {
+      'lunch_time': (from: ld, to: lh),
+      'dinner_time': (from: cd, to: ch),
+    };
+  }
 
   /// Y además, tres horas entre una parada y otra.
   ///
@@ -1293,7 +1326,13 @@ class _RouteAssistantRefineScreenState
   /// es sentarse dos veces seguidas. Tres horas es lo máximo que cabe sin
   /// contradecir las franjas: 12:00 más tres son las 15:00, justo el tope de
   /// la franja de comidas. Con cuatro no habría ninguna hora válida.
-  static const _mealGapMinutes = 180;
+  /// Tres horas en España. En otros países las franjas están más juntas —en
+  /// Alemania se come a las 12:00— así que el hueco lo calcula el servidor a
+  /// partir de las propias franjas y lo manda en `gap_minutes`.
+  int get _mealGapMinutes {
+    final g = widget.mealWindows?['gap_minutes'];
+    return (g is int && g >= 60) ? g : 180;
+  }
 
   /// Minutos desde medianoche de una hora guardada como "HH:MM".
   int? _minutesOf(String? value) {
@@ -1331,7 +1370,11 @@ class _RouteAssistantRefineScreenState
     final window = _mealWindows['lunch_time']!;
     final out = _departure;
 
-    if (out == null) return 11 * 60;
+    // Sin hora de salida, la que propone el país de la ruta (11:00 en España).
+    if (out == null) {
+      return _minutesOf(widget.mealWindows?['lunch']?['default']?.toString())
+          ?? 11 * 60;
+    }
 
     // A la media hora más cercana: un almuerzo a las 11:17 no lo pone nadie.
     final propuesta = ((out + 120) / 30).round() * 30;
