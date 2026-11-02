@@ -826,6 +826,8 @@
         "direct_roads_desc": "Itinéraire direct par routes secondaires, sans arrêts.",
         "direct_fast_desc": "Itinéraire direct par autoroute, sans arrêts.",
         "direct_skips": "Ne passe pas par les {n} points que tu as choisis",
-        "zone_far": "{zona} est à {km} km et cet itinéraire atteint {alcance}. Vous n’en frôlerez que le bord : y rouler demanderait environ {necesarios} km, ou un départ plus proche."
+        "zone_far": "{zona} est à {km} km et cet itinéraire atteint {alcance}. Vous n’en frôlerez que le bord : y rouler demanderait environ {necesarios} km, ou un départ plus proche.",
+        "lunch_kind_cafe": "Un café",
+        "lunch_kind_almuerzo": "Casse-croûte"
     }
 }

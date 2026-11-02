@@ -826,6 +826,8 @@
         "direct_roads_desc": "Direct route on back roads, no stops.",
         "direct_fast_desc": "Direct route by motorway, no stops.",
         "direct_skips": "Skips the {n} places you picked",
-        "zone_far": "{zona} is {km} km away and this route reaches {alcance}. You will only clip its edge: riding there would take about {necesarios} km, or a closer starting point."
+        "zone_far": "{zona} is {km} km away and this route reaches {alcance}. You will only clip its edge: riding there would take about {necesarios} km, or a closer starting point.",
+        "lunch_kind_cafe": "A coffee",
+        "lunch_kind_almuerzo": "A proper bite"
     }
 }

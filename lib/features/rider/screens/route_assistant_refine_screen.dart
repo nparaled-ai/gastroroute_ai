@@ -347,7 +347,9 @@ class _RouteAssistantRefineScreenState
 
     // Las paradas cuentan: media hora el almuerzo, una la comida. Son las que
     // usa el generador.
-    if (_fields['suggest_lunch'] == true) minutes += 30;
+    if (_fields['suggest_lunch'] == true) {
+      minutes += _lunchKind == 'cafe' ? 15 : 30;
+    }
     if (_fields['suggest_dinner'] == true) minutes += 60;
 
     return out + minutes;
@@ -1145,6 +1147,53 @@ class _RouteAssistantRefineScreenState
           onText: 'assistant.v_lunch'.tr(),
           offText: 'assistant.v_no_lunch'.tr(),
         ),
+
+        // Qué clase de parada de media mañana, decidido el 02-11-2026: *«no es
+        // lo mismo parar a almorzar y comerse un plato de huevos fritos que
+        // parar a tomarte un café»*. Con la fila apagada no se enseña: entonces
+        // la parada es «nada» y no hay nada que elegir.
+        //
+        // Para almorzar NO vale una cafetería; para un café, sí. Y duran
+        // distinto: 15 minutos el café y 30 el almuerzo, que cuentan en las
+        // horas de llegada de todo lo que va detrás.
+        if (_fields['suggest_lunch'] == true && _lunchMakesSense)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(46, 0, 12, 11),
+            child: Row(
+              children: [
+                for (final clase in const ['cafe', 'almuerzo'])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: GestureDetector(
+                      onTap: () => setState(() => _fields['lunch_kind'] = clase),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: _lunchKind == clase
+                              ? AppColors.orange.withOpacity(0.15)
+                              : AppColors.surface,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: _lunchKind == clase ? AppColors.orange : AppColors.greyDark,
+                            width: _lunchKind == clase ? 2 : 1,
+                          ),
+                        ),
+                        child: Text(
+                          'assistant.lunch_kind_$clase'.tr(),
+                          style: TextStyle(
+                            color: _lunchKind == clase ? AppColors.orange : AppColors.grey,
+                            fontSize: 12.5,
+                            fontWeight:
+                                _lunchKind == clase ? FontWeight.w700 : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         _mealRow(
           icon: Icons.restaurant,
           field: 'suggest_dinner',
@@ -1195,6 +1244,12 @@ class _RouteAssistantRefineScreenState
   /// el sitio que toque del recorrido y para recalcular los horarios de los
   /// puntos siguientes. Activarla sin hora dejaba al servidor sin ese dato, y
   /// el formulario de siempre la exige.
+  /// Qué clase de parada de media mañana. Sin decir nada, **almuerzo**: es lo
+  /// estricto, porque en un bar que sirve huevos también ponen café y al revés
+  /// no.
+  String get _lunchKind =>
+      '${_fields['lunch_kind'] ?? 'almuerzo'}' == 'cafe' ? 'cafe' : 'almuerzo';
+
   Widget _mealRow({
     required IconData icon,
     required String field,

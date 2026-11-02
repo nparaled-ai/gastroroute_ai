@@ -826,6 +826,8 @@
         "direct_roads_desc": "Percurso direto por estradas secundárias, sem paragens.",
         "direct_fast_desc": "Percurso direto por autoestrada, sem paragens.",
         "direct_skips": "Não passa pelos {n} pontos que escolheste",
-        "zone_far": "{zona} fica a {km} km e esta rota chega aos {alcance}. Só vais roçar a berma: para andar por lá seriam precisos uns {necesarios} km, ou partir de mais perto."
+        "zone_far": "{zona} fica a {km} km e esta rota chega aos {alcance}. Só vais roçar a berma: para andar por lá seriam precisos uns {necesarios} km, ou partir de mais perto.",
+        "lunch_kind_cafe": "Um café",
+        "lunch_kind_almuerzo": "Comer algo"
     }
 }

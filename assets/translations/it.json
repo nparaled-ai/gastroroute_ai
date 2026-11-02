@@ -826,6 +826,8 @@
         "direct_roads_desc": "Percorso diretto su strade secondarie, senza soste.",
         "direct_fast_desc": "Percorso diretto in autostrada, senza soste.",
         "direct_skips": "Non passa dai {n} punti che hai scelto",
-        "zone_far": "{zona} è a {km} km e questo percorso arriva a {alcance}. Ne sfiorerai solo il bordo: per girarci servirebbero circa {necesarios} km, o partire da più vicino."
+        "zone_far": "{zona} è a {km} km e questo percorso arriva a {alcance}. Ne sfiorerai solo il bordo: per girarci servirebbero circa {necesarios} km, o partire da più vicino.",
+        "lunch_kind_cafe": "Un caffè",
+        "lunch_kind_almuerzo": "Spuntino"
     }
 }
