@@ -825,6 +825,7 @@
         "direct_fast_why": "La più veloce, ma è autostrada: chilometri dritti e poco altro. Sta qui nel caso tu sia di corsa.",
         "direct_roads_desc": "Percorso diretto su strade secondarie, senza soste.",
         "direct_fast_desc": "Percorso diretto in autostrada, senza soste.",
-        "direct_skips": "Non passa dai {n} punti che hai scelto"
+        "direct_skips": "Non passa dai {n} punti che hai scelto",
+        "zone_far": "{zona} è a {km} km e questo percorso arriva a {alcance}. Ne sfiorerai solo il bordo: per girarci servirebbero circa {necesarios} km, o partire da più vicino."
     }
 }

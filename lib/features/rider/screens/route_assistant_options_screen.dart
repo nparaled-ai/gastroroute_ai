@@ -50,6 +50,10 @@ class _RouteAssistantOptionsScreenState
 
   List<Map<String, dynamic>> _options = const [];
   String? _note;
+
+  /// Norma 24: la zona que ha pedido queda fuera del alcance de esta ruta.
+  /// Se le dice ANTES de generar, con los numeros, y decide el.
+  Map<String, dynamic>? _zoneFar;
   String? _error;
 
   /// Dónde sale, para que el encuadre incluya la salida y no solo los hitos.
@@ -124,6 +128,7 @@ class _RouteAssistantOptionsScreenState
     setState(() {
       _options = options;
       _note = result['note'];
+      _zoneFar = (result['zone_far'] as Map?)?.cast<String, dynamic>();
       _error = result['error'];
       _loading = false;
       _highlighted = 0;
@@ -635,6 +640,39 @@ class _RouteAssistantOptionsScreenState
                     fontSize: 11.5,
                     height: 1.45,
                   ),
+                ),
+              ),
+            ],
+
+            // El aviso de que la zona queda lejos va ANTES de las propuestas:
+            // si la ruta no llega a donde ha pedido, eso es lo primero que
+            // tiene que leer, no la tercera tarjeta.
+            if (_zoneFar != null) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.orange.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.orange.withOpacity(0.35)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.social_distance, color: AppColors.orange, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'assistant.zone_far'.tr(namedArgs: {
+                          'zona': '${_zoneFar!['zona']}',
+                          'km': '${_zoneFar!['km']}',
+                          'alcance': '${_zoneFar!['alcance_km']}',
+                          'necesarios': '${_zoneFar!['km_necesarios']}',
+                        }),
+                        style: const TextStyle(color: AppColors.white, fontSize: 12, height: 1.45),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

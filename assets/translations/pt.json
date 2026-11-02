@@ -825,6 +825,7 @@
         "direct_fast_why": "A mais rápida, mas é autoestrada: quilómetros a direito e pouco mais. Está aqui para quando tiveres o tempo contado.",
         "direct_roads_desc": "Percurso direto por estradas secundárias, sem paragens.",
         "direct_fast_desc": "Percurso direto por autoestrada, sem paragens.",
-        "direct_skips": "Não passa pelos {n} pontos que escolheste"
+        "direct_skips": "Não passa pelos {n} pontos que escolheste",
+        "zone_far": "{zona} fica a {km} km e esta rota chega aos {alcance}. Só vais roçar a berma: para andar por lá seriam precisos uns {necesarios} km, ou partir de mais perto."
     }
 }
