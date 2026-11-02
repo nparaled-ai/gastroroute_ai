@@ -266,7 +266,9 @@
             "one": "{} rider notified",
             "other": "{} riders notified"
         },
-        "meal_detour": "So you can eat we take you to {}, {} km off route. The distance already includes it."
+        "meal_detour": "So you can eat we take you to {}, {} minutes off route. The distance already includes it.",
+        "unpaved": "Heads up: {} km of this route run on unpaved track, in {} stretch(es).",
+        "unpaved_hint": "The longest is {} km, along {}. Take care on road tyres."
     },
     "verify_email": {
         "title": "Verify your email!",

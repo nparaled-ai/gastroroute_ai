@@ -266,7 +266,9 @@
             "one": "{} motociclista avvisato",
             "other": "{} motociclisti avvisati"
         },
-        "meal_detour": "Per farti mangiare passiamo da {}, a {} km. I chilometri del percorso lo includono già."
+        "meal_detour": "Per farti mangiare passiamo da {}, a {} minuti. I chilometri del percorso lo includono già.",
+        "unpaved": "Attenzione: {} km di questo percorso sono su sterrato, in {} tratto/i.",
+        "unpaved_hint": "Il più lungo è di {} km, lungo {}. Con gomme stradali, prudenza."
     },
     "verify_email": {
         "title": "Verifica la tua email!",

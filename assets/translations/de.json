@@ -266,7 +266,9 @@
             "one": "{} Biker benachrichtigt",
             "other": "{} Biker benachrichtigt"
         },
-        "meal_detour": "Damit du essen kannst, fahren wir über {}, {} km Umweg. Die Streckenlänge enthält das schon."
+        "meal_detour": "Damit du essen kannst, führen wir dich über {}, {} Minuten Umweg. Die Streckenkilometer enthalten das schon.",
+        "unpaved": "Achtung: {} km dieser Route verlaufen über unbefestigte Wege, in {} Abschnitt(en).",
+        "unpaved_hint": "Der längste ist {} km lang, über {}. Mit Straßenreifen vorsichtig fahren."
     },
     "verify_email": {
         "title": "E-Mail bestätigen!",

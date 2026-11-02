@@ -88,10 +88,50 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         icon: Icons.alt_route,
         title: 'route_result.meal_detour'.tr(args: [
           (mio.first['location'] ?? '').toString(),
-          (mio.first['km'] ?? 0).toString(),
+          // Los minutos, no los kilómetros: es lo que el motero nota y es la
+          // unidad en la que se decide el desvío desde el 02-11-2026. En
+          // carretera de montaña 20 km son 35 minutos y en llano 15.
+          (mio.first['minutos'] ?? mio.first['km'] ?? 0).toString(),
         ]),
         subtitle: '',
         color: color,
+      ),
+      const SizedBox(height: 16),
+    ];
+  }
+
+  /// El aviso de que la ruta pisa camino sin asfaltar.
+  ///
+  /// Norma 20. Se le dice SIEMPRE, lleve las ruedas que lleve: *«una cosa es
+  /// poder ir y otra que te pille de sorpresa a 200 km de casa»*. Melo lo vio
+  /// porque conoce Huesca; el que va a Cáceres por primera vez necesita que se
+  /// lo digamos nosotros.
+  ///
+  /// El servidor solo manda aquí lo que ha confirmado por mayoría de muestras
+  /// contra el mapa, así que si aparece es que está, no que podría estar.
+  List<Widget> _unpavedNotice() {
+    final pistas = _aiSummary?['unpaved'];
+    if (pistas is! List || pistas.isEmpty) return const [];
+
+    final tramos = pistas.cast<Map>();
+    final km = tramos.fold<double>(
+      0, (suma, t) => suma + ((t['km'] as num?)?.toDouble() ?? 0));
+    final mayor = tramos
+        .map((t) => (t['km'] as num?)?.toDouble() ?? 0)
+        .reduce((a, b) => a > b ? a : b);
+
+    return [
+      _SuggestionCard(
+        icon: Icons.warning_amber_rounded,
+        title: 'route_result.unpaved'.tr(args: [
+          km.toStringAsFixed(1),
+          tramos.length.toString(),
+        ]),
+        subtitle: 'route_result.unpaved_hint'.tr(args: [
+          mayor.toStringAsFixed(1),
+          (tramos.first['nombre'] ?? '').toString(),
+        ]),
+        color: AppColors.orange,
       ),
       const SizedBox(height: 16),
     ];
@@ -760,6 +800,10 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
 
               ..._mealNotice(_aiSummary?['dinner_skipped'],
                   'route_result.no_dinner', Icons.no_meals_outlined, AppColors.cyan),
+
+              // Y si la ruta pisa camino sin asfaltar, que lo sepa antes de
+              // salir y no a 200 km de casa (norma 20).
+              ..._unpavedNotice(),
 
               // Tags
               if (_route['tags'] != null && (_route['tags'] as List).isNotEmpty) ...[

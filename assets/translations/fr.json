@@ -266,7 +266,9 @@
             "one": "{} motard averti",
             "other": "{} motards avertis"
         },
-        "meal_detour": "Pour que vous puissiez manger, nous passons par {}, à {} km. La distance l'inclut déjà."
+        "meal_detour": "Pour que vous puissiez manger, nous passons par {}, à {} minutes. Les kilomètres de l’itinéraire en tiennent déjà compte.",
+        "unpaved": "Attention : {} km de cet itinéraire passent par de la piste, en {} tronçon(s).",
+        "unpaved_hint": "Le plus long fait {} km, par {}. Prudence avec des pneus route."
     },
     "verify_email": {
         "title": "Vérifiez votre email !",

@@ -266,7 +266,9 @@
             "one": "{} motero notificado",
             "other": "{} moteros notificados"
         },
-        "meal_detour": "Para que puedas comer te desviamos a {}, a {} km. Los kilómetros de la ruta ya lo incluyen."
+        "meal_detour": "Para que puedas comer te desviamos a {}, a {} minutos. Los kilómetros de la ruta ya lo incluyen.",
+        "unpaved": "Ojo: {} km de esta ruta van por camino sin asfaltar, en {} tramo(s).",
+        "unpaved_hint": "El más largo son {} km, por {}. Con neumático de carretera, cuidado."
     },
     "verify_email": {
         "title": "¡Verifica tu email!",

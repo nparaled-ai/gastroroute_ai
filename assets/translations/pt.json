@@ -266,7 +266,9 @@
             "one": "{} motard notificado",
             "other": "{} motards notificados"
         },
-        "meal_detour": "Para poderes comer passamos por {}, a {} km. Os quilómetros da rota já o incluem."
+        "meal_detour": "Para poderes comer desviamos-te por {}, a {} minutos. Os quilómetros da rota já incluem isso.",
+        "unpaved": "Atenção: {} km desta rota são por caminho sem alcatrão, em {} troço(s).",
+        "unpaved_hint": "O mais longo tem {} km, por {}. Com pneus de estrada, cuidado."
     },
     "verify_email": {
         "title": "Verifique o seu email!",
