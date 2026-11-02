@@ -268,7 +268,9 @@
         },
         "meal_detour": "Para que puedas comer te desviamos a {}, a {} minutos. Los kilómetros de la ruta ya lo incluyen.",
         "unpaved": "Ojo: {} km de esta ruta van por camino sin asfaltar, en {} tramo(s).",
-        "unpaved_hint": "El más largo son {} km, por {}. Con neumático de carretera, cuidado."
+        "unpaved_hint": "El más largo son {} km, por {}. Con neumático de carretera, cuidado.",
+        "repeated_road": "Esta ruta repite {} km de los {}: parte de la vuelta va por donde ya has pasado.",
+        "repeated_road_hint": "El tramo repetido más largo son {} km. Por aquí no hemos encontrado forma de cerrar el anillo."
     },
     "verify_email": {
         "title": "¡Verifica tu email!",

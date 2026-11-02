@@ -268,7 +268,9 @@
         },
         "meal_detour": "Per farti mangiare passiamo da {}, a {} minuti. I chilometri del percorso lo includono già.",
         "unpaved": "Attenzione: {} km di questo percorso sono su sterrato, in {} tratto/i.",
-        "unpaved_hint": "Il più lungo è di {} km, lungo {}. Con gomme stradali, prudenza."
+        "unpaved_hint": "Il più lungo è di {} km, lungo {}. Con gomme stradali, prudenza.",
+        "repeated_road": "Questo percorso ripete {} km su {}: parte del ritorno passa per strade già fatte.",
+        "repeated_road_hint": "Il tratto ripetuto più lungo è di {} km. Da queste parti non si è trovato modo di chiudere l’anello."
     },
     "verify_email": {
         "title": "Verifica la tua email!",

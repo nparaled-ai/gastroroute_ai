@@ -268,7 +268,9 @@
         },
         "meal_detour": "Para poderes comer desviamos-te por {}, a {} minutos. Os quilómetros da rota já incluem isso.",
         "unpaved": "Atenção: {} km desta rota são por caminho sem alcatrão, em {} troço(s).",
-        "unpaved_hint": "O mais longo tem {} km, por {}. Com pneus de estrada, cuidado."
+        "unpaved_hint": "O mais longo tem {} km, por {}. Com pneus de estrada, cuidado.",
+        "repeated_road": "Esta rota repete {} km dos {}: parte do regresso passa por onde já andaste.",
+        "repeated_road_hint": "O troço repetido mais longo tem {} km. Por aqui não encontrámos forma de fechar o anel."
     },
     "verify_email": {
         "title": "Verifique o seu email!",

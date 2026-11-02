@@ -268,7 +268,9 @@
         },
         "meal_detour": "Pour que vous puissiez manger, nous passons par {}, à {} minutes. Les kilomètres de l’itinéraire en tiennent déjà compte.",
         "unpaved": "Attention : {} km de cet itinéraire passent par de la piste, en {} tronçon(s).",
-        "unpaved_hint": "Le plus long fait {} km, par {}. Prudence avec des pneus route."
+        "unpaved_hint": "Le plus long fait {} km, par {}. Prudence avec des pneus route.",
+        "repeated_road": "Cet itinéraire répète {} km sur {} : une partie du retour emprunte des routes déjà parcourues.",
+        "repeated_road_hint": "Le tronçon répété le plus long fait {} km. Impossible de boucler la boucle par ici."
     },
     "verify_email": {
         "title": "Vérifiez votre email !",

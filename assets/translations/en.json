@@ -268,7 +268,9 @@
         },
         "meal_detour": "So you can eat we take you to {}, {} minutes off route. The distance already includes it.",
         "unpaved": "Heads up: {} km of this route run on unpaved track, in {} stretch(es).",
-        "unpaved_hint": "The longest is {} km, along {}. Take care on road tyres."
+        "unpaved_hint": "The longest is {} km, along {}. Take care on road tyres.",
+        "repeated_road": "This route repeats {} km out of {}: part of the way back uses roads you have already ridden.",
+        "repeated_road_hint": "The longest repeated stretch is {} km. We found no way to close the loop around here."
     },
     "verify_email": {
         "title": "Verify your email!",

@@ -268,7 +268,9 @@
         },
         "meal_detour": "Damit du essen kannst, führen wir dich über {}, {} Minuten Umweg. Die Streckenkilometer enthalten das schon.",
         "unpaved": "Achtung: {} km dieser Route verlaufen über unbefestigte Wege, in {} Abschnitt(en).",
-        "unpaved_hint": "Der längste ist {} km lang, über {}. Mit Straßenreifen vorsichtig fahren."
+        "unpaved_hint": "Der längste ist {} km lang, über {}. Mit Straßenreifen vorsichtig fahren.",
+        "repeated_road": "Diese Route wiederholt {} von {} km: ein Teil des Rückwegs führt über schon gefahrene Straßen.",
+        "repeated_road_hint": "Der längste wiederholte Abschnitt ist {} km lang. Hier ließ sich keine Rundstrecke schließen."
     },
     "verify_email": {
         "title": "E-Mail bestätigen!",

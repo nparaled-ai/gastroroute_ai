@@ -100,6 +100,36 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     ];
   }
 
+  /// El aviso de que la ruta repite carretera.
+  ///
+  /// Norma 2. Solo llega aquí lo que pasa del tope y **no es un globo**: salir
+  /// por un valle, dar la vuelta arriba y volver por la misma carretera es un
+  /// solo tramo repetido y es una forma razonable de ruta, así que no se avisa.
+  /// Lo que se avisa es la estrella: dos o más idas y vueltas.
+  ///
+  /// Se le dice porque el servidor ya ha intentado arreglarlo cortando el brazo
+  /// y no ha podido: *«hay que intentar si se puede el anillo; si no se puede,
+  /// pues como ahora»*.
+  List<Widget> _repeatedRoadNotice() {
+    final r = _aiSummary?['repeated_road'];
+    if (r is! Map) return const [];
+
+    return [
+      _SuggestionCard(
+        icon: Icons.u_turn_left,
+        title: 'route_result.repeated_road'.tr(args: [
+          (r['km'] ?? 0).toString(),
+          (r['km_total'] ?? 0).toString(),
+        ]),
+        subtitle: 'route_result.repeated_road_hint'.tr(args: [
+          (r['mayor_km'] ?? 0).toString(),
+        ]),
+        color: AppColors.cyan,
+      ),
+      const SizedBox(height: 16),
+    ];
+  }
+
   /// El aviso de que la ruta pisa camino sin asfaltar.
   ///
   /// Norma 20. Se le dice SIEMPRE, lleve las ruedas que lleve: *«una cosa es
@@ -804,6 +834,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               // Y si la ruta pisa camino sin asfaltar, que lo sepa antes de
               // salir y no a 200 km de casa (norma 20).
               ..._unpavedNotice(),
+
+              // Y si repite carretera de verdad (no un globo), tambien.
+              ..._repeatedRoadNotice(),
 
               // Tags
               if (_route['tags'] != null && (_route['tags'] as List).isNotEmpty) ...[
