@@ -136,7 +136,20 @@
         "photo_tap": "Pulsa para añadir foto de la moto",
         "photo_camera": "Hacer foto",
         "photo_gallery": "Elegir de galería",
-        "photo_remove": "Eliminar foto"
+        "photo_remove": "Eliminar foto",
+        "types": {
+            "trail": "Trail",
+            "enduro": "Enduro",
+            "supermotard": "Supermotard",
+            "custom": "Custom",
+            "sport": "Deportiva",
+            "touring": "Turismo",
+            "naked": "Naked",
+            "scooter": "Scooter",
+            "otro": "Otra"
+        },
+        "off_road": "Ruedas preparadas para pista",
+        "off_road_hint": "Marca esto solo si llevas neumático mixto o de tacos. Si no, las rutas evitarán cualquier camino sin asfaltar."
     },
     "planner": {
         "title": "Planificador IA",

@@ -136,7 +136,20 @@
         "photo_remove": "Rimuovi foto",
         "alias_required": "L'alias è obbligatorio.",
         "brand_required": "La marca è obbligatoria.",
-        "type_required": "Il tipo di moto è obbligatorio."
+        "type_required": "Il tipo di moto è obbligatorio.",
+        "types": {
+            "trail": "Enduro stradale",
+            "enduro": "Enduro",
+            "supermotard": "Supermotard",
+            "custom": "Custom",
+            "sport": "Sportiva",
+            "touring": "Turismo",
+            "naked": "Naked",
+            "scooter": "Scooter",
+            "otro": "Altra"
+        },
+        "off_road": "Gomme adatte allo sterrato",
+        "off_road_hint": "Spunta solo se monti pneumatici misti o tassellati. Altrimenti i percorsi eviteranno ogni strada sterrata."
     },
     "planner": {
         "title": "Pianificatore IA",

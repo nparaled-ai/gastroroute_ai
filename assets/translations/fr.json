@@ -136,7 +136,20 @@
         "photo_remove": "Supprimer la photo",
         "alias_required": "L'alias est obligatoire.",
         "brand_required": "La marque est obligatoire.",
-        "type_required": "Le type de moto est obligatoire."
+        "type_required": "Le type de moto est obligatoire.",
+        "types": {
+            "trail": "Trail",
+            "enduro": "Enduro",
+            "supermotard": "Supermotard",
+            "custom": "Custom",
+            "sport": "Sportive",
+            "touring": "Routière",
+            "naked": "Roadster",
+            "scooter": "Scooter",
+            "otro": "Autre"
+        },
+        "off_road": "Pneus prêts pour la piste",
+        "off_road_hint": "À cocher seulement si vous montez des pneus mixtes ou crantés. Sinon, les itinéraires éviteront toute piste non goudronnée."
     },
     "planner": {
         "title": "Planificateur IA",

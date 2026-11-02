@@ -136,7 +136,20 @@
         "photo_remove": "Remove photo",
         "alias_required": "Alias is required.",
         "brand_required": "Brand is required.",
-        "type_required": "Bike type is required."
+        "type_required": "Bike type is required.",
+        "types": {
+            "trail": "Adventure",
+            "enduro": "Enduro",
+            "supermotard": "Supermoto",
+            "custom": "Cruiser",
+            "sport": "Sport",
+            "touring": "Touring",
+            "naked": "Naked",
+            "scooter": "Scooter",
+            "otro": "Other"
+        },
+        "off_road": "Tyres ready for gravel",
+        "off_road_hint": "Only tick this if you run dual-sport or knobbly tyres. Otherwise your routes will avoid every unpaved track."
     },
     "planner": {
         "title": "AI Route Planner",

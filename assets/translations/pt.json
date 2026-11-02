@@ -136,7 +136,20 @@
         "photo_remove": "Remover foto",
         "alias_required": "O alias é obrigatório.",
         "brand_required": "A marca é obrigatória.",
-        "type_required": "O tipo de mota é obrigatório."
+        "type_required": "O tipo de mota é obrigatório.",
+        "types": {
+            "trail": "Trail",
+            "enduro": "Enduro",
+            "supermotard": "Supermotard",
+            "custom": "Custom",
+            "sport": "Desportiva",
+            "touring": "Turismo",
+            "naked": "Naked",
+            "scooter": "Scooter",
+            "otro": "Outra"
+        },
+        "off_road": "Pneus preparados para pista",
+        "off_road_hint": "Marca apenas se usas pneus mistos ou de tacos. Caso contrário, as rotas evitarão qualquer caminho sem alcatrão."
     },
     "planner": {
         "title": "Planificador IA",

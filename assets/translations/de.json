@@ -136,7 +136,20 @@
         "photo_remove": "Foto entfernen",
         "alias_required": "Alias ist erforderlich.",
         "brand_required": "Marke ist erforderlich.",
-        "type_required": "Motorradtyp ist erforderlich."
+        "type_required": "Motorradtyp ist erforderlich.",
+        "types": {
+            "trail": "Enduro-Reise",
+            "enduro": "Enduro",
+            "supermotard": "Supermoto",
+            "custom": "Chopper",
+            "sport": "Sportler",
+            "touring": "Tourer",
+            "naked": "Naked Bike",
+            "scooter": "Roller",
+            "otro": "Andere"
+        },
+        "off_road": "Reifen für Schotter geeignet",
+        "off_road_hint": "Nur ankreuzen, wenn du Dual-Sport- oder Stollenreifen fährst. Sonst meiden deine Routen jeden unbefestigten Weg."
     },
     "planner": {
         "title": "KI-Routenplaner",

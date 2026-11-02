@@ -24,6 +24,7 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
   late TextEditingController _fuelCapacityController;
   late TextEditingController _consumptionController;
   String? _motoType;
+  bool    _offRoadTyres = false;
   bool _loading = false;
   bool _uploadingPhoto = false;
   bool _photoRemoved = false;
@@ -33,7 +34,19 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
 
   bool get _isEditing => widget.moto != null;
 
-  final _types = ['trail', 'custom', 'sport', 'touring', 'naked', 'scooter', 'otro'];
+  // Los nueve tipos. `enduro` y `supermotard` se añadieron el 02-11-2026 con la
+  // norma 20: son las motos que de verdad pueden ir por pista y hasta entonces
+  // caían en 'otro'. La lista está también en el servidor (RiderProfileController,
+  // validación `in:`) y las dos tienen que ir a la par.
+  final _types = ['trail', 'enduro', 'supermotard', 'custom', 'sport',
+                  'touring', 'naked', 'scooter', 'otro'];
+
+  /// En cuáles tiene sentido preguntar por el neumático.
+  ///
+  /// *«No tiene sentido marcar si una naked»*: una Panigale no va por grava
+  /// lleve el neumático que lleve, así que a las otras cinco ni se les enseña la
+  /// casilla. `otro` sí, porque ahí cae la moto rara que no está en la lista.
+  static const _puedenPista = {'trail', 'enduro', 'supermotard', 'otro'};
 
   final _brands = [
     'Aprilia', 'Benelli', 'Beta', 'BMW', 'Bultaco', 'Buell', 'Cagiva',
@@ -57,6 +70,7 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
     _fuelCapacityController = TextEditingController(text: m?['fuel_capacity']?.toString() ?? '');
     _consumptionController  = TextEditingController(text: m?['consumption_per_100km']?.toString() ?? '');
     _motoType               = m?['moto_type'];
+    _offRoadTyres           = m?['off_road_tyres'] == true;
     _photoUrl               = m?['photo_url'];
     _savedMotoId            = m?['id'];
   }
@@ -111,6 +125,10 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
       'year':                  int.tryParse(_yearController.text.trim()),
       'engine_cc':             int.tryParse(_engineController.text.trim()),
       'moto_type':             _motoType,
+      // Solo se manda marcado si el tipo lo permite: si alguien marca la
+      // casilla y luego cambia a naked, la moto no se queda con las ruedas
+      // puestas.
+      'off_road_tyres':        _puedenPista.contains(_motoType) && _offRoadTyres,
       'fuel_capacity':         double.tryParse(_fuelCapacityController.text.trim()),
       'consumption_per_100km': double.tryParse(_consumptionController.text.trim()),
     };
@@ -381,13 +399,33 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: isSelected ? AppColors.orange : AppColors.greyDark, width: isSelected ? 2 : 1),
                     ),
-                    child: Text(type[0].toUpperCase() + type.substring(1),
+                    child: Text('motos.types.$type'.tr(),
                         style: TextStyle(color: isSelected ? AppColors.orange : AppColors.grey,
                             fontSize: 13, fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal)),
                   ),
                 );
               }).toList(),
             ),
+
+            // Las ruedas, solo donde puede ser verdad (norma 20).
+            //
+            // No es una casilla más: de ella depende que las rutas de esta moto
+            // puedan pasar por pista, así que lleva su explicación debajo y
+            // pregunta por el NEUMÁTICO, no por la moto.
+            if (_puedenPista.contains(_motoType)) ...[
+              const SizedBox(height: 24),
+              SwitchListTile.adaptive(
+                value: _offRoadTyres,
+                onChanged: (v) => setState(() => _offRoadTyres = v),
+                activeColor: AppColors.orange,
+                contentPadding: EdgeInsets.zero,
+                title: Text('motos.off_road'.tr(),
+                    style: const TextStyle(color: AppColors.white,
+                        fontSize: 14, fontWeight: FontWeight.w600)),
+                subtitle: Text('motos.off_road_hint'.tr(),
+                    style: const TextStyle(color: AppColors.grey, fontSize: 12, height: 1.4)),
+              ),
+            ],
 
             const SizedBox(height: 32),
           ],
