@@ -25,6 +25,21 @@ class _PlaceSheetState extends State<PlaceSheet> {
   List<Map<String, dynamic>> _results = [];
   bool _loading = false;
 
+  /// Donde esta el motero, para que el buscador ordene por cercania.
+  ///
+  /// Sin esto, "Hotel Reina Cristina Jaca" devolvia el de Granada primero:
+  /// el buscador se traga la poblacion que escribes. Se usa la ULTIMA posicion
+  /// conocida y no se pide el GPS en cada tecla; si no hay, se busca igual.
+  Position? _donde;
+
+  @override
+  void initState() {
+    super.initState();
+    Geolocator.getLastKnownPosition()
+        .then((p) { if (mounted && p != null) _donde = p; })
+        .catchError((_) => null);
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -38,8 +53,15 @@ class _PlaceSheetState extends State<PlaceSheet> {
     try {
       // poi=1 para que devuelva también gasolineras y bares: en una ruta en
       // grupo se queda en un sitio concreto, no en "Jaca".
-      final response = await ApiClient.dio.get('/location/search',
-          queryParameters: {'q': query, 'lang': 'es', 'poi': '1'});
+      final response = await ApiClient.dio.get('/location/search', queryParameters: {
+        'q': query,
+        // El idioma de la app, no "es" a pelo: asi lo pedia un aleman y le
+        // contestaban en español.
+        'lang': context.locale.languageCode,
+        'poi': '1',
+        if (_donde != null) 'lat': '${_donde!.latitude}',
+        if (_donde != null) 'lng': '${_donde!.longitude}',
+      });
 
       if (!mounted) return;
       setState(() {
@@ -72,7 +94,7 @@ class _PlaceSheetState extends State<PlaceSheet> {
           queryParameters: {
             'q': '${position.latitude},${position.longitude}',
             'reverse': '1',
-            'lang': 'es',
+            'lang': context.locale.languageCode,
           });
 
       final data = response.data as List? ?? [];

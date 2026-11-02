@@ -206,7 +206,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
           // Geocodificar el nombre
           try {
             final response = await ApiClient.dio.get('/location/search', queryParameters: {
-              'q': province, 'lang': 'es',
+              'q': province, 'lang': context.locale.languageCode,
             });
             final List data = response.data as List? ?? [];
             if (data.isNotEmpty && mounted) {
@@ -244,7 +244,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   Future<void> _fetchOrigin(String query) async {
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
-        'q': query, 'lang': 'es',
+        'q': query, 'lang': context.locale.languageCode,
       });
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty && mounted) {
@@ -304,7 +304,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   Future<void> _fetchDestination(String query) async {
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
-        'q': query, 'lang': 'es',
+        'q': query, 'lang': context.locale.languageCode,
       });
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty && mounted) {
@@ -355,7 +355,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     if (index >= _pointSuggestions.length) return;
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
-        'q': query, 'lang': 'es', 'poi': '1',
+        'q': query, 'lang': context.locale.languageCode, 'poi': '1',
       });
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty && mounted) {
@@ -415,7 +415,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium));
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
-        'q': '${position.latitude},${position.longitude}', 'lang': 'es', 'reverse': '1',
+        'q': '${position.latitude},${position.longitude}', 'lang': context.locale.languageCode, 'reverse': '1',
       });
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty && mounted) {
