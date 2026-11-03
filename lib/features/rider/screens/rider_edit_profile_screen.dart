@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/api/api_client.dart';
+import '../../../core/labels.dart';
 import '../../../core/storage/auth_storage.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/rider_avatar.dart';
@@ -547,7 +548,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: isSelected ? color : AppColors.greyDark, width: isSelected ? 2 : 1),
                       ),
-                      child: Text(level[0].toUpperCase() + level.substring(1),
+                      child: Text(levelLabel(level),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: isSelected ? color : AppColors.grey,
                               fontSize: 13, fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal)),

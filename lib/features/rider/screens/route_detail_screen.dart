@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
+import '../../../core/labels.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/api/api_client.dart';
 import '../../../widgets/rider_avatar.dart';
@@ -894,7 +895,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                               '${((_route!['duration_minutes'] ?? 0) / 60).toStringAsFixed(1)} h',
                               AppColors.cyan),
                           const SizedBox(width: 8),
-                          _Chip(Icons.terrain, _route!['difficulty'] ?? '',
+                          _Chip(Icons.terrain, paceLabel(_route!['difficulty']),
                               AppColors.gold),
                         ]),
                       ]),

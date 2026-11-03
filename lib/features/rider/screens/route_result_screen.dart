@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/labels.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/rider_avatar.dart';
 import '../../../widgets/route_map_image.dart';
@@ -661,7 +662,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                     label: '${((_route['duration_minutes'] ?? 0) / 60).toStringAsFixed(1)} h',
                     color: AppColors.cyan),
                 const SizedBox(width: 8),
-                _StatBadge(icon: Icons.terrain, label: _route['difficulty'] ?? '', color: AppColors.gold),
+                _StatBadge(icon: Icons.terrain, label: paceLabel(_route['difficulty']), color: AppColors.gold),
               ]),
 
               _buildDayWarning(),
