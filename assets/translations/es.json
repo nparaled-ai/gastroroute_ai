@@ -632,7 +632,7 @@
         "select_all": "Todos",
         "deselect_all": "Quitar todos",
         "save_for_me": "Guardar para mí",
-        "save_for_me_desc": "Solo tú puedes verla. Aparecerá en Mis Rutas.",
+        "save_for_me_desc": "Solo tú puedes verla, por ahora. Aparecerá en Mis Rutas y podrás compartirla más tarde, antes de rodar.",
         "forget": "Olvidar",
         "creator": "Creador"
     },

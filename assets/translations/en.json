@@ -632,7 +632,7 @@
         "select_all": "All",
         "deselect_all": "Clear all",
         "save_for_me": "Save for myself",
-        "save_for_me_desc": "Only you can see it. It will appear in My Routes.",
+        "save_for_me_desc": "Only you can see it, for now. It will appear in My Routes and you can share it later, before you ride.",
         "forget": "Dismiss",
         "creator": "Creator"
     },

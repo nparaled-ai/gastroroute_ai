@@ -632,7 +632,7 @@
         "select_all": "Todos",
         "deselect_all": "Retirar todos",
         "save_for_me": "Guardar para mim",
-        "save_for_me_desc": "Só tu a podes ver. Vai aparecer em As Minhas Rotas.",
+        "save_for_me_desc": "Só tu a podes ver, por agora. Vai aparecer em As Minhas Rotas e poderás partilhá-la mais tarde, antes de arrancar.",
         "forget": "Esquecer",
         "creator": "Criador"
     },

@@ -632,7 +632,7 @@
         "select_all": "Alle",
         "deselect_all": "Alle entfernen",
         "save_for_me": "Für mich speichern",
-        "save_for_me_desc": "Nur du kannst sie sehen. Sie erscheint in Meine Routen.",
+        "save_for_me_desc": "Nur du kannst sie sehen, vorerst. Sie erscheint in Meine Routen und du kannst sie später teilen, bevor du losfährst.",
         "forget": "Verwerfen",
         "creator": "Ersteller"
     },

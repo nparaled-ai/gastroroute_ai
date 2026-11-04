@@ -632,7 +632,7 @@
         "select_all": "Tous",
         "deselect_all": "Tout retirer",
         "save_for_me": "Garder pour moi",
-        "save_for_me_desc": "Vous seul pouvez le voir. Il apparaîtra dans Mes itinéraires.",
+        "save_for_me_desc": "Vous seul pouvez le voir, pour l’instant. Il apparaîtra dans Mes itinéraires et vous pourrez le partager plus tard, avant de rouler.",
         "forget": "Oublier",
         "creator": "Créateur"
     },

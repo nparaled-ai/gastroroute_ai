@@ -632,7 +632,7 @@
         "select_all": "Tutti",
         "deselect_all": "Rimuovi tutti",
         "save_for_me": "Salva per me",
-        "save_for_me_desc": "Solo tu puoi vederlo. Apparirà in I miei percorsi.",
+        "save_for_me_desc": "Solo tu puoi vederlo, per ora. Apparirà in I miei percorsi e potrai condividerlo più tardi, prima di partire.",
         "forget": "Dimentica",
         "creator": "Creatore"
     },
