@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../core/labels.dart';
+import '../../../core/route_times.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/api/api_client.dart';
 import '../../../widgets/rider_avatar.dart';
@@ -398,6 +399,17 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     saveData.remove('updated_at');
     saveData.remove('gpx_temp_path');
 
+    // Las horas de los puntos y de las paradas son de reloj, no solo minutos desde
+    // la salida: hay que moverlas lo que se mueve la salida. Y si la parada de
+    // almorzar o comer ya no cae en hora de comer —una ruta de las 09:00 con el
+    // almuerzo a las 11:08, repetida a las 11:00, lo dejaria a las 13:08—, se
+    // quita y se le dice. Las franjas las manda el servidor (`meal_windows`).
+    shiftRouteTimes(saveData, _route!['departure_time']?.toString(), time);
+    final removedMeals = dropOutOfHoursMeals(
+      saveData,
+      _route!['meal_windows'] is Map ? _route!['meal_windows'] as Map : null,
+    );
+
     // Actualizar clima para la nueva fecha
     Map<String, dynamic>? freshWeather;
     final lat = _route!['origin_lat'];
@@ -416,15 +428,64 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       saveData.remove('weather_summary');
     }
 
+    // Lo que se ha quitado, antes de enseñar la ruta: que no se entere al
+    // buscar una parada que no esta.
+    if (removedMeals.isNotEmpty && mounted) {
+      await _showRemovedMeals(removedMeals);
+    }
+
     // Navegar a la pantalla de resultado igual que una ruta nueva
     if (!mounted) return;
     context.push('/rider/route-result', extra: {
       'route': saveData,
       'weather': freshWeather,
-      'ai_summary': _route!['ai_summary'],
+      'ai_summary': saveData['ai_summary'],
       'form_data': {},
       '_save_data': saveData,
     });
+  }
+
+  /// Avisa de las paradas que se han quitado al repetir la ruta a otra hora.
+  Future<void> _showRemovedMeals(List<RemovedMeal> removed) {
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('repeat.meals_title'.tr(),
+            style: const TextStyle(color: AppColors.white, fontSize: 18)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final m in removed)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                // Con la etiqueta de la propia app ('Parada para almorzar'...), que es
+                // lo que ve en la ficha: asi el aviso nombra lo mismo que se ha quitado.
+                child: Text(
+                  'repeat.meal_removed'.tr(namedArgs: {
+                    'stop': (m.key == 'lunch_stop'
+                            ? 'route_result.lunch_stop'
+                            : 'route_result.dinner_stop')
+                        .tr(),
+                    'time': m.time,
+                  }),
+                  style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.4),
+                ),
+              ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange),
+            child: Text('repeat.understood'.tr(),
+                style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _dismiss() async {

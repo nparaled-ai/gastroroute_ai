@@ -572,7 +572,10 @@
         "button": "Ripeti questo percorso",
         "pick_datetime": "Scegli la nuova data e ora di partenza:",
         "pick_date": "Seleziona data",
-        "time_passed": "Quell’ora è già passata. Scegli un orario più tardi oggi, o un altro giorno."
+        "time_passed": "Quell’ora è già passata. Scegli un orario più tardi oggi, o un altro giorno.",
+        "meals_title": "Modifiche per il nuovo orario",
+        "understood": "Capito",
+        "meal_removed": "“{stop}” è stata tolta: alle {time} cade fuori dagli orari dei pasti locali."
     },
     "route_detail": {
         "waypoints": "Punti del percorso",

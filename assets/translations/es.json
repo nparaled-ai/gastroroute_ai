@@ -572,7 +572,10 @@
         "button": "Repetir esta ruta",
         "pick_datetime": "Elige la nueva fecha y hora de salida:",
         "pick_date": "Selecciona fecha",
-        "time_passed": "Esa hora ya ha pasado. Elige una hora de hoy que aún no haya pasado, o un día posterior."
+        "time_passed": "Esa hora ya ha pasado. Elige una hora de hoy que aún no haya pasado, o un día posterior.",
+        "meals_title": "Cambios por la nueva hora",
+        "understood": "Entendido",
+        "meal_removed": "«{stop}» se ha quitado: a las {time} cae fuera de la hora de comer de la zona."
     },
     "route_detail": {
         "waypoints": "Waypoints de la ruta",

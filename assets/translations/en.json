@@ -572,7 +572,10 @@
         "button": "Repeat this route",
         "pick_datetime": "Choose the new departure date and time:",
         "pick_date": "Select date",
-        "time_passed": "That time has already passed. Pick a time later today, or another day."
+        "time_passed": "That time has already passed. Pick a time later today, or another day.",
+        "meals_title": "Changes because of the new time",
+        "understood": "Got it",
+        "meal_removed": "“{stop}” has been removed: at {time} it falls outside local mealtimes."
     },
     "route_detail": {
         "waypoints": "Route waypoints",

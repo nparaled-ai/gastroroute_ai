@@ -572,7 +572,10 @@
         "button": "Diese Route wiederholen",
         "pick_datetime": "Wähle das neue Abfahrtsdatum und die Uhrzeit:",
         "pick_date": "Datum wählen",
-        "time_passed": "Diese Uhrzeit ist schon vorbei. Wähle eine spätere Uhrzeit heute oder einen anderen Tag."
+        "time_passed": "Diese Uhrzeit ist schon vorbei. Wähle eine spätere Uhrzeit heute oder einen anderen Tag.",
+        "meals_title": "Änderungen wegen der neuen Uhrzeit",
+        "understood": "Verstanden",
+        "meal_removed": "„{stop}“ wurde entfernt: um {time} liegt es außerhalb der üblichen Essenszeiten vor Ort."
     },
     "route_detail": {
         "waypoints": "Wegpunkte der Route",

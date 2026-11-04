@@ -572,7 +572,10 @@
         "button": "Répéter cet itinéraire",
         "pick_datetime": "Choisissez la nouvelle date et heure de départ :",
         "pick_date": "Sélectionner une date",
-        "time_passed": "Cette heure est déjà passée. Choisissez une heure plus tard aujourd’hui, ou un autre jour."
+        "time_passed": "Cette heure est déjà passée. Choisissez une heure plus tard aujourd’hui, ou un autre jour.",
+        "meals_title": "Changements dus à la nouvelle heure",
+        "understood": "Compris",
+        "meal_removed": "« {stop} » a été retiré : à {time}, c’est en dehors des heures de repas locales."
     },
     "route_detail": {
         "waypoints": "Points de passage",
