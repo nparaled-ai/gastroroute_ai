@@ -39,13 +39,13 @@ class RouteAssistantService {
       return {
         'understood': false,
         'reason': 'error',
-        'error': e.response?.data?['message'] ?? 'errors.connection'.tr(),
+        'error': e.response?.data?['message'] ?? 'common.connection_error'.tr(),
       };
     } catch (_) {
       return {
         'understood': false,
         'reason': 'error',
-        'error': 'errors.connection'.tr(),
+        'error': 'common.connection_error'.tr(),
       };
     }
   }
@@ -80,12 +80,12 @@ class RouteAssistantService {
     } on DioException catch (e) {
       return {
         'options': const <Map<String, dynamic>>[],
-        'error': e.response?.data?['message'] ?? 'errors.connection'.tr(),
+        'error': e.response?.data?['message'] ?? 'common.connection_error'.tr(),
       };
     } catch (_) {
       return {
         'options': const <Map<String, dynamic>>[],
-        'error': 'errors.connection'.tr(),
+        'error': 'common.connection_error'.tr(),
       };
     }
   }
@@ -108,10 +108,10 @@ class RouteAssistantService {
       return {'result': response.data};
     } on DioException catch (e) {
       return {
-        'error': e.response?.data?['message'] ?? 'errors.connection'.tr(),
+        'error': e.response?.data?['message'] ?? 'common.connection_error'.tr(),
       };
     } catch (_) {
-      return {'error': 'errors.connection'.tr()};
+      return {'error': 'common.connection_error'.tr()};
     }
   }
 

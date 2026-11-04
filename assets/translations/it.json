@@ -55,7 +55,7 @@
         "subtitle": "La tua avventura inizia qui",
         "departing_today": "Oggi parti alle {time}",
         "create_route": "Crea percorso",
-        "create_route_desc": "Genera con IA, Google Maps o GPX",
+        "create_route_desc": "Genera con l'IA, Google Maps o GPX",
         "my_routes": "I Miei Percorsi",
         "my_routes_desc": "Visualizza e gestisci i tuoi percorsi",
         "my_routes_pending": {

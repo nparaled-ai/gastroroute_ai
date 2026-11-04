@@ -56,9 +56,9 @@ class PoiService {
         'mode': response.data['mode'],
       };
     } on DioException catch (e) {
-      return {'error': e.response?.data?['message'] ?? 'errors.connection'.tr()};
+      return {'error': e.response?.data?['message'] ?? 'common.connection_error'.tr()};
     } catch (_) {
-      return {'error': 'errors.connection'.tr()};
+      return {'error': 'common.connection_error'.tr()};
     }
   }
 

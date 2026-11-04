@@ -117,7 +117,7 @@ class _RouteAssistantScreenState extends State<RouteAssistantScreen> {
       setState(() => _error = switch (result['reason']) {
             'multi_day' => 'assistant.multi_day'.tr(),
             'unclear' => 'assistant.unclear'.tr(),
-            _ => result['error'] ?? 'errors.connection'.tr(),
+            _ => result['error'] ?? 'common.connection_error'.tr(),
           });
       return;
     }

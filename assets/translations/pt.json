@@ -33,7 +33,7 @@
         "register_subtitle": "Crie o seu perfil de motard",
         "nickname": "Alcunha",
         "nickname_hint": "O seu nome na comunidade",
-        "min_chars": "Mínimo 8 caracteres",
+        "min_chars": "Mínimo de 8 caracteres",
         "create_account": "CRIAR CONTA",
         "already_account": "Já tem conta?",
         "login_link": "Iniciar sessão",
@@ -72,7 +72,7 @@
             "one": "1 notificação de amizade",
             "other": "{} notificações de amizade"
         },
-        "planner": "Planificador IA",
+        "planner": "Planeador IA",
         "planner_desc": "Gere a sua rota perfeita com IA",
         "gastronomy": "Gastronomia",
         "gastronomy_desc": "Em breve",
@@ -155,7 +155,7 @@
         "off_road_hint": "Marca apenas se usas pneus mistos ou de tacos. Caso contrário, as rotas evitarão qualquer caminho sem alcatrão."
     },
     "planner": {
-        "title": "Planificador IA",
+        "title": "Planeador IA",
         "ai_generated": "Rota gerada por IA",
         "generate_timeout": "A rota está a demorar demasiado a ser gerada. Tenta de novo ou pede menos distância.",
         "routes_remaining": "Restam-te {} rotas com IA",
@@ -290,7 +290,7 @@
         "minutes_ago": "há {n} min",
         "hours_ago": "há {n} h",
         "days_ago": "há {n} d",
-        "delete_all": "Eliminar todas",
+        "delete_all": "Apagar todas",
         "delete": "Eliminar",
         "delete_all_confirm": "Eliminar todas as notificações?",
         "deleted": "Notificação eliminada",
