@@ -829,25 +829,31 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         .isBefore(DateTime(now.year, now.month, now.day));
   }
 
-  /// ¿Se puede reprogramar esta ruta?
+  /// ¿Se puede repetir esta ruta?
   ///
   /// Tiene sentido en dos casos: la rodaste y quieres volver a hacerla, o se
   /// te pasó la fecha y no saliste. En una ruta que aún está por delante no
   /// aporta nada, porque ya la tienes programada.
-  bool get _canRepeat => _isOwner && (_isPast || _hasBeenRidden || _startWindowClosed);
+  ///
+  /// Y vale tanto para las tuyas como para las de otro motero en las que estás
+  /// apuntado: si te apuntó, la rodaste y quieres repetirla, la copia es **tuya**
+  /// —privada, sin los apuntados del otro— y la compartes con quien quieras.
+  /// Una ruta ajena en la que no estás apuntado no se repite.
+  bool get _canRepeat =>
+      (_isOwner || _isJoined) &&
+      (_isPast || _hasBeenRidden || _startWindowClosed);
 
   /// Ya se paso el margen para arrancar esta ruta: la hora de salida + 2 h.
   ///
   /// Decidido el 04-11-2026. Hasta hoy el boton de iniciar estaba disponible
-  /// todo el dia de la ruta, asi que una ruta de las 09:00 se podia arrancar a
-  /// las once de la noche. Es el mismo margen con el que la app OFRECE
-  /// arrancarla (`_startWindowAfter`) y con el que el servidor la pasa a «No
-  /// realizadas» (`RouteController::START_WINDOW_AFTER_MIN`): si se cambia
-  /// uno, los tres.
+  /// todo el dia de la ruta, asi que una de las 09:00 se podia arrancar a las
+  /// once de la noche. Es el mismo margen con el que la app OFRECE arrancarla
+  /// (`_startWindowAfter`) y con el que el servidor la pasa a «No realizadas»
+  /// (`App\Support\StartWindow`): si se cambia uno, los tres.
   ///
   /// **Si se esta grabando ESTA ruta nunca se cierra**: la que salio a su hora
-  /// y sigue en marcha no puede quedarse sin boton ni cambiar de sitio a
-  /// mitad de camino.
+  /// y sigue en marcha no puede quedarse sin boton ni cambiar de sitio a mitad
+  /// de camino.
   bool get _startWindowClosed {
     if (_isTrackingThisRoute) return false;
     final route = _route;
@@ -1351,7 +1357,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       ),
                     ],
 
-                    // ── Repetir (rodadas o no realizadas, propias) ────
+                    // ── Repetir (rodadas o no realizadas, propias o en las que estás apuntado) ──
                     if (_canRepeat) ...[
                       const SizedBox(height: 12),
                       OutlinedButton(
