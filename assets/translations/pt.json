@@ -211,6 +211,7 @@
         "generating": "A gerar rota com IA...",
         "origin_required": "O ponto de partida é obrigatório.",
         "destination_required": "O destino é obrigatório.",
+        "destination_pick": "Escolhe o destino da lista para o podermos localizar. Se não aparecer, toca outra vez e usaremos o que escreveste.",
         "moto_required": "Selecione uma mota.",
         "weather_forecast_notice": "⚠️ A previsão meteorológica só está disponível para os próximos 5 dias. Para datas posteriores o tempo pode mudar.",
         "lunch_time_required": "Indique a hora aproximada do almoço.",
@@ -830,6 +831,7 @@
         "direct_fast_desc": "Percurso direto por autoestrada, sem paragens.",
         "direct_skips": "Não passa pelos {n} pontos que escolheste",
         "zone_far": "{zona} fica a {km} km e esta rota chega aos {alcance}. Só vais roçar a berma: para andar por lá seriam precisos uns {necesarios} km, ou partir de mais perto.",
+        "destination_unknown": "Não sabemos onde fica esse destino, por isso a rota não poderá ser traçada. Volta atrás e escreve-o de outra forma, com o distrito.",
         "lunch_kind_cafe": "Um café",
         "lunch_kind_almuerzo": "Comer algo"
     }

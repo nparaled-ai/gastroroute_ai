@@ -211,6 +211,7 @@
         "generating": "Generating route with AI...",
         "origin_required": "Origin is required.",
         "destination_required": "Destination is required for routes with destination.",
+        "destination_pick": "Pick the destination from the list so we can place it. If it is not there, tap again and we will use what you typed.",
         "moto_required": "Please select a bike.",
         "weather_forecast_notice": "⚠️ Weather forecast is only available for the next 5 days. For later dates the weather may change.",
         "lunch_time_required": "Please enter the approximate lunch time.",
@@ -830,6 +831,7 @@
         "direct_fast_desc": "Direct route by motorway, no stops.",
         "direct_skips": "Skips the {n} places you picked",
         "zone_far": "{zona} is {km} km away and this route reaches {alcance}. You will only clip its edge: riding there would take about {necesarios} km, or a closer starting point.",
+        "destination_unknown": "We do not know where that destination is, so the route cannot be drawn. Go back and write it another way, with the province.",
         "lunch_kind_cafe": "A coffee",
         "lunch_kind_almuerzo": "A proper bite"
     }

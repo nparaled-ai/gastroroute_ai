@@ -64,6 +64,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   bool _detectingLocation = false;
   bool _originValidated   = false;
   bool _destinationValidated = false;
+
+  /// Ha vuelto a pulsar «Generar» con un destino escrito a mano: manda él.
+  bool _destinationInsisted = false;
   List<Map<String, dynamic>> _originSuggestions = [];
   List<Map<String, dynamic>> _destinationSuggestions = [];
   List<List<Map<String, dynamic>>> _pointSuggestions = [];
@@ -287,8 +290,13 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   /// Así que se dejan a la vista hasta que llegan las nuevas. Además de ser
   /// más rápido se ve mejor: la lista no parpadea entre letra y letra.
   void _searchDestination(String query) {
-    if (_destinationValidated) {
-      setState(() => _destinationValidated = false);
+    if (_destinationValidated || _destinationInsisted) {
+      setState(() {
+        _destinationValidated = false;
+        // Si cambia el texto, la insistencia anterior ya no vale: lo que
+        // habia aceptado era otro destino.
+        _destinationInsisted = false;
+      });
     }
 
     if (query.length < 3) {
@@ -596,6 +604,26 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     }
     if (!_circular && _destinationController.text.trim().isEmpty) {
       setState(() => _error = 'planner.destination_required'.tr());
+      return;
+    }
+
+    // Que el destino salga de la lista o del mapa, no de lo que se haya
+    // escrito a mano.
+    //
+    // Decidido el 03-11-2026. Hasta hoy la única comprobación era que la
+    // casilla no estuviera vacía, así que un destino que no existe se mandaba
+    // al servidor y el error volvía al final del viaje. La pieza ya estaba
+    // —las sugerencias y `_destinationValidated`— y no se usaba.
+    //
+    // Pero no se bloquea: a la segunda pulsación se manda lo escrito. Hay
+    // sitios que el buscador no sugiere y sí existen, y para esos el servidor
+    // tiene su propio rescate (Places). Esto es para que no se pierda el viaje
+    // por una errata, no para decidir por él.
+    if (!_circular && !_destinationValidated && !_destinationInsisted) {
+      setState(() {
+        _destinationInsisted = true;
+        _error = 'planner.destination_pick'.tr();
+      });
       return;
     }
     if (_suggestLunch && _lunchTimeController.text.trim().isEmpty) {

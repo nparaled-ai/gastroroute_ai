@@ -211,6 +211,7 @@
         "generating": "Generazione percorso con IA...",
         "origin_required": "Il punto di partenza è obbligatorio.",
         "destination_required": "La destinazione è obbligatoria.",
+        "destination_pick": "Scegli la destinazione dall’elenco così possiamo localizzarla. Se non c’è, premi di nuovo e useremo quello che hai scritto.",
         "moto_required": "Seleziona una moto.",
         "weather_forecast_notice": "⚠️ Le previsioni meteo sono disponibili solo per i prossimi 5 giorni. Per date successive il tempo potrebbe cambiare.",
         "lunch_time_required": "Inserisci l'orario approssimativo del pranzo.",
@@ -830,6 +831,7 @@
         "direct_fast_desc": "Percorso diretto in autostrada, senza soste.",
         "direct_skips": "Non passa dai {n} punti che hai scelto",
         "zone_far": "{zona} è a {km} km e questo percorso arriva a {alcance}. Ne sfiorerai solo il bordo: per girarci servirebbero circa {necesarios} km, o partire da più vicino.",
+        "destination_unknown": "Non sappiamo dove si trova quella destinazione, quindi il percorso non si potrà tracciare. Torna indietro e scrivila in altro modo, con la provincia.",
         "lunch_kind_cafe": "Un caffè",
         "lunch_kind_almuerzo": "Spuntino"
     }

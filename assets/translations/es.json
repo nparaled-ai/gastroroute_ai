@@ -211,6 +211,7 @@
         "generating": "Generando ruta con IA...",
         "origin_required": "El origen es obligatorio.",
         "destination_required": "El destino es obligatorio para rutas con destino.",
+        "destination_pick": "Elige el destino de la lista para que podamos situarlo. Si no aparece, vuelve a pulsar y usaremos lo que has escrito.",
         "moto_required": "Selecciona una moto.",
         "weather_forecast_notice": "⚠️ La previsión meteorológica solo está disponible para los próximos 5 días. Para fechas más lejanas el clima podría variar.",
         "lunch_time_required": "Indica la hora aproximada de almuerzo.",
@@ -830,6 +831,7 @@
         "direct_fast_desc": "Ruta directa por autopista, sin paradas.",
         "direct_skips": "No pasa por los {n} puntos que has elegido",
         "zone_far": "{zona} queda a {km} km y esta ruta llega a {alcance}. Solo rozarás el borde: para rodar por allí harían falta unos {necesarios} km, o salir desde más cerca.",
+        "destination_unknown": "No sabemos dónde está ese destino, así que la ruta no se podrá trazar. Vuelve atrás y escríbelo de otra forma, con la provincia.",
         "lunch_kind_cafe": "Un café",
         "lunch_kind_almuerzo": "Almorzar"
     }

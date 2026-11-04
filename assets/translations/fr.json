@@ -211,6 +211,7 @@
         "generating": "Génération de l'itinéraire avec l'IA...",
         "origin_required": "Le point de départ est obligatoire.",
         "destination_required": "La destination est obligatoire.",
+        "destination_pick": "Choisissez la destination dans la liste pour que nous puissions la situer. Si elle n’y est pas, appuyez à nouveau et nous utiliserons ce que vous avez écrit.",
         "moto_required": "Veuillez sélectionner une moto.",
         "weather_forecast_notice": "⚠️ Les prévisions météo ne sont disponibles que pour les 5 prochains jours. Pour les dates ultérieures, la météo peut changer.",
         "lunch_time_required": "Veuillez indiquer l'heure approximative du déjeuner.",
@@ -830,6 +831,7 @@
         "direct_fast_desc": "Itinéraire direct par autoroute, sans arrêts.",
         "direct_skips": "Ne passe pas par les {n} points que tu as choisis",
         "zone_far": "{zona} est à {km} km et cet itinéraire atteint {alcance}. Vous n’en frôlerez que le bord : y rouler demanderait environ {necesarios} km, ou un départ plus proche.",
+        "destination_unknown": "Nous ne savons pas où se trouve cette destination, donc l’itinéraire ne pourra pas être tracé. Revenez en arrière et écrivez-la autrement, avec la province.",
         "lunch_kind_cafe": "Un café",
         "lunch_kind_almuerzo": "Casse-croûte"
     }

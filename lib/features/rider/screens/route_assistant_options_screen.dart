@@ -54,6 +54,13 @@ class _RouteAssistantOptionsScreenState
   /// Norma 24: la zona que ha pedido queda fuera del alcance de esta ruta.
   /// Se le dice ANTES de generar, con los numeros, y decide el.
   Map<String, dynamic>? _zoneFar;
+
+  /// El destino que ha pedido no se puede situar en el mapa.
+  ///
+  /// Se le dice aquí, que es donde todavía puede corregirlo: antes elegía
+  /// propuesta, esperaba a que se generase la ruta y el error llegaba al final.
+  bool _destinationUnknown = false;
+
   String? _error;
 
   /// Dónde sale, para que el encuadre incluya la salida y no solo los hitos.
@@ -129,6 +136,7 @@ class _RouteAssistantOptionsScreenState
       _options = options;
       _note = result['note'];
       _zoneFar = (result['zone_far'] as Map?)?.cast<String, dynamic>();
+      _destinationUnknown = result['destination_unknown'] == true;
       _error = result['error'];
       _loading = false;
       _highlighted = 0;
@@ -640,6 +648,36 @@ class _RouteAssistantOptionsScreenState
                     fontSize: 11.5,
                     height: 1.45,
                   ),
+                ),
+              ),
+            ],
+
+            // Y el del destino va todavía más arriba: si no sabemos dónde
+            // está, la ruta no se va a poder generar, así que no tiene sentido
+            // que se ponga a elegir propuesta.
+            if (_destinationUnknown) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.error.withOpacity(0.35)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.wrong_location_outlined,
+                        color: AppColors.error, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'assistant.destination_unknown'.tr(),
+                        style: const TextStyle(
+                            color: AppColors.white, fontSize: 12, height: 1.45),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
