@@ -209,4 +209,47 @@ void main() {
       expect(d['dinner_stop'], isNotNull);
     });
   });
+
+  group('almuerzo y comida a la vez, como las guarda una ruta de verdad', () {
+    final es = {
+      'lunch': {'from': '09:00', 'to': '12:00'},
+      'dinner': {'from': '13:00', 'to': '15:00'},
+    };
+
+    // Sale a las 09:00, almuerza a las 11:08 y come a las 14:00.
+    Map<String, dynamic> conLasDos() => {
+          'waypoints': [
+            {'estimated_arrival_time': '10:00'},
+            {'estimated_arrival_time': '14:00'},
+          ],
+          'lunch_stop': {'location': 'A', 'estimated_time': '11:08'},
+          'dinner_stop': {'location': 'B', 'estimated_time': '14:00'},
+        };
+
+    List<String> quitadas(String hora) {
+      final d = conLasDos();
+      shiftRouteTimes(d, '09:00', hora);
+      return dropOutOfHoursMeals(d, es).map((q) => q.key).toList();
+    }
+
+    test('a las 09:00 (la misma) no se quita nada', () {
+      expect(quitadas('09:00'), isEmpty);
+    });
+
+    test('a las 10:00: el almuerzo (12:08) se pasa 8 minutos y se quita; la comida (15:00) cabe justo', () {
+      expect(quitadas('10:00'), ['lunch_stop']);
+    });
+
+    test('a las 11:00: se quitan las dos (13:08 y 16:00)', () {
+      expect(quitadas('11:00'), ['lunch_stop', 'dinner_stop']);
+    });
+
+    test('a las 08:00: el almuerzo (10:08) cabe y la comida (13:00) cabe justo', () {
+      expect(quitadas('08:00'), isEmpty);
+    });
+
+    test('a las 07:30: el almuerzo (09:38) cabe, y la comida (12:30) aun no es hora: se quita solo ella', () {
+      expect(quitadas('07:30'), ['dinner_stop']);
+    });
+  });
 }

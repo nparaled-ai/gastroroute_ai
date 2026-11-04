@@ -291,7 +291,11 @@
         "repeated_road": "Cet itinéraire répète {} km sur {} : une partie du retour emprunte des routes déjà parcourues.",
         "repeated_road_hint": "Le tronçon répété le plus long fait {} km. Impossible de boucler la boucle par ici.",
         "wind_humidity": "Vent {wind} m/s · Humidité {hum} %",
-        "wind_range": "Vent {wind} m/s · {min}° / {max}°"
+        "wind_range": "Vent {wind} m/s · {min}° / {max}°",
+        "leave_title": "Itinéraire non enregistré",
+        "leave_body": "Cet itinéraire n’est pas enregistré. Si vous quittez maintenant, il sera perdu.",
+        "leave_stay": "Rester",
+        "leave_exit": "Quitter sans enregistrer"
     },
     "verify_email": {
         "title": "Vérifiez votre email !",

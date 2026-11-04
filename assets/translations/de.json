@@ -291,7 +291,11 @@
         "repeated_road": "Diese Route wiederholt {} von {} km: ein Teil des Rückwegs führt über schon gefahrene Straßen.",
         "repeated_road_hint": "Der längste wiederholte Abschnitt ist {} km lang. Hier ließ sich keine Rundstrecke schließen.",
         "wind_humidity": "Wind {wind} m/s · Luftfeuchte {hum} %",
-        "wind_range": "Wind {wind} m/s · {min}° / {max}°"
+        "wind_range": "Wind {wind} m/s · {min}° / {max}°",
+        "leave_title": "Route nicht gespeichert",
+        "leave_body": "Diese Route ist nicht gespeichert. Wenn du jetzt gehst, geht sie verloren.",
+        "leave_stay": "Bleiben",
+        "leave_exit": "Ohne Speichern verlassen"
     },
     "verify_email": {
         "title": "E-Mail bestätigen!",

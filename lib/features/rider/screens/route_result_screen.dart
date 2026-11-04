@@ -509,8 +509,75 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     );
   }
 
+  /// Salir de la pantalla con la ruta SIN guardar.
+  ///
+  /// Decidido el 04-11-2026. Hasta hoy no avisaba de nada: la ruta solo existe en
+  /// la base cuando se pulsa uno de los dos botones que guardan («Guardar y
+  /// compartir» o el icono de compartir), asi que quien generaba una ruta —unos 15
+  /// centavos de IA y Google— o la repetia y se iba con la flecha o el gesto de
+  /// atras la perdia sin enterarse. Le paso con «Repetir»: puso la fecha, pulso el
+  /// «Guardar» del dialogo, vio la ruta y salio, y la ruta no estaba por ningun
+  /// lado.
+  ///
+  /// Mientras se esta guardando no se sale: que acabe.
+  Future<void> _confirmExit() async {
+    if (_saving) return;
+
+    if (_saved) {
+      _leave();
+      return;
+    }
+
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('route_result.leave_title'.tr(),
+            style: const TextStyle(color: AppColors.white, fontSize: 18)),
+        content: Text('route_result.leave_body'.tr(),
+            style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('route_result.leave_stay'.tr(),
+                style: const TextStyle(color: AppColors.cyan)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('route_result.leave_exit'.tr(),
+                style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+
+    if (leave == true && mounted) _leave();
+  }
+
+  void _leave() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/rider/home');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // `canPop` solo vale cuando la ruta ya esta guardada: antes, el gesto de atras
+    // y el boton del sistema pasan por el aviso. `Navigator.pop` directo no se
+    // intercepta, y por eso `_leave` puede salir sin volver a preguntar.
+    return PopScope(
+      canPop: _saved,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _confirmExit();
+      },
+      child: _buildScaffold(context),
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -518,13 +585,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/rider/home');
-            }
-          },
+          onPressed: _confirmExit,
         ),
         title: Text('route_result.title'.tr(),
             style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),

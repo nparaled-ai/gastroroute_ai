@@ -291,7 +291,11 @@
         "repeated_road": "Esta ruta repite {} km de los {}: parte de la vuelta va por donde ya has pasado.",
         "repeated_road_hint": "El tramo repetido más largo son {} km. Por aquí no hemos encontrado forma de cerrar el anillo.",
         "wind_humidity": "Viento {wind} m/s · Humedad {hum}%",
-        "wind_range": "Viento {wind} m/s · {min}° / {max}°"
+        "wind_range": "Viento {wind} m/s · {min}° / {max}°",
+        "leave_title": "Ruta sin guardar",
+        "leave_body": "Esta ruta no está guardada. Si sales ahora, se pierde.",
+        "leave_stay": "Quedarme",
+        "leave_exit": "Salir sin guardar"
     },
     "verify_email": {
         "title": "¡Verifica tu email!",
