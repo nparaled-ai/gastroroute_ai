@@ -1440,9 +1440,18 @@ class _RouteAssistantRefineScreenState
   /// La hora a la que se propone comer: respetando el hueco del almuerzo.
   int get _defaultDinner {
     final window = _mealWindows['dinner_time']!;
+
+    // La hora que propone el país de la ruta (14:00 en España), no el comienzo de la
+    // franja. Hasta el 04-11-2026 se cogía `window.from` —las 13:00—, y con las 13:00
+    // pedidas el servidor admitía, con sus 90 minutos de margen, llegadas desde las
+    // 11:30: una ruta entregó la comida a las 11:47 sin que el motero hubiera tocado
+    // la hora. El almuerzo ya lo hacía bien (`_defaultLunch`).
+    final propuesta =
+        _minutesOf(widget.mealWindows?['dinner']?['default']?.toString()) ?? 14 * 60;
+
     final earliest = _earliestDinner ?? window.from;
 
-    return math.max(window.from, earliest).clamp(window.from, window.to);
+    return math.max(propuesta, earliest).clamp(window.from, window.to);
   }
 
   /// La primera hora a la que ya se puede comer, contando el almuerzo.
