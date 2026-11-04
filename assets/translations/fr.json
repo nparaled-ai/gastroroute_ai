@@ -571,7 +571,8 @@
         "title": "Répéter l'itinéraire",
         "button": "Répéter cet itinéraire",
         "pick_datetime": "Choisissez la nouvelle date et heure de départ :",
-        "pick_date": "Sélectionner une date"
+        "pick_date": "Sélectionner une date",
+        "time_passed": "Cette heure est déjà passée. Choisissez une heure plus tard aujourd’hui, ou un autre jour."
     },
     "route_detail": {
         "waypoints": "Points de passage",

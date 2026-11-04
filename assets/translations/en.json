@@ -571,7 +571,8 @@
         "title": "Repeat route",
         "button": "Repeat this route",
         "pick_datetime": "Choose the new departure date and time:",
-        "pick_date": "Select date"
+        "pick_date": "Select date",
+        "time_passed": "That time has already passed. Pick a time later today, or another day."
     },
     "route_detail": {
         "waypoints": "Route waypoints",

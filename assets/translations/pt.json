@@ -571,7 +571,8 @@
         "title": "Repetir rota",
         "button": "Repetir esta rota",
         "pick_datetime": "Escolhe a nova data e hora de partida:",
-        "pick_date": "Selecionar data"
+        "pick_date": "Selecionar data",
+        "time_passed": "Essa hora já passou. Escolhe uma hora mais tarde hoje, ou outro dia."
     },
     "route_detail": {
         "waypoints": "Pontos da rota",

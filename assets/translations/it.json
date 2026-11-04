@@ -571,7 +571,8 @@
         "title": "Ripeti percorso",
         "button": "Ripeti questo percorso",
         "pick_datetime": "Scegli la nuova data e ora di partenza:",
-        "pick_date": "Seleziona data"
+        "pick_date": "Seleziona data",
+        "time_passed": "Quell’ora è già passata. Scegli un orario più tardi oggi, o un altro giorno."
     },
     "route_detail": {
         "waypoints": "Punti del percorso",

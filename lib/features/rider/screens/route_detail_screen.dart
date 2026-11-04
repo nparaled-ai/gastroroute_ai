@@ -248,6 +248,14 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   }
 
   /// Combina `departure_date` y `departure_time`, que llegan como texto.
+  /// ¿Esa fecha y hora ya han pasado el margen de salida? Para no crear una
+  /// copia que nace caducada: repetir hoy a una hora ya pasada la mandaria
+  /// directamente a «No realizadas».
+  static bool _startWindowPassed(String date, String time) {
+    final departure = _departureOf({'departure_date': date, 'departure_time': time});
+    return departure != null && DateTime.now().isAfter(departure.add(_startWindowAfter));
+  }
+
   static DateTime? _departureOf(Map<String, dynamic> route) {
     final date = route['departure_date']?.toString();
     if (date == null || date.isEmpty) return null;
@@ -351,6 +359,11 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                   ]),
                 ),
               ),
+              if (date != null && _startWindowPassed(date!, time)) ...[
+                const SizedBox(height: 10),
+                Text('repeat.time_passed'.tr(),
+                    style: const TextStyle(color: AppColors.error, fontSize: 12)),
+              ],
             ]),
             actions: [
               TextButton(
@@ -359,7 +372,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                     style: const TextStyle(color: AppColors.grey)),
               ),
               ElevatedButton(
-                onPressed: date == null ? null : () => Navigator.pop(ctx, true),
+                onPressed: (date == null || _startWindowPassed(date!, time))
+                    ? null
+                    : () => Navigator.pop(ctx, true),
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange),
                 child: Text('common.save'.tr(),
                     style: const TextStyle(color: Colors.white)),
@@ -758,7 +773,28 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   /// Tiene sentido en dos casos: la rodaste y quieres volver a hacerla, o se
   /// te pasó la fecha y no saliste. En una ruta que aún está por delante no
   /// aporta nada, porque ya la tienes programada.
-  bool get _canRepeat => _isOwner && (_isPast || _hasBeenRidden);
+  bool get _canRepeat => _isOwner && (_isPast || _hasBeenRidden || _startWindowClosed);
+
+  /// Ya se paso el margen para arrancar esta ruta: la hora de salida + 2 h.
+  ///
+  /// Decidido el 04-11-2026. Hasta hoy el boton de iniciar estaba disponible
+  /// todo el dia de la ruta, asi que una ruta de las 09:00 se podia arrancar a
+  /// las once de la noche. Es el mismo margen con el que la app OFRECE
+  /// arrancarla (`_startWindowAfter`) y con el que el servidor la pasa a «No
+  /// realizadas» (`RouteController::START_WINDOW_AFTER_MIN`): si se cambia
+  /// uno, los tres.
+  ///
+  /// **Si se esta grabando ESTA ruta nunca se cierra**: la que salio a su hora
+  /// y sigue en marcha no puede quedarse sin boton ni cambiar de sitio a
+  /// mitad de camino.
+  bool get _startWindowClosed {
+    if (_isTrackingThisRoute) return false;
+    final route = _route;
+    if (route == null) return false;
+    final departure = _departureOf(route);
+    if (departure == null) return false;
+    return DateTime.now().isAfter(departure.add(_startWindowAfter));
+  }
 
   /// La ruta ya tiene alguna salida grabada.
   bool get _hasBeenRidden => _route?['has_been_ridden'] == true;
@@ -800,6 +836,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   /// Previstas y pulsar por curiosidad te tiraba la ruta que estabas rodando.
   bool get _canStartTracking =>
       _isToday &&
+      !_startWindowClosed &&
       (_isOwner || _isJoined) &&
       !_hasBeenRidden &&
       !RouteTrackingManager.instance.isTracking;
@@ -1018,7 +1055,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                     // ── Se está grabando OTRA ruta ────────────────────
                     // Aquí no se puede empezar: el servidor descartaría la
                     // que está en marcha. Se explica y se da la salida.
-                    if (_isTrackingOtherRoute && _isToday && !_hasBeenRidden) ...[
+                    if (_isTrackingOtherRoute && _isToday && !_startWindowClosed && !_hasBeenRidden) ...[
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
@@ -1220,7 +1257,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                         _route!['visibility'] == 'private' &&
                         !_isTrackingThisRoute &&
                         !_hasBeenRidden &&
-                        !_isPast) ...[
+                        !_isPast &&
+                        !_startWindowClosed) ...[
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: _publishing ? null : _showShareDialog,
