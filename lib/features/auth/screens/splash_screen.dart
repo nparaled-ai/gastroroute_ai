@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'RUTAS · COMUNIDAD · PASIÓN',
+                  'auth.splash_tagline'.tr(),
                   style: const TextStyle(color: AppColors.grey, fontSize: 12, letterSpacing: 3),
                 ),
                 const SizedBox(height: 48),

@@ -579,7 +579,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                     const SizedBox(width: 10),
                     const Icon(Icons.schedule, color: AppColors.cyan, size: 13),
                     const SizedBox(width: 4),
-                    Text('Salida: ${_route['departure_time']}',
+                    Text('route_detail.departure_at'.tr(namedArgs: {'time': '${_route['departure_time']}'}),
                         style: const TextStyle(color: AppColors.cyan, fontSize: 13, fontWeight: FontWeight.w600)),
                   ],
                 ]),
@@ -686,10 +686,10 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                       Text('${_weather!['temp']?.toStringAsFixed(0)}°C · ${_weather!['description']}',
                           style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600)),
                       if (_weather!['humidity'] != null)
-                        Text('Viento ${_weather!['wind_speed']} m/s · Humedad ${_weather!['humidity']}%',
+                        Text('route_result.wind_humidity'.tr(namedArgs: {'wind': '${_weather!['wind_speed']}', 'hum': '${_weather!['humidity']}'}),
                             style: const TextStyle(color: AppColors.grey, fontSize: 12))
                       else
-                        Text('Viento ${_weather!['wind_speed']} m/s · ${_weather!['temp_min']?.toStringAsFixed(0)}° / ${_weather!['temp_max']?.toStringAsFixed(0)}°',
+                        Text('route_result.wind_range'.tr(namedArgs: {'wind': '${_weather!['wind_speed']}', 'min': '${_weather!['temp_min']?.toStringAsFixed(0)}', 'max': '${_weather!['temp_max']?.toStringAsFixed(0)}'}),
                             style: const TextStyle(color: AppColors.grey, fontSize: 12)),
                     ])),
                     // Botón actualizar solo si la fecha está dentro de los próximos 5 días o no hay fecha
@@ -1011,7 +1011,7 @@ onTap: () => setState(() => _step = 0),
 child: const Icon(Icons.arrow_back_ios, color: AppColors.grey, size: 18),
       ),
 const SizedBox(width: 8),
-const Text('Selecciona amigos',
+Text('route_detail.select_friends'.tr(),
 style: TextStyle(color: AppColors.white, fontSize: 17, fontWeight: FontWeight.w700)),
 const Spacer(),
 if (_friends.isNotEmpty)

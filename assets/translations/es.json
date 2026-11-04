@@ -19,7 +19,9 @@
         "manage": "Gestionar",
         "add": "Añadir",
         "confirm": "Confirmar",
-        "connection_error": "Error de conexión."
+        "connection_error": "Error de conexión.",
+        "location_permission_hint": "Activa los permisos de ubicación en ajustes.",
+        "location_failed": "No se pudo obtener la ubicación."
     },
     "auth": {
         "welcome_back": "Bienvenido de vuelta",
@@ -46,7 +48,8 @@
         "remember_me": "Recordar usuario",
         "forgot_password": "¿Olvidaste tu contraseña?",
         "sign_in_google": "Continuar con Google",
-        "or": "o"
+        "or": "o",
+        "splash_tagline": "RUTAS · COMUNIDAD · PASIÓN"
     },
     "home": {
         "welcome": "¡Bienvenido, motero!",
@@ -111,7 +114,17 @@
         "privacy_friends": "Solo amigos",
         "privacy_friends_desc": "Tus amigos de la app pueden verlo",
         "privacy_public": "Todo el mundo",
-        "privacy_public_desc": "Cualquier motero puede verlo"
+        "privacy_public_desc": "Cualquier motero puede verlo",
+        "first_name": "Nombre",
+        "first_name_hint": "Tu nombre",
+        "last_name": "Apellidos",
+        "last_name_hint": "Tus apellidos",
+        "bio": "Bio",
+        "i_am": "Soy...",
+        "level_label": "Nivel",
+        "zone_routes": "Rutas públicas de la zona",
+        "zone_routes_desc": "Recibir notificaciones cuando alguien publique una ruta cerca de ti",
+        "notify_radius": "Radio de notificación"
     },
     "motos": {
         "title": "Mis Motos",
@@ -219,7 +232,9 @@
         "date_required": "La fecha de salida es obligatoria.",
         "time_required": "La hora de salida es obligatoria.",
         "use_my_location": "Usar mi ubicación",
-        "search_place": "Buscar un sitio: un bar, una gasolinera, un pueblo…"
+        "search_place": "Buscar un sitio: un bar, una gasolinera, un pueblo…",
+        "target_distance": "📏 Distancia objetivo: {km} km",
+        "ai_duration_desc": "La IA calculará la duración óptima según tus puntos, moto y preferencias."
     },
     "route_result": {
         "title": "Ruta generada",
@@ -274,7 +289,9 @@
         "unpaved": "Ojo: {} km de esta ruta van por camino sin asfaltar, en {} tramo(s).",
         "unpaved_hint": "El más largo son {} km, por {}. Con neumático de carretera, cuidado.",
         "repeated_road": "Esta ruta repite {} km de los {}: parte de la vuelta va por donde ya has pasado.",
-        "repeated_road_hint": "El tramo repetido más largo son {} km. Por aquí no hemos encontrado forma de cerrar el anillo."
+        "repeated_road_hint": "El tramo repetido más largo son {} km. Por aquí no hemos encontrado forma de cerrar el anillo.",
+        "wind_humidity": "Viento {wind} m/s · Humedad {hum}%",
+        "wind_range": "Viento {wind} m/s · {min}° / {max}°"
     },
     "verify_email": {
         "title": "¡Verifica tu email!",
@@ -365,7 +382,8 @@
         "period_year": "Último año",
         "source_ai": "IA",
         "source_maps": "Maps",
-        "source_gpx": "GPX"
+        "source_gpx": "GPX",
+        "from": "De: {quien}"
     },
     "friends_screen": {
         "title": "Amigos",
@@ -382,7 +400,10 @@
         "reject": "Rechazar",
         "accepted": "¡Aceptada!",
         "rejected": "Rechazada",
-        "pending_status": "Pendiente"
+        "pending_status": "Pendiente",
+        "search_hint": "Buscar por nombre o nickname...",
+        "min_two_chars": "Escribe al menos 2 caracteres",
+        "none_found": "No se encontraron moteros"
     },
     "create_route": {
         "title": "Crear ruta",
@@ -598,7 +619,9 @@
         "select_all": "Todos",
         "deselect_all": "Quitar todos",
         "save_for_me": "Guardar para mí",
-        "save_for_me_desc": "Solo tú puedes verla. Aparecerá en Mis Rutas."
+        "save_for_me_desc": "Solo tú puedes verla. Aparecerá en Mis Rutas.",
+        "forget": "Olvidar",
+        "creator": "Creador"
     },
     "refine": {
         "title": "Afinar la ruta",
@@ -679,7 +702,18 @@
         "mock_origin_dest": "Origen → Destino",
         "mock_found": "Ruta encontrada",
         "mock_share_via": "Compartir vía",
-        "mock_save": "Guardar"
+        "mock_save": "Guardar",
+        "gpx_title": "Importar archivo GPX",
+        "gpx_compatible": "Compatible con Wikiloc, Komoot, Garmin y cualquier app que exporte .gpx",
+        "gpx_desc": "Selecciona el archivo y procesaremos la ruta automáticamente: distancia, tiempos, gasolineras y clima.",
+        "gpx_file": "Archivo GPX",
+        "gpx_change": "Toca para cambiar el archivo",
+        "gpx_select": "Toca para seleccionar archivo .gpx",
+        "gpx_sources": "Wikiloc · Komoot · Garmin Connect · otros",
+        "gpx_moto_for_gas": "Moto (para gasolineras)",
+        "gpx_import": "Importar ruta GPX",
+        "tap_here": "Pulsa aquí",
+        "select_copy_link": "Selecciona \"Copiar enlace\""
     },
     "poi_picker": {
         "title": "Puntos de interés",

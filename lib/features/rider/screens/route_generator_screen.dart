@@ -416,8 +416,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
         if (permission == LocationPermission.denied) { setState(() => _detectingLocation = false); return; }
       }
       if (permission == LocationPermission.deniedForever) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Activa los permisos de ubicación en ajustes.'), backgroundColor: AppColors.error));
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('common.location_permission_hint'.tr()), backgroundColor: AppColors.error));
         setState(() => _detectingLocation = false); return;
       }
       final position = await Geolocator.getCurrentPosition(
@@ -434,8 +434,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
         });
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('No se pudo obtener la ubicación.'), backgroundColor: AppColors.error));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('common.location_failed'.tr()), backgroundColor: AppColors.error));
     }
     if (mounted) setState(() => _detectingLocation = false);
   }
@@ -857,7 +857,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                                     child: CircularProgressIndicator(color: AppColors.cyan, strokeWidth: 2))
                                 : const Icon(Icons.my_location, color: AppColors.cyan, size: 13),
                             const SizedBox(width: 4),
-                            const Text('Usar mi ubicación',
+                            Text('planner.use_my_location'.tr(),
                                 style: TextStyle(color: AppColors.cyan, fontSize: 11, fontWeight: FontWeight.w600)),
                           ]),
                         ),
@@ -1240,7 +1240,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
 
                   if (_durationMode == 'km') ...[
                     const SizedBox(height: 8),
-                    Text('📏 Distancia objetivo: $_km km',
+                    Text('planner.target_distance'.tr(namedArgs: {'km': '$_km'}),
                         style: const TextStyle(color: AppColors.white, fontSize: 13, fontWeight: FontWeight.w600)),
                     Slider(
                       value: _km.toDouble(), min: 50, max: 600, divisions: 22,
@@ -1265,10 +1265,10 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                       child: Row(children: [
                         const Icon(Icons.auto_awesome, color: AppColors.gold, size: 16),
                         const SizedBox(width: 8),
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'La IA calculará la duración óptima según tus puntos, moto y preferencias.',
-                            style: TextStyle(color: AppColors.gold, fontSize: 12),
+                            'planner.ai_duration_desc'.tr(),
+                            style: const TextStyle(color: AppColors.gold, fontSize: 12),
                           ),
                         ),
                       ]),

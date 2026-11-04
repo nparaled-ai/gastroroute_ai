@@ -1196,7 +1196,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                                     borderRadius: BorderRadius.circular(12)),
                                 padding: const EdgeInsets.symmetric(horizontal: 14),
                               ),
-                              child: const Text('Olvidar',
+                              child: Text('route_detail.forget'.tr(),
                                   style: TextStyle(
                                       color: AppColors.grey, fontSize: 13)),
                             ),
@@ -1285,7 +1285,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     final owner = _route!['owner'];
     final name = '${owner['first_name'] ?? ''} ${owner['last_name'] ?? ''}'.trim();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('Creador', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+      Text('route_detail.creator'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 13)),
       const SizedBox(height: 8),
       Container(
         padding: const EdgeInsets.all(14),
@@ -1589,16 +1589,18 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
             Center(child: Text(text, style: const TextStyle(color: AppColors.grey))),
       );
 
+  /// La fecha en el idioma de la app.
+  ///
+  /// Hasta el 04-11-2026 los dias y los meses estaban escritos a mano en dos
+  /// listas —['lun','mar',...] y ['ene','feb',...]—, asi que TODA tarjeta de
+  /// ruta salia con la fecha en castellano aunque la app estuviera en aleman.
+  /// No se arregla con claves: `DateFormat` ya sabe hacerlo en los seis
+  /// idiomas, solo habia que decirle en cual.
   String _formatDate(String? date) {
     if (date == null) return '';
     try {
-      final d = DateTime.parse(date);
-      const days = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
-      const months = [
-        'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-        'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
-      ];
-      return '${days[d.weekday - 1]} ${d.day} ${months[d.month - 1]} ${d.year}';
+      return DateFormat('EEE d MMM y', context.locale.languageCode)
+          .format(DateTime.parse(date));
     } catch (_) {
       return date;
     }

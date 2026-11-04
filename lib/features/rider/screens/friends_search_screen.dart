@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -72,7 +73,7 @@ class _FriendsSearchScreenState extends State<FriendsSearchScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Buscar moteros',
+        title: Text('friends_screen.search_riders'.tr(),
             style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
       ),
       body: Column(children: [
@@ -86,7 +87,7 @@ class _FriendsSearchScreenState extends State<FriendsSearchScreen> {
             style: const TextStyle(color: AppColors.white),
             onChanged: _search,
             decoration: InputDecoration(
-              hintText: 'Buscar por nombre o nickname...',
+              hintText: 'friends_screen.search_hint'.tr(),
               prefixIcon: const Icon(Icons.search, color: AppColors.grey),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
@@ -109,7 +110,7 @@ class _FriendsSearchScreenState extends State<FriendsSearchScreen> {
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
                         const Icon(Icons.person_search_outlined, color: AppColors.greyDark, size: 64),
                         const SizedBox(height: 16),
-                        const Text('Escribe al menos 2 caracteres',
+                        Text('friends_screen.min_two_chars'.tr(),
                             style: TextStyle(color: AppColors.grey)),
                       ]),
                     )
@@ -118,7 +119,7 @@ class _FriendsSearchScreenState extends State<FriendsSearchScreen> {
                           child: Column(mainAxisSize: MainAxisSize.min, children: [
                             const Icon(Icons.search_off, color: AppColors.greyDark, size: 64),
                             const SizedBox(height: 16),
-                            const Text('No se encontraron moteros',
+                            Text('friends_screen.none_found'.tr(),
                                 style: TextStyle(color: AppColors.grey)),
                           ]),
                         )
@@ -186,10 +187,10 @@ class _SearchResultCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.green.withOpacity(0.3)),
         ),
-        child: const Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.check, color: Colors.green, size: 14),
-          SizedBox(width: 4),
-          Text('Amigos', style: TextStyle(color: Colors.green, fontSize: 12)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.check, color: Colors.green, size: 14),
+          const SizedBox(width: 4),
+          Text('friends_screen.title'.tr(), style: TextStyle(color: Colors.green, fontSize: 12)),
         ]),
       );
     }
@@ -223,10 +224,10 @@ class _SearchResultCard extends StatelessWidget {
         child: sending
             ? const SizedBox(width: 16, height: 16,
                 child: CircularProgressIndicator(color: AppColors.orange, strokeWidth: 2))
-            : const Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.person_add_outlined, color: AppColors.orange, size: 14),
-                SizedBox(width: 4),
-                Text('Añadir', style: TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w600)),
+            : Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.person_add_outlined, color: AppColors.orange, size: 14),
+                const SizedBox(width: 4),
+                Text('common.add'.tr(), style: TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w600)),
               ]),
       ),
     );

@@ -19,7 +19,9 @@
         "manage": "Gerir",
         "add": "Adicionar",
         "confirm": "Confirmar",
-        "connection_error": "Erro de ligação."
+        "connection_error": "Erro de ligação.",
+        "location_permission_hint": "Ativa as permissões de localização nas definições.",
+        "location_failed": "Não foi possível obter a localização."
     },
     "auth": {
         "welcome_back": "Bem-vindo de volta",
@@ -46,7 +48,8 @@
         "remember_me": "Lembrar-me",
         "forgot_password": "Esqueceu a palavra-passe?",
         "sign_in_google": "Continuar com o Google",
-        "or": "ou"
+        "or": "ou",
+        "splash_tagline": "ROTAS · COMUNIDADE · PAIXÃO"
     },
     "home": {
         "welcome": "Bem-vindo, motard!",
@@ -111,7 +114,17 @@
         "privacy_friends": "Apenas amigos",
         "privacy_friends_desc": "Os teus amigos na app podem ver",
         "privacy_public": "Toda a gente",
-        "privacy_public_desc": "Qualquer motociclista pode ver"
+        "privacy_public_desc": "Qualquer motociclista pode ver",
+        "first_name": "Nome",
+        "first_name_hint": "O teu nome",
+        "last_name": "Apelidos",
+        "last_name_hint": "Os teus apelidos",
+        "bio": "Bio",
+        "i_am": "Sou…",
+        "level_label": "Nível",
+        "zone_routes": "Rotas públicas da zona",
+        "zone_routes_desc": "Receber notificações quando alguém publicar uma rota perto de ti",
+        "notify_radius": "Raio de notificação"
     },
     "motos": {
         "title": "As Minhas Motas",
@@ -219,7 +232,9 @@
         "date_required": "A data de partida é obrigatória.",
         "time_required": "A hora de partida é obrigatória.",
         "use_my_location": "Usar a minha localização",
-        "search_place": "Procurar um sítio: um bar, uma bomba, uma aldeia…"
+        "search_place": "Procurar um sítio: um bar, uma bomba, uma aldeia…",
+        "target_distance": "📏 Distância pretendida: {km} km",
+        "ai_duration_desc": "A IA calculará a duração ideal segundo os teus pontos, a mota e as preferências."
     },
     "route_result": {
         "title": "Rota gerada",
@@ -274,7 +289,9 @@
         "unpaved": "Atenção: {} km desta rota são por caminho sem alcatrão, em {} troço(s).",
         "unpaved_hint": "O mais longo tem {} km, por {}. Com pneus de estrada, cuidado.",
         "repeated_road": "Esta rota repete {} km dos {}: parte do regresso passa por onde já andaste.",
-        "repeated_road_hint": "O troço repetido mais longo tem {} km. Por aqui não encontrámos forma de fechar o anel."
+        "repeated_road_hint": "O troço repetido mais longo tem {} km. Por aqui não encontrámos forma de fechar o anel.",
+        "wind_humidity": "Vento {wind} m/s · Humidade {hum}%",
+        "wind_range": "Vento {wind} m/s · {min}° / {max}°"
     },
     "verify_email": {
         "title": "Verifique o seu email!",
@@ -365,7 +382,8 @@
         "period_year": "Último ano",
         "source_ai": "IA",
         "source_maps": "Maps",
-        "source_gpx": "GPX"
+        "source_gpx": "GPX",
+        "from": "De: {quien}"
     },
     "friends_screen": {
         "title": "Amigos",
@@ -382,7 +400,10 @@
         "reject": "Rejeitar",
         "accepted": "Aceite!",
         "rejected": "Rejeitado",
-        "pending_status": "Pendente"
+        "pending_status": "Pendente",
+        "search_hint": "Procurar por nome ou nickname…",
+        "min_two_chars": "Escreve pelo menos 2 caracteres",
+        "none_found": "Nenhum motard encontrado"
     },
     "create_route": {
         "title": "Criar rota",
@@ -598,7 +619,9 @@
         "select_all": "Todos",
         "deselect_all": "Retirar todos",
         "save_for_me": "Guardar para mim",
-        "save_for_me_desc": "Só tu a podes ver. Vai aparecer em As Minhas Rotas."
+        "save_for_me_desc": "Só tu a podes ver. Vai aparecer em As Minhas Rotas.",
+        "forget": "Esquecer",
+        "creator": "Criador"
     },
     "refine": {
         "title": "Afinar a rota",
@@ -679,7 +702,18 @@
         "mock_origin_dest": "Partida → Destino",
         "mock_found": "Rota encontrada",
         "mock_share_via": "Partilhar via",
-        "mock_save": "Guardar"
+        "mock_save": "Guardar",
+        "gpx_title": "Importar ficheiro GPX",
+        "gpx_compatible": "Compatível com Wikiloc, Komoot, Garmin e qualquer app que exporte .gpx",
+        "gpx_desc": "Escolhe o ficheiro e processaremos a rota automaticamente: distância, tempos, bombas de gasolina e meteorologia.",
+        "gpx_file": "Ficheiro GPX",
+        "gpx_change": "Toca para mudar o ficheiro",
+        "gpx_select": "Toca para escolher um ficheiro .gpx",
+        "gpx_sources": "Wikiloc · Komoot · Garmin Connect · outros",
+        "gpx_moto_for_gas": "Mota (para as bombas)",
+        "gpx_import": "Importar rota GPX",
+        "tap_here": "Toca aqui",
+        "select_copy_link": "Escolhe \"Copiar link\""
     },
     "poi_picker": {
         "title": "Pontos de interesse",

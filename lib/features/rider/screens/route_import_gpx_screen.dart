@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
@@ -107,7 +108,7 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Importar archivo GPX',
+        title: Text('import.gpx_title'.tr(),
             style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 16)),
       ),
       body: SingleChildScrollView(
@@ -131,12 +132,12 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
                 child: const Icon(Icons.folder_open, color: AppColors.cyan, size: 26),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Compatible con Wikiloc, Komoot, Garmin y cualquier app que exporte .gpx',
+                  Text('import.gpx_compatible'.tr(),
                       style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 14)),
                   SizedBox(height: 6),
-                  Text('Selecciona el archivo y procesaremos la ruta automáticamente: distancia, tiempos, gasolineras y clima.',
+                  Text('import.gpx_desc'.tr(),
                       style: TextStyle(color: AppColors.grey, fontSize: 13, height: 1.5)),
                 ]),
               ),
@@ -146,7 +147,7 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
           const SizedBox(height: 32),
 
           // Selector de archivo
-          const Text('Archivo GPX', style: TextStyle(color: AppColors.grey, fontSize: 12, fontWeight: FontWeight.w600)),
+          Text('import.gpx_file'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 12, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           GestureDetector(
             onTap: _loading ? null : _pickFile,
@@ -171,18 +172,18 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
                               style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 14),
                               overflow: TextOverflow.ellipsis),
                           const SizedBox(height: 2),
-                          const Text('Toca para cambiar el archivo',
+                          Text('import.gpx_change'.tr(),
                               style: TextStyle(color: AppColors.grey, fontSize: 11)),
                         ]),
                       ),
                     ])
-                  : const Column(children: [
-                      Icon(Icons.upload_file, color: AppColors.cyan, size: 36),
-                      SizedBox(height: 8),
-                      Text('Toca para seleccionar archivo .gpx',
+                  : Column(children: [
+                      const Icon(Icons.upload_file, color: AppColors.cyan, size: 36),
+                      const SizedBox(height: 8),
+                      Text('import.gpx_select'.tr(),
                           style: TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700, fontSize: 14)),
                       SizedBox(height: 4),
-                      Text('Wikiloc · Komoot · Garmin Connect · otros',
+                      Text('import.gpx_sources'.tr(),
                           style: TextStyle(color: AppColors.grey, fontSize: 12)),
                     ]),
             ),
@@ -191,7 +192,7 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
           const SizedBox(height: 24),
 
           // Fecha y hora
-          const Text('Salida', style: TextStyle(color: AppColors.grey, fontSize: 12, fontWeight: FontWeight.w600)),
+          Text('route_result.departure'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 12, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           Row(children: [
             Expanded(
@@ -264,7 +265,7 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
 
           // Moto
           if (_motos.isNotEmpty) ...[
-            const Text('Moto (para gasolineras)', style: TextStyle(color: AppColors.grey, fontSize: 12, fontWeight: FontWeight.w600)),
+            Text('import.gpx_moto_for_gas'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 12, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
@@ -282,7 +283,7 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
                       value: _motoId,
                       dropdownColor: AppColors.surface,
                       style: const TextStyle(color: AppColors.white, fontSize: 13),
-                      hint: const Text('Selecciona tu moto',
+                      hint: Text('import.pick_moto'.tr(),
                           style: TextStyle(color: AppColors.grey, fontSize: 13)),
                       items: _motos.map((m) => DropdownMenuItem<int>(
                         value: m['id'] as int,
@@ -328,10 +329,10 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
             child: _loading
                 ? const SizedBox(width: 22, height: 22,
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Icon(Icons.download_outlined, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
-                    Text('Importar ruta GPX',
+                : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    const Icon(Icons.download_outlined, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Text('import.gpx_import'.tr(),
                         style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
                   ]),
           ),

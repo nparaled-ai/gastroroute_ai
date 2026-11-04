@@ -19,7 +19,9 @@
         "manage": "Gérer",
         "add": "Ajouter",
         "confirm": "Confirmer",
-        "connection_error": "Erreur de connexion."
+        "connection_error": "Erreur de connexion.",
+        "location_permission_hint": "Activez les autorisations de localisation dans les réglages.",
+        "location_failed": "Impossible d’obtenir la position."
     },
     "auth": {
         "welcome_back": "Bon retour",
@@ -46,7 +48,8 @@
         "remember_me": "Se souvenir de moi",
         "forgot_password": "Mot de passe oublié ?",
         "sign_in_google": "Continuer avec Google",
-        "or": "ou"
+        "or": "ou",
+        "splash_tagline": "ITINÉRAIRES · COMMUNAUTÉ · PASSION"
     },
     "home": {
         "welcome": "Bienvenue, motard!",
@@ -111,7 +114,17 @@
         "privacy_friends": "Amis uniquement",
         "privacy_friends_desc": "Vos amis dans l'application peuvent le voir",
         "privacy_public": "Tout le monde",
-        "privacy_public_desc": "Tout motard peut le voir"
+        "privacy_public_desc": "Tout motard peut le voir",
+        "first_name": "Prénom",
+        "first_name_hint": "Votre prénom",
+        "last_name": "Nom",
+        "last_name_hint": "Votre nom",
+        "bio": "Bio",
+        "i_am": "Je suis…",
+        "level_label": "Niveau",
+        "zone_routes": "Itinéraires publics de la zone",
+        "zone_routes_desc": "Être prévenu quand quelqu’un publie un itinéraire près de vous",
+        "notify_radius": "Rayon de notification"
     },
     "motos": {
         "title": "Mes Motos",
@@ -219,7 +232,9 @@
         "date_required": "La date de départ est obligatoire.",
         "time_required": "L'heure de départ est obligatoire.",
         "use_my_location": "Utiliser ma position",
-        "search_place": "Chercher un lieu : un bar, une station-service, un village..."
+        "search_place": "Chercher un lieu : un bar, une station-service, un village...",
+        "target_distance": "📏 Distance visée : {km} km",
+        "ai_duration_desc": "L’IA calculera la durée idéale selon vos points, votre moto et vos préférences."
     },
     "route_result": {
         "title": "Itinéraire généré",
@@ -274,7 +289,9 @@
         "unpaved": "Attention : {} km de cet itinéraire passent par de la piste, en {} tronçon(s).",
         "unpaved_hint": "Le plus long fait {} km, par {}. Prudence avec des pneus route.",
         "repeated_road": "Cet itinéraire répète {} km sur {} : une partie du retour emprunte des routes déjà parcourues.",
-        "repeated_road_hint": "Le tronçon répété le plus long fait {} km. Impossible de boucler la boucle par ici."
+        "repeated_road_hint": "Le tronçon répété le plus long fait {} km. Impossible de boucler la boucle par ici.",
+        "wind_humidity": "Vent {wind} m/s · Humidité {hum} %",
+        "wind_range": "Vent {wind} m/s · {min}° / {max}°"
     },
     "verify_email": {
         "title": "Vérifiez votre email !",
@@ -365,7 +382,8 @@
         "period_year": "Dernière année",
         "source_ai": "IA",
         "source_maps": "Maps",
-        "source_gpx": "GPX"
+        "source_gpx": "GPX",
+        "from": "De : {quien}"
     },
     "friends_screen": {
         "title": "Amis",
@@ -382,7 +400,10 @@
         "reject": "Refuser",
         "accepted": "Acceptée!",
         "rejected": "Refusée",
-        "pending_status": "En attente"
+        "pending_status": "En attente",
+        "search_hint": "Rechercher par nom ou pseudo…",
+        "min_two_chars": "Saisissez au moins 2 caractères",
+        "none_found": "Aucun motard trouvé"
     },
     "create_route": {
         "title": "Créer un itinéraire",
@@ -598,7 +619,9 @@
         "select_all": "Tous",
         "deselect_all": "Tout retirer",
         "save_for_me": "Garder pour moi",
-        "save_for_me_desc": "Vous seul pouvez le voir. Il apparaîtra dans Mes itinéraires."
+        "save_for_me_desc": "Vous seul pouvez le voir. Il apparaîtra dans Mes itinéraires.",
+        "forget": "Oublier",
+        "creator": "Créateur"
     },
     "refine": {
         "title": "Affiner l'itinéraire",
@@ -679,7 +702,18 @@
         "mock_origin_dest": "Départ → Destination",
         "mock_found": "Itinéraire trouvé",
         "mock_share_via": "Partager via",
-        "mock_save": "Enregistrer"
+        "mock_save": "Enregistrer",
+        "gpx_title": "Importer un fichier GPX",
+        "gpx_compatible": "Compatible avec Wikiloc, Komoot, Garmin et toute app qui exporte du .gpx",
+        "gpx_desc": "Choisissez le fichier et nous traiterons l’itinéraire automatiquement : distance, horaires, stations et météo.",
+        "gpx_file": "Fichier GPX",
+        "gpx_change": "Touchez pour changer de fichier",
+        "gpx_select": "Touchez pour choisir un fichier .gpx",
+        "gpx_sources": "Wikiloc · Komoot · Garmin Connect · autres",
+        "gpx_moto_for_gas": "Moto (pour les stations)",
+        "gpx_import": "Importer l’itinéraire GPX",
+        "tap_here": "Touchez ici",
+        "select_copy_link": "Choisissez « Copier le lien »"
     },
     "poi_picker": {
         "title": "Points d'intérêt",

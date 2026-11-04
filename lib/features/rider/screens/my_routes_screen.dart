@@ -527,14 +527,18 @@ class _RouteCard extends StatelessWidget {
     }
   }
 
-  String _formatDate(String? date) {
+  /// La fecha en el idioma de la app.
+  ///
+  /// Hasta el 04-11-2026 los dias y los meses estaban escritos a mano en dos
+  /// listas —['lun','mar',...] y ['ene','feb',...]—, asi que TODA tarjeta de
+  /// ruta salia con la fecha en castellano aunque la app estuviera en aleman.
+  /// No se arregla con claves: `DateFormat` ya sabe hacerlo en los seis
+  /// idiomas, solo habia que decirle en cual.
+  String _formatDate(BuildContext context, String? date) {
     if (date == null) return '';
     try {
-      final d = DateTime.parse(date);
-      final days   = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
-      final months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun',
-                      'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-      return '${days[d.weekday - 1]} ${d.day} ${months[d.month - 1]} ${d.year}';
+      return DateFormat('EEE d MMM y', context.locale.languageCode)
+          .format(DateTime.parse(date));
     } catch (_) { return date; }
   }
 
@@ -571,7 +575,7 @@ class _RouteCard extends StatelessWidget {
               child: Row(children: [
                 const Icon(Icons.event, color: AppColors.cyan, size: 15),
                 const SizedBox(width: 7),
-                Text(_formatDate(date),
+                Text(_formatDate(context, date),
                     style: const TextStyle(
                         color: AppColors.cyan,
                         fontWeight: FontWeight.w700,
@@ -580,7 +584,7 @@ class _RouteCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   const Icon(Icons.schedule, color: AppColors.cyan, size: 14),
                   const SizedBox(width: 4),
-                  Text('Salida: $time',
+                  Text('route_detail.departure_at'.tr(namedArgs: {'time': time}),
                       style: const TextStyle(
                           color: AppColors.cyan,
                           fontWeight: FontWeight.w700,
@@ -600,7 +604,7 @@ class _RouteCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    'De: ${route['owner_name']}${route['owner_nick'] != null ? ' @${route['owner_nick']}' : ''}',
+                    'my_routes.from'.tr(namedArgs: {'quien': '${route['owner_name']}${route['owner_nick'] != null ? ' @${route['owner_nick']}' : ''}'}),
                     style: TextStyle(
                         color: route['is_confirmed'] == true ? AppColors.cyan : AppColors.orange,
                         fontSize: 12, fontWeight: FontWeight.w600),

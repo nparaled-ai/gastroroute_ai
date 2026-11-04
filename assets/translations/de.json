@@ -19,7 +19,9 @@
         "manage": "Verwalten",
         "add": "Hinzufügen",
         "confirm": "Bestätigen",
-        "connection_error": "Verbindungsfehler."
+        "connection_error": "Verbindungsfehler.",
+        "location_permission_hint": "Aktiviere die Standortberechtigung in den Einstellungen.",
+        "location_failed": "Standort konnte nicht ermittelt werden."
     },
     "auth": {
         "welcome_back": "Willkommen zurück",
@@ -46,7 +48,8 @@
         "remember_me": "Angemeldet bleiben",
         "forgot_password": "Passwort vergessen?",
         "sign_in_google": "Mit Google fortfahren",
-        "or": "oder"
+        "or": "oder",
+        "splash_tagline": "ROUTEN · COMMUNITY · LEIDENSCHAFT"
     },
     "home": {
         "welcome": "Willkommen, Fahrer!",
@@ -111,7 +114,17 @@
         "privacy_friends": "Nur Freunde",
         "privacy_friends_desc": "Deine Freunde in der App können es sehen",
         "privacy_public": "Alle",
-        "privacy_public_desc": "Jeder Motorradfahrer kann es sehen"
+        "privacy_public_desc": "Jeder Motorradfahrer kann es sehen",
+        "first_name": "Vorname",
+        "first_name_hint": "Dein Vorname",
+        "last_name": "Nachname",
+        "last_name_hint": "Dein Nachname",
+        "bio": "Bio",
+        "i_am": "Ich bin…",
+        "level_label": "Niveau",
+        "zone_routes": "Öffentliche Routen in der Nähe",
+        "zone_routes_desc": "Benachrichtigt werden, wenn jemand eine Route in deiner Nähe veröffentlicht",
+        "notify_radius": "Benachrichtigungsradius"
     },
     "motos": {
         "title": "Meine Motorräder",
@@ -219,7 +232,9 @@
         "date_required": "Das Abfahrtsdatum ist erforderlich.",
         "time_required": "Die Abfahrtszeit ist erforderlich.",
         "use_my_location": "Meinen Standort verwenden",
-        "search_place": "Ort suchen: eine Bar, eine Tankstelle, ein Dorf..."
+        "search_place": "Ort suchen: eine Bar, eine Tankstelle, ein Dorf...",
+        "target_distance": "📏 Zieldistanz: {km} km",
+        "ai_duration_desc": "Die KI berechnet die passende Dauer aus deinen Punkten, deinem Motorrad und deinen Vorlieben."
     },
     "route_result": {
         "title": "Generierte Route",
@@ -274,7 +289,9 @@
         "unpaved": "Achtung: {} km dieser Route verlaufen über unbefestigte Wege, in {} Abschnitt(en).",
         "unpaved_hint": "Der längste ist {} km lang, über {}. Mit Straßenreifen vorsichtig fahren.",
         "repeated_road": "Diese Route wiederholt {} von {} km: ein Teil des Rückwegs führt über schon gefahrene Straßen.",
-        "repeated_road_hint": "Der längste wiederholte Abschnitt ist {} km lang. Hier ließ sich keine Rundstrecke schließen."
+        "repeated_road_hint": "Der längste wiederholte Abschnitt ist {} km lang. Hier ließ sich keine Rundstrecke schließen.",
+        "wind_humidity": "Wind {wind} m/s · Luftfeuchte {hum} %",
+        "wind_range": "Wind {wind} m/s · {min}° / {max}°"
     },
     "verify_email": {
         "title": "E-Mail bestätigen!",
@@ -365,7 +382,8 @@
         "period_year": "Letztes Jahr",
         "source_ai": "KI",
         "source_maps": "Maps",
-        "source_gpx": "GPX"
+        "source_gpx": "GPX",
+        "from": "Von: {quien}"
     },
     "friends_screen": {
         "title": "Freunde",
@@ -382,7 +400,10 @@
         "reject": "Ablehnen",
         "accepted": "Angenommen!",
         "rejected": "Abgelehnt",
-        "pending_status": "Ausstehend"
+        "pending_status": "Ausstehend",
+        "search_hint": "Nach Name oder Nickname suchen…",
+        "min_two_chars": "Gib mindestens 2 Zeichen ein",
+        "none_found": "Keine Biker gefunden"
     },
     "create_route": {
         "title": "Route erstellen",
@@ -598,7 +619,9 @@
         "select_all": "Alle",
         "deselect_all": "Alle entfernen",
         "save_for_me": "Für mich speichern",
-        "save_for_me_desc": "Nur du kannst sie sehen. Sie erscheint in Meine Routen."
+        "save_for_me_desc": "Nur du kannst sie sehen. Sie erscheint in Meine Routen.",
+        "forget": "Verwerfen",
+        "creator": "Ersteller"
     },
     "refine": {
         "title": "Route verfeinern",
@@ -679,7 +702,18 @@
         "mock_origin_dest": "Start → Ziel",
         "mock_found": "Route gefunden",
         "mock_share_via": "Teilen über",
-        "mock_save": "Speichern"
+        "mock_save": "Speichern",
+        "gpx_title": "GPX-Datei importieren",
+        "gpx_compatible": "Kompatibel mit Wikiloc, Komoot, Garmin und jeder App, die .gpx exportiert",
+        "gpx_desc": "Wähle die Datei und wir verarbeiten die Route automatisch: Distanz, Zeiten, Tankstellen und Wetter.",
+        "gpx_file": "GPX-Datei",
+        "gpx_change": "Tippe, um die Datei zu wechseln",
+        "gpx_select": "Tippe, um eine .gpx-Datei zu wählen",
+        "gpx_sources": "Wikiloc · Komoot · Garmin Connect · andere",
+        "gpx_moto_for_gas": "Motorrad (für Tankstellen)",
+        "gpx_import": "GPX-Route importieren",
+        "tap_here": "Hier tippen",
+        "select_copy_link": "\"Link kopieren\" auswählen"
     },
     "poi_picker": {
         "title": "Sehenswürdigkeiten",

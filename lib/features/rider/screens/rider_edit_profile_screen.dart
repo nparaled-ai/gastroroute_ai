@@ -98,8 +98,8 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       }
       if (permission == LocationPermission.deniedForever) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Activa los permisos de ubicación en ajustes.'),
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('common.location_permission_hint'.tr()),
             backgroundColor: AppColors.error,
           ));
         }
@@ -129,8 +129,8 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('No se pudo obtener la ubicación actual.'),
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('common.location_failed'.tr()),
           backgroundColor: AppColors.error,
         ));
       }
@@ -324,7 +324,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
             const SizedBox(height: 32),
 
             // Email (inmodificable)
-            const Text('Email', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            Text('auth.email'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -349,7 +349,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
 
             // Nombre
             Row(children: [
-              const Text('Nombre', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+              Text('profile.first_name'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 13)),
               const SizedBox(width: 4),
               const Text('*', style: TextStyle(color: AppColors.error, fontSize: 13)),
             ]),
@@ -358,9 +358,9 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
               controller: _firstNameController,
               style: const TextStyle(color: AppColors.white),
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.person_outlined, color: AppColors.grey),
-                hintText: 'Tu nombre',
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.person_outlined, color: AppColors.grey),
+                hintText: 'profile.first_name_hint'.tr(),
               ),
             ),
 
@@ -368,7 +368,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
 
             // Apellidos
             Row(children: [
-              const Text('Apellidos', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+              Text('profile.last_name'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 13)),
               const SizedBox(width: 4),
               const Text('*', style: TextStyle(color: AppColors.error, fontSize: 13)),
             ]),
@@ -377,16 +377,16 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
               controller: _lastNameController,
               style: const TextStyle(color: AppColors.white),
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.person_outlined, color: AppColors.grey),
-                hintText: 'Tus apellidos',
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.person_outlined, color: AppColors.grey),
+                hintText: 'profile.last_name_hint'.tr(),
               ),
             ),
 
             const SizedBox(height: 20),
 
             // Nickname
-            const Text('Nickname', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            Text('auth.nickname'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             TextFormField(
               controller: _nicknameController,
@@ -398,7 +398,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
             const SizedBox(height: 20),
 
             // Bio
-            const Text('Bio', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            Text('profile.bio'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             TextFormField(
               controller: _bioController,
@@ -432,7 +432,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                               child: CircularProgressIndicator(color: AppColors.cyan, strokeWidth: 2))
                           : const Icon(Icons.my_location, color: AppColors.cyan, size: 13),
                       const SizedBox(width: 4),
-                      const Text('Usar mi ubicación',
+                      Text('planner.use_my_location'.tr(),
                           style: TextStyle(color: AppColors.cyan, fontSize: 11, fontWeight: FontWeight.w600)),
                     ]),
                   ),
@@ -500,7 +500,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
             const SizedBox(height: 20),
 
             // Género
-            const Text('Soy...', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            Text('profile.i_am'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             Row(children: [
               _GenderChip(
@@ -525,7 +525,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
             const SizedBox(height: 20),
 
             // Nivel
-            const Text('Nivel', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+            Text('profile.level_label'.tr(), style: TextStyle(color: AppColors.grey, fontSize: 13)),
             const SizedBox(height: 8),
             Row(
               children: _levels.map((level) {
@@ -603,11 +603,11 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                 Row(children: [
                   const Icon(Icons.public, color: AppColors.orange, size: 20),
                   const SizedBox(width: 10),
-                  const Expanded(
+                  Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('Rutas públicas de la zona',
+                      Text('profile.zone_routes'.tr(),
                           style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w600, fontSize: 14)),
-                      Text('Recibir notificaciones cuando alguien publique una ruta cerca de ti',
+                      Text('profile.zone_routes_desc'.tr(),
                           style: TextStyle(color: AppColors.grey, fontSize: 11, height: 1.4)),
                     ]),
                   ),
@@ -624,7 +624,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                   const Divider(color: AppColors.greyDark),
                   const SizedBox(height: 8),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    const Text('Radio de notificación',
+                    Text('profile.notify_radius'.tr(),
                         style: TextStyle(color: AppColors.grey, fontSize: 12)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

@@ -677,10 +677,10 @@ class _ShareButtonIllustration extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: AppColors.orange.withOpacity(0.4)),
               ),
-              child: const Row(children: [
-                Icon(Icons.arrow_upward, color: AppColors.orange, size: 16),
-                SizedBox(width: 6),
-                Text('Pulsa aquí', style: TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700, fontSize: 13)),
+              child: Row(children: [
+                const Icon(Icons.arrow_upward, color: AppColors.orange, size: 16),
+                const SizedBox(width: 6),
+                Text('import.tap_here'.tr(), style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700, fontSize: 13)),
               ]),
             ),
           ]),
@@ -741,10 +741,10 @@ class _CopyLinkIllustration extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.cyan.withOpacity(0.4)),
             ),
-            child: const Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.copy, color: AppColors.cyan, size: 16),
-              SizedBox(width: 6),
-              Text('Selecciona "Copiar enlace"', style: TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700, fontSize: 12)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.copy, color: AppColors.cyan, size: 16),
+              const SizedBox(width: 6),
+              Text('import.select_copy_link'.tr(), style: const TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700, fontSize: 12)),
             ]),
           ),
         ]),

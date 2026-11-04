@@ -19,7 +19,9 @@
         "manage": "Manage",
         "add": "Add",
         "confirm": "Confirm",
-        "connection_error": "Connection error."
+        "connection_error": "Connection error.",
+        "location_permission_hint": "Enable location permissions in settings.",
+        "location_failed": "Could not get your location."
     },
     "auth": {
         "welcome_back": "Welcome back",
@@ -46,7 +48,8 @@
         "remember_me": "Remember me",
         "forgot_password": "Forgot password?",
         "sign_in_google": "Continue with Google",
-        "or": "or"
+        "or": "or",
+        "splash_tagline": "ROUTES · COMMUNITY · PASSION"
     },
     "home": {
         "welcome": "Welcome, rider!",
@@ -111,7 +114,17 @@
         "privacy_friends": "Friends only",
         "privacy_friends_desc": "Your friends in the app can see it",
         "privacy_public": "Everyone",
-        "privacy_public_desc": "Any rider can see it"
+        "privacy_public_desc": "Any rider can see it",
+        "first_name": "First name",
+        "first_name_hint": "Your first name",
+        "last_name": "Last name",
+        "last_name_hint": "Your last name",
+        "bio": "Bio",
+        "i_am": "I am…",
+        "level_label": "Level",
+        "zone_routes": "Public routes nearby",
+        "zone_routes_desc": "Get notified when someone publishes a route near you",
+        "notify_radius": "Notification radius"
     },
     "motos": {
         "title": "My Bikes",
@@ -219,7 +232,9 @@
         "date_required": "Departure date is required.",
         "time_required": "Departure time is required.",
         "use_my_location": "Use my location",
-        "search_place": "Search a place: a bar, a petrol station, a town..."
+        "search_place": "Search a place: a bar, a petrol station, a town...",
+        "target_distance": "📏 Target distance: {km} km",
+        "ai_duration_desc": "The AI will work out the best duration from your points, bike and preferences."
     },
     "route_result": {
         "title": "Generated Route",
@@ -274,7 +289,9 @@
         "unpaved": "Heads up: {} km of this route run on unpaved track, in {} stretch(es).",
         "unpaved_hint": "The longest is {} km, along {}. Take care on road tyres.",
         "repeated_road": "This route repeats {} km out of {}: part of the way back uses roads you have already ridden.",
-        "repeated_road_hint": "The longest repeated stretch is {} km. We found no way to close the loop around here."
+        "repeated_road_hint": "The longest repeated stretch is {} km. We found no way to close the loop around here.",
+        "wind_humidity": "Wind {wind} m/s · Humidity {hum}%",
+        "wind_range": "Wind {wind} m/s · {min}° / {max}°"
     },
     "verify_email": {
         "title": "Verify your email!",
@@ -365,7 +382,8 @@
         "period_year": "Last year",
         "source_ai": "AI",
         "source_maps": "Maps",
-        "source_gpx": "GPX"
+        "source_gpx": "GPX",
+        "from": "From: {quien}"
     },
     "friends_screen": {
         "title": "Friends",
@@ -382,7 +400,10 @@
         "reject": "Reject",
         "accepted": "Accepted!",
         "rejected": "Rejected",
-        "pending_status": "Pending"
+        "pending_status": "Pending",
+        "search_hint": "Search by name or nickname…",
+        "min_two_chars": "Type at least 2 characters",
+        "none_found": "No riders found"
     },
     "create_route": {
         "title": "Create route",
@@ -598,7 +619,9 @@
         "select_all": "All",
         "deselect_all": "Clear all",
         "save_for_me": "Save for myself",
-        "save_for_me_desc": "Only you can see it. It will appear in My Routes."
+        "save_for_me_desc": "Only you can see it. It will appear in My Routes.",
+        "forget": "Dismiss",
+        "creator": "Creator"
     },
     "refine": {
         "title": "Fine-tune the route",
@@ -679,7 +702,18 @@
         "mock_origin_dest": "Start → Destination",
         "mock_found": "Route found",
         "mock_share_via": "Share via",
-        "mock_save": "Save"
+        "mock_save": "Save",
+        "gpx_title": "Import GPX file",
+        "gpx_compatible": "Works with Wikiloc, Komoot, Garmin and any app that exports .gpx",
+        "gpx_desc": "Pick the file and we will process the route automatically: distance, times, fuel stops and weather.",
+        "gpx_file": "GPX file",
+        "gpx_change": "Tap to change the file",
+        "gpx_select": "Tap to select a .gpx file",
+        "gpx_sources": "Wikiloc · Komoot · Garmin Connect · others",
+        "gpx_moto_for_gas": "Bike (for fuel stops)",
+        "gpx_import": "Import GPX route",
+        "tap_here": "Tap here",
+        "select_copy_link": "Choose \"Copy link\""
     },
     "poi_picker": {
         "title": "Points of interest",

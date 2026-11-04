@@ -19,7 +19,9 @@
         "manage": "Gestisci",
         "add": "Aggiungi",
         "confirm": "Conferma",
-        "connection_error": "Errore di connessione."
+        "connection_error": "Errore di connessione.",
+        "location_permission_hint": "Attiva i permessi di posizione nelle impostazioni.",
+        "location_failed": "Non è stato possibile ottenere la posizione."
     },
     "auth": {
         "welcome_back": "Bentornato",
@@ -46,7 +48,8 @@
         "remember_me": "Ricordami",
         "forgot_password": "Hai dimenticato la password?",
         "sign_in_google": "Continua con Google",
-        "or": "oppure"
+        "or": "oppure",
+        "splash_tagline": "PERCORSI · COMUNITÀ · PASSIONE"
     },
     "home": {
         "welcome": "Benvenuto, motociclista!",
@@ -111,7 +114,17 @@
         "privacy_friends": "Solo amici",
         "privacy_friends_desc": "I tuoi amici nell'app possono vederlo",
         "privacy_public": "Tutti",
-        "privacy_public_desc": "Qualsiasi motociclista può vederlo"
+        "privacy_public_desc": "Qualsiasi motociclista può vederlo",
+        "first_name": "Nome",
+        "first_name_hint": "Il tuo nome",
+        "last_name": "Cognome",
+        "last_name_hint": "Il tuo cognome",
+        "bio": "Bio",
+        "i_am": "Sono…",
+        "level_label": "Livello",
+        "zone_routes": "Percorsi pubblici della zona",
+        "zone_routes_desc": "Ricevi una notifica quando qualcuno pubblica un percorso vicino a te",
+        "notify_radius": "Raggio di notifica"
     },
     "motos": {
         "title": "Le Mie Moto",
@@ -219,7 +232,9 @@
         "date_required": "La data di partenza è obbligatoria.",
         "time_required": "L'orario di partenza è obbligatorio.",
         "use_my_location": "Usa la mia posizione",
-        "search_place": "Cerca un posto: un bar, un distributore, un paese..."
+        "search_place": "Cerca un posto: un bar, un distributore, un paese...",
+        "target_distance": "📏 Distanza obiettivo: {km} km",
+        "ai_duration_desc": "L’IA calcolerà la durata ottimale in base ai tuoi punti, alla moto e alle preferenze."
     },
     "route_result": {
         "title": "Percorso generato",
@@ -274,7 +289,9 @@
         "unpaved": "Attenzione: {} km di questo percorso sono su sterrato, in {} tratto/i.",
         "unpaved_hint": "Il più lungo è di {} km, lungo {}. Con gomme stradali, prudenza.",
         "repeated_road": "Questo percorso ripete {} km su {}: parte del ritorno passa per strade già fatte.",
-        "repeated_road_hint": "Il tratto ripetuto più lungo è di {} km. Da queste parti non si è trovato modo di chiudere l’anello."
+        "repeated_road_hint": "Il tratto ripetuto più lungo è di {} km. Da queste parti non si è trovato modo di chiudere l’anello.",
+        "wind_humidity": "Vento {wind} m/s · Umidità {hum}%",
+        "wind_range": "Vento {wind} m/s · {min}° / {max}°"
     },
     "verify_email": {
         "title": "Verifica la tua email!",
@@ -365,7 +382,8 @@
         "period_year": "Ultimo anno",
         "source_ai": "IA",
         "source_maps": "Maps",
-        "source_gpx": "GPX"
+        "source_gpx": "GPX",
+        "from": "Da: {quien}"
     },
     "friends_screen": {
         "title": "Amici",
@@ -382,7 +400,10 @@
         "reject": "Rifiuta",
         "accepted": "Accettata!",
         "rejected": "Rifiutata",
-        "pending_status": "In attesa"
+        "pending_status": "In attesa",
+        "search_hint": "Cerca per nome o nickname…",
+        "min_two_chars": "Scrivi almeno 2 caratteri",
+        "none_found": "Nessun motociclista trovato"
     },
     "create_route": {
         "title": "Crea percorso",
@@ -598,7 +619,9 @@
         "select_all": "Tutti",
         "deselect_all": "Rimuovi tutti",
         "save_for_me": "Salva per me",
-        "save_for_me_desc": "Solo tu puoi vederlo. Apparirà in I miei percorsi."
+        "save_for_me_desc": "Solo tu puoi vederlo. Apparirà in I miei percorsi.",
+        "forget": "Dimentica",
+        "creator": "Creatore"
     },
     "refine": {
         "title": "Rifinire il percorso",
@@ -679,7 +702,18 @@
         "mock_origin_dest": "Partenza → Destinazione",
         "mock_found": "Percorso trovato",
         "mock_share_via": "Condividi con",
-        "mock_save": "Salva"
+        "mock_save": "Salva",
+        "gpx_title": "Importa file GPX",
+        "gpx_compatible": "Compatibile con Wikiloc, Komoot, Garmin e qualsiasi app che esporti .gpx",
+        "gpx_desc": "Scegli il file e processeremo il percorso automaticamente: distanza, tempi, benzinai e meteo.",
+        "gpx_file": "File GPX",
+        "gpx_change": "Tocca per cambiare file",
+        "gpx_select": "Tocca per scegliere un file .gpx",
+        "gpx_sources": "Wikiloc · Komoot · Garmin Connect · altri",
+        "gpx_moto_for_gas": "Moto (per i benzinai)",
+        "gpx_import": "Importa percorso GPX",
+        "tap_here": "Tocca qui",
+        "select_copy_link": "Scegli \"Copia link\""
     },
     "poi_picker": {
         "title": "Punti di interesse",
