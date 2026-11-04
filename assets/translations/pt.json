@@ -295,7 +295,12 @@
         "leave_title": "Rota não guardada",
         "leave_body": "Esta rota não está guardada. Se saíres agora, perde-se.",
         "leave_stay": "Ficar",
-        "leave_exit": "Sair sem guardar"
+        "leave_exit": "Sair sem guardar",
+        "save_or_share": "Guardar ou partilhar",
+        "share_action": "Partilhar",
+        "pick_one_friend": "Escolhe pelo menos um amigo",
+        "share_with_one": "Partilhar com 1 amigo",
+        "share_with_many": "Partilhar com {n} amigos"
     },
     "verify_email": {
         "title": "Verifique o seu email!",

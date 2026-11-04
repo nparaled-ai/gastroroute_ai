@@ -295,7 +295,12 @@
         "leave_title": "Ruta sin guardar",
         "leave_body": "Esta ruta no está guardada. Si sales ahora, se pierde.",
         "leave_stay": "Quedarme",
-        "leave_exit": "Salir sin guardar"
+        "leave_exit": "Salir sin guardar",
+        "save_or_share": "Guardar o compartir",
+        "share_action": "Compartir",
+        "pick_one_friend": "Selecciona al menos un amigo",
+        "share_with_one": "Compartir con 1 amigo",
+        "share_with_many": "Compartir con {n} amigos"
     },
     "verify_email": {
         "title": "¡Verifica tu email!",

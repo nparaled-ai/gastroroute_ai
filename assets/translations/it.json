@@ -295,7 +295,12 @@
         "leave_title": "Percorso non salvato",
         "leave_body": "Questo percorso non è salvato. Se esci adesso, andrà perso.",
         "leave_stay": "Resta",
-        "leave_exit": "Esci senza salvare"
+        "leave_exit": "Esci senza salvare",
+        "save_or_share": "Salva o condividi",
+        "share_action": "Condividi",
+        "pick_one_friend": "Scegli almeno un amico",
+        "share_with_one": "Condividi con 1 amico",
+        "share_with_many": "Condividi con {n} amici"
     },
     "verify_email": {
         "title": "Verifica la tua email!",

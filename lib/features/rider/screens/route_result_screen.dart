@@ -254,29 +254,45 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     }
   }
 
-  // Solo guardar sin compartir
-  Future<void> _saveOnly() async {
-    if (_saved && _savedRoute != null) {
-      _showSaveResult();
-      return;
-    }
+  /// Guarda la ruta si todavia no lo esta. `true` = ya esta guardada.
+  ///
+  /// Decidido el 04-11-2026: la ruta se guarda cuando el motero ELIGE una de las
+  /// tres opciones del cuadro —guardar para mi, compartir con amigos o publicar—,
+  /// y no antes. Hasta entonces el boton de compartir guardaba al abrir el
+  /// cuadro, sin preguntar: quien lo cerraba sin elegir nada se encontraba con la
+  /// ruta guardada (privada) sin saberlo. Se vio en el movil: dos copias del
+  /// Anillo del Moncayo que nadie habia decidido guardar.
+  ///
+  /// Las tres opciones pasan por aqui, asi que guardar es siempre lo mismo y el
+  /// aviso de «ruta sin guardar» al salir sigue siendo cierto.
+  Future<bool> _ensureSaved() async {
+    if (_saved && _savedRoute != null) return true;
+    if (_saving) return false;
+
     setState(() => _saving = true);
     final saveData = Map<String, dynamic>.from(widget.result['_save_data'] ?? {});
     saveData['title']       = _route['title'];
     saveData['description'] = _route['description'];
     final result = await RouteService.saveRoute(saveData);
-    if (!mounted) return;
-    setState(() { _saving = false; });
+    if (!mounted) return false;
+    setState(() => _saving = false);
+
     if (result['error'] != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['error']), backgroundColor: AppColors.error));
-      return;
+      return false;
     }
+
     setState(() { _saved = true; _savedRoute = result['route']; });
     routeListRefresh.value++;
-    _showSaveResult();
+    return true;
   }
 
+  // Opcion 1 del cuadro: guardar para mi, privada.
+  Future<void> _saveOnly() async {
+    if (!await _ensureSaved()) return;
+    _showSaveResult();
+  }
   void _showSaveResult() {
     showDialog(
       context: context,
@@ -318,34 +334,11 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   }
 
   // Guardar y luego compartir
-  Future<void> _saveAndShare() async {
-    // Si ya está guardada, abrir directo el bottom sheet
-    if (_saved && _savedRoute != null) {
-      _showShareDialog();
-      return;
-    }
-    setState(() => _saving = true);
-    final saveData = Map<String, dynamic>.from(widget.result['_save_data'] ?? {});
-    saveData['title']       = _route['title'];
-    saveData['description'] = _route['description'];
-    final result = await RouteService.saveRoute(saveData);
-    if (!mounted) return;
-    setState(() => _saving = false);
-    if (result['error'] != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['error']), backgroundColor: AppColors.error));
-      return;
-    }
-    setState(() {
-      _saved      = true;
-      _savedRoute = result['route'];
-    });
-    routeListRefresh.value++;
-    _showShareDialog();
-  }
 
   // Compartir (usa _savedRoute que ya tiene ID)
   Future<void> _shareWithFriends(List<int> selectedFriendIds) async {
+    // Compartir tambien es elegir: se guarda en este momento, no antes.
+    if (!await _ensureSaved()) return;
     final routeId = _savedRoute?['id'] ?? _route['id'];
     if (routeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -360,6 +353,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   }
 
   Future<void> _sharePublic() async {
+    if (!await _ensureSaved()) return;
     final routeId = _savedRoute?['id'] ?? _route['id'];
     if (routeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -592,7 +586,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined, color: AppColors.orange),
-            onPressed: _saveAndShare,
+            onPressed: _showShareDialog,
           ),
         ],
       ),
@@ -936,7 +930,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               const SizedBox(height: 12),
 
               OutlinedButton(
-                onPressed: (_publishing || _saving) ? null : _saveAndShare,
+                onPressed: (_publishing || _saving) ? null : _showShareDialog,
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 52),
                   side: const BorderSide(color: AppColors.orange),
@@ -949,7 +943,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                         Icon(_saved ? Icons.share_outlined : Icons.save_outlined,
                             color: AppColors.orange, size: 20),
                         const SizedBox(width: 8),
-                        Text(_saved ? 'Compartir' : 'Guardar y compartir',
+                        Text(_saved ? 'route_result.share_action'.tr() : 'route_result.save_or_share'.tr(),
                             style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.w700)),
                       ]),
               ),
@@ -1020,29 +1014,6 @@ if (_step == 1) ..._buildFriendSelector(),
 }
 
 List<Widget> _buildMainMenu() => [
-// La ruta YA esta guardada cuando se abre este cuadro: se abre despues de guardar,
-// tanto desde el boton grande como desde el icono de compartir de la barra. Sin
-// decirlo, quien lo cerraba sin elegir nada pensaba que no habia hecho nada
-// —y el cuadro, ademas, ofrece «Guardar para mi» como si faltara por hacer—.
-// Decidido el 04-11-2026.
-Container(
-  padding: const EdgeInsets.all(12),
-  decoration: BoxDecoration(
-    color: Colors.green.withOpacity(0.12),
-    borderRadius: BorderRadius.circular(10),
-    border: Border.all(color: Colors.green.withOpacity(0.35)),
-  ),
-  child: Row(children: [
-    const Icon(Icons.check_circle_outline, color: Colors.green, size: 20),
-    const SizedBox(width: 10),
-    // Solo el titulo: el cuadro se puede volver a abrir DESPUES de compartir, y
-    // «solo tu puedes verla» —el cuerpo de `saved_body`— ya no seria cierto.
-    Expanded(child: Text('route_result.saved_title'.tr(),
-        style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 14))),
-  ]),
-),
-const SizedBox(height: 16),
-
 Text('route_result.what_to_do'.tr(),
 style: const TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w700)),
 const SizedBox(height: 20),
@@ -1051,8 +1022,8 @@ const SizedBox(height: 20),
 _OptionCard(
 icon: Icons.lock_outline,
 color: AppColors.grey,
-title: 'Guardar para mí',
-desc: 'Solo tú puedes verla. Aparecerá en Mis Rutas.',
+title: 'route_detail.save_for_me'.tr(),
+desc: 'route_detail.save_for_me_desc'.tr(),
 onTap: () {
 Navigator.pop(context);
 widget.onSaveOnly();
@@ -1064,8 +1035,8 @@ const SizedBox(height: 12),
 _OptionCard(
 icon: Icons.people_outlined,
 color: AppColors.cyan,
-title: 'Compartir con amigos',
-desc: 'Elige qué amigos pueden ver la ruta y apuntarse.',
+title: 'route_result.share_friends'.tr(),
+desc: 'route_result.share_friends_desc'.tr(),
 onTap: _loadFriends,
 trailing: _loading
           ? const SizedBox(width: 18, height: 18,
@@ -1078,8 +1049,8 @@ const SizedBox(height: 12),
 _OptionCard(
 icon: Icons.public,
 color: AppColors.orange,
-title: 'Publicar para todos',
-desc: 'Cualquier motero de tu zona puede verla y apuntarse.',
+title: 'route_result.share_public'.tr(),
+desc: 'route_result.share_public_desc'.tr(),
 onTap: () {
 Navigator.pop(context);
 widget.onSharePublic();
@@ -1104,7 +1075,7 @@ onTap: () => setState(() {
 if (_shareAll) { _selected.clear(); _shareAll = false; }
 else { _selected = _friends.map((f) => f['user_id'] as int).toSet(); _shareAll = true; }
 }),
-child: Text(_shareAll ? 'Quitar todos' : 'Todos',
+child: Text(_shareAll ? 'route_detail.deselect_all'.tr() : 'route_detail.select_all'.tr(),
 style: const TextStyle(color: AppColors.grey, fontSize: 12)),
 ),
 ]),
@@ -1166,8 +1137,10 @@ shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   ),
     child: Text(
       _selected.isEmpty
-            ? 'Selecciona al menos un amigo'
-          : 'Compartir con ${_selected.length} amigo${_selected.length > 1 ? 's' : ''}',
+            ? 'route_result.pick_one_friend'.tr()
+          : (_selected.length == 1
+              ? 'route_result.share_with_one'.tr()
+              : 'route_result.share_with_many'.tr(namedArgs: {'n': '${_selected.length}'})),
 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
 ),
 ),

@@ -295,7 +295,12 @@
         "leave_title": "Route not saved",
         "leave_body": "This route is not saved. If you leave now, it will be lost.",
         "leave_stay": "Stay",
-        "leave_exit": "Leave without saving"
+        "leave_exit": "Leave without saving",
+        "save_or_share": "Save or share",
+        "share_action": "Share",
+        "pick_one_friend": "Select at least one friend",
+        "share_with_one": "Share with 1 friend",
+        "share_with_many": "Share with {n} friends"
     },
     "verify_email": {
         "title": "Verify your email!",

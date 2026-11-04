@@ -295,7 +295,12 @@
         "leave_title": "Route nicht gespeichert",
         "leave_body": "Diese Route ist nicht gespeichert. Wenn du jetzt gehst, geht sie verloren.",
         "leave_stay": "Bleiben",
-        "leave_exit": "Ohne Speichern verlassen"
+        "leave_exit": "Ohne Speichern verlassen",
+        "save_or_share": "Speichern oder teilen",
+        "share_action": "Teilen",
+        "pick_one_friend": "Wähle mindestens einen Freund",
+        "share_with_one": "Mit 1 Freund teilen",
+        "share_with_many": "Mit {n} Freunden teilen"
     },
     "verify_email": {
         "title": "E-Mail bestätigen!",
