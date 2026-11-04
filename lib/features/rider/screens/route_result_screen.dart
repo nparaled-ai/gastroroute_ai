@@ -1020,6 +1020,29 @@ if (_step == 1) ..._buildFriendSelector(),
 }
 
 List<Widget> _buildMainMenu() => [
+// La ruta YA esta guardada cuando se abre este cuadro: se abre despues de guardar,
+// tanto desde el boton grande como desde el icono de compartir de la barra. Sin
+// decirlo, quien lo cerraba sin elegir nada pensaba que no habia hecho nada
+// —y el cuadro, ademas, ofrece «Guardar para mi» como si faltara por hacer—.
+// Decidido el 04-11-2026.
+Container(
+  padding: const EdgeInsets.all(12),
+  decoration: BoxDecoration(
+    color: Colors.green.withOpacity(0.12),
+    borderRadius: BorderRadius.circular(10),
+    border: Border.all(color: Colors.green.withOpacity(0.35)),
+  ),
+  child: Row(children: [
+    const Icon(Icons.check_circle_outline, color: Colors.green, size: 20),
+    const SizedBox(width: 10),
+    // Solo el titulo: el cuadro se puede volver a abrir DESPUES de compartir, y
+    // «solo tu puedes verla» —el cuerpo de `saved_body`— ya no seria cierto.
+    Expanded(child: Text('route_result.saved_title'.tr(),
+        style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 14))),
+  ]),
+),
+const SizedBox(height: 16),
+
 Text('route_result.what_to_do'.tr(),
 style: const TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w700)),
 const SizedBox(height: 20),
