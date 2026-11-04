@@ -1150,7 +1150,8 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                             const SizedBox(width: 8),
                             Expanded(child: Text('route_detail.declined_banner'.tr(),
                                 style: const TextStyle(color: AppColors.grey))),
-                            TextButton(
+                            if (!_startWindowClosed)
+                              TextButton(
                               onPressed: _join,
                               child: Text('route_detail.change_mind'.tr(),
                                   style: const TextStyle(color: AppColors.cyan, fontSize: 12)),
@@ -1159,8 +1160,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                         )
                       else
                         Row(children: [
-                          // Botón apuntarme (si no está apuntado)
-                          if (!_isJoined)
+                          // Botón apuntarme (si no está apuntado, y si la ruta no ha salido
+                          // ya: pasado el margen de salida iria directa a «No realizadas»)
+                          if (!_isJoined && !_startWindowClosed)
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: _joining ? null : _join,
