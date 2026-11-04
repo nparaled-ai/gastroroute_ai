@@ -450,11 +450,11 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
 
     String? warning;
     if (_durationMode == 'hours' && _hours <= 4 && pointCount >= 2) {
-      warning = '⚠️ Tienes $_hours horas y $pointCount puntos obligatorios. La ruta puede sobrepasar el tiempo disponible. Considera ampliar las horas o dejar que la IA calcule.';
+      warning = 'planner.warn_hours_points'.tr(namedArgs: {'hours': '$_hours', 'points': '$pointCount'});
     } else if (_durationMode == 'hours' && _hours <= 6 && pointCount >= 3) {
-      warning = '⚠️ Con $pointCount puntos obligatorios y $_hours horas disponibles la ruta puede ser ajustada. La IA intentará optimizarla.';
+      warning = 'planner.warn_hours_points_soft'.tr(namedArgs: {'points': '$pointCount', 'hours': '$_hours'});
     } else if (_durationMode == 'km' && _km <= 150 && pointCount >= 2) {
-      warning = '⚠️ Tienes $_km km y $pointCount puntos obligatorios. La distancia puede ser insuficiente. Considera ampliar los km o dejar que la IA calcule.';
+      warning = 'planner.warn_km_points'.tr(namedArgs: {'km': '$_km', 'points': '$pointCount'});
     }
 
     if (warning != null && mounted) {
@@ -463,7 +463,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
         backgroundColor: AppColors.gold,
         duration: const Duration(seconds: 5),
         action: SnackBarAction(
-          label: 'Dejar a la IA',
+          label: 'planner.let_ai'.tr(),
           textColor: AppColors.background,
           onPressed: () => setState(() => _durationMode = 'ai'),
         ),
@@ -651,7 +651,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
           );
           final h = suggested.hour.toString().padLeft(2, '0');
           final m = suggested.minute.toString().padLeft(2, '0');
-          setState(() => _error = 'Debe haber al menos 4 horas entre almuerzo y comida. Hora de comida mínima: $h:$m');
+          setState(() => _error = 'planner.min_gap'.tr(namedArgs: {'time': '$h:$m'}));
           return;
         }
       }
@@ -660,11 +660,11 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     // Validar que los puntos obligatorios no estén vacíos
     for (int i = 0; i < _customPointControllers.length; i++) {
       if (_customPointControllers[i].text.trim().isEmpty) {
-        setState(() => _error = 'El punto ${i + 1} está vacío. Rellénalo o elimínalo.');
+        setState(() => _error = 'planner.point_empty'.tr(namedArgs: {'n': '${i + 1}'}));
         return;
       }
       if (i < _pointValidated.length && !_pointValidated[i]) {
-        setState(() => _error = 'El punto ${i + 1} no está validado. Selecciónalo de la lista de sugerencias.');
+        setState(() => _error = 'planner.point_not_validated'.tr(namedArgs: {'n': '${i + 1}'}));
         return;
       }
     }
@@ -1156,8 +1156,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                               final color = isCritical ? AppColors.error : isWarning ? AppColors.gold : Colors.green;
                               final icon  = isCritical ? '⛔' : isWarning ? '⚠️' : '✅';
                               final msg   = isCritical
-                                  ? 'Muy lejos del origen — puede generar ruta incorrecta'
-                                  : isWarning ? 'Lejos del origen — la ruta será larga' : null;
+                                  ? 'planner.far_very'.tr()
+                                  : isWarning ? 'planner.far'.tr() : null;
                               return Container(
                                 margin: const EdgeInsets.only(top: 4, left: 32),
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -1170,7 +1170,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                                   Row(children: [
                                     Text(icon, style: const TextStyle(fontSize: 12)),
                                     const SizedBox(width: 6),
-                                    Text('${dist.toInt()} km del origen',
+                                    Text('planner.km_from_origin'.tr(namedArgs: {'km': '${dist.toInt()}'}),
                                         style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600)),
                                   ]),
                                   if (msg != null)
@@ -1193,7 +1193,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   Row(children: [
                     _DurationModeChip(
                       icon: Icons.auto_awesome,
-                      label: 'La IA decide',
+                      label: 'planner.ai_decides'.tr(),
                       selected: _durationMode == 'ai',
                       color: AppColors.gold,
                       onTap: () => setState(() => _durationMode = 'ai'),
@@ -1201,7 +1201,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     const SizedBox(width: 8),
                     _DurationModeChip(
                       icon: Icons.access_time,
-                      label: 'Por horas',
+                      label: 'planner.by_hours'.tr(),
                       selected: _durationMode == 'hours',
                       color: AppColors.orange,
                       onTap: () {
@@ -1212,7 +1212,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     const SizedBox(width: 8),
                     _DurationModeChip(
                       icon: Icons.speed,
-                      label: 'Por km',
+                      label: 'planner.by_km'.tr(),
                       selected: _durationMode == 'km',
                       color: AppColors.cyan,
                       onTap: () {
@@ -1445,7 +1445,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   _ToggleOption(
                     icon: Icons.dinner_dining,
                     label: 'planner.dinner_stop'.tr(),
-                    subtitle: 'planner.dinner_desc'.tr() + ' (parada ~1 hora)',
+                    subtitle: 'planner.dinner_desc'.tr() + ' ' + 'planner.stop_one_hour'.tr(),
                     value: _suggestDinner, enabled: true, color: AppColors.cyan,
                     onChanged: (val) => setState(() => _suggestDinner = val),
                   ),

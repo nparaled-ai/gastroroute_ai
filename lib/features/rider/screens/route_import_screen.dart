@@ -729,7 +729,7 @@ class _CopyLinkIllustration extends StatelessWidget {
                     ),
                   ),
                 ]),
-                _ShareOption(icon: Icons.more_horiz, label: 'Más', color: Colors.grey),
+                _ShareOption(icon: Icons.more_horiz, label: 'import.mock_more'.tr(), color: Colors.grey),
               ]),
             ]),
           ),

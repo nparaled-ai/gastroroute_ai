@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import '../../../core/api/api_client.dart';
 
@@ -8,7 +9,7 @@ class FriendshipService {
       final response = await ApiClient.dio.get('/rider/friends/search', queryParameters: {'q': query});
       return {'results': List<Map<String, dynamic>>.from(response.data)};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -18,7 +19,7 @@ class FriendshipService {
       final response = await ApiClient.dio.post('/rider/friends/request', data: {'friend_id': friendId});
       return {'success': true, 'message': response.data['message']};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -28,7 +29,7 @@ class FriendshipService {
       await ApiClient.dio.patch('/rider/friends/$friendshipId/accept');
       return {'success': true};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -38,7 +39,7 @@ class FriendshipService {
       await ApiClient.dio.patch('/rider/friends/$friendshipId/reject');
       return {'success': true};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -48,7 +49,7 @@ class FriendshipService {
       await ApiClient.dio.delete('/rider/friends/$friendUserId');
       return {'success': true};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -58,7 +59,7 @@ class FriendshipService {
       final response = await ApiClient.dio.get('/rider/friends');
       return {'friends': List<Map<String, dynamic>>.from(response.data)};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -68,7 +69,7 @@ class FriendshipService {
       final response = await ApiClient.dio.get('/rider/friends/pending/received');
       return {'requests': List<Map<String, dynamic>>.from(response.data)};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -78,7 +79,7 @@ class FriendshipService {
       final response = await ApiClient.dio.get('/rider/friends/pending/sent');
       return {'requests': List<Map<String, dynamic>>.from(response.data)};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 }

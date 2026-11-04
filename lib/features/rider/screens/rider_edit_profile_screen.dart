@@ -227,19 +227,19 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
 
   Future<void> _save() async {
     if (_firstNameController.text.trim().isEmpty) {
-      setState(() => _error = 'El nombre es obligatorio.');
+      setState(() => _error = 'profile.err_first_name'.tr());
       return;
     }
     if (_lastNameController.text.trim().isEmpty) {
-      setState(() => _error = 'Los apellidos son obligatorios.');
+      setState(() => _error = 'profile.err_last_name'.tr());
       return;
     }
     if (_provinceController.text.trim().isEmpty) {
-      setState(() => _error = 'La ubicación es obligatoria.');
+      setState(() => _error = 'profile.err_location'.tr());
       return;
     }
     if (_provinceController.text.trim().isNotEmpty && !_locationValidated) {
-      setState(() => _error = 'Selecciona una ubicación de la lista de sugerencias.');
+      setState(() => _error = 'profile.err_location_pick'.tr());
       return;
     }
     setState(() { _loading = true; _error = null; });

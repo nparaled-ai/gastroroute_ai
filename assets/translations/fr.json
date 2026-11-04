@@ -49,7 +49,8 @@
         "forgot_password": "Mot de passe oublié ?",
         "sign_in_google": "Continuer avec Google",
         "or": "ou",
-        "splash_tagline": "ITINÉRAIRES · COMMUNAUTÉ · PASSION"
+        "splash_tagline": "ITINÉRAIRES · COMMUNAUTÉ · PASSION",
+        "role_admin_desc": "Panneau de contrôle"
     },
     "home": {
         "welcome": "Bienvenue, motard!",
@@ -124,7 +125,11 @@
         "level_label": "Niveau",
         "zone_routes": "Itinéraires publics de la zone",
         "zone_routes_desc": "Être prévenu quand quelqu’un publie un itinéraire près de vous",
-        "notify_radius": "Rayon de notification"
+        "notify_radius": "Rayon de notification",
+        "err_first_name": "Le prénom est obligatoire.",
+        "err_last_name": "Le nom est obligatoire.",
+        "err_location": "La localisation est obligatoire.",
+        "err_location_pick": "Choisissez un lieu dans la liste de suggestions."
     },
     "motos": {
         "title": "Mes Motos",
@@ -234,7 +239,21 @@
         "use_my_location": "Utiliser ma position",
         "search_place": "Chercher un lieu : un bar, une station-service, un village...",
         "target_distance": "📏 Distance visée : {km} km",
-        "ai_duration_desc": "L’IA calculera la durée idéale selon vos points, votre moto et vos préférences."
+        "ai_duration_desc": "L’IA calculera la durée idéale selon vos points, votre moto et vos préférences.",
+        "warn_hours_points": "⚠️ Vous avez {hours} heures et {points} points obligatoires. L’itinéraire peut dépasser le temps disponible. Pensez à augmenter les heures ou à laisser l’IA calculer.",
+        "warn_hours_points_soft": "⚠️ Avec {points} points obligatoires et {hours} heures disponibles, l’itinéraire peut être serré. L’IA essaiera de l’optimiser.",
+        "warn_km_points": "⚠️ Vous avez {km} km et {points} points obligatoires. La distance peut être insuffisante. Pensez à augmenter les km ou à laisser l’IA calculer.",
+        "let_ai": "Laisser l’IA décider",
+        "min_gap": "Il doit y avoir au moins 4 heures entre les deux arrêts repas. Heure minimale du second arrêt : {time}",
+        "point_empty": "Le point {n} est vide. Remplissez-le ou supprimez-le.",
+        "point_not_validated": "Le point {n} n’est pas validé. Choisissez-le dans la liste de suggestions.",
+        "far_very": "Très loin du départ — l’itinéraire risque d’être incorrect",
+        "far": "Loin du départ — l’itinéraire sera long",
+        "km_from_origin": "{km} km du départ",
+        "ai_decides": "L’IA décide",
+        "by_hours": "Par heures",
+        "by_km": "Par km",
+        "stop_one_hour": "(arrêt ~1 heure)"
     },
     "route_result": {
         "title": "Itinéraire généré",
@@ -300,7 +319,12 @@
         "share_action": "Partager",
         "pick_one_friend": "Choisissez au moins un ami",
         "share_with_one": "Partager avec 1 ami",
-        "share_with_many": "Partager avec {n} amis"
+        "share_with_many": "Partager avec {n} amis",
+        "warn_very_long": "⛔ Itinéraire très exigeant pour 1 jour : {km} km / {h} h.",
+        "warn_long": "⚠️ Itinéraire long pour 1 jour : {km} km / {h} h.",
+        "regenerate_shorter": "Régénérer plus court",
+        "refuel_km": "⛽ Faire le plein à {km} km",
+        "refuel_km_n": "⛽ Faire le plein à {km} km ({n}/{total})"
     },
     "verify_email": {
         "title": "Vérifiez votre email !",
@@ -634,7 +658,11 @@
         "save_for_me": "Garder pour moi",
         "save_for_me_desc": "Vous seul pouvez le voir, pour l’instant. Il apparaîtra dans Mes itinéraires et vous pourrez le partager plus tard, avant de rouler.",
         "forget": "Oublier",
-        "creator": "Créateur"
+        "creator": "Créateur",
+        "weather_prefix_forecast": "Prévision · ",
+        "weather_prefix_now": "Maintenant · ",
+        "cannot_go": "❌ Ne peut pas venir",
+        "all_friends_invited": "Tous vos amis ont déjà été invités."
     },
     "refine": {
         "title": "Affiner l'itinéraire",
@@ -726,7 +754,12 @@
         "gpx_moto_for_gas": "Moto (pour les stations)",
         "gpx_import": "Importer l’itinéraire GPX",
         "tap_here": "Touchez ici",
-        "select_copy_link": "Choisissez « Copier le lien »"
+        "select_copy_link": "Choisissez « Copier le lien »",
+        "gpx_err_access": "Impossible d’accéder au fichier. Réessayez.",
+        "gpx_err_ext": "Le fichier doit avoir l’extension .gpx (Wikiloc, Komoot, Garmin…)",
+        "gpx_err_none": "Choisissez d’abord un fichier .gpx.",
+        "gpx_err_date": "Choisissez une date de départ.",
+        "mock_more": "Plus"
     },
     "poi_picker": {
         "title": "Points d'intérêt",
@@ -881,5 +914,22 @@
         "destination_unknown": "Nous ne savons pas où se trouve cette destination, donc l’itinéraire ne pourra pas être tracé. Revenez en arrière et écrivez-la autrement, avec la province.",
         "lunch_kind_cafe": "Un café",
         "lunch_kind_almuerzo": "Casse-croûte"
+    },
+    "errors": {
+        "save": "Échec de l’enregistrement.",
+        "weather": "Impossible d’actualiser la météo.",
+        "share": "Échec du partage.",
+        "join": "Échec de l’inscription.",
+        "tracking_start": "Impossible de démarrer l’enregistrement.",
+        "tracking_finish": "Impossible de terminer l’itinéraire.",
+        "image_upload": "Échec de l’envoi de l’image.",
+        "photo_upload": "Échec de l’envoi de la photo.",
+        "photo_delete": "Impossible de supprimer la photo.",
+        "import_route": "Échec de l’importation de l’itinéraire.",
+        "import_gpx": "Échec de l’importation du fichier GPX.",
+        "invalid_token": "Jeton invalide.",
+        "reset": "Échec de la réinitialisation.",
+        "google_token": "Impossible d’obtenir le jeton Google.",
+        "google_login": "Échec de la connexion avec Google."
     }
 }

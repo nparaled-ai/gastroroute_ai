@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
 import '../../../core/api/api_client.dart';
@@ -27,7 +28,7 @@ class AvatarService {
 
       return {'avatar_url': avatarUrl};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al subir la imagen.'};
+      return {'error': e.response?.data['message'] ?? 'errors.image_upload'.tr()};
     }
   }
 
@@ -36,7 +37,7 @@ class AvatarService {
       await ApiClient.dio.delete('/rider/profile/avatar');
       return {'success': true};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al eliminar la foto.'};
+      return {'error': e.response?.data['message'] ?? 'errors.photo_delete'.tr()};
     }
   }
 }

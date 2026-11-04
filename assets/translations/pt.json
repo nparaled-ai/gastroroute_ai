@@ -49,7 +49,8 @@
         "forgot_password": "Esqueceu a palavra-passe?",
         "sign_in_google": "Continuar com o Google",
         "or": "ou",
-        "splash_tagline": "ROTAS · COMUNIDADE · PAIXÃO"
+        "splash_tagline": "ROTAS · COMUNIDADE · PAIXÃO",
+        "role_admin_desc": "Painel de controlo"
     },
     "home": {
         "welcome": "Bem-vindo, motard!",
@@ -124,7 +125,11 @@
         "level_label": "Nível",
         "zone_routes": "Rotas públicas da zona",
         "zone_routes_desc": "Receber notificações quando alguém publicar uma rota perto de ti",
-        "notify_radius": "Raio de notificação"
+        "notify_radius": "Raio de notificação",
+        "err_first_name": "O nome é obrigatório.",
+        "err_last_name": "Os apelidos são obrigatórios.",
+        "err_location": "A localização é obrigatória.",
+        "err_location_pick": "Escolhe uma localização na lista de sugestões."
     },
     "motos": {
         "title": "As Minhas Motas",
@@ -234,7 +239,21 @@
         "use_my_location": "Usar a minha localização",
         "search_place": "Procurar um sítio: um bar, uma bomba, uma aldeia…",
         "target_distance": "📏 Distância pretendida: {km} km",
-        "ai_duration_desc": "A IA calculará a duração ideal segundo os teus pontos, a mota e as preferências."
+        "ai_duration_desc": "A IA calculará a duração ideal segundo os teus pontos, a mota e as preferências.",
+        "warn_hours_points": "⚠️ Tens {hours} horas e {points} pontos obrigatórios. A rota pode exceder o tempo disponível. Considera aumentar as horas ou deixar a IA calcular.",
+        "warn_hours_points_soft": "⚠️ Com {points} pontos obrigatórios e {hours} horas disponíveis a rota pode ficar apertada. A IA vai tentar otimizá-la.",
+        "warn_km_points": "⚠️ Tens {km} km e {points} pontos obrigatórios. A distância pode ser insuficiente. Considera aumentar os km ou deixar a IA calcular.",
+        "let_ai": "Deixar a IA decidir",
+        "min_gap": "Tem de haver pelo menos 4 horas entre as duas paragens para comer. Hora mínima da segunda paragem: {time}",
+        "point_empty": "O ponto {n} está vazio. Preenche-o ou elimina-o.",
+        "point_not_validated": "O ponto {n} não está validado. Escolhe-o na lista de sugestões.",
+        "far_very": "Muito longe da origem — a rota pode sair errada",
+        "far": "Longe da origem — a rota será longa",
+        "km_from_origin": "{km} km da origem",
+        "ai_decides": "A IA decide",
+        "by_hours": "Por horas",
+        "by_km": "Por km",
+        "stop_one_hour": "(paragem ~1 hora)"
     },
     "route_result": {
         "title": "Rota gerada",
@@ -300,7 +319,12 @@
         "share_action": "Partilhar",
         "pick_one_friend": "Escolhe pelo menos um amigo",
         "share_with_one": "Partilhar com 1 amigo",
-        "share_with_many": "Partilhar com {n} amigos"
+        "share_with_many": "Partilhar com {n} amigos",
+        "warn_very_long": "⛔ Rota muito exigente para 1 dia: {km} km / {h} h.",
+        "warn_long": "⚠️ Rota longa para 1 dia: {km} km / {h} h.",
+        "regenerate_shorter": "Regenerar mais curta",
+        "refuel_km": "⛽ Abastecer aos {km} km",
+        "refuel_km_n": "⛽ Abastecer aos {km} km ({n}/{total})"
     },
     "verify_email": {
         "title": "Verifique o seu email!",
@@ -634,7 +658,11 @@
         "save_for_me": "Guardar para mim",
         "save_for_me_desc": "Só tu a podes ver, por agora. Vai aparecer em As Minhas Rotas e poderás partilhá-la mais tarde, antes de arrancar.",
         "forget": "Esquecer",
-        "creator": "Criador"
+        "creator": "Criador",
+        "weather_prefix_forecast": "Previsão · ",
+        "weather_prefix_now": "Agora · ",
+        "cannot_go": "❌ Não pode ir",
+        "all_friends_invited": "Todos os teus amigos já foram convidados."
     },
     "refine": {
         "title": "Afinar a rota",
@@ -726,7 +754,12 @@
         "gpx_moto_for_gas": "Mota (para as bombas)",
         "gpx_import": "Importar rota GPX",
         "tap_here": "Toca aqui",
-        "select_copy_link": "Escolhe \"Copiar link\""
+        "select_copy_link": "Escolhe \"Copiar link\"",
+        "gpx_err_access": "Não foi possível aceder ao ficheiro. Tenta de novo.",
+        "gpx_err_ext": "O ficheiro tem de ter a extensão .gpx (Wikiloc, Komoot, Garmin…)",
+        "gpx_err_none": "Escolhe primeiro um ficheiro .gpx.",
+        "gpx_err_date": "Escolhe uma data de partida.",
+        "mock_more": "Mais"
     },
     "poi_picker": {
         "title": "Pontos de interesse",
@@ -881,5 +914,22 @@
         "destination_unknown": "Não sabemos onde fica esse destino, por isso a rota não poderá ser traçada. Volta atrás e escreve-o de outra forma, com o distrito.",
         "lunch_kind_cafe": "Um café",
         "lunch_kind_almuerzo": "Comer algo"
+    },
+    "errors": {
+        "save": "Erro ao guardar.",
+        "weather": "Erro ao atualizar a meteorologia.",
+        "share": "Erro ao partilhar.",
+        "join": "Erro ao inscrever-se.",
+        "tracking_start": "Erro ao iniciar a gravação.",
+        "tracking_finish": "Erro ao terminar a rota.",
+        "image_upload": "Erro ao carregar a imagem.",
+        "photo_upload": "Erro ao carregar a foto.",
+        "photo_delete": "Erro ao eliminar a foto.",
+        "import_route": "Erro ao importar a rota.",
+        "import_gpx": "Erro ao importar o ficheiro GPX.",
+        "invalid_token": "Token inválido.",
+        "reset": "Erro ao repor.",
+        "google_token": "Não foi possível obter o token da Google.",
+        "google_login": "Erro ao iniciar sessão com a Google."
     }
 }

@@ -945,7 +945,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.white),
           onPressed: () => context.pop(),
         ),
-        title: Text(_route?['title'] ?? 'Ruta',
+        title: Text(_route?['title'] ?? 'my_routes.no_title'.tr(),
             style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700),
             overflow: TextOverflow.ellipsis),
         actions: [
@@ -1514,7 +1514,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                     color: AppColors.white, fontWeight: FontWeight.w600)),
             Row(children: [
               Text(
-                w['is_forecast'] == true ? 'Previsión · ' : 'Ahora · ',
+                w['is_forecast'] == true ? 'route_detail.weather_prefix_forecast'.tr() : 'route_detail.weather_prefix_now'.tr(),
                 style: TextStyle(
                   color: w['is_forecast'] == true
                       ? AppColors.cyan
@@ -1759,7 +1759,7 @@ class _ParticipantRow extends StatelessWidget {
         break;
       case 'declined':
         badgeColor = AppColors.error;
-        badgeText = '❌ No puede ir';
+        badgeText = 'route_detail.cannot_go'.tr();
         break;
       default:
         badgeColor = AppColors.gold;
@@ -1944,8 +1944,8 @@ class _ShareBottomSheetState extends State<_ShareBottomSheet> {
               }),
               child: Text(
                   _selected.length == _friends.length
-                      ? 'Quitar todos'
-                      : 'Todos',
+                      ? 'route_detail.deselect_all'.tr()
+                      : 'route_detail.select_all'.tr(),
                   style:
                       const TextStyle(color: AppColors.grey, fontSize: 12)),
             ),
@@ -1956,8 +1956,8 @@ class _ShareBottomSheetState extends State<_ShareBottomSheet> {
             padding: const EdgeInsets.all(16),
             child: Text(
               widget.excludeUserIds.isNotEmpty
-                  ? 'Todos tus amigos ya han sido invitados.'
-                  : 'No tienes amigos aún.',
+                  ? 'route_detail.all_friends_invited'.tr()
+                  : 'route_result.no_friends'.tr(),
               style: const TextStyle(color: AppColors.grey),
             ),
           )
@@ -2026,8 +2026,8 @@ class _ShareBottomSheetState extends State<_ShareBottomSheet> {
           ),
           child: Text(
             _selected.isEmpty
-                ? 'Selecciona al menos un amigo'
-                : 'Compartir con ${_selected.length} amigo${_selected.length > 1 ? 's' : ''}',
+                ? 'route_result.pick_one_friend'.tr()
+                : (_selected.length == 1 ? 'route_result.share_with_one'.tr() : 'route_result.share_with_many'.tr(namedArgs: {'n': '${_selected.length}'})),
             style: const TextStyle(
                 color: Colors.white, fontWeight: FontWeight.w700),
           ),
@@ -2252,8 +2252,8 @@ class _RepeatShareBottomSheetState extends State<_RepeatShareBottomSheet> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Text(
-        _selected.isEmpty ? 'Selecciona al menos un amigo'
-            : 'Compartir con ${_selected.length} amigo${_selected.length > 1 ? 's' : ''}',
+        _selected.isEmpty ? 'route_result.pick_one_friend'.tr()
+            : (_selected.length == 1 ? 'route_result.share_with_one'.tr() : 'route_result.share_with_many'.tr(namedArgs: {'n': '${_selected.length}'})),
         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
       ),
     ),

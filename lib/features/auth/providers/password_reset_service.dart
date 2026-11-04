@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import '../../../core/api/api_client.dart';
 
@@ -8,7 +9,7 @@ class PasswordResetService {
           data: {'email': email});
       return {'message': response.data['message'], 'debug_token': response.data['debug_token']};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -19,7 +20,7 @@ class PasswordResetService {
           data: {'email': email, 'token': token});
       return {'valid': response.data['valid'] ?? true};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Token inválido.'};
+      return {'error': e.response?.data['message'] ?? 'errors.invalid_token'.tr()};
     }
   }
 
@@ -34,7 +35,7 @@ class PasswordResetService {
       });
       return {'message': response.data['message']};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al restablecer.'};
+      return {'error': e.response?.data['message'] ?? 'errors.reset'.tr()};
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import '../../../core/api/api_client.dart';
 
@@ -17,7 +18,7 @@ class RouteImportService {
       });
       return {'result': response.data};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al importar la ruta.'};
+      return {'error': e.response?.data['message'] ?? 'errors.import_route'.tr()};
     }
   }
 
@@ -42,7 +43,7 @@ class RouteImportService {
       );
       return {'result': response.data};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al importar el archivo GPX.'};
+      return {'error': e.response?.data['message'] ?? 'errors.import_gpx'.tr()};
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import '../../../core/api/api_client.dart';
 
@@ -23,7 +24,7 @@ class MotoPhotoService {
 
       return {'photo_url': photoUrl};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al subir la foto.'};
+      return {'error': e.response?.data['message'] ?? 'errors.photo_upload'.tr()};
     }
   }
 
@@ -32,7 +33,7 @@ class MotoPhotoService {
       await ApiClient.dio.delete('/rider/motos/$motoId/photo');
       return {'success': true};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al eliminar la foto.'};
+      return {'error': e.response?.data['message'] ?? 'errors.photo_delete'.tr()};
     }
   }
 }

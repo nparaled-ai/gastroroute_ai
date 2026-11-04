@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import '../../../core/api/api_client.dart';
 
@@ -19,7 +20,7 @@ class RouteShareService {
         'notified_count': response.data['notified_count'],
       };
     } on DioException catch (e) {
-      final msg = e.response?.data?['message'] ?? e.message ?? 'Error al compartir.';
+      final msg = e.response?.data?['message'] ?? e.message ?? 'errors.share'.tr();
       return {'error': msg};
     } catch (e) {
       return {'error': e.toString()};
@@ -35,7 +36,7 @@ class RouteShareService {
       // te convierte esta llamada.
       return {'success': true, 'message': response.data['message']};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al apuntarse.'};
+      return {'error': e.response?.data['message'] ?? 'errors.join'.tr()};
     }
   }
 

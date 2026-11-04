@@ -49,7 +49,8 @@
         "forgot_password": "Hai dimenticato la password?",
         "sign_in_google": "Continua con Google",
         "or": "oppure",
-        "splash_tagline": "PERCORSI · COMUNITÀ · PASSIONE"
+        "splash_tagline": "PERCORSI · COMUNITÀ · PASSIONE",
+        "role_admin_desc": "Pannello di controllo"
     },
     "home": {
         "welcome": "Benvenuto, motociclista!",
@@ -124,7 +125,11 @@
         "level_label": "Livello",
         "zone_routes": "Percorsi pubblici della zona",
         "zone_routes_desc": "Ricevi una notifica quando qualcuno pubblica un percorso vicino a te",
-        "notify_radius": "Raggio di notifica"
+        "notify_radius": "Raggio di notifica",
+        "err_first_name": "Il nome è obbligatorio.",
+        "err_last_name": "Il cognome è obbligatorio.",
+        "err_location": "La posizione è obbligatoria.",
+        "err_location_pick": "Scegli una posizione dall’elenco dei suggerimenti."
     },
     "motos": {
         "title": "Le Mie Moto",
@@ -234,7 +239,21 @@
         "use_my_location": "Usa la mia posizione",
         "search_place": "Cerca un posto: un bar, un distributore, un paese...",
         "target_distance": "📏 Distanza obiettivo: {km} km",
-        "ai_duration_desc": "L’IA calcolerà la durata ottimale in base ai tuoi punti, alla moto e alle preferenze."
+        "ai_duration_desc": "L’IA calcolerà la durata ottimale in base ai tuoi punti, alla moto e alle preferenze.",
+        "warn_hours_points": "⚠️ Hai {hours} ore e {points} punti obbligatori. Il percorso potrebbe superare il tempo disponibile. Valuta di aumentare le ore o di lasciar calcolare all’IA.",
+        "warn_hours_points_soft": "⚠️ Con {points} punti obbligatori e {hours} ore disponibili il percorso potrebbe essere stretto. L’IA cercherà di ottimizzarlo.",
+        "warn_km_points": "⚠️ Hai {km} km e {points} punti obbligatori. La distanza potrebbe non bastare. Valuta di aumentare i km o di lasciar calcolare all’IA.",
+        "let_ai": "Lascia fare all’IA",
+        "min_gap": "Devono passare almeno 4 ore tra le due soste per mangiare. Orario minimo della seconda sosta: {time}",
+        "point_empty": "Il punto {n} è vuoto. Compilalo o eliminalo.",
+        "point_not_validated": "Il punto {n} non è convalidato. Sceglilo dall’elenco dei suggerimenti.",
+        "far_very": "Molto lontano dalla partenza — il percorso potrebbe risultare errato",
+        "far": "Lontano dalla partenza — il percorso sarà lungo",
+        "km_from_origin": "{km} km dalla partenza",
+        "ai_decides": "Decide l’IA",
+        "by_hours": "Per ore",
+        "by_km": "Per km",
+        "stop_one_hour": "(sosta ~1 ora)"
     },
     "route_result": {
         "title": "Percorso generato",
@@ -300,7 +319,12 @@
         "share_action": "Condividi",
         "pick_one_friend": "Scegli almeno un amico",
         "share_with_one": "Condividi con 1 amico",
-        "share_with_many": "Condividi con {n} amici"
+        "share_with_many": "Condividi con {n} amici",
+        "warn_very_long": "⛔ Percorso molto impegnativo per 1 giorno: {km} km / {h} h.",
+        "warn_long": "⚠️ Percorso lungo per 1 giorno: {km} km / {h} h.",
+        "regenerate_shorter": "Rigenera più corto",
+        "refuel_km": "⛽ Fai rifornimento ai {km} km",
+        "refuel_km_n": "⛽ Fai rifornimento ai {km} km ({n}/{total})"
     },
     "verify_email": {
         "title": "Verifica la tua email!",
@@ -634,7 +658,11 @@
         "save_for_me": "Salva per me",
         "save_for_me_desc": "Solo tu puoi vederlo, per ora. Apparirà in I miei percorsi e potrai condividerlo più tardi, prima di partire.",
         "forget": "Dimentica",
-        "creator": "Creatore"
+        "creator": "Creatore",
+        "weather_prefix_forecast": "Previsione · ",
+        "weather_prefix_now": "Adesso · ",
+        "cannot_go": "❌ Non può venire",
+        "all_friends_invited": "Tutti i tuoi amici sono già stati invitati."
     },
     "refine": {
         "title": "Rifinire il percorso",
@@ -726,7 +754,12 @@
         "gpx_moto_for_gas": "Moto (per i benzinai)",
         "gpx_import": "Importa percorso GPX",
         "tap_here": "Tocca qui",
-        "select_copy_link": "Scegli \"Copia link\""
+        "select_copy_link": "Scegli \"Copia link\"",
+        "gpx_err_access": "Impossibile accedere al file. Riprova.",
+        "gpx_err_ext": "Il file deve avere estensione .gpx (Wikiloc, Komoot, Garmin…)",
+        "gpx_err_none": "Scegli prima un file .gpx.",
+        "gpx_err_date": "Scegli una data di partenza.",
+        "mock_more": "Altro"
     },
     "poi_picker": {
         "title": "Punti di interesse",
@@ -881,5 +914,22 @@
         "destination_unknown": "Non sappiamo dove si trova quella destinazione, quindi il percorso non si potrà tracciare. Torna indietro e scrivila in altro modo, con la provincia.",
         "lunch_kind_cafe": "Un caffè",
         "lunch_kind_almuerzo": "Spuntino"
+    },
+    "errors": {
+        "save": "Errore durante il salvataggio.",
+        "weather": "Impossibile aggiornare il meteo.",
+        "share": "Errore durante la condivisione.",
+        "join": "Errore durante l’iscrizione.",
+        "tracking_start": "Impossibile avviare la registrazione.",
+        "tracking_finish": "Impossibile terminare il percorso.",
+        "image_upload": "Errore nel caricamento dell’immagine.",
+        "photo_upload": "Errore nel caricamento della foto.",
+        "photo_delete": "Impossibile eliminare la foto.",
+        "import_route": "Errore nell’importazione del percorso.",
+        "import_gpx": "Errore nell’importazione del file GPX.",
+        "invalid_token": "Token non valido.",
+        "reset": "Errore durante il ripristino.",
+        "google_token": "Impossibile ottenere il token di Google.",
+        "google_login": "Errore di accesso con Google."
     }
 }

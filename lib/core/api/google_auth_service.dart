@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'api_client.dart';
@@ -15,7 +16,7 @@ class GoogleAuthService {
 
       final auth = await account.authentication;
       final idToken = auth.idToken;
-      if (idToken == null) return {'error': 'No se pudo obtener el token de Google.'};
+      if (idToken == null) return {'error': 'errors.google_token'.tr()};
 
       final response = await ApiClient.dio.post('/auth/google', data: {
         'id_token': idToken,
@@ -41,9 +42,9 @@ class GoogleAuthService {
       return {'success': true, 'role': data['user']['active_role']};
 
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     } catch (e) {
-      return {'error': 'Error al iniciar sesión con Google.'};
+      return {'error': 'errors.google_login'.tr()};
     }
   }
 

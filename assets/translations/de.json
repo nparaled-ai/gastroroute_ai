@@ -49,7 +49,8 @@
         "forgot_password": "Passwort vergessen?",
         "sign_in_google": "Mit Google fortfahren",
         "or": "oder",
-        "splash_tagline": "ROUTEN · COMMUNITY · LEIDENSCHAFT"
+        "splash_tagline": "ROUTEN · COMMUNITY · LEIDENSCHAFT",
+        "role_admin_desc": "Kontrollbereich"
     },
     "home": {
         "welcome": "Willkommen, Fahrer!",
@@ -124,7 +125,11 @@
         "level_label": "Niveau",
         "zone_routes": "Öffentliche Routen in der Nähe",
         "zone_routes_desc": "Benachrichtigt werden, wenn jemand eine Route in deiner Nähe veröffentlicht",
-        "notify_radius": "Benachrichtigungsradius"
+        "notify_radius": "Benachrichtigungsradius",
+        "err_first_name": "Der Vorname ist erforderlich.",
+        "err_last_name": "Der Nachname ist erforderlich.",
+        "err_location": "Der Standort ist erforderlich.",
+        "err_location_pick": "Wähle einen Ort aus der Vorschlagsliste."
     },
     "motos": {
         "title": "Meine Motorräder",
@@ -234,7 +239,21 @@
         "use_my_location": "Meinen Standort verwenden",
         "search_place": "Ort suchen: eine Bar, eine Tankstelle, ein Dorf...",
         "target_distance": "📏 Zieldistanz: {km} km",
-        "ai_duration_desc": "Die KI berechnet die passende Dauer aus deinen Punkten, deinem Motorrad und deinen Vorlieben."
+        "ai_duration_desc": "Die KI berechnet die passende Dauer aus deinen Punkten, deinem Motorrad und deinen Vorlieben.",
+        "warn_hours_points": "⚠️ Du hast {hours} Stunden und {points} Pflichtpunkte. Die Route könnte die verfügbare Zeit überschreiten. Plane mehr Stunden ein oder lass die KI rechnen.",
+        "warn_hours_points_soft": "⚠️ Mit {points} Pflichtpunkten und {hours} verfügbaren Stunden könnte die Route knapp werden. Die KI versucht, sie zu optimieren.",
+        "warn_km_points": "⚠️ Du hast {km} km und {points} Pflichtpunkte. Die Strecke könnte nicht ausreichen. Plane mehr km ein oder lass die KI rechnen.",
+        "let_ai": "KI entscheiden lassen",
+        "min_gap": "Zwischen den beiden Essensstopps müssen mindestens 4 Stunden liegen. Früheste Zeit für den zweiten Stopp: {time}",
+        "point_empty": "Punkt {n} ist leer. Fülle ihn aus oder entferne ihn.",
+        "point_not_validated": "Punkt {n} ist nicht bestätigt. Wähle ihn aus der Vorschlagsliste.",
+        "far_very": "Sehr weit vom Start — die Route könnte falsch werden",
+        "far": "Weit vom Start — die Route wird lang",
+        "km_from_origin": "{km} km vom Start",
+        "ai_decides": "Die KI entscheidet",
+        "by_hours": "Nach Stunden",
+        "by_km": "Nach km",
+        "stop_one_hour": "(Stopp ~1 Stunde)"
     },
     "route_result": {
         "title": "Generierte Route",
@@ -300,7 +319,12 @@
         "share_action": "Teilen",
         "pick_one_friend": "Wähle mindestens einen Freund",
         "share_with_one": "Mit 1 Freund teilen",
-        "share_with_many": "Mit {n} Freunden teilen"
+        "share_with_many": "Mit {n} Freunden teilen",
+        "warn_very_long": "⛔ Sehr anspruchsvolle Route für 1 Tag: {km} km / {h} Std.",
+        "warn_long": "⚠️ Lange Route für 1 Tag: {km} km / {h} Std.",
+        "regenerate_shorter": "Kürzer neu erstellen",
+        "refuel_km": "⛽ Tanken bei {km} km",
+        "refuel_km_n": "⛽ Tanken bei {km} km ({n}/{total})"
     },
     "verify_email": {
         "title": "E-Mail bestätigen!",
@@ -634,7 +658,11 @@
         "save_for_me": "Für mich speichern",
         "save_for_me_desc": "Nur du kannst sie sehen, vorerst. Sie erscheint in Meine Routen und du kannst sie später teilen, bevor du losfährst.",
         "forget": "Verwerfen",
-        "creator": "Ersteller"
+        "creator": "Ersteller",
+        "weather_prefix_forecast": "Vorhersage · ",
+        "weather_prefix_now": "Jetzt · ",
+        "cannot_go": "❌ Kann nicht mitfahren",
+        "all_friends_invited": "Alle deine Freunde wurden bereits eingeladen."
     },
     "refine": {
         "title": "Route verfeinern",
@@ -726,7 +754,12 @@
         "gpx_moto_for_gas": "Motorrad (für Tankstellen)",
         "gpx_import": "GPX-Route importieren",
         "tap_here": "Hier tippen",
-        "select_copy_link": "\"Link kopieren\" auswählen"
+        "select_copy_link": "\"Link kopieren\" auswählen",
+        "gpx_err_access": "Auf die Datei konnte nicht zugegriffen werden. Versuche es erneut.",
+        "gpx_err_ext": "Die Datei muss die Endung .gpx haben (Wikiloc, Komoot, Garmin…)",
+        "gpx_err_none": "Wähle zuerst eine .gpx-Datei.",
+        "gpx_err_date": "Wähle ein Abfahrtsdatum.",
+        "mock_more": "Mehr"
     },
     "poi_picker": {
         "title": "Sehenswürdigkeiten",
@@ -881,5 +914,22 @@
         "destination_unknown": "Wir wissen nicht, wo dieses Ziel liegt, also lässt sich die Route nicht berechnen. Geh zurück und schreib es anders, mit der Provinz.",
         "lunch_kind_cafe": "Ein Kaffee",
         "lunch_kind_almuerzo": "Zweites Frühstück"
+    },
+    "errors": {
+        "save": "Speichern fehlgeschlagen.",
+        "weather": "Das Wetter konnte nicht aktualisiert werden.",
+        "share": "Teilen fehlgeschlagen.",
+        "join": "Anmeldung fehlgeschlagen.",
+        "tracking_start": "Die Aufzeichnung konnte nicht gestartet werden.",
+        "tracking_finish": "Die Route konnte nicht beendet werden.",
+        "image_upload": "Das Bild konnte nicht hochgeladen werden.",
+        "photo_upload": "Das Foto konnte nicht hochgeladen werden.",
+        "photo_delete": "Das Foto konnte nicht gelöscht werden.",
+        "import_route": "Die Route konnte nicht importiert werden.",
+        "import_gpx": "Die GPX-Datei konnte nicht importiert werden.",
+        "invalid_token": "Ungültiges Token.",
+        "reset": "Zurücksetzen fehlgeschlagen.",
+        "google_token": "Das Google-Token konnte nicht abgerufen werden.",
+        "google_login": "Anmeldung mit Google fehlgeschlagen."
     }
 }

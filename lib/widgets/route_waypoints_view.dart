@@ -355,8 +355,8 @@ class _FuelStopRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = total > 1
-        ? '⛽ Repostar a los $km km ($stopNumber/$total)'
-        : '⛽ Repostar a los $km km';
+        ? 'route_result.refuel_km_n'.tr(namedArgs: {'km': '$km', 'n': '$stopNumber', 'total': '$total'})
+        : 'route_result.refuel_km'.tr(namedArgs: {'km': '$km'});
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Column(children: [
         Container(

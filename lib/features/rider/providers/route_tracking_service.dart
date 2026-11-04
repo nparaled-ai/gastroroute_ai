@@ -41,7 +41,7 @@ class RouteTrackingService {
 
       return {'tracking': Map<String, dynamic>.from(response.data)};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al iniciar el tracking.'};
+      return {'error': e.response?.data['message'] ?? 'errors.tracking_start'.tr()};
     }
   }
 
@@ -56,7 +56,7 @@ class RouteTrackingService {
       );
       return {'tracking': Map<String, dynamic>.from(response.data)};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al finalizar la ruta.'};
+      return {'error': e.response?.data['message'] ?? 'errors.tracking_finish'.tr()};
     }
   }
 

@@ -36,7 +36,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
     'admin': {
       'label': 'Admin',
       'icon':  Icons.admin_panel_settings_outlined,
-      'desc':  'Panel de control',
+      'desc':  'auth.role_admin_desc'.tr(),
       'color': AppColors.gold,
     },
   };

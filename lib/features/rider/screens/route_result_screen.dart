@@ -468,8 +468,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     final color = critical ? AppColors.error : AppColors.gold;
     final icon  = critical ? Icons.warning_rounded : Icons.info_outline;
     final message = critical
-        ? '⛔ Ruta muy exigente para 1 día: ${distKm.toInt()} km / ${hours.toStringAsFixed(1)} h.'
-        : '⚠️ Ruta larga para 1 día: ${distKm.toInt()} km / ${hours.toStringAsFixed(1)} h.';
+        ? 'route_result.warn_very_long'.tr(namedArgs: {'km': '${distKm.toInt()}', 'h': hours.toStringAsFixed(1)})
+        : 'route_result.warn_long'.tr(namedArgs: {'km': '${distKm.toInt()}', 'h': hours.toStringAsFixed(1)});
 
     return Container(
       margin: const EdgeInsets.only(top: 12),
@@ -488,7 +488,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         ]),
         const SizedBox(height: 10),
         Row(children: [
-          Expanded(child: _ActionBtn(label: 'Regenerar más corta', icon: Icons.auto_awesome, color: color,
+          Expanded(child: _ActionBtn(label: 'route_result.regenerate_shorter'.tr(), icon: Icons.auto_awesome, color: color,
               onTap: () => context.go('/rider/route-generator', extra: {..._buildFormData(), 'duration_mode': 'ai'}))),
         ]),
         const SizedBox(height: 6),

@@ -109,7 +109,7 @@ class RouteService {
         'received': List<Map<String, dynamic>>.from(data['received'] ?? []),
       };
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -119,7 +119,7 @@ class RouteService {
       return {'route': response.data};
     } on DioException catch (e) {
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }
@@ -161,7 +161,7 @@ class RouteService {
       // departure_at_utc que se envía arriba.
       return {'route': route, 'message': response.data['message']};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al guardar.'};
+      return {'error': e.response?.data['message'] ?? 'errors.save'.tr()};
     }
   }
 
@@ -172,7 +172,7 @@ class RouteService {
       final response = await ApiClient.dio.get('/rider/routes/weather', queryParameters: params);
       return {'weather': response.data['weather']};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error al actualizar el clima.'};
+      return {'error': e.response?.data['message'] ?? 'errors.weather'.tr()};
     }
   }
 
@@ -184,7 +184,7 @@ class RouteService {
       return {'success': true, 'route': response.data['route']};
     } on DioException catch (e) {
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }

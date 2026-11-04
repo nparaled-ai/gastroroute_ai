@@ -49,7 +49,8 @@
         "forgot_password": "Forgot password?",
         "sign_in_google": "Continue with Google",
         "or": "or",
-        "splash_tagline": "ROUTES · COMMUNITY · PASSION"
+        "splash_tagline": "ROUTES · COMMUNITY · PASSION",
+        "role_admin_desc": "Control panel"
     },
     "home": {
         "welcome": "Welcome, rider!",
@@ -124,7 +125,11 @@
         "level_label": "Level",
         "zone_routes": "Public routes nearby",
         "zone_routes_desc": "Get notified when someone publishes a route near you",
-        "notify_radius": "Notification radius"
+        "notify_radius": "Notification radius",
+        "err_first_name": "First name is required.",
+        "err_last_name": "Last name is required.",
+        "err_location": "Location is required.",
+        "err_location_pick": "Pick a location from the suggestions list."
     },
     "motos": {
         "title": "My Bikes",
@@ -234,7 +239,21 @@
         "use_my_location": "Use my location",
         "search_place": "Search a place: a bar, a petrol station, a town...",
         "target_distance": "📏 Target distance: {km} km",
-        "ai_duration_desc": "The AI will work out the best duration from your points, bike and preferences."
+        "ai_duration_desc": "The AI will work out the best duration from your points, bike and preferences.",
+        "warn_hours_points": "⚠️ You have {hours} hours and {points} mandatory points. The route may exceed the available time. Consider adding more hours or letting the AI work it out.",
+        "warn_hours_points_soft": "⚠️ With {points} mandatory points and {hours} hours available the route may be tight. The AI will try to optimise it.",
+        "warn_km_points": "⚠️ You have {km} km and {points} mandatory points. The distance may not be enough. Consider adding more km or letting the AI work it out.",
+        "let_ai": "Let the AI decide",
+        "min_gap": "There must be at least 4 hours between the two meal stops. Earliest time for the second stop: {time}",
+        "point_empty": "Point {n} is empty. Fill it in or remove it.",
+        "point_not_validated": "Point {n} is not validated. Pick it from the suggestions list.",
+        "far_very": "Very far from the start — the route may come out wrong",
+        "far": "Far from the start — the route will be long",
+        "km_from_origin": "{km} km from the start",
+        "ai_decides": "The AI decides",
+        "by_hours": "By hours",
+        "by_km": "By km",
+        "stop_one_hour": "(stop ~1 hour)"
     },
     "route_result": {
         "title": "Generated Route",
@@ -300,7 +319,12 @@
         "share_action": "Share",
         "pick_one_friend": "Select at least one friend",
         "share_with_one": "Share with 1 friend",
-        "share_with_many": "Share with {n} friends"
+        "share_with_many": "Share with {n} friends",
+        "warn_very_long": "⛔ Very demanding route for 1 day: {km} km / {h} h.",
+        "warn_long": "⚠️ Long route for 1 day: {km} km / {h} h.",
+        "regenerate_shorter": "Regenerate shorter",
+        "refuel_km": "⛽ Refuel at {km} km",
+        "refuel_km_n": "⛽ Refuel at {km} km ({n}/{total})"
     },
     "verify_email": {
         "title": "Verify your email!",
@@ -634,7 +658,11 @@
         "save_for_me": "Save for myself",
         "save_for_me_desc": "Only you can see it, for now. It will appear in My Routes and you can share it later, before you ride.",
         "forget": "Dismiss",
-        "creator": "Creator"
+        "creator": "Creator",
+        "weather_prefix_forecast": "Forecast · ",
+        "weather_prefix_now": "Now · ",
+        "cannot_go": "❌ Can’t make it",
+        "all_friends_invited": "All your friends have already been invited."
     },
     "refine": {
         "title": "Fine-tune the route",
@@ -726,7 +754,12 @@
         "gpx_moto_for_gas": "Bike (for fuel stops)",
         "gpx_import": "Import GPX route",
         "tap_here": "Tap here",
-        "select_copy_link": "Choose \"Copy link\""
+        "select_copy_link": "Choose \"Copy link\"",
+        "gpx_err_access": "Could not access the file. Try again.",
+        "gpx_err_ext": "The file must have a .gpx extension (Wikiloc, Komoot, Garmin…)",
+        "gpx_err_none": "Select a .gpx file first.",
+        "gpx_err_date": "Select a departure date.",
+        "mock_more": "More"
     },
     "poi_picker": {
         "title": "Points of interest",
@@ -881,5 +914,22 @@
         "destination_unknown": "We do not know where that destination is, so the route cannot be drawn. Go back and write it another way, with the province.",
         "lunch_kind_cafe": "A coffee",
         "lunch_kind_almuerzo": "A proper bite"
+    },
+    "errors": {
+        "save": "Could not save.",
+        "weather": "Could not update the weather.",
+        "share": "Could not share.",
+        "join": "Could not sign up.",
+        "tracking_start": "Could not start tracking.",
+        "tracking_finish": "Could not finish the route.",
+        "image_upload": "Could not upload the image.",
+        "photo_upload": "Could not upload the photo.",
+        "photo_delete": "Could not delete the photo.",
+        "import_route": "Could not import the route.",
+        "import_gpx": "Could not import the GPX file.",
+        "invalid_token": "Invalid token.",
+        "reset": "Could not reset.",
+        "google_token": "Could not get the Google token.",
+        "google_login": "Could not sign in with Google."
     }
 }

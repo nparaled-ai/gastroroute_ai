@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import 'api_client.dart';
 import '../storage/auth_storage.dart';
@@ -52,7 +53,7 @@ class AuthService {
         };
       }
       return {
-        'error': data?['message'] ?? 'Error de conexión.',
+        'error': data?['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }
@@ -82,7 +83,7 @@ class AuthService {
 
     } on DioException catch (e) {
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }
@@ -116,7 +117,7 @@ class AuthService {
         return {'error': firstError};
       }
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }
@@ -126,7 +127,7 @@ class AuthService {
       final response = await ApiClient.dio.post('/auth/resend-verification', data: {'email': email});
       return {'success': true, 'message': response.data['message']};
     } on DioException catch (e) {
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 

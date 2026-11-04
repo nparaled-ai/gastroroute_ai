@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import '../../../core/api/api_client.dart';
 
@@ -8,7 +9,7 @@ class RiderProfileService {
       return {'profile': response.data};
     } on DioException catch (e) {
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }
@@ -23,7 +24,7 @@ class RiderProfileService {
         final firstError = (errors as Map).values.first[0];
         return {'error': firstError};
       }
-      return {'error': e.response?.data['message'] ?? 'Error de conexión.'};
+      return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     }
   }
 
@@ -33,7 +34,7 @@ class RiderProfileService {
       return {'motos': response.data};
     } on DioException catch (e) {
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }
@@ -44,7 +45,7 @@ class RiderProfileService {
       return {'moto': response.data};
     } on DioException catch (e) {
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }
@@ -55,7 +56,7 @@ class RiderProfileService {
       return {'moto': response.data};
     } on DioException catch (e) {
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }
@@ -66,7 +67,7 @@ class RiderProfileService {
       return {'success': true};
     } on DioException catch (e) {
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }
@@ -77,7 +78,7 @@ class RiderProfileService {
       return {'success': true, 'moto': response.data['moto']};
     } on DioException catch (e) {
       return {
-        'error': e.response?.data['message'] ?? 'Error de conexión.',
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
       };
     }
   }

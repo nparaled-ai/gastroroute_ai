@@ -53,11 +53,11 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
     if (result != null && result.files.isNotEmpty) {
       final file = result.files.first;
       if (file.path == null) {
-        setState(() => _error = 'No se pudo acceder al archivo. Inténtalo de nuevo.');
+        setState(() => _error = 'import.gpx_err_access'.tr());
         return;
       }
       if (!file.name.toLowerCase().endsWith('.gpx')) {
-        setState(() => _error = 'El archivo debe tener extensión .gpx (Wikiloc, Komoot, Garmin…)');
+        setState(() => _error = 'import.gpx_err_ext'.tr());
         return;
       }
       setState(() {
@@ -69,11 +69,11 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
 
   Future<void> _import() async {
     if (_selectedFilePath == null) {
-      setState(() => _error = 'Selecciona un archivo .gpx primero.');
+      setState(() => _error = 'import.gpx_err_none'.tr());
       return;
     }
     if (_departureDate == null) {
-      setState(() => _error = 'Selecciona una fecha de salida.');
+      setState(() => _error = 'import.gpx_err_date'.tr());
       return;
     }
 
@@ -220,7 +220,7 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
                     const Icon(Icons.event, color: AppColors.cyan, size: 18),
                     const SizedBox(width: 8),
                     Text(
-                      _departureDate ?? 'Fecha de salida',
+                      _departureDate ?? 'import.departure_date'.tr(),
                       style: TextStyle(
                         color: _departureDate != null ? AppColors.cyan : AppColors.grey,
                         fontSize: 13, fontWeight: FontWeight.w600,
