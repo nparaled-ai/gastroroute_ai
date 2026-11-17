@@ -1,9 +1,11 @@
+import '../../../widgets/long_day_notice.dart';
 import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/highways_maps_notice.dart';
 import '../../../widgets/place_sheet.dart';
 import '../providers/rider_profile_service.dart';
 import '../providers/route_assistant_service.dart';
@@ -459,6 +461,12 @@ class _RouteAssistantRefineScreenState
             const SizedBox(height: 6),
             _estimateWarning(estimated),
           ],
+
+          // Y si lo pedido es demasiado para un día, que lo sepa antes de generar.
+          LongDayNotice(
+            km: _fields['duration_mode'] == 'km' ? _toDouble(_fields['km']) : null,
+            hours: _fields['duration_mode'] == 'hours' ? _toDouble(_fields['hours']) : null,
+          ),
 
           const SizedBox(height: 14),
 
@@ -1214,6 +1222,7 @@ class _RouteAssistantRefineScreenState
           onText: 'assistant.v_avoid'.tr(),
           offText: 'assistant.v_highways'.tr(),
         ),
+        if (_fields['avoid_highways'] == false) const HighwaysMapsNotice(),
 
         // Las gasolineras solo se pueden calcular con el depósito y el
         // consumo de la moto. Sin esos datos la fila se queda apagada y dice

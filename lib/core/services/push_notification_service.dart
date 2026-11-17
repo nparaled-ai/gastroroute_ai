@@ -1,9 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../features/rider/providers/app_notification_service.dart';
+import '../api/auth_service.dart';
 import '../router.dart';
+import '../storage/auth_storage.dart';
+import 'route_tracking_manager.dart';
 
 // Handler para mensajes en background (top-level, fuera de clase)
 @pragma('vm:entry-point')
@@ -23,6 +27,45 @@ class PushNotificationService {
     sound: RawResourceAndroidNotificationSound('sound_moto'),
   );
 
+  /// Canal de los avisos de Moderación: SIN sonido propio, para que Android use el
+  /// tono de notificación estándar del móvil y no el de la moto.
+  static const _moderationChannel = AndroidNotificationChannel(
+    'gastroroute_moderation',
+    'Moderación',
+    importance: Importance.high,
+  );
+
+  /// Vuelve a crear el canal con el texto en el idioma del motero.
+  ///
+  /// `init()` corre antes de `runApp`, cuando aún no hay idioma cargado y `.tr()`
+  /// devolvería la clave. Android actualiza nombre y descripción de un canal que
+  /// ya existe (no su importancia), así que basta con crearlo otra vez.
+  static Future<void> refreshChannelTexts() async {
+    try {
+      await _fln
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(AndroidNotificationChannel(
+            _androidChannel.id,
+            _androidChannel.name,
+            description: 'channels.default_desc'.tr(),
+            importance: _androidChannel.importance,
+            sound: _androidChannel.sound,
+          ));
+      await _fln
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(AndroidNotificationChannel(
+            _moderationChannel.id,
+            'channels.moderation'.tr(),
+            description: 'channels.moderation_desc'.tr(),
+            importance: _moderationChannel.importance,
+          ));
+    } catch (e) {
+      debugPrint('[push] no se pudo actualizar el texto del canal: $e');
+    }
+  }
+
   /// Al pulsar una notificación local (app en primer plano).
   static void _onNotificationTapped(NotificationResponse response) {
     final payload = response.payload;
@@ -33,6 +76,11 @@ class PushNotificationService {
     // el botón de finalizar y el resumen.
     if (payload == 'tracking') {
       router.push('/rider/tracking');
+      return;
+    }
+
+    if (payload == 'moderation') {
+      openModeration();
       return;
     }
 
@@ -49,6 +97,32 @@ class PushNotificationService {
   /// del router aún no ha decidido si el motero tiene sesión. Se guarda aquí y
   /// la pantalla de inicio la consume cuando ya puede navegar de verdad.
   static int? _pendingRouteId;
+
+  /// Un aviso de Moderación pulsado con la app cerrada: se abrirá cuando la app esté lista.
+  static bool _pendingModeration = false;
+
+  static bool consumePendingModeration() {
+    final p = _pendingModeration;
+    _pendingModeration = false;
+    return p;
+  }
+
+  /// Lleva a la cola de comentarios, cambiando antes al perfil de administración
+  /// (o de moderador) si se estaba en otro. No cambia de perfil mientras se graba
+  /// una ruta.
+  static Future<void> openModeration() async {
+    if (RouteTrackingManager.instance.isTracking) return;
+    final role = await AuthStorage.getRole();
+    if (role != 'admin' && role != 'moderator') {
+      var r = await AuthService.switchRole('admin');
+      if (r['success'] != true) r = await AuthService.switchRole('moderator');
+      if (r['success'] != true) return;
+    }
+    router.go('/admin/moderation');
+    router.push('/admin/moderation/comments');
+  }
+
+  static bool _isModeration(RemoteMessage m) => m.data['screen'] == 'moderation';
 
   /// Devuelve la ruta pendiente y la olvida, para que no se abra dos veces.
   static int? consumePendingRoute() {
@@ -101,6 +175,10 @@ class PushNotificationService {
     // Al tocar un push que llega con la app en segundo plano.
     FirebaseMessaging.onMessageOpenedApp.listen((m) {
       debugPrint('[push] toque con app en SEGUNDO PLANO, data=${m.data}');
+      if (_isModeration(m)) {
+        openModeration();
+        return;
+      }
       _openRoute(_routeIdOf(m));
     });
 
@@ -113,31 +191,48 @@ class PushNotificationService {
     final initial = await _messaging.getInitialMessage();
     debugPrint('[push] arranque: getInitialMessage='
         '${initial == null ? "null (no se abrio desde un push)" : "data=${initial.data}"}');
-    if (initial != null) _pendingRouteId = _routeIdOf(initial);
+    if (initial != null) {
+      if (_isModeration(initial)) {
+        _pendingModeration = true;
+      } else {
+        _pendingRouteId = _routeIdOf(initial);
+      }
+    }
 
     // Mensaje en primer plano → mostrar notificación local
     FirebaseMessaging.onMessage.listen((message) {
       final notification = message.notification;
       if (notification == null) return;
       final routeId = _routeIdOf(message);
+      final moderacion = _isModeration(message);
       _fln.show(
         notification.hashCode,
         notification.title,
         notification.body,
         NotificationDetails(
-          android: AndroidNotificationDetails(
-            _androidChannel.id,
-            _androidChannel.name,
-            channelDescription: _androidChannel.description,
-            importance: Importance.high,
-            priority: Priority.high,
-            icon: '@mipmap/ic_launcher',
-            sound: const RawResourceAndroidNotificationSound('sound_moto'),
-          ),
-          iOS: const DarwinNotificationDetails(sound: 'sound_moto.mp3'),
+          android: moderacion
+              ? AndroidNotificationDetails(
+                  _moderationChannel.id,
+                  _moderationChannel.name,
+                  importance: Importance.high,
+                  priority: Priority.high,
+                  icon: '@mipmap/ic_launcher',
+                )
+              : AndroidNotificationDetails(
+                  _androidChannel.id,
+                  _androidChannel.name,
+                  channelDescription: _androidChannel.description,
+                  importance: Importance.high,
+                  priority: Priority.high,
+                  icon: '@mipmap/ic_launcher',
+                  sound: const RawResourceAndroidNotificationSound('sound_moto'),
+                ),
+          iOS: moderacion
+              ? const DarwinNotificationDetails()
+              : const DarwinNotificationDetails(sound: 'sound_moto.mp3'),
         ),
-        // Para que tocarla lleve a la ruta también en primer plano.
-        payload: routeId == null ? null : 'route:$routeId',
+        // Para que tocarla lleve a la ruta (o a Moderación) también en primer plano.
+        payload: moderacion ? 'moderation' : (routeId == null ? null : 'route:$routeId'),
       );
     });
 

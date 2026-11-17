@@ -27,6 +27,7 @@ class GoogleAuthService {
       if (data['select_role'] == true) {
         return {
           'select_role': true,
+          'selection_token': data['selection_token'],
           'user_id': data['user_id'],
           'roles': data['roles'],
         };

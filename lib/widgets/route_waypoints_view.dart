@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
+import '../features/rider/providers/route_service.dart';
 
 /// Widget compartido para mostrar waypoints, paradas y clima
 /// Usado tanto en route_result_screen como en route_detail_screen
@@ -149,11 +151,15 @@ class RouteWaypointsView extends StatelessWidget {
       if (wpName.contains('repostaje') || wpName.contains('gasolinera') ||
           wpName.contains('repostar') || wpNote.contains('repostar antes')) continue;
 
-      if (_dinnerStop != null && (wpName.contains('comida') || wpName.contains('comer') ||
+      // Lo que manda es la marca `type` que pone el servidor (idioma aparte): las
+      // palabras de abajo son el respaldo de las rutas guardadas antes de ella.
+      final tipo = (wp['type'] ?? '').toString();
+
+      if (_dinnerStop != null && (tipo == 'comida' || wpName.contains('comida') || wpName.contains('comer') ||
           wpName.contains('dinner') || wpNote.contains('parada para comer') ||
           wpNote.contains('comida'))) continue;
 
-      if (_lunchStop != null && (wpName.contains('almuerzo') || wpName.contains('lunch') ||
+      if (_lunchStop != null && (tipo == 'almuerzo' || wpName.contains('almuerzo') || wpName.contains('lunch') ||
           wpNote.contains('almuerzo') || wpNote.contains('parada para almorzar'))) continue;
 
       final isFirst = i == 0;
@@ -179,7 +185,9 @@ class RouteWaypointsView extends StatelessWidget {
           lunchInserted = true;
           items.add(_MealStopRow(
             icon: Icons.restaurant_outlined, color: AppColors.orange,
-            location: _lunchStop!['location'] ?? '', suggestion: _lunchStop!['suggestion'] ?? '',
+            location: _lunchStop!['location'] ?? '',
+            eatery: _lunchStop!['eatery'] is Map ? Map<String, dynamic>.from(_lunchStop!['eatery']) : null,
+            suggestion: _lunchStop!['suggestion'] ?? '',
             time: _lunchStop!['estimated_time'],
             label: 'route_result.lunch_stop'.tr(),
           ));
@@ -194,7 +202,9 @@ class RouteWaypointsView extends StatelessWidget {
           dinnerInserted = true;
           items.add(_MealStopRow(
             icon: Icons.dinner_dining, color: AppColors.cyan,
-            location: _dinnerStop!['location'] ?? '', suggestion: _dinnerStop!['suggestion'] ?? '',
+            location: _dinnerStop!['location'] ?? '',
+            eatery: _dinnerStop!['eatery'] is Map ? Map<String, dynamic>.from(_dinnerStop!['eatery']) : null,
+            suggestion: _dinnerStop!['suggestion'] ?? '',
             time: _dinnerStop!['estimated_time'],
             label: 'route_result.dinner_stop'.tr(),
           ));
@@ -336,9 +346,15 @@ class _WaypointRow extends StatelessWidget {
                 'minutes': '${wp['estimated_minutes_from_start']}'
               }),
               color: AppColors.grey),
-        if (weather != null) ...[
+        // El tiempo de ESTE punto a su hora de paso, si el servidor lo manda;
+        // si no, el general de la ruta.
+        if ((wp['weather'] ?? weather) != null) ...[
           const SizedBox(width: 6),
-          _WeatherBadge(weather: weather),
+          _WeatherBadge(
+            weather: wp['weather'] is Map
+                ? Map<String, dynamic>.from(wp['weather'])
+                : weather,
+          ),
         ],
       ]),
     ]);
@@ -391,9 +407,13 @@ class _MealStopRow extends StatelessWidget {
   final String suggestion;
   final String? time;
   final String label;
+
+  /// El bar o restaurante concreto, si lo conocemos (norma 21): es el que se
+  /// valora al terminar la ruta, así que hay que poder saber cuál es.
+  final Map<String, dynamic>? eatery;
   const _MealStopRow({
     required this.icon, required this.color, required this.location,
-    required this.suggestion, required this.label, this.time,
+    required this.suggestion, required this.label, this.time, this.eatery,
   });
 
   @override
@@ -439,6 +459,39 @@ class _MealStopRow extends StatelessWidget {
             if (location.isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(location, style: const TextStyle(color: AppColors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+            ],
+            if (eatery != null && '${eatery!['name'] ?? ''}'.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text('${eatery!['name']}',
+                  style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 2),
+              // Las estrellas de los moteros junto al sitio, y el botón para leer
+              // lo que han dejado escrito (norma 21).
+              Row(children: [
+                if (eatery!['rating'] != null) ...[
+                  const Icon(Icons.star, color: AppColors.gold, size: 14),
+                  const SizedBox(width: 3),
+                  Text(
+                    '${(eatery!['rating'] as num).toStringAsFixed(1)} (${eatery!['votes'] ?? 0})',
+                    style: const TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ] else
+                  Text('rating.no_votes'.tr(),
+                      style: const TextStyle(color: AppColors.grey, fontSize: 11)),
+                if (eatery!['parking'] == true) ...[
+                  const SizedBox(width: 8),
+                  const Icon(Icons.two_wheeler, color: AppColors.cyan, size: 14),
+                ],
+                const Spacer(),
+                if (eatery!['id'] != null)
+                  GestureDetector(
+                    onTap: () => _showOpinions(context, (eatery!['id'] as num).toInt()),
+                    child: Text('rating.see_opinions'.tr(),
+                        style: TextStyle(
+                            color: color, fontSize: 12, fontWeight: FontWeight.w700,
+                            decoration: TextDecoration.underline)),
+                  ),
+              ]),
             ],
             if (suggestion.isNotEmpty) ...[
               const SizedBox(height: 2),
@@ -522,4 +575,199 @@ class _WeatherBadge extends StatelessWidget {
       ]),
     );
   }
+}
+
+
+/// Lo que dicen los moteros de un sitio de comer: media, aparcamiento y los
+/// comentarios que han pasado la moderación.
+Future<void> _showOpinions(BuildContext context, int eateryId) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: AppColors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (ctx) => _OpinionsSheet(eateryId: eateryId),
+  );
+}
+
+/// La hoja de opiniones: los comentarios llegan de 20 en 20 y la siguiente tanda
+/// se pide sola al acercarse al final de la lista.
+class _OpinionsSheet extends StatefulWidget {
+  final int eateryId;
+  const _OpinionsSheet({required this.eateryId});
+
+  @override
+  State<_OpinionsSheet> createState() => _OpinionsSheetState();
+}
+
+class _OpinionsSheetState extends State<_OpinionsSheet> {
+  Map<String, dynamic>? _data;
+  final List _comments = [];
+  bool _loading = true;
+  bool _loadingMore = false;
+  bool _hasMore = false;
+  int _page = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _first();
+  }
+
+  Future<void> _first() async {
+    final d = await RouteService.eateryOpinions(widget.eateryId);
+    if (!mounted) return;
+    setState(() {
+      _data = d;
+      _comments
+        ..clear()
+        ..addAll(d == null ? const [] : (d['comments'] as List? ?? const []));
+      _hasMore = d?['has_more'] == true;
+      _loading = false;
+    });
+  }
+
+  Future<void> _more() async {
+    if (_loading || _loadingMore || !_hasMore) return;
+    setState(() => _loadingMore = true);
+    final d = await RouteService.eateryOpinions(widget.eateryId, page: _page + 1);
+    if (!mounted) return;
+    setState(() {
+      if (d != null) {
+        _page++;
+        _comments.addAll(d['comments'] as List? ?? const []);
+        _hasMore = d['has_more'] == true;
+      }
+      _loadingMore = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final d = _data;
+    final comments = _comments;
+
+    return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
+          builder: (ctx, scroll) => Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : d == null
+                    ? Center(
+                        child: Text('rating.opinions_error'.tr(),
+                            style: const TextStyle(color: AppColors.grey)))
+                    : NotificationListener<ScrollNotification>(
+                        onNotification: (n) {
+                          if (n.metrics.extentAfter < 300) _more();
+                          return false;
+                        },
+                        child: ListView(controller: scroll, children: [
+                        Text('${d['name']}',
+                            style: const TextStyle(
+                                color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 6),
+                        Row(children: [
+                          if (d['rating'] != null) ...[
+                            const Icon(Icons.star, color: AppColors.gold, size: 18),
+                            const SizedBox(width: 4),
+                            Text('${(d['rating'] as num).toStringAsFixed(1)} · '
+                                '${'rating.votes'.tr(namedArgs: {'n': '${d['votes']}'})}'
+                                ' · ${'rating.comments_count'.tr(namedArgs: {'n': '${d['total_comments'] ?? comments.length}'})}',
+                                style: const TextStyle(color: AppColors.white, fontSize: 14)),
+                          ] else
+                            Text('rating.no_votes'.tr(),
+                                style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                        ]),
+                        if ((d['parking_yes'] ?? 0) + (d['parking_no'] ?? 0) > 0) ...[
+                          const SizedBox(height: 6),
+                          Row(children: [
+                            const Icon(Icons.two_wheeler, color: AppColors.cyan, size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              'rating.parking_summary'.tr(namedArgs: {
+                                'yes': '${d['parking_yes']}',
+                                'total': '${(d['parking_yes'] as num) + (d['parking_no'] as num)}',
+                              }),
+                              style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                            ),
+                          ]),
+                        ],
+                        const Divider(height: 24, color: AppColors.greyDark),
+                        if (comments.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: Text('rating.no_comments'.tr(),
+                                style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                          ),
+                        for (final c in comments)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Row(children: [
+                                if (c['stars'] != null) ...[
+                                  for (var i = 1; i <= 5; i++)
+                                    Icon(i <= (c['stars'] as num) ? Icons.star : Icons.star_border,
+                                        color: AppColors.gold, size: 13),
+                                  const SizedBox(width: 8),
+                                ],
+                                Expanded(
+                                  child: Text(
+                                    // Cuándo ESTUVO allí (la fecha de la rodada), que es lo que
+                                    // da confianza; si no se conoce, cuándo lo escribió.
+                                    '${c['nickname'] ?? 'rating.anonymous'.tr()} · ${_fechaVisita(context, c)}',
+                                    style: const TextStyle(color: AppColors.grey, fontSize: 11),
+                                  ),
+                                ),
+                              ]),
+                              if (c['parked'] != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Row(children: [
+                                    const Icon(Icons.two_wheeler, color: AppColors.cyan, size: 14),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      (c['parked'] == true ? 'moderation.parking_yes' : 'moderation.parking_no').tr(),
+                                      style: const TextStyle(color: AppColors.grey, fontSize: 11),
+                                    ),
+                                  ]),
+                                ),
+                              const SizedBox(height: 4),
+                              Text('${c['comment']}',
+                                  style: const TextStyle(
+                                      color: AppColors.white, fontSize: 13, height: 1.4)),
+                              if (c['translated'] == true && c['original'] != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text('rating.original'.tr(namedArgs: {'text': '${c['original']}'}),
+                                      style: const TextStyle(
+                                          color: AppColors.grey, fontSize: 11, fontStyle: FontStyle.italic)),
+                                ),
+                            ]),
+                          ),
+                        if (_loadingMore)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                          ),
+                      ])),
+          ),
+        );
+  }
+}
+
+/// «Estuvo el 2 nov 2026» si se conoce el día de la rodada; si no, la fecha del comentario.
+String _fechaVisita(BuildContext context, Map c) {
+  final iso = '${c['visited_on'] ?? ''}';
+  final d = DateTime.tryParse(iso);
+  if (d != null) {
+    return 'rating.visited_on'.tr(
+      namedArgs: {'date': DateFormat.yMMMd(context.locale.toString()).format(d)},
+    );
+  }
+  return '${c['date'] ?? ''}';
 }

@@ -1,3 +1,4 @@
+import '../../../core/role_home.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -81,7 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (result['success'] == true) {
       final role = result['role'];
       PushNotificationService.registerToken();
-      if (role == 'rider') context.go('/rider/home');
+      final home = homeForRole(role);
+      if (home != null) context.go(home);
     }
   }
 
@@ -106,12 +108,14 @@ class _LoginScreenState extends State<LoginScreen> {
         'user_id': result['user_id'],
         'roles':   result['roles'],
         'password': '',
+        'selection_token': result['selection_token'],
       });
       return;
     }
     if (result['success'] == true) {
       PushNotificationService.registerToken();
-      if (result['role'] == 'rider') context.go('/rider/home');
+      final home = homeForRole(result['role']);
+      if (home != null) context.go(home);
     }
   }
 

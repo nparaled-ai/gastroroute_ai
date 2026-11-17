@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/labels.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/rider_avatar.dart';
 import '../providers/friendship_service.dart';
@@ -324,13 +325,7 @@ class _FriendCardWithActions extends StatelessWidget {
     }
   }
 
-  String _levelLabel(String? level) {
-    switch (level) {
-      case 'experto':    return 'EXPERTO';
-      case 'intermedio': return 'INTER.';
-      default:           return 'NOVATO';
-    }
-  }
+  String _levelLabel(String? level) => levelLabel(level);
 
   @override
   Widget build(BuildContext context) {
@@ -444,13 +439,7 @@ class _FriendCard extends StatelessWidget {
     }
   }
 
-  String _levelLabel(String? level) {
-    switch (level) {
-      case 'experto':    return 'EXPERTO';
-      case 'intermedio': return 'INTER.';
-      default:           return 'NOVATO';
-    }
-  }
+  String _levelLabel(String? level) => levelLabel(level);
 
   @override
   Widget build(BuildContext context) {

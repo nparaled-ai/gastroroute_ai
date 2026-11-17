@@ -41,6 +41,9 @@ class AuthStorage {
     await _storage.write(key: _keyRole,   value: role);
   }
 
+  static Future<String?> getEmail() async =>
+      await _storage.read(key: _keyEmail);
+
   static Future<void> saveLanguage(String lang) async =>
       await _storage.write(key: _keyLanguage, value: lang);
 

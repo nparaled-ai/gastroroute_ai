@@ -51,7 +51,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   /// Generosa por detrás: es normal salir con retraso, y el motero que abre la
   /// app una hora tarde sigue queriendo grabar su ruta.
   static const _startWindowBefore = Duration(minutes: 30);
-  static const _startWindowAfter  = Duration(hours: 2);
+  static const _startWindowAfter  = Duration(hours: 3);
 
   /// Distancia máxima al origen para dar por hecho que se está saliendo.
   ///
@@ -136,6 +136,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     });
 
     _offerStartIfDeparting();
+    _checkDistanceToStart();
   }
 
   /// Si el motero está en el origen y a la hora, le ofrece empezar a grabar.
@@ -149,6 +150,67 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   /// nadie lo haya pedido sorprende, y es de las cosas que acaban en malas
   /// reseñas. El diálogo deja «Empezar» como acción principal, así que sigue
   /// siendo un solo toque.
+  /// A cuántos metros está el motero del punto de salida (null = no se sabe: sin permiso de
+  /// ubicación o sin GPS). Sirve para esconder «Cómo llegar a la salida» cuando ya estás allí.
+  double? _metresToStart;
+
+  /// Mide la distancia al punto de salida SIN pedir permiso: si el motero no lo ha dado, no se
+  /// le pregunta por sorpresa al abrir una ruta (el botón se enseña igual).
+  Future<void> _checkDistanceToStart() async {
+    final lat = _coord(_route?['origin_lat']);
+    final lng = _coord(_route?['origin_lng']);
+    if (lat == null || lng == null) return;
+
+    final permission = await Geolocator.checkPermission();
+    if (permission != LocationPermission.always && permission != LocationPermission.whileInUse) return;
+
+    try {
+      final p = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+      ).timeout(const Duration(seconds: 8));
+      if (!mounted) return;
+      setState(() => _metresToStart = RouteTrackingManager.haversine(p.latitude, p.longitude, lat, lng));
+    } catch (_) {
+      // Sin posición fiable el botón se enseña igual.
+    }
+  }
+
+  /// «Cómo llegar a la salida»: para quien va a hacer la ruta (suya o apuntado), mientras no
+  /// se haya rodado ni pasado el margen, si la salida tiene coordenadas y NO viene del catálogo
+  /// (esas ya llevan su propio tramo de acercamiento desde donde estás). Y no se enseña si ya estás
+  /// a menos de 1 km de la salida.
+  bool get _canGetToStart =>
+      (_isOwner || _isJoined) &&
+      !_hasBeenRidden &&
+      !_startWindowClosed &&
+      _route?['source_type'] != 'catalog' &&
+      _route?['catalog_route_id'] == null &&
+      _coord(_route?['origin_lat']) != null &&
+      _coord(_route?['origin_lng']) != null &&
+      !(_metresToStart != null && _metresToStart! < _startNearOriginM);
+
+  /// Abre Google Maps con la ruta en coche/moto desde TU posición hasta el punto de salida
+  /// (sin `origin`: Maps usa dónde estás).
+  Future<void> _openGetToStart() async {
+    final lat = _coord(_route?['origin_lat']);
+    final lng = _coord(_route?['origin_lng']);
+    if (lat == null || lng == null) return;
+    final uri = Uri.https('www.google.com', '/maps/dir/', {
+      'api': '1',
+      'destination': '$lat,$lng',
+      'travelmode': 'driving',
+    });
+    if (!await canLaunchUrl(uri)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('route_detail.maps_unavailable'.tr()),
+        backgroundColor: AppColors.error,
+      ));
+      return;
+    }
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
   Future<void> _offerStartIfDeparting() async {
     if (_startOffered || !mounted || _route == null) return;
 
@@ -419,6 +481,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         double.tryParse(lat.toString()) ?? lat,
         double.tryParse(lng.toString()) ?? lng,
         date: date,
+        time: _route!['departure_time'],
       );
       freshWeather = weatherResult['weather'];
     }
@@ -434,10 +497,37 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       await _showRemovedMeals(removedMeals);
     }
 
+    // El tiempo de cada punto, el de la FECHA NUEVA. Los puntos de la ruta vieja
+    // traen el suyo (de la fecha de entonces): se quita de lo que se guarda y se
+    // pide de nuevo solo para pintar.
+    final wps = saveData['waypoints'];
+    var routeView = saveData;
+    if (wps is List) {
+      final limpios = [
+        for (final w in wps)
+          if (w is Map) (Map<String, dynamic>.from(w)..remove('weather')) else w,
+      ];
+      saveData['waypoints'] = limpios;
+      final porPunto = await RouteService.refreshWaypointsWeather(limpios,
+          date: date, time: time);
+      routeView = Map<String, dynamic>.from(saveData);
+      routeView['waypoints'] = [
+        for (var i = 0; i < limpios.length; i++)
+          if (limpios[i] is Map)
+            {
+              ...Map<String, dynamic>.from(limpios[i] as Map),
+              if (porPunto.length == limpios.length && porPunto[i] != null)
+                'weather': porPunto[i],
+            }
+          else
+            limpios[i],
+      ];
+    }
+
     // Navegar a la pantalla de resultado igual que una ruta nueva
     if (!mounted) return;
     context.push('/rider/route-result', extra: {
-      'route': saveData,
+      'route': routeView,
       'weather': freshWeather,
       'ai_summary': saveData['ai_summary'],
       'form_data': {},
@@ -726,11 +816,22 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     final date = _route?['departure_date'];
     if (lat == null || lng == null) return;
     setState(() => _refreshingWeather = true);
-    final result = await RouteService.refreshWeather(lat, lng, date: date);
+    final result = await RouteService.refreshWeather(lat, lng,
+        date: date, time: _route?['departure_time']);
+    final wps = _route?['waypoints'];
+    final porPunto = wps is List
+        ? await RouteService.refreshWaypointsWeather(wps,
+            date: date, time: _route?['departure_time'])
+        : const [];
     if (!mounted) return;
     setState(() {
       _refreshingWeather = false;
       if (result['weather'] != null) _currentWeather = result['weather'];
+      if (wps is List && porPunto.length == wps.length) {
+        for (var i = 0; i < wps.length; i++) {
+          if (wps[i] is Map) wps[i]['weather'] = porPunto[i];
+        }
+      }
     });
     if (result['weather']?['is_forecast'] == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -768,6 +869,165 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     if (!mounted) return;
     setState(() => _publishing = false);
     _handleShareResult(result);
+  }
+
+  /// Pide publicar esta ruta rodada en Rutas moteras. La revisa el administrador.
+  Future<void> _requestPublication() async {
+    setState(() => _publishing = true);
+
+    // ¿Ya hay en Rutas moteras alguna parecida? Se avisa; publicar sigue siendo posible.
+    final parecidas = await RouteService.similarForPublish(_route!['id']);
+    if (!mounted) return;
+    if (parecidas.isNotEmpty) {
+      setState(() => _publishing = false);
+      final seguir = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text('catalog.pub_similar_title'.tr(),
+              style: const TextStyle(color: AppColors.white, fontSize: 17)),
+          content: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('catalog.pub_similar_body'.tr(),
+                  style: const TextStyle(color: AppColors.greyText, fontSize: 14)),
+              const SizedBox(height: 12),
+              for (final s in parecidas)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: InkWell(
+                    onTap: () => context.push('/rider/catalog/${s['id']}'),
+                    child: Row(children: [
+                      const Icon(Icons.alt_route, color: AppColors.cyan, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${s['name']} · ${'catalog.km_short'.tr(namedArgs: {'km': '${s['km']}'})} · '
+                          '${'catalog.sim_pct'.tr(namedArgs: {'pct': '${s['similarity']}'})}',
+                          style: const TextStyle(color: AppColors.white, fontSize: 13),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+            ]),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('common.cancel'.tr())),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('catalog.pub_similar_confirm'.tr(),
+                    style: const TextStyle(color: AppColors.orange))),
+          ],
+        ),
+      );
+      if (seguir != true || !mounted) return;
+      setState(() => _publishing = true);
+    }
+
+    final result = await RouteService.publishRoute(_route!['id'], 'public');
+    if (!mounted) return;
+    setState(() => _publishing = false);
+
+    if (result['error'] != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${result['error']}'), backgroundColor: AppColors.error));
+      return;
+    }
+    // El servidor deja la ruta pendiente de revisión.
+    final r = Map<String, dynamic>.from(result['route'] as Map? ?? {});
+    setState(() {
+      _route!['publication_status'] = r['publication_status'] ?? 'pending';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('catalog.publish_pending'.tr())));
+  }
+
+  /// El estado de la publicación en Rutas moteras, o el botón para pedirla.
+  Widget _buildPublicationBlock() {
+    final status = _route?['publication_status'] as String?;
+
+    // Una ruta guardada desde «Rutas moteras» ya está en el catálogo: no se vuelve a publicar;
+    // se valora en su ficha.
+    final catalogId = _route?['catalog_route_id'];
+    if (catalogId != null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.cyan.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.landscape_outlined, color: AppColors.cyan, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text('catalog.already_in_catalog'.tr(),
+                  style: const TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700)),
+            ),
+          ]),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => context.push('/rider/catalog/$catalogId'),
+              child: Text('catalog.see_in_catalog'.tr()),
+            ),
+          ),
+        ]),
+      );
+    }
+
+    if (status == 'pending' || status == 'approved') {
+      final approved = status == 'approved';
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: (approved ? AppColors.cyan : AppColors.gold).withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(children: [
+          Icon(approved ? Icons.verified_outlined : Icons.hourglass_top,
+              color: approved ? AppColors.cyan : AppColors.gold, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              (approved ? 'catalog.publish_published' : 'catalog.publish_pending').tr(),
+              style: TextStyle(
+                  color: approved ? AppColors.cyan : AppColors.gold,
+                  fontWeight: FontWeight.w700),
+            ),
+          ),
+        ]),
+      );
+    }
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      if (status == 'rejected')
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(
+            '${'catalog.publish_rejected'.tr()}'
+            '${(_route?['publication_reason'] ?? '').toString().isNotEmpty ? ': ${_route!['publication_reason']}' : ''}',
+            style: const TextStyle(color: AppColors.error, fontSize: 13),
+          ),
+        ),
+      OutlinedButton.icon(
+        onPressed: _publishing ? null : _requestPublication,
+        icon: const Icon(Icons.landscape_outlined, color: AppColors.cyan),
+        label: Text('catalog.publish'.tr(), style: const TextStyle(color: AppColors.cyan)),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 48),
+          side: const BorderSide(color: AppColors.cyan),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: Text('catalog.publish_help'.tr(),
+            style: const TextStyle(color: AppColors.greyText, fontSize: 12, height: 1.4)),
+      ),
+    ]);
   }
 
   Future<void> _sharePublic() async {
@@ -843,7 +1103,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       (_isOwner || _isJoined) &&
       (_isPast || _hasBeenRidden || _startWindowClosed);
 
-  /// Ya se paso el margen para arrancar esta ruta: la hora de salida + 2 h.
+  /// Ya se paso el margen para arrancar esta ruta: la hora de salida + 3 h (antes 2 h; cambiado el 17-11-2026).
   ///
   /// Decidido el 04-11-2026. Hasta hoy el boton de iniciar estaba disponible
   /// todo el dia de la ruta, asi que una de las 09:00 se podia arrancar a las
@@ -1176,6 +1436,22 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                           ]),
                     ),
 
+                    // ── Cómo llegar a la salida ───────────────────────
+                    if (_canGetToStart) ...[
+                      const SizedBox(height: 10),
+                      OutlinedButton.icon(
+                        onPressed: _openGetToStart,
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 48),
+                          side: const BorderSide(color: AppColors.cyan),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        icon: const Icon(Icons.navigation_outlined, color: AppColors.cyan, size: 20),
+                        label: Text('route_detail.get_to_start'.tr(),
+                            style: const TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+
                     // ── Botón descargar GPX ───────────────────────────
                     if (_route?['source_type'] == 'gpx') ...[
                       const SizedBox(height: 10),
@@ -1308,6 +1584,15 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                             ),
                           ],
                         ]),
+                    ],
+
+                    // ── Publicar en Rutas moteras (ruta propia YA RODADA) ──
+                    // Enseñar el recorrido de una ruta hecha para que otros la
+                    // repitan es otra cosa que compartir: pasa por el
+                    // administrador antes de verse (decidido el 10-10-2026).
+                    if (_isOwner && _hasBeenRidden) ...[
+                      const SizedBox(height: 12),
+                      _buildPublicationBlock(),
                     ],
 
                     // ── Compartir (ruta propia y privada, aún por hacer) ──

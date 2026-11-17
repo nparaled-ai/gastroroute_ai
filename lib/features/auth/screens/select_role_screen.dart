@@ -1,3 +1,5 @@
+import '../../../core/services/push_notification_service.dart';
+import '../../../core/role_home.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +11,16 @@ class SelectRoleScreen extends StatefulWidget {
   final List<String> roles;
   final String password;
 
-  const SelectRoleScreen({super.key, required this.userId, required this.roles, required this.password});
+  /// Boleto de la entrada con Google (sin contraseña).
+  final String? selectionToken;
+
+  const SelectRoleScreen({
+    super.key,
+    required this.userId,
+    required this.roles,
+    required this.password,
+    this.selectionToken,
+  });
 
   @override
   State<SelectRoleScreen> createState() => _SelectRoleScreenState();
@@ -22,19 +33,25 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
 
   Map<String, Map<String, dynamic>> get _roleConfig => {
     'rider': {
-      'label': 'Motero',
+      'label': 'profile_menu.role_rider'.tr(),
       'icon':  Icons.two_wheeler,
       'desc':  'planner.route_desc'.tr(),
       'color': AppColors.orange,
     },
     'partner': {
-      'label': 'Partner',
+      'label': 'profile_menu.role_partner'.tr(),
       'icon':  Icons.store_outlined,
       'desc':  'home.gastronomy_desc'.tr(),
       'color': AppColors.cyan,
     },
+    'moderator': {
+      'label': 'profile_menu.role_moderator'.tr(),
+      'icon':  Icons.shield_outlined,
+      'desc':  'auth.role_admin_desc'.tr(),
+      'color': AppColors.gold,
+    },
     'admin': {
-      'label': 'Admin',
+      'label': 'profile_menu.role_admin'.tr(),
       'icon':  Icons.admin_panel_settings_outlined,
       'desc':  'auth.role_admin_desc'.tr(),
       'color': AppColors.gold,
@@ -49,6 +66,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
       userId:   widget.userId,
       role:     _selectedRole!,
       password: widget.password,
+      selectionToken: widget.selectionToken,
     );
 
     if (!mounted) return;
@@ -61,9 +79,11 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
 
     if (result['success'] == true) {
       final role = result['role'];
-      if (role == 'rider')   context.go('/rider/home');
-      if (role == 'partner') context.go('/login');
-      if (role == 'admin')   context.go('/login');
+      // El móvil se registra para los avisos también al elegir perfil: antes solo
+      // se hacía con un único perfil y quien tenía dos no recibía ninguno.
+      PushNotificationService.registerToken();
+      // Cada perfil a su pantalla; el de partner aún no tiene (vuelve al login).
+      context.go(homeForRole(role) ?? '/login');
     }
   }
 

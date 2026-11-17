@@ -180,9 +180,8 @@ class RouteTrackingManager {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'route_tracking',
-        channelName: 'Tracking de rutas',
-        channelDescription:
-            'Notificación permanente mientras se graba una ruta.',
+        channelName: 'channels.tracking_name'.tr(),
+        channelDescription: 'channels.tracking_desc'.tr(),
         // El canal va en importancia baja: es informativa, no debe sonar ni
         // vibrar cada vez que se actualizan los kilómetros.
         channelImportance: NotificationChannelImportance.LOW,
@@ -615,13 +614,14 @@ class RouteTrackingManager {
 
   static const _arrivalNotificationId = 910001;
 
-  static const _arrivalChannel = AndroidNotificationChannel(
-    'route_arrival',
-    'Llegada a destino',
-    description: 'Aviso al llegar al final de una ruta que estás grabando.',
-    importance: Importance.high,
-    sound: RawResourceAndroidNotificationSound('sound_moto'),
-  );
+  // Getter y no const: el nombre se traduce al crear el canal, con el idioma ya cargado.
+  static AndroidNotificationChannel get _arrivalChannel => AndroidNotificationChannel(
+        'route_arrival',
+        'channels.arrival_name'.tr(),
+        description: 'channels.arrival_desc'.tr(),
+        importance: Importance.high,
+        sound: const RawResourceAndroidNotificationSound('sound_moto'),
+      );
 
   /// Distancia en metros entre dos coordenadas.
   static double haversine(double lat1, double lng1, double lat2, double lng2) {

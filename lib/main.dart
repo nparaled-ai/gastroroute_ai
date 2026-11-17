@@ -40,8 +40,26 @@ void main() async {
   );
 }
 
-class GastroRouteApp extends StatelessWidget {
+class GastroRouteApp extends StatefulWidget {
   const GastroRouteApp({super.key});
+
+  @override
+  State<GastroRouteApp> createState() => _GastroRouteAppState();
+}
+
+class _GastroRouteAppState extends State<GastroRouteApp> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Con el idioma ya cargado (y cada vez que cambia), los canales de
+    // notificación de Android con su texto traducido.
+    final locale = context.locale;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && locale == context.locale) {
+        PushNotificationService.refreshChannelTexts();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

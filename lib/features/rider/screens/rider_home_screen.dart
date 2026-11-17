@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/api/auth_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/profile_menu_button.dart';
 import '../providers/app_notification_service.dart';
 import '../providers/friendship_service.dart';
 import '../providers/route_service.dart';
@@ -39,7 +39,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
   /// Ventana alrededor de la hora de salida, igual que en el detalle:
   /// generosa por detrás, porque salir con retraso es lo normal.
   static const _windowBefore = Duration(minutes: 30);
-  static const _windowAfter  = Duration(hours: 2);
+  static const _windowAfter  = Duration(hours: 3);
 
   /// Distancia máxima al origen. Amplia: el punto de salida real suele ser el
   /// bar o la gasolinera de al lado, no la coordenada exacta.
@@ -184,6 +184,10 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
   /// El postFrameCallback espera a que el primer frame esté pintado; sin él la
   /// navegación se lanzaría mientras esta misma pantalla se está construyendo.
   void _openRouteFromPush() {
+    if (PushNotificationService.consumePendingModeration()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => PushNotificationService.openModeration());
+      return;
+    }
     final routeId = PushNotificationService.consumePendingRoute();
     debugPrint('[push] Inicio recoge ruta pendiente: $routeId');
     if (routeId == null) return;
@@ -313,12 +317,6 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
     _loadNotifications();
   }
 
-  Future<void> _logout() async {
-    await AuthService.logout();
-    if (!mounted) return;
-    context.go('/login');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -365,14 +363,8 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
                 ),
             ],
           ),
-          IconButton(
-            icon: const Icon(Icons.person_outlined, color: AppColors.white),
-            onPressed: () => context.go('/rider/profile'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: AppColors.grey),
-            onPressed: _logout,
-          ),
+          // El perfil, el cambio de perfil y salir, en un solo botón.
+          ProfileMenuButton(nickname: _nickname),
         ],
       ),
       // Desplazable: la columna era fija y, al añadir la tarjeta de salida,
@@ -470,6 +462,14 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
                 await context.push('/rider/my-routes');
                 _loadNotifications();
               },
+            ),
+            const SizedBox(height: 16),
+            _QuickAccessCard(
+              icon: Icons.landscape_outlined,
+              title: 'home.catalog'.tr(),
+              desc: 'home.catalog_desc'.tr(),
+              color: AppColors.cyan,
+              onTap: () => context.push('/rider/catalog'),
             ),
             const SizedBox(height: 16),
             _QuickAccessCard(

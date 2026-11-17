@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../widgets/route_map_image.dart';
 import '../providers/route_tracking_service.dart';
 import '../providers/achievement_service.dart';
+import '../providers/route_service.dart';
 
 /// Resumen de ruta, al finalizar el tracking.
 ///
@@ -41,6 +42,20 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
 
   Map<String, dynamic> get _route =>
       Map<String, dynamic>.from(widget.tracking['route'] ?? {});
+
+  /// Las tarjetas de valorar, para poder enviar lo marcado al pulsar «Listo».
+  final Map<String, GlobalKey<_EateryRatingCardState>> _ratingKeys = {};
+
+  /// Lo que ya valoró en esta ruta, por sitio.
+  Map<int, Map<String, dynamic>> get _myRatings => {
+        for (final r in ((widget.tracking['my_ratings'] as List?) ?? const []))
+          (r['eatery_id'] as num).toInt(): Map<String, dynamic>.from(r as Map),
+      };
+
+  /// Los sitios de comer que ya valoró en esta ruta.
+  Set<int> get _ratedIds => ((widget.tracking['rated_eatery_ids'] as List?) ?? const [])
+      .map((e) => (e as num).toInt())
+      .toSet();
 
   @override
   void initState() {
@@ -92,6 +107,10 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
   /// desbloqueado logros. El resumen no los menciona a propósito: la
   /// celebración es el momento del descubrimiento.
   Future<void> _finish() async {
+    for (final k in _ratingKeys.values) {
+      await k.currentState?.sendIfPending();
+    }
+
     // Desde el historial es una consulta: se vuelve por donde se vino.
     if (widget.fromHistory) {
       context.canPop() ? context.pop() : context.go('/rider/home');
@@ -251,6 +270,35 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
                         ? () => _removePoi(poi)
                         : null,
                   )),
+
+            // ¿Qué tal se comió? (norma 21): solo al terminar, no al consultar el historial.
+            // También desde el historial, mientras no lo haya valorado ya.
+            // Si ya lo valoró, se enseña lo que puso, sin poder tocarlo.
+            for (final campo in const ['lunch_stop', 'dinner_stop'])
+              if (_route[campo] is Map &&
+                  _route[campo]['eatery'] is Map &&
+                  _ratedIds.contains((_route[campo]['eatery']['id'] as num).toInt())) ...[
+                const SizedBox(height: 24),
+                _EateryRatedCard(
+                  eatery: Map<String, dynamic>.from(_route[campo]['eatery'] as Map),
+                  rating: _myRatings[(_route[campo]['eatery']['id'] as num).toInt()] ?? const {},
+                ),
+              ],
+            for (final campo in const ['lunch_stop', 'dinner_stop'])
+              if (_route[campo] is Map &&
+                  _route[campo]['eatery'] is Map &&
+                  !_ratedIds.contains((_route[campo]['eatery']['id'] as num).toInt())) ...[
+                  const SizedBox(height: 24),
+                  _EateryRatingCard(
+                    key: _ratingKeys.putIfAbsent(
+                        campo, () => GlobalKey<_EateryRatingCardState>()),
+                    routeId: (_route['id'] as num).toInt(),
+                    eatery: Map<String, dynamic>.from(_route[campo]['eatery'] as Map),
+                    title: campo == 'lunch_stop'
+                        ? 'route_result.lunch_stop'.tr()
+                        : 'route_result.dinner_stop'.tr(),
+                  ),
+                ],
 
             // POIs sugeridos
             if (_suggested.isNotEmpty) ...[
@@ -446,6 +494,254 @@ class _PoiTile extends StatelessWidget {
           )
         else
           const Icon(Icons.check_circle, color: AppColors.orange, size: 20),
+      ]),
+    );
+  }
+}
+
+
+/// La pregunta de la norma 21 al cerrar la ruta: qué tal se comió, si se pudo
+/// aparcar la moto, y si el sitio ya no existe. Todo opcional: se manda lo que
+/// haya contestado.
+class _EateryRatingCard extends StatefulWidget {
+  final int routeId;
+  final Map<String, dynamic> eatery;
+  final String title;
+
+  const _EateryRatingCard({
+    super.key,
+    required this.routeId,
+    required this.eatery,
+    required this.title,
+  });
+
+  @override
+  State<_EateryRatingCard> createState() => _EateryRatingCardState();
+}
+
+class _EateryRatingCardState extends State<_EateryRatingCard> {
+  int _stars = 0;
+  bool? _parked;
+  bool _closed = false;
+  bool _sending = false;
+  bool _sent = false;
+  bool _pending = false;
+  final _comment = TextEditingController();
+
+  /// Al pulsar «Listo» se envía lo que haya marcado aunque no haya pulsado
+  /// «Enviar»: antes se perdía y la tarjeta volvía a salir.
+  Future<void> sendIfPending() async {
+    if (_hasAnswer && !_sent && !_sending) await _send();
+  }
+
+  bool get _hasAnswer =>
+      _stars > 0 || _parked != null || _closed || _comment.text.trim().isNotEmpty;
+
+  @override
+  void dispose() {
+    _comment.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    setState(() => _sending = true);
+    final result = await RouteService.rateEatery(
+      (widget.eatery['id'] as num).toInt(),
+      widget.routeId,
+      stars: _stars > 0 ? _stars : null,
+      parked: _parked,
+      closed: _closed,
+      comment: _comment.text,
+    );
+    if (!mounted) return;
+    final ok = result != null;
+    setState(() {
+      _sending = false;
+      _sent = ok;
+      _pending = result == 'pending';
+    });
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('rating.error'.tr())),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.greyDark),
+      ),
+      child: _sent
+          ? Row(children: [
+              const Icon(Icons.check_circle_outline, color: AppColors.cyan, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text((_pending ? 'rating.thanks_pending' : 'rating.thanks').tr(),
+                    style: const TextStyle(color: AppColors.white, fontSize: 13)),
+              ),
+            ])
+          : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('rating.title'.tr(namedArgs: {'name': '${widget.eatery['name']}'}),
+                  style: const TextStyle(
+                      color: AppColors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text(widget.title,
+                  style: const TextStyle(color: AppColors.grey, fontSize: 11)),
+              const SizedBox(height: 10),
+              Row(children: [
+                for (var i = 1; i <= 5; i++)
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                    onPressed: _closed ? null : () => setState(() => _stars = i),
+                    icon: Icon(
+                      i <= _stars ? Icons.star : Icons.star_border,
+                      color: AppColors.gold,
+                      size: 30,
+                    ),
+                  ),
+              ]),
+              const SizedBox(height: 8),
+              Text('rating.parking'.tr(),
+                  style: const TextStyle(color: AppColors.white, fontSize: 13)),
+              const SizedBox(height: 6),
+              Wrap(spacing: 8, children: [
+                ChoiceChip(
+                  label: Text('rating.yes'.tr()),
+                  selected: _parked == true,
+                  onSelected: (v) => setState(() => _parked = v ? true : null),
+                ),
+                ChoiceChip(
+                  label: Text('rating.no'.tr()),
+                  selected: _parked == false,
+                  onSelected: (v) => setState(() => _parked = v ? false : null),
+                ),
+              ]),
+              const SizedBox(height: 4),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                controlAffinity: ListTileControlAffinity.leading,
+                value: _closed,
+                onChanged: (v) => setState(() {
+                  _closed = v ?? false;
+                  if (_closed) _stars = 0;
+                }),
+                title: Text('rating.closed'.tr(),
+                    style: const TextStyle(color: AppColors.white, fontSize: 13)),
+              ),
+              const SizedBox(height: 4),
+              TextField(
+                controller: _comment,
+                maxLength: 500,
+                maxLines: 3,
+                minLines: 1,
+                style: const TextStyle(color: AppColors.white, fontSize: 13),
+                onChanged: (_) => setState(() {}),
+                decoration: InputDecoration(
+                  hintText: 'rating.comment_hint'.tr(),
+                  hintStyle: const TextStyle(color: AppColors.grey, fontSize: 13),
+                  isDense: true,
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: OutlinedButton(
+                  onPressed: _hasAnswer && !_sending ? _send : null,
+                  child: _sending
+                      ? const SizedBox(
+                          width: 16, height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2))
+                      : Text('rating.send'.tr()),
+                ),
+              ),
+            ]),
+    );
+  }
+}
+
+
+/// Lo que ya valoró de un sitio de comer, sin poder tocarlo, con el estado de su
+/// comentario (pendiente de revisar, publicado o no publicado).
+class _EateryRatedCard extends StatelessWidget {
+  final Map<String, dynamic> eatery;
+  final Map<String, dynamic> rating;
+
+  const _EateryRatedCard({required this.eatery, required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
+    final stars = (rating['stars'] as num?)?.toInt() ?? 0;
+    final parked = rating['parked'];
+    final comment = '${rating['comment'] ?? ''}'.trim();
+    final status = rating['status'] as String?;
+
+    final (Color color, String statusKey) = switch (status) {
+      'approved' => (const Color(0xFF7BE0A1), 'rating.status_approved'),
+      'rejected' => (const Color(0xFFFF9A9A), 'rating.status_rejected'),
+      'annulled' => (const Color(0xFFFF9A9A), 'rating.status_annulled'),
+      _ => (const Color(0xFFFFD77A), 'rating.status_pending'),
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.greyDark),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.check_circle_outline, color: AppColors.cyan, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text('rating.your_rating'.tr(namedArgs: {'name': '${eatery['name']}'}),
+                style: const TextStyle(
+                    color: AppColors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+          ),
+        ]),
+        if (stars > 0) ...[
+          const SizedBox(height: 8),
+          Row(children: [
+            for (var i = 1; i <= 5; i++)
+              Icon(i <= stars ? Icons.star : Icons.star_border, color: AppColors.gold, size: 22),
+          ]),
+        ],
+        if (parked != null) ...[
+          const SizedBox(height: 8),
+          Row(children: [
+            const Icon(Icons.two_wheeler, color: AppColors.cyan, size: 16),
+            const SizedBox(width: 6),
+            Text((parked == true ? 'rating.parked_yes' : 'rating.parked_no').tr(),
+                style: const TextStyle(color: AppColors.white, fontSize: 13)),
+          ]),
+        ],
+        if (rating['closed'] == true) ...[
+          const SizedBox(height: 8),
+          Text('rating.reported_closed'.tr(),
+              style: const TextStyle(color: AppColors.white, fontSize: 13)),
+        ],
+        if (status == 'annulled') ...[
+          const SizedBox(height: 10),
+          Text('rating.status_annulled'.tr(),
+              style: const TextStyle(
+                  color: Color(0xFFFF9A9A), fontSize: 12, fontWeight: FontWeight.w700)),
+        ],
+        if (comment.isNotEmpty && status != 'annulled') ...[
+          const SizedBox(height: 10),
+          Text('“$comment”',
+              style: const TextStyle(
+                  color: AppColors.white, fontSize: 13, height: 1.4, fontStyle: FontStyle.italic)),
+          const SizedBox(height: 8),
+          Text(statusKey.tr(),
+              style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700)),
+        ],
       ]),
     );
   }

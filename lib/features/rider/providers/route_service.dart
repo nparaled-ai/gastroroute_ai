@@ -165,14 +165,85 @@ class RouteService {
     }
   }
 
-  static Future<Map<String, dynamic>> refreshWeather(dynamic lat, dynamic lng, {String? date}) async {
+  static Future<Map<String, dynamic>> refreshWeather(dynamic lat, dynamic lng, {String? date, String? time}) async {
     try {
       final params = <String, dynamic>{'lat': '$lat', 'lng': '$lng'};
       if (date != null) params['date'] = date;
+      // La previsión es la de la HORA de salida, no la media del día.
+      if (time != null && time.isNotEmpty) params['time'] = time;
       final response = await ApiClient.dio.get('/rider/routes/weather', queryParameters: params);
       return {'weather': response.data['weather']};
     } on DioException catch (e) {
       return {'error': e.response?.data['message'] ?? 'errors.weather'.tr()};
+    }
+  }
+
+  /// El tiempo de cada punto a su hora de paso, en el mismo orden. Un punto sin
+  /// dato viene como null.
+  static Future<List<dynamic>> refreshWaypointsWeather(
+      List<dynamic> waypoints, {String? date, String? time}) async {
+    try {
+      final response = await ApiClient.dio.post('/rider/routes/weather/points', data: {
+        'waypoints': waypoints
+            .map((w) => {
+                  'lat': w['lat'],
+                  'lng': w['lng'],
+                  'estimated_arrival_time': w['estimated_arrival_time'],
+                })
+            .toList(),
+        if (date != null) 'date': date,
+        if (time != null) 'time': time,
+      });
+      return List<dynamic>.from(response.data['weather'] ?? const []);
+    } on DioException {
+      return const [];
+    }
+  }
+
+  /// Lo que dicen los moteros de un sitio de comer: media, aparcamiento y los
+  /// comentarios aprobados. null si no se pudo pedir.
+  static Future<Map<String, dynamic>?> eateryOpinions(int eateryId, {int page = 1}) async {
+    try {
+      final r = await ApiClient.dio.get('/rider/eateries/$eateryId/ratings',
+          queryParameters: {'page': page});
+      return Map<String, dynamic>.from(r.data as Map);
+    } on DioException {
+      return null;
+    }
+  }
+
+  /// Valora un sitio de comer tras rodar la ruta (norma 21). Devuelve qué pasó con
+  /// el comentario, o null si no se pudo enviar.
+  static Future<String?> rateEatery(int eateryId, int routeId,
+      {int? stars, bool? parked, bool closed = false, String? comment}) async {
+    try {
+      final r = await ApiClient.dio.post('/rider/eateries/$eateryId/rating', data: {
+        'route_id': routeId,
+        if (stars != null) 'stars': stars,
+        if (parked != null) 'parked': parked,
+        if (closed) 'closed': true,
+        if (comment != null && comment.trim().isNotEmpty) 'comment': comment.trim(),
+      });
+      // Qué pasó con el comentario: approved, pending, rejected o null (sin comentario).
+      return (r.data['moderation'] ?? 'ok').toString();
+    } on DioException {
+      return null;
+    }
+  }
+
+  /// Rutas de «Rutas moteras» parecidas a una ruta propia, antes de pedir publicarla.
+  /// Lista vacía si no hay ninguna (o si falló: avisar es una ayuda, no un requisito).
+  static Future<List<Map<String, dynamic>>> similarForPublish(int id) async {
+    try {
+      final r = await ApiClient.dio.get(
+        '/rider/routes/$id/similar',
+        options: Options(receiveTimeout: const Duration(seconds: 60)),
+      );
+      return List<Map<String, dynamic>>.from(
+        ((r.data['similar'] as List?) ?? const []).map((e) => Map<String, dynamic>.from(e as Map)),
+      );
+    } on DioException {
+      return const [];
     }
   }
 

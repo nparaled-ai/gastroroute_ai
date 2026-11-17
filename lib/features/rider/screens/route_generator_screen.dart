@@ -1,3 +1,4 @@
+import '../../../widgets/long_day_notice.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
@@ -6,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/highways_maps_notice.dart';
 import '../providers/rider_profile_service.dart';
 import '../providers/route_service.dart';
 import 'poi_picker_screen.dart';
@@ -1236,6 +1238,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                         _checkDurationWarning();
                       },
                     ),
+                    LongDayNotice(hours: _hours),
                   ],
 
                   if (_durationMode == 'km') ...[
@@ -1251,6 +1254,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                         _checkDurationWarning();
                       },
                     ),
+                    LongDayNotice(km: _km),
                   ],
 
                   if (_durationMode == 'ai')
@@ -1406,6 +1410,8 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     value: _avoidHighways, enabled: true, color: AppColors.cyan,
                     onChanged: (val) => setState(() => _avoidHighways = val),
                   ),
+                  // Con las autopistas PERMITIDAS: Maps puede tenerlas evitadas por su cuenta.
+                  if (!_avoidHighways) const HighwaysMapsNotice(),
 
                   const SizedBox(height: 24),
 

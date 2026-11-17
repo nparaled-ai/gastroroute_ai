@@ -1,3 +1,4 @@
+import '../../../core/role_home.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -33,11 +34,9 @@ class _SplashScreenState extends State<SplashScreen>
     final isLoggedIn = await AuthStorage.isLoggedIn();
     final role       = await AuthStorage.getRole();
     if (!mounted) return;
-    if (isLoggedIn && role == 'rider') {
-      context.go('/rider/home');
-    } else {
-      context.go('/login');
-    }
+    // Cada perfil a su pantalla (antes solo el de motero entraba solo).
+    final home = isLoggedIn ? homeForRole(role) : null;
+    context.go(home ?? '/login');
   }
 
   @override

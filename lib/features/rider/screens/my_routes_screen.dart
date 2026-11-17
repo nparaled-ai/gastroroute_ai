@@ -2,7 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/labels.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/zone_filter.dart';
 import '../providers/route_service.dart' show RouteService, routeListRefresh;
 import '../providers/route_tracking_service.dart';
 
@@ -311,7 +313,9 @@ class _RouteListState extends State<_RouteList> {
   String _search      = '';
   String? _difficulty; // tranquila | moderada | exigente
   String? _routeType;  // circular | destino
-  String? _source;     // ai | google_maps | gpx
+  String? _source;     // ai | google_maps | gpx | catalog
+  String? _country;    // código de país
+  String? _zone;       // a:<ISO> comunidad | r:<ISO> provincia
 
   @override
   void dispose() {
@@ -328,11 +332,12 @@ class _RouteListState extends State<_RouteList> {
       if (_difficulty != null && r['difficulty'] != _difficulty) return false;
       if (_routeType  != null && r['route_type']  != _routeType)  return false;
       if (_source     != null && r['source_type'] != _source)     return false;
+      if (!ZoneFilter.matches(r, _country, _zone)) return false;
       return true;
     }).toList();
   }
 
-  bool get _hasFilters => _search.isNotEmpty || _difficulty != null || _routeType != null || _source != null;
+  bool get _hasFilters => _search.isNotEmpty || _difficulty != null || _routeType != null || _source != null || _country != null || _zone != null;
 
   void _clearFilters() => setState(() {
     _search = '';
@@ -340,6 +345,8 @@ class _RouteListState extends State<_RouteList> {
     _difficulty = null;
     _routeType  = null;
     _source     = null;
+    _country    = null;
+    _zone       = null;
   });
 
   @override
@@ -369,6 +376,13 @@ class _RouteListState extends State<_RouteList> {
         ),
       ),
 
+      ZoneFilterBar(
+        routes: widget.routes,
+        country: _country,
+        zone: _zone,
+        onChanged: (c, z) => setState(() { _country = c; _zone = z; }),
+      ),
+
       // ── Chips de filtro ──
       SizedBox(
         height: 44,
@@ -393,6 +407,8 @@ class _RouteListState extends State<_RouteList> {
                 onTap: () => setState(() => _source = _source == 'ai'           ? null : 'ai')),
             _FilterChip(label: 'Maps', active: _source == 'google_maps', color: AppColors.orange,
                 onTap: () => setState(() => _source = _source == 'google_maps'  ? null : 'google_maps')),
+            _FilterChip(label: 'my_routes.source_catalog'.tr(), active: _source == 'catalog', color: AppColors.cyan,
+                onTap: () => setState(() => _source = _source == 'catalog'      ? null : 'catalog')),
             _FilterChip(label: 'GPX', active: _source == 'gpx', color: AppColors.cyan,
                 onTap: () => setState(() => _source = _source == 'gpx'          ? null : 'gpx')),
             if (_hasFilters) ...[
@@ -649,7 +665,7 @@ class _RouteCard extends StatelessWidget {
                   _Chip(Icons.access_time,
                       '${(((route['duration_minutes'] ?? 0) as num) / 60).toStringAsFixed(1)} h',
                       AppColors.cyan),
-                  _Chip(Icons.terrain, route['difficulty'] ?? '', AppColors.gold),
+                  _Chip(Icons.terrain, paceLabel(route['difficulty']), AppColors.gold),
                   // Origen de la ruta. Antes solo se pintaba en las GPX, así
                   // que las de IA y las de Google Maps no mostraban nada y
                   // parecía que faltaba información según la pestaña.
@@ -767,6 +783,8 @@ class _RiddenListState extends State<_RiddenList> {
   /// Aquí el filtro útil es el tiempo, no la dificultad: las rodadas se
   /// buscan por "cuándo la hice", y la lista crece sin parar.
   int? _days;
+  String? _country;
+  String? _zone;
 
   @override
   void dispose() {
@@ -789,6 +807,8 @@ class _RiddenListState extends State<_RiddenList> {
         if (!title.contains(q) && !origin.contains(q)) return false;
       }
 
+      if (!ZoneFilter.matches(route, _country, _zone)) return false;
+
       if (limit != null) {
         final started = DateTime.tryParse('${ride['started_at']}')?.toLocal();
         if (started == null || started.isBefore(limit)) return false;
@@ -798,7 +818,7 @@ class _RiddenListState extends State<_RiddenList> {
     }).toList();
   }
 
-  bool get _hasFilters => _search.isNotEmpty || _days != null;
+  bool get _hasFilters => _search.isNotEmpty || _days != null || _country != null || _zone != null;
 
   String _formatDate(String? iso) {
     final date = iso == null ? null : DateTime.tryParse(iso);
@@ -840,6 +860,13 @@ class _RiddenListState extends State<_RiddenList> {
         ),
       ),
 
+      ZoneFilterBar(
+        routes: widget.rides.map((r) => Map<String, dynamic>.from(r['route'] ?? {})).toList(),
+        country: _country,
+        zone: _zone,
+        onChanged: (c, z) => setState(() { _country = c; _zone = z; }),
+      ),
+
       SizedBox(
         height: 44,
         child: ListView(
@@ -865,6 +892,8 @@ class _RiddenListState extends State<_RiddenList> {
                         _search = '';
                         _searchController.clear();
                         _days = null;
+                        _country = null;
+                        _zone = null;
                       })),
           ],
         ),
@@ -990,7 +1019,7 @@ class _RiddenListState extends State<_RiddenList> {
                   _Chip(Icons.route, '${km.toStringAsFixed(1)} km', AppColors.orange),
                   _Chip(Icons.access_time, _formatDuration(seconds), AppColors.cyan),
                   if (route['difficulty'] != null)
-                    _Chip(Icons.terrain, route['difficulty'].toString(), AppColors.gold),
+                    _Chip(Icons.terrain, paceLabel(route['difficulty']), AppColors.gold),
                   _SourceChip(source: route['source_type']?.toString()),
                 ]),
                 const SizedBox(height: 8),
@@ -1131,6 +1160,7 @@ class _SourceChip extends StatelessWidget {
     final (icon, label) = switch (source) {
       'gpx'         => (Icons.folder_open, 'my_routes.source_gpx'.tr()),
       'google_maps' => (Icons.map_outlined, 'my_routes.source_maps'.tr()),
+      'catalog'     => (Icons.landscape_outlined, 'my_routes.source_catalog'.tr()),
       _             => (Icons.auto_awesome, 'my_routes.source_ai'.tr()),
     };
 

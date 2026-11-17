@@ -36,6 +36,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   final _descFocus  = FocusNode();
 
   Map<String, dynamic> get _route => widget.result['route'] ?? {};
+
+  /// Viene de las «Rutas moteras» (catálogo), no de la IA.
+  bool get _isFromCatalog => _route['source_type'] == 'catalog';
   bool get _isImported => (_route['tags'] as List? ?? []).contains('importada');
   Map<String, dynamic>? get _weather     => _currentWeather ?? widget.result['weather'];
   Map<String, dynamic>? get _aiSummary   => widget.result['ai_summary'];
@@ -96,6 +99,29 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         ]),
         subtitle: '',
         color: color,
+      ),
+      const SizedBox(height: 16),
+    ];
+  }
+
+  /// Los sitios que anunciaba la tarjeta elegida y que la ruta no lleva.
+  ///
+  /// La ruta de una tarjeta se traza por los puntos de la tarjeta, así que esto
+  /// sale casi siempre vacío. Sale cuando un punto no tenía carretera o hubo
+  /// que quitarlo para que la ruta cupiera en lo pedido: la tarjeta es una
+  /// promesa y, si no se cumple del todo, se dice cuál de las cosas no.
+  List<Widget> _cardMissingNotice() {
+    final faltan = _aiSummary?['card_missing'];
+    if (faltan is! List || faltan.isEmpty) return const [];
+
+    return [
+      _SuggestionCard(
+        icon: Icons.wrong_location_outlined,
+        title: 'route_result.card_missing'.tr(
+          args: [faltan.map((e) => '$e').join(', ')],
+        ),
+        subtitle: '',
+        color: AppColors.cyan,
       ),
       const SizedBox(height: 16),
     ];
@@ -239,11 +265,22 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       _route['origin_lat'],
       _route['origin_lng'],
       date: _route['departure_date'],
+      time: _route['departure_time'],
     );
+    final wps = _route['waypoints'];
+    final porPunto = wps is List
+        ? await RouteService.refreshWaypointsWeather(wps,
+            date: _route['departure_date'], time: _route['departure_time'])
+        : const [];
     if (!mounted) return;
     setState(() {
       _refreshingWeather = false;
       if (result['weather'] != null) _currentWeather = result['weather'];
+      if (wps is List && porPunto.length == wps.length) {
+        for (var i = 0; i < wps.length; i++) {
+          if (wps[i] is Map) wps[i]['weather'] = porPunto[i];
+        }
+      }
     });
     if (result['weather'] != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -557,6 +594,15 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     }
   }
 
+  /// La fecha de salida en el idioma de la app («vie 5 dic 2026»), no el «2026-12-05» del servidor.
+  String _dateLabel(dynamic date) {
+    try {
+      return DateFormat('EEE d MMM y', context.locale.languageCode).format(DateTime.parse('$date'));
+    } catch (_) {
+      return '$date';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // `canPop` solo vale cuando la ruta ya esta guardada: antes, el gesto de atras
@@ -605,13 +651,21 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Icon(
-                  _isImported ? Icons.download_outlined : Icons.auto_awesome,
+                  _isImported
+                      ? Icons.download_outlined
+                      : (_isFromCatalog ? Icons.landscape_outlined : Icons.auto_awesome),
                   color: AppColors.orange, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   _isImported
                       ? 'route_result.imported_from_maps'.tr()
-                      : 'route_result.generated_by_ai'.tr(),
+                      : (_isFromCatalog
+                          // Una ruta de las «Rutas moteras» no la ha generado la IA: es de
+                          // GastroRouteAI o de un motero.
+                          ? 'route_result.from_catalog'.tr(namedArgs: {
+                              'source': '${_route['catalog_source_label'] ?? 'GastroRouteAI'}'
+                            })
+                          : 'route_result.generated_by_ai'.tr()),
                   style: const TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 if (_routesRemaining != null)
@@ -628,7 +682,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                 Row(children: [
                   const Icon(Icons.event, color: AppColors.cyan, size: 14),
                   const SizedBox(width: 6),
-                  Text(_route['departure_date'],
+                  Text(_dateLabel(_route['departure_date']),
                       style: const TextStyle(color: AppColors.cyan, fontWeight: FontWeight.w700, fontSize: 13)),
                   if (_route['departure_time'] != null) ...[  
                     const SizedBox(width: 10),
@@ -892,6 +946,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               ..._unpavedNotice(),
 
               // Y si repite carretera de verdad (no un globo), tambien.
+              ..._cardMissingNotice(),
               ..._repeatedRoadNotice(),
 
               // Tags

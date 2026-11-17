@@ -456,6 +456,16 @@ class _RouteAssistantOptionsScreenState
 
     if (names.isNotEmpty) payload['suggested_points'] = names;
 
+    // Y donde están, tal como los ha visto en la tarjeta: la ruta se traza por
+    // esos mismos puntos, sin volver a buscarlos con otro buscador.
+    if (option != null) {
+      final geo = List<Map<String, dynamic>>.from(option['points'] ?? const [])
+          .where((p) => p['lat'] != null && p['lng'] != null)
+          .map((p) => {'name': '${p['name']}', 'lat': p['lat'], 'lng': p['lng']})
+          .toList();
+      if (geo.isNotEmpty) payload['suggested_geo'] = geo;
+    }
+
     return RouteService.generateRoute(payload);
   }
 

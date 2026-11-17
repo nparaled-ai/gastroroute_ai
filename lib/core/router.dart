@@ -6,6 +6,14 @@ import '../features/auth/screens/splash_screen.dart';
 import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/register_screen.dart';
 import '../features/auth/screens/select_role_screen.dart';
+import '../features/admin/screens/moderation_home_screen.dart';
+import '../features/admin/screens/moderation_comments_screen.dart';
+import '../features/admin/screens/moderation_routes_screen.dart';
+import '../features/admin/screens/similar_routes_screen.dart';
+import '../features/admin/screens/moderation_catalog_comments_screen.dart';
+import '../features/rider/screens/catalog_screen.dart';
+import '../features/rider/screens/catalog_detail_screen.dart';
+import '../features/rider/screens/catalog_plan_screen.dart';
 import '../features/auth/screens/forgot_password_screen.dart';
 import '../features/auth/screens/reset_password_screen.dart';
 import '../features/rider/screens/rider_home_screen.dart';
@@ -53,6 +61,29 @@ final router = GoRouter(
       },
     ),
     GoRoute(
+      path: '/admin/moderation',
+      builder: (context, state) => const ModerationHomeScreen(),
+    ),
+    GoRoute(
+      path: '/admin/moderation/comments',
+      builder: (context, state) => const ModerationCommentsScreen(),
+    ),
+    GoRoute(
+      path: '/admin/moderation/routes',
+      builder: (context, state) => const ModerationRoutesScreen(),
+    ),
+    GoRoute(
+      path: '/admin/moderation/routes/:id/similar',
+      builder: (context, state) => SimilarRoutesScreen(
+        routeId: int.parse(state.pathParameters['id']!),
+        title: '${(state.extra as Map<String, dynamic>?)?['title'] ?? ''}',
+      ),
+    ),
+    GoRoute(
+      path: '/admin/moderation/catalog-comments',
+      builder: (context, state) => const ModerationCatalogCommentsScreen(),
+    ),
+    GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
     ),
@@ -70,7 +101,8 @@ final router = GoRouter(
         return SelectRoleScreen(
           userId: extra['user_id'],
           roles:  List<String>.from(extra['roles']),
-          password: extra['password'],
+          password: extra['password'] ?? '',
+          selectionToken: extra['selection_token'],
         );
       },
     ),
@@ -205,6 +237,23 @@ final router = GoRouter(
         final extra = state.extra as Map<String, dynamic>;
         return RouteResultScreen(result: extra);
       },
+    ),
+    // Rutas moteras: el catálogo de rutas comprobadas y las que publican los moteros.
+    GoRoute(
+      path: '/rider/catalog',
+      builder: (context, state) => const CatalogScreen(),
+    ),
+    GoRoute(
+      path: '/rider/catalog/:id',
+      builder: (context, state) =>
+          CatalogDetailScreen(id: int.parse(state.pathParameters['id']!)),
+    ),
+    GoRoute(
+      path: '/rider/catalog/:id/plan',
+      builder: (context, state) => CatalogPlanScreen(
+        id: int.parse(state.pathParameters['id']!),
+        route: (state.extra as Map<String, dynamic>?) ?? const {},
+      ),
     ),
   ],
   redirect: (context, state) async {

@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dio/dio.dart';
 import 'api_client.dart';
@@ -61,13 +62,18 @@ class AuthService {
   static Future<Map<String, dynamic>> selectRole({
     required int userId,
     required String role,
-    required String password,
+    String password = '',
+    // Con Google no hay contraseña: el servidor da un boleto de cinco minutos.
+    String? selectionToken,
   }) async {
     try {
       final response = await ApiClient.dio.post('/auth/login/select-role', data: {
         'user_id':  userId,
         'role':     role,
-        'password': password,
+        if (selectionToken != null && selectionToken.isNotEmpty)
+          'selection_token': selectionToken
+        else
+          'password': password,
       });
 
       final data = response.data;
@@ -131,10 +137,57 @@ class AuthService {
     }
   }
 
-  static Future<void> logout() async {
+  /// Los perfiles de la persona con lo pendiente en cada uno. Vacío si falla.
+  static Future<List<Map<String, dynamic>>> profiles() async {
     try {
-      await ApiClient.dio.post('/auth/logout');
+      final r = await ApiClient.dio.get('/auth/profiles');
+      return List<Map<String, dynamic>>.from(
+        (r.data['profiles'] as List).map((e) => Map<String, dynamic>.from(e as Map)),
+      );
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Cambia de perfil SIN cerrar sesión ni escribir la contraseña: el servidor
+  /// da un token nuevo para un perfil que la persona ya tiene.
+  static Future<Map<String, dynamic>> switchRole(String role) async {
+    try {
+      final response = await ApiClient.dio.post('/auth/switch-role', data: {'role': role});
+      final data = response.data;
+
+      await AuthStorage.saveToken(data['access_token']);
+      await AuthStorage.saveUser(
+        userId: data['user']['id'].toString(),
+        email:  data['user']['email'],
+        role:   data['user']['active_role'],
+      );
+
+      return {'success': true, 'role': data['user']['active_role']};
+    } on DioException catch (e) {
+      return {
+        'error': e.response?.data['message'] ?? 'common.connection_error'.tr(),
+      };
+    }
+  }
+
+  static Future<void> logout() async {
+    // El identificador de avisos de este movil: el servidor lo borra para que no
+    // lleguen avisos a quien ya salió, y luego se tira en el propio movil para
+    // que quien entre después reciba uno nuevo.
+    String? fcm;
+    try {
+      fcm = await FirebaseMessaging.instance.getToken();
     } catch (_) {}
+
+    try {
+      await ApiClient.dio.post('/auth/logout', data: {if (fcm != null) 'fcm_token': fcm});
+    } catch (_) {}
+
+    try {
+      await FirebaseMessaging.instance.deleteToken();
+    } catch (_) {}
+
     await AuthStorage.clear();
   }
 }
