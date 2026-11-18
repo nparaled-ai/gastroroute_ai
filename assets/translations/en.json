@@ -1173,6 +1173,10 @@
         "mod_season_to": "Closes in",
         "mod_end": "Finish: {place}",
         "mod_curves": "Curves: {label} ({score})",
-        "mod_filters": "Shown in the filters: {levels}"
+        "mod_filters": "Shown in the filters: {levels}",
+        "level_easy": "Easy",
+        "level_moderate": "Moderate",
+        "level_hard": "Challenging",
+        "mod_reject_route": "Reject route"
     }
 }

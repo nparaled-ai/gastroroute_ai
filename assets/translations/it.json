@@ -1173,6 +1173,10 @@
         "mod_season_to": "Chiude a",
         "mod_end": "Arrivo: {place}",
         "mod_curves": "Curve: {label} ({score})",
-        "mod_filters": "Appare nei filtri: {levels}"
+        "mod_filters": "Appare nei filtri: {levels}",
+        "level_easy": "Facile",
+        "level_moderate": "Moderato",
+        "level_hard": "Impegnativo",
+        "mod_reject_route": "Rifiuta il percorso"
     }
 }

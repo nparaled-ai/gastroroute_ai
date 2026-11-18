@@ -1173,6 +1173,10 @@
         "mod_season_to": "Fecha em",
         "mod_end": "Chegada: {place}",
         "mod_curves": "Curvas: {label} ({score})",
-        "mod_filters": "Aparece nos filtros: {levels}"
+        "mod_filters": "Aparece nos filtros: {levels}",
+        "level_easy": "Fácil",
+        "level_moderate": "Moderado",
+        "level_hard": "Exigente",
+        "mod_reject_route": "Rejeitar a rota"
     }
 }

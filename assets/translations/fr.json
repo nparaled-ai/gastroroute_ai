@@ -1173,6 +1173,10 @@
         "mod_season_to": "Ferme en",
         "mod_end": "Arrivée : {place}",
         "mod_curves": "Virages : {label} ({score})",
-        "mod_filters": "Apparaît dans les filtres : {levels}"
+        "mod_filters": "Apparaît dans les filtres : {levels}",
+        "level_easy": "Facile",
+        "level_moderate": "Modérée",
+        "level_hard": "Difficile",
+        "mod_reject_route": "Rejeter l’itinéraire"
     }
 }

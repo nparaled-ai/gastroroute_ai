@@ -139,9 +139,9 @@ class _RouteReviewState extends State<_RouteReview> {
 
   /// En qué grupos del filtro del catálogo caerá la ruta según su sinuosidad medida.
   static const _levelCategories = {
-    'common.pace_easy': ['tranquila', 'agradable'],
-    'common.pace_moderate': ['agradable', 'revirada'],
-    'common.pace_hard': ['revirada', 'muy_revirada'],
+    'catalog.level_easy': ['tranquila', 'agradable'],
+    'catalog.level_moderate': ['agradable', 'revirada'],
+    'catalog.level_hard': ['revirada', 'muy_revirada'],
   };
 
   String _levels(String? cat) => _levelCategories.entries
@@ -206,7 +206,7 @@ class _RouteReviewState extends State<_RouteReview> {
                 child: Text('common.cancel'.tr())),
             TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: Text('moderation.reject'.tr())),
+                child: Text('catalog.mod_reject_route'.tr())),
           ],
         ),
       );
@@ -602,7 +602,7 @@ class _RouteReviewState extends State<_RouteReview> {
                 onPressed: _busy ? null : () => _decide('rejected'),
                 style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.error)),
-                child: Text('moderation.reject'.tr(),
+                child: Text('catalog.mod_reject_route'.tr(),
                     style: const TextStyle(color: AppColors.error)),
               ),
             ),

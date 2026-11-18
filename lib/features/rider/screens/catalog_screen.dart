@@ -508,9 +508,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
             runSpacing: 0,
             children: [
               for (final d in const [
-                ['easy', 'common.pace_easy'],
-                ['moderate', 'common.pace_moderate'],
-                ['hard', 'common.pace_hard'],
+                ['easy', 'catalog.level_easy'],
+                ['moderate', 'catalog.level_moderate'],
+                ['hard', 'catalog.level_hard'],
               ])
                 ChoiceChip(
                   label: Text(d[1].tr()),
