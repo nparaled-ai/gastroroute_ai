@@ -1159,7 +1159,6 @@
         "pub_similar_body": "En Rutas moteras ya hay rutas parecidas a la tuya. Puedes publicarla igualmente: el administrador decidirá.",
         "pub_similar_confirm": "Publicar igualmente",
         "mod_start": "Salida: {place}",
-        "mod_difficulty": "Saldrá en el catálogo como: {levels}",
         "mod_duration": "Duración: {time}",
         "mod_countries": "Países por los que pasa (el primero es la salida)",
         "mod_areas": "Comunidades y regiones",
@@ -1171,6 +1170,9 @@
         "mod_season_cerrado_invierno": "Cierra en invierno",
         "mod_season_ocasional": "Puede cerrar con nieve",
         "mod_season_from": "Abre en",
-        "mod_season_to": "Cierra en"
+        "mod_season_to": "Cierra en",
+        "mod_end": "Llegada: {place}",
+        "mod_curves": "Curvas: {label} ({score})",
+        "mod_filters": "Aparece en los filtros: {levels}"
     }
 }

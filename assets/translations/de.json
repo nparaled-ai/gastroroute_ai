@@ -1159,7 +1159,6 @@
         "pub_similar_body": "In den Motorrad-Routen gibt es bereits ähnliche Routen. Du kannst sie trotzdem veröffentlichen: Der Administrator entscheidet.",
         "pub_similar_confirm": "Trotzdem veröffentlichen",
         "mod_start": "Start: {place}",
-        "mod_difficulty": "Im Katalog erscheint sie als: {levels}",
         "mod_duration": "Dauer: {time}",
         "mod_countries": "Durchfahrene Länder (das erste ist der Start)",
         "mod_areas": "Gemeinschaften und Regionen",
@@ -1171,6 +1170,9 @@
         "mod_season_cerrado_invierno": "Im Winter gesperrt",
         "mod_season_ocasional": "Kann bei Schnee gesperrt sein",
         "mod_season_from": "Öffnet im",
-        "mod_season_to": "Schließt im"
+        "mod_season_to": "Schließt im",
+        "mod_end": "Ziel: {place}",
+        "mod_curves": "Kurven: {label} ({score})",
+        "mod_filters": "Erscheint in den Filtern: {levels}"
     }
 }

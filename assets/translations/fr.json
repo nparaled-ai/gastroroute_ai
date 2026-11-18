@@ -1159,7 +1159,6 @@
         "pub_similar_body": "Les Itinéraires moto contiennent déjà des itinéraires similaires au vôtre. Vous pouvez la publier quand même : l’administrateur décidera.",
         "pub_similar_confirm": "Publier quand même",
         "mod_start": "Départ : {place}",
-        "mod_difficulty": "Elle apparaîtra dans le catalogue comme : {levels}",
         "mod_duration": "Durée : {time}",
         "mod_countries": "Pays traversés (le premier est le départ)",
         "mod_areas": "Communautés et régions",
@@ -1171,6 +1170,9 @@
         "mod_season_cerrado_invierno": "Fermée en hiver",
         "mod_season_ocasional": "Peut fermer en cas de neige",
         "mod_season_from": "Ouvre en",
-        "mod_season_to": "Ferme en"
+        "mod_season_to": "Ferme en",
+        "mod_end": "Arrivée : {place}",
+        "mod_curves": "Virages : {label} ({score})",
+        "mod_filters": "Apparaît dans les filtres : {levels}"
     }
 }

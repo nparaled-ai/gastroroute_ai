@@ -1159,7 +1159,6 @@
         "pub_similar_body": "In Percorsi in moto ci sono già percorsi simili al tuo. Puoi pubblicarlo comunque: deciderà l’amministratore.",
         "pub_similar_confirm": "Pubblica comunque",
         "mod_start": "Partenza: {place}",
-        "mod_difficulty": "Apparirà nel catalogo come: {levels}",
         "mod_duration": "Durata: {time}",
         "mod_countries": "Paesi attraversati (il primo è la partenza)",
         "mod_areas": "Comunità e regioni",
@@ -1171,6 +1170,9 @@
         "mod_season_cerrado_invierno": "Chiusa in inverno",
         "mod_season_ocasional": "Può chiudere con la neve",
         "mod_season_from": "Apre a",
-        "mod_season_to": "Chiude a"
+        "mod_season_to": "Chiude a",
+        "mod_end": "Arrivo: {place}",
+        "mod_curves": "Curve: {label} ({score})",
+        "mod_filters": "Appare nei filtri: {levels}"
     }
 }

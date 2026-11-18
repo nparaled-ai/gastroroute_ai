@@ -1159,7 +1159,6 @@
         "pub_similar_body": "Motorcycle Routes already has routes similar to yours. You can still publish it: the administrator will decide.",
         "pub_similar_confirm": "Publish anyway",
         "mod_start": "Start: {place}",
-        "mod_difficulty": "It will appear in the catalogue as: {levels}",
         "mod_duration": "Duration: {time}",
         "mod_countries": "Countries it goes through (the first is the start)",
         "mod_areas": "Communities and regions",
@@ -1171,6 +1170,9 @@
         "mod_season_cerrado_invierno": "Closed in winter",
         "mod_season_ocasional": "May close with snow",
         "mod_season_from": "Opens in",
-        "mod_season_to": "Closes in"
+        "mod_season_to": "Closes in",
+        "mod_end": "Finish: {place}",
+        "mod_curves": "Curves: {label} ({score})",
+        "mod_filters": "Shown in the filters: {levels}"
     }
 }

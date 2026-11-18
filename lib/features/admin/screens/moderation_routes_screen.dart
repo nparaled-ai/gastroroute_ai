@@ -269,8 +269,15 @@ class _RouteReviewState extends State<_RouteReview> {
       padding: const EdgeInsets.only(top: 10),
       child: Wrap(spacing: 14, runSpacing: 4, children: [
         if (cat != null)
-          Text('catalog.mod_difficulty'.tr(namedArgs: {'levels': _levels(cat)}),
+          Text(
+              'catalog.mod_curves'.tr(namedArgs: {
+                'label': '${r['category_label'] ?? cat}',
+                'score': '${r['score'] ?? ''}',
+              }),
               style: const TextStyle(color: AppColors.white, fontSize: 13)),
+        if (cat != null)
+          Text('catalog.mod_filters'.tr(namedArgs: {'levels': _levels(cat)}),
+              style: const TextStyle(color: AppColors.greyText, fontSize: 12)),
         if (dur.isNotEmpty)
           Text('catalog.mod_duration'.tr(namedArgs: {'time': dur}),
               style: const TextStyle(color: AppColors.white, fontSize: 13)),
@@ -531,6 +538,9 @@ class _RouteReviewState extends State<_RouteReview> {
                 // La salida que se publicará (nunca la casa del motero)
                 if ('${r['origin'] ?? ''}'.isNotEmpty)
                   Text('catalog.mod_start'.tr(namedArgs: {'place': '${r['origin']}'}),
+                      style: const TextStyle(color: AppColors.white, fontSize: 13)),
+                if ('${r['destination'] ?? ''}'.isNotEmpty)
+                  Text('catalog.mod_end'.tr(namedArgs: {'place': '${r['destination']}'}),
                       style: const TextStyle(color: AppColors.white, fontSize: 13)),
                 Text('catalog.km_short'.tr(namedArgs: {'km': '${r['km'] ?? '?'}'}),
                     style: const TextStyle(color: AppColors.greyText, fontSize: 13)),
