@@ -1179,6 +1179,7 @@
         "level_hard": "Impegnativo",
         "mod_reject_route": "Rifiuta il percorso",
         "rate_author": "Sei l’autore di questo percorso: non puoi votarlo, ma puoi commentarlo.",
-        "rate_not_enough": "L’hai percorsa, ma meno del 60 % del percorso: non puoi ancora valutarla."
+        "rate_not_enough": "L’hai percorsa, ma meno del 60 % del percorso: non puoi ancora valutarla.",
+        "publish_need_60": "Per pubblicare questo percorso devi averne percorso almeno il 60 % dei km."
     }
 }

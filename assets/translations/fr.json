@@ -1179,6 +1179,7 @@
         "level_hard": "Difficile",
         "mod_reject_route": "Rejeter l’itinéraire",
         "rate_author": "Vous êtes l’auteur de cet itinéraire : vous ne pouvez pas le noter, mais vous pouvez le commenter.",
-        "rate_not_enough": "Vous l’avez roulée, mais moins de 60 % de l’itinéraire : vous ne pouvez pas encore la noter."
+        "rate_not_enough": "Vous l’avez roulée, mais moins de 60 % de l’itinéraire : vous ne pouvez pas encore la noter.",
+        "publish_need_60": "Pour publier cet itinéraire, il faut en avoir parcouru au moins 60 % des km."
     }
 }

@@ -1179,6 +1179,7 @@
         "level_hard": "Challenging",
         "mod_reject_route": "Reject route",
         "rate_author": "You are the author of this route: you cannot rate it, but you can comment.",
-        "rate_not_enough": "You rode it, but covered less than 60 % of the route: you cannot rate it yet."
+        "rate_not_enough": "You rode it, but covered less than 60 % of the route: you cannot rate it yet.",
+        "publish_need_60": "To publish this route you need to have covered at least 60 % of its km."
     }
 }

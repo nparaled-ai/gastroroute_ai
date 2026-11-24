@@ -1179,6 +1179,7 @@
         "level_hard": "Schwer",
         "mod_reject_route": "Route ablehnen",
         "rate_author": "Du bist der Autor dieser Route: Du kannst sie nicht bewerten, aber kommentieren.",
-        "rate_not_enough": "Du bist sie gefahren, aber weniger als 60 % der Route: Du kannst sie noch nicht bewerten."
+        "rate_not_enough": "Du bist sie gefahren, aber weniger als 60 % der Route: Du kannst sie noch nicht bewerten.",
+        "publish_need_60": "Um diese Route zu veröffentlichen, musst du mindestens 60 % ihrer km gefahren sein."
     }
 }

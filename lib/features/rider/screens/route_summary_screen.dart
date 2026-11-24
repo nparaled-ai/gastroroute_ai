@@ -231,6 +231,16 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
               ),
             ],
 
+            // La rodada no llega al 60 % de los km: no se puede publicar y se explica por que
+            if (rejected == null && _route['publish_blocked_short'] == true) ...[
+              const SizedBox(height: 16),
+              _Notice(
+                icon: Icons.landscape_outlined,
+                color: AppColors.grey,
+                text: 'catalog.publish_need_60'.tr(),
+              ),
+            ],
+
             // Publicar la ruta en Rutas moteras: el momento natural es al acabar de rodarla
             if (rejected == null && _route['can_publish'] == true) ...[
               const SizedBox(height: 20),

@@ -1179,6 +1179,7 @@
         "level_hard": "Exigente",
         "mod_reject_route": "Rejeitar a rota",
         "rate_author": "És o autor desta rota: não a podes pontuar, mas podes comentá-la.",
-        "rate_not_enough": "Fizeste a rota, mas percorreste menos de 60 %: ainda não a podes avaliar."
+        "rate_not_enough": "Fizeste a rota, mas percorreste menos de 60 %: ainda não a podes avaliar.",
+        "publish_need_60": "Para publicar esta rota é preciso ter percorrido pelo menos 60 % dos seus km."
     }
 }
