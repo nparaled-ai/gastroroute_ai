@@ -1112,9 +1112,9 @@
         "continue": "Vedi e salva",
         "publish": "Pubblica in Percorsi in moto",
         "publish_help": "La vedono tutti i motociclisti. L’amministratore la controlla prima della pubblicazione.",
-        "publish_pending": "In attesa di revisione",
-        "publish_published": "Pubblicata in Percorsi in moto",
-        "publish_rejected": "Non pubblicata",
+        "publish_pending": "Pubblicazione in attesa di revisione. Un amministratore la controllerà prima che compaia in Percorsi in moto.",
+        "publish_published": "Percorso pubblicato in Percorsi in moto. Gli altri motociclisti possono ora vederlo e farlo.",
+        "publish_rejected": "Pubblicazione rifiutata. Puoi correggere il percorso e richiederla di nuovo.",
         "mod_comments": "Commenti dei percorsi",
         "mod_route_draft": "Compilato automaticamente: controllalo",
         "mod_name": "Nome",
@@ -1180,6 +1180,9 @@
         "mod_reject_route": "Rifiuta il percorso",
         "rate_author": "Sei l’autore di questo percorso: non puoi votarlo, ma puoi commentarlo.",
         "rate_not_enough": "L’hai percorsa, ma meno del 60 % del percorso: non puoi ancora valutarla.",
-        "publish_need_60": "Per pubblicare questo percorso devi averne percorso almeno il 60 % dei km."
+        "publish_need_60": "Per pubblicare questo percorso devi averne percorso almeno il 60 % dei km.",
+        "publish_rejected_reason": "Motivo: {reason}",
+        "mod_approved_msg": "Percorso pubblicato. L’autore è stato avvisato.",
+        "mod_rejected_msg": "Percorso rifiutato. L’autore è stato avvisato."
     }
 }

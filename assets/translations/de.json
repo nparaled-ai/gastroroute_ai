@@ -1112,9 +1112,9 @@
         "continue": "Ansehen und speichern",
         "publish": "In Motorradrouten veröffentlichen",
         "publish_help": "Alle Fahrer sehen sie. Der Administrator prüft sie vor der Veröffentlichung.",
-        "publish_pending": "Wartet auf Prüfung",
-        "publish_published": "In Motorradrouten veröffentlicht",
-        "publish_rejected": "Nicht veröffentlicht",
+        "publish_pending": "Veröffentlichung wartet auf Prüfung. Ein Administrator prüft sie, bevor sie in den Motorradrouten erscheint.",
+        "publish_published": "Route in den Motorradrouten veröffentlicht. Andere Fahrer können sie jetzt sehen und fahren.",
+        "publish_rejected": "Veröffentlichung abgelehnt. Du kannst die Route verbessern und erneut anfragen.",
         "mod_comments": "Routenkommentare",
         "mod_route_draft": "Automatisch ausgefüllt: bitte prüfen",
         "mod_name": "Name",
@@ -1180,6 +1180,9 @@
         "mod_reject_route": "Route ablehnen",
         "rate_author": "Du bist der Autor dieser Route: Du kannst sie nicht bewerten, aber kommentieren.",
         "rate_not_enough": "Du bist sie gefahren, aber weniger als 60 % der Route: Du kannst sie noch nicht bewerten.",
-        "publish_need_60": "Um diese Route zu veröffentlichen, musst du mindestens 60 % ihrer km gefahren sein."
+        "publish_need_60": "Um diese Route zu veröffentlichen, musst du mindestens 60 % ihrer km gefahren sein.",
+        "publish_rejected_reason": "Grund: {reason}",
+        "mod_approved_msg": "Route veröffentlicht. Der Autor wurde benachrichtigt.",
+        "mod_rejected_msg": "Route abgelehnt. Der Autor wurde benachrichtigt."
     }
 }

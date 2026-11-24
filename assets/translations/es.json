@@ -1112,9 +1112,9 @@
         "continue": "Ver y guardar",
         "publish": "Publicar en Rutas moteras",
         "publish_help": "La ven todos los moteros. La revisa el administrador antes de publicarse.",
-        "publish_pending": "Pendiente de revisión",
-        "publish_published": "Publicada en Rutas moteras",
-        "publish_rejected": "No se ha publicado",
+        "publish_pending": "Publicación pendiente de revisión. Un administrador la revisará antes de que aparezca en Rutas moteras.",
+        "publish_published": "Ruta publicada en Rutas moteras. Ya pueden verla y hacerla otros moteros.",
+        "publish_rejected": "Publicación rechazada. Puedes corregir la ruta y volver a pedirla.",
         "mod_comments": "Comentarios de rutas",
         "mod_route_draft": "Rellenado automáticamente: revísalo",
         "mod_name": "Nombre",
@@ -1180,6 +1180,9 @@
         "mod_reject_route": "Rechazar ruta",
         "rate_author": "Eres el autor de esta ruta: no puedes puntuarla, pero sí comentarla.",
         "rate_not_enough": "La rodaste, pero recorriste menos del 60 % de la ruta: todavía no puedes valorarla.",
-        "publish_need_60": "Para publicar esta ruta hay que haber recorrido al menos el 60 % de sus km."
+        "publish_need_60": "Para publicar esta ruta hay que haber recorrido al menos el 60 % de sus km.",
+        "publish_rejected_reason": "Motivo: {reason}",
+        "mod_approved_msg": "Ruta publicada. Se ha avisado a su autor.",
+        "mod_rejected_msg": "Ruta rechazada. Se ha avisado a su autor."
     }
 }

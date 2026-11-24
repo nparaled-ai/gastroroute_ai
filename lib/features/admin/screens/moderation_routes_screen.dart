@@ -249,6 +249,9 @@ class _RouteReviewState extends State<_RouteReview> {
           SnackBar(content: Text(err.isEmpty ? 'moderation.error'.tr() : err)));
       return;
     }
+    // Qué pasó, claro: la ruta se ha decidido y su autor ya lo sabe (aviso en la app y notificación al móvil).
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text((decision == 'approved' ? 'catalog.mod_approved_msg' : 'catalog.mod_rejected_msg').tr())));
     widget.onDone();
   }
 

@@ -141,8 +141,11 @@ class _RoutePublicationBlockState extends State<RoutePublicationBlock> {
         Padding(
           padding: const EdgeInsets.only(bottom: 6),
           child: Text(
-            '${'catalog.publish_rejected'.tr()}${(widget.reason ?? '').isNotEmpty ? ': ${widget.reason}' : ''}',
-            style: const TextStyle(color: AppColors.error, fontSize: 13),
+            'catalog.publish_rejected'.tr() +
+                ((widget.reason ?? '').isNotEmpty
+                    ? '\n${'catalog.publish_rejected_reason'.tr(namedArgs: {'reason': widget.reason!})}'
+                    : ''),
+            style: const TextStyle(color: AppColors.error, fontSize: 13, height: 1.4),
           ),
         ),
       OutlinedButton.icon(

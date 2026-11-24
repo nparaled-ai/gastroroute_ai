@@ -1112,9 +1112,9 @@
         "continue": "Voir et enregistrer",
         "publish": "Publier dans Routes moto",
         "publish_help": "Tous les motards la voient. L’administrateur la vérifie avant publication.",
-        "publish_pending": "En attente de révision",
-        "publish_published": "Publiée dans Routes moto",
-        "publish_rejected": "Non publiée",
+        "publish_pending": "Publication en attente de validation. Un administrateur la vérifiera avant qu’elle apparaisse dans Routes moto.",
+        "publish_published": "Itinéraire publié dans Routes moto. Les autres motards peuvent maintenant le voir et le rouler.",
+        "publish_rejected": "Publication refusée. Vous pouvez corriger l’itinéraire et la redemander.",
         "mod_comments": "Commentaires d’itinéraires",
         "mod_route_draft": "Rempli automatiquement : vérifiez",
         "mod_name": "Nom",
@@ -1180,6 +1180,9 @@
         "mod_reject_route": "Rejeter l’itinéraire",
         "rate_author": "Vous êtes l’auteur de cet itinéraire : vous ne pouvez pas le noter, mais vous pouvez le commenter.",
         "rate_not_enough": "Vous l’avez roulée, mais moins de 60 % de l’itinéraire : vous ne pouvez pas encore la noter.",
-        "publish_need_60": "Pour publier cet itinéraire, il faut en avoir parcouru au moins 60 % des km."
+        "publish_need_60": "Pour publier cet itinéraire, il faut en avoir parcouru au moins 60 % des km.",
+        "publish_rejected_reason": "Motif : {reason}",
+        "mod_approved_msg": "Itinéraire publié. Son auteur a été prévenu.",
+        "mod_rejected_msg": "Itinéraire refusé. Son auteur a été prévenu."
     }
 }

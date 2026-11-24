@@ -1112,9 +1112,9 @@
         "continue": "Ver e guardar",
         "publish": "Publicar em Rotas de moto",
         "publish_help": "Todos os motociclistas a veem. O administrador revê antes de publicar.",
-        "publish_pending": "A aguardar revisão",
-        "publish_published": "Publicada em Rotas de moto",
-        "publish_rejected": "Não publicada",
+        "publish_pending": "Publicação pendente de revisão. Um administrador vai revê-la antes de aparecer em Rotas de moto.",
+        "publish_published": "Rota publicada em Rotas de moto. Outros motociclistas já a podem ver e fazer.",
+        "publish_rejected": "Publicação rejeitada. Podes corrigir a rota e pedi-la de novo.",
         "mod_comments": "Comentários de rotas",
         "mod_route_draft": "Preenchido automaticamente: confirma",
         "mod_name": "Nome",
@@ -1180,6 +1180,9 @@
         "mod_reject_route": "Rejeitar a rota",
         "rate_author": "És o autor desta rota: não a podes pontuar, mas podes comentá-la.",
         "rate_not_enough": "Fizeste a rota, mas percorreste menos de 60 %: ainda não a podes avaliar.",
-        "publish_need_60": "Para publicar esta rota é preciso ter percorrido pelo menos 60 % dos seus km."
+        "publish_need_60": "Para publicar esta rota é preciso ter percorrido pelo menos 60 % dos seus km.",
+        "publish_rejected_reason": "Motivo: {reason}",
+        "mod_approved_msg": "Rota publicada. O autor foi avisado.",
+        "mod_rejected_msg": "Rota rejeitada. O autor foi avisado."
     }
 }

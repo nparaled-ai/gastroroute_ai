@@ -1007,9 +1007,11 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         Padding(
           padding: const EdgeInsets.only(bottom: 6),
           child: Text(
-            '${'catalog.publish_rejected'.tr()}'
-            '${(_route?['publication_reason'] ?? '').toString().isNotEmpty ? ': ${_route!['publication_reason']}' : ''}',
-            style: const TextStyle(color: AppColors.error, fontSize: 13),
+            'catalog.publish_rejected'.tr() +
+                ((_route?['publication_reason'] ?? '').toString().isNotEmpty
+                    ? '\n${'catalog.publish_rejected_reason'.tr(namedArgs: {'reason': '${_route!['publication_reason']}'})}'
+                    : ''),
+            style: const TextStyle(color: AppColors.error, fontSize: 13, height: 1.4),
           ),
         ),
       OutlinedButton.icon(
