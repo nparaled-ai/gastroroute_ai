@@ -1177,6 +1177,8 @@
         "level_easy": "Facile",
         "level_moderate": "Modérée",
         "level_hard": "Difficile",
-        "mod_reject_route": "Rejeter l’itinéraire"
+        "mod_reject_route": "Rejeter l’itinéraire",
+        "rate_author": "Vous êtes l’auteur de cet itinéraire : vous ne pouvez pas le noter, mais vous pouvez le commenter.",
+        "rate_not_enough": "Vous l’avez roulée, mais moins de 60 % de l’itinéraire : vous ne pouvez pas encore la noter."
     }
 }

@@ -1177,6 +1177,8 @@
         "level_easy": "Easy",
         "level_moderate": "Moderate",
         "level_hard": "Challenging",
-        "mod_reject_route": "Reject route"
+        "mod_reject_route": "Reject route",
+        "rate_author": "You are the author of this route: you cannot rate it, but you can comment.",
+        "rate_not_enough": "You rode it, but covered less than 60 % of the route: you cannot rate it yet."
     }
 }

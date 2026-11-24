@@ -1177,6 +1177,8 @@
         "level_easy": "Einfach",
         "level_moderate": "Mittel",
         "level_hard": "Schwer",
-        "mod_reject_route": "Route ablehnen"
+        "mod_reject_route": "Route ablehnen",
+        "rate_author": "Du bist der Autor dieser Route: Du kannst sie nicht bewerten, aber kommentieren.",
+        "rate_not_enough": "Du bist sie gefahren, aber weniger als 60 % der Route: Du kannst sie noch nicht bewerten."
     }
 }

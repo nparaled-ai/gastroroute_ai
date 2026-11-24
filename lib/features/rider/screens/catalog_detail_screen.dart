@@ -93,6 +93,7 @@ class _CatalogDetailScreenState extends State<CatalogDetailScreen> {
         routeId: (mine['route_id'] as num).toInt(),
         initialStars: (mine['stars'] as num?)?.toInt(),
         initialComment: mine['comment'] as String?,
+        commentOnly: mine['is_author'] == true,
       ),
     );
     if (done == true) _load();
@@ -242,10 +243,15 @@ class _CatalogDetailScreenState extends State<CatalogDetailScreen> {
                   style: const TextStyle(color: AppColors.gold)),
             ),
         ]),
-        if (mine['ridden'] != true)
+        if (mine['ridden'] != true || mine['is_author'] == true)
           Padding(
             padding: const EdgeInsets.only(top: 4, bottom: 6),
-            child: Text('catalog.rate_only_ridden'.tr(),
+            child: Text(
+                mine['is_author'] == true
+                    ? 'catalog.rate_author'.tr()
+                    : (mine['ridden_short'] == true
+                        ? 'catalog.rate_not_enough'.tr()
+                        : 'catalog.rate_only_ridden'.tr()),
                 style: const TextStyle(color: AppColors.greyText, fontSize: 12, height: 1.4)),
           ),
         if (_comments.isEmpty && !_loadingComments)
@@ -345,11 +351,14 @@ class _RateSheet extends StatefulWidget {
   final int routeId;
   final int? initialStars;
   final String? initialComment;
+  /// El autor de la ruta solo puede comentarla, no puntuarla.
+  final bool commentOnly;
   const _RateSheet({
     required this.catalogId,
     required this.routeId,
     this.initialStars,
     this.initialComment,
+    this.commentOnly = false,
   });
 
   @override
@@ -374,9 +383,9 @@ class _RateSheetState extends State<_RateSheet> {
     final r = await CatalogService.rate(
       widget.catalogId,
       routeId: widget.routeId,
-      stars: _stars,
-      wasOpen: _wasOpen,
-      roadworks: _roadworks,
+      stars: widget.commentOnly ? null : _stars,
+      wasOpen: widget.commentOnly ? null : _wasOpen,
+      roadworks: widget.commentOnly ? null : _roadworks,
       comment: _comment.text,
     );
     if (!mounted) return;
@@ -413,7 +422,7 @@ class _RateSheetState extends State<_RateSheet> {
                 style: const TextStyle(
                     color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 12),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            if (!widget.commentOnly) Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               for (var i = 1; i <= 5; i++)
                 IconButton(
                   iconSize: 36,
@@ -422,8 +431,10 @@ class _RateSheetState extends State<_RateSheet> {
                       color: AppColors.gold),
                 ),
             ]),
-            _yesNo('catalog.was_open'.tr(), _wasOpen, (v) => setState(() => _wasOpen = v)),
-            _yesNo('catalog.roadworks'.tr(), _roadworks, (v) => setState(() => _roadworks = v)),
+            if (!widget.commentOnly) ...[
+              _yesNo('catalog.was_open'.tr(), _wasOpen, (v) => setState(() => _wasOpen = v)),
+              _yesNo('catalog.roadworks'.tr(), _roadworks, (v) => setState(() => _roadworks = v)),
+            ],
             const SizedBox(height: 10),
             TextField(
               controller: _comment,

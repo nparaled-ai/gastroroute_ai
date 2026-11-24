@@ -1177,6 +1177,8 @@
         "level_easy": "Fácil",
         "level_moderate": "Moderada",
         "level_hard": "Exigente",
-        "mod_reject_route": "Rechazar ruta"
+        "mod_reject_route": "Rechazar ruta",
+        "rate_author": "Eres el autor de esta ruta: no puedes puntuarla, pero sí comentarla.",
+        "rate_not_enough": "La rodaste, pero recorriste menos del 60 % de la ruta: todavía no puedes valorarla."
     }
 }

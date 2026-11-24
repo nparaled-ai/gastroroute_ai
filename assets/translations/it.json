@@ -1177,6 +1177,8 @@
         "level_easy": "Facile",
         "level_moderate": "Moderato",
         "level_hard": "Impegnativo",
-        "mod_reject_route": "Rifiuta il percorso"
+        "mod_reject_route": "Rifiuta il percorso",
+        "rate_author": "Sei l’autore di questo percorso: non puoi votarlo, ma puoi commentarlo.",
+        "rate_not_enough": "L’hai percorsa, ma meno del 60 % del percorso: non puoi ancora valutarla."
     }
 }
