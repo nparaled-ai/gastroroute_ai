@@ -496,6 +496,7 @@ class _RouteReviewState extends State<_RouteReview> {
         padding: const EdgeInsets.only(top: 8),
         child: TextField(
           controller: c,
+          minLines: lines > 1 ? 2 : 1,
           maxLines: lines,
           style: const TextStyle(color: AppColors.white, fontSize: 14),
           decoration: InputDecoration(
@@ -572,7 +573,7 @@ class _RouteReviewState extends State<_RouteReview> {
           const Divider(color: AppColors.greyDark),
           Text('catalog.mod_route_draft'.tr(),
               style: const TextStyle(color: AppColors.gold, fontSize: 12)),
-          _field('catalog.mod_name'.tr(), _name),
+          _field('catalog.mod_name'.tr(), _name, lines: 4),
           _measureInfo(r),
           _zonesEditor(),
           _field('catalog.mod_roads'.tr(), _roads),
