@@ -539,7 +539,8 @@
         "gps_gaps": {
             "one": "1 stretch without GPS coverage, counted as a straight line.",
             "other": "{} stretches without GPS coverage, counted as straight lines."
-        }
+        },
+        "no_track": "The route of this ride was not saved (no GPS points were recorded), so there is no map to show."
     },
     "achievements": {
         "title": "Achievements",
@@ -1183,6 +1184,9 @@
         "publish_need_60": "To publish this route you need to have covered at least 60 % of its km.",
         "publish_rejected_reason": "Reason: {reason}",
         "mod_approved_msg": "Route published. Its author has been notified.",
-        "mod_rejected_msg": "Route rejected. Its author has been notified."
+        "mod_rejected_msg": "Route rejected. Its author has been notified.",
+        "warn_far_severe": "The start is {km} km ({time}) from where you set off: this is not a route for a day out from home.",
+        "start_at_route": "Start at the route’s start",
+        "route_start": "Route start"
     }
 }

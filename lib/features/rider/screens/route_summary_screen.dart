@@ -255,10 +255,23 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
             const SizedBox(height: 24),
 
             // Mapa con el recorrido real grabado
-            RouteMapImage(
-              title: 'summary.route_map'.tr(),
-              loader: () => RouteTrackingService.mapImage(_trackingId),
-            ),
+            // Sin puntos GPS grabados (p. ej. se perdió la señal todo el rato) no hay nada que dibujar:
+            // se dice claramente en vez de enseñar un error de carga.
+            if (((widget.tracking['points_count'] as num?)?.toInt() ?? 2) < 2) ...[
+              Text('summary.route_map'.tr(),
+                  style: const TextStyle(
+                      color: AppColors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 10),
+              _Notice(
+                icon: Icons.location_off_outlined,
+                color: AppColors.grey,
+                text: 'summary.no_track'.tr(),
+              ),
+            ] else
+              RouteMapImage(
+                title: 'summary.route_map'.tr(),
+                loader: () => RouteTrackingService.mapImage(_trackingId),
+              ),
 
             const SizedBox(height: 24),
 

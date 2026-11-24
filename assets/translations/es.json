@@ -539,7 +539,8 @@
         "gps_gaps": {
             "one": "1 tramo sin cobertura GPS, contado en línea recta.",
             "other": "{} tramos sin cobertura GPS, contados en línea recta."
-        }
+        },
+        "no_track": "No se guardó el recorrido de esta rodada (no hubo puntos GPS), así que no hay mapa que enseñar."
     },
     "achievements": {
         "title": "Logros",
@@ -1183,6 +1184,9 @@
         "publish_need_60": "Para publicar esta ruta hay que haber recorrido al menos el 60 % de sus km.",
         "publish_rejected_reason": "Motivo: {reason}",
         "mod_approved_msg": "Ruta publicada. Se ha avisado a su autor.",
-        "mod_rejected_msg": "Ruta rechazada. Se ha avisado a su autor."
+        "mod_rejected_msg": "Ruta rechazada. Se ha avisado a su autor.",
+        "warn_far_severe": "El inicio está a {km} km ({time}) de tu salida: no es una ruta para hacer en un día saliendo de casa.",
+        "start_at_route": "Empezar en la salida de la ruta",
+        "route_start": "Salida de la ruta"
     }
 }

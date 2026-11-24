@@ -9,6 +9,10 @@ class ApiClient {
 
   static final _storage = FlutterSecureStorage();
 
+  /// Idioma con el que se está mostrando la app (lo fija main.dart cada vez que cambia).
+  /// Es lo que se manda al servidor: así los textos que devuelve coinciden con la pantalla.
+  static String? appLanguage;
+
   static Dio get dio {
     final dio = Dio(BaseOptions(
       baseUrl: baseUrl,
@@ -28,7 +32,8 @@ class ApiClient {
             options.headers['Authorization'] = 'Bearer $token';
           }
           // Enviar idioma al backend para mensajes de error localizados
-          final lang = await _storage.read(key: 'language') ?? 'es';
+          // El de la interfaz (appLanguage) manda; el guardado es solo el respaldo.
+          final lang = appLanguage ?? await _storage.read(key: 'language') ?? 'es';
           options.headers['Accept-Language'] = lang;
           return handler.next(options);
         },

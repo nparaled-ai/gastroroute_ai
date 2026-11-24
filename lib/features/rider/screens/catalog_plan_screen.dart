@@ -72,10 +72,18 @@ class _CatalogPlanScreenState extends State<CatalogPlanScreen> {
       if (p == LocationPermission.denied || p == LocationPermission.deniedForever) {
         throw Exception('denied');
       }
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
-      );
-      if (!mounted) return;
+      // Sin límite de tiempo, un móvil con la ubicación activa pero sin cobertura GPS (dentro de un
+      // edificio, o un emulador) se quedaba en «Buscando tu ubicación…» para siempre. Primero la última
+      // conocida (instantánea) y, si no la hay, 15 s como máximo: pasado ese tiempo se avisa y se elige a mano.
+      final pos = await Geolocator.getLastKnownPosition() ??
+          await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.medium,
+              timeLimit: Duration(seconds: 15),
+            ),
+          );
+      // Si mientras tanto el motero eligió el punto a mano, esa elección manda.
+      if (!mounted || !_locating) return;
       setState(() {
         _lat = pos.latitude;
         _lng = pos.longitude;
@@ -109,6 +117,7 @@ class _CatalogPlanScreenState extends State<CatalogPlanScreen> {
       _lat = (r['lat'] as num).toDouble();
       _lng = (r['lng'] as num).toDouble();
       _originName = '${r['description']}';
+      _locating = false;   // si la ubicación seguía buscándose, ya no hace falta
       _result = null;
     });
   }
@@ -547,10 +556,28 @@ class _CatalogPlanScreenState extends State<CatalogPlanScreen> {
 
     switch (w['type']) {
       case 'far':
-        text = 'catalog.warn_far'.tr(namedArgs: {
+        final severe = w['severe'] == true;
+        text = (severe ? 'catalog.warn_far_severe' : 'catalog.warn_far').tr(namedArgs: {
           'km': '${w['km']}',
           'time': _time2((w['minutes'] as num).toInt()),
         });
+        if (severe) color = AppColors.error;
+        // Un acercamiento enorme: se ofrece empezar en la salida de la ruta (quien lleva la moto en
+        // furgoneta o tren), en vez de calcular desde su casa.
+        if (severe && w['start_lat'] is num && w['start_lng'] is num) {
+          action = TextButton(
+            onPressed: () {
+              setState(() {
+                _lat = (w['start_lat'] as num).toDouble();
+                _lng = (w['start_lng'] as num).toDouble();
+                _originName = '${w['start_name'] ?? 'catalog.route_start'.tr()}';
+                _result = null;
+              });
+              _calculate();
+            },
+            child: Text('catalog.start_at_route'.tr()),
+          );
+        }
         break;
       case 'closed_on_date':
         text = 'catalog.warn_closed_on_date'.tr(namedArgs: {

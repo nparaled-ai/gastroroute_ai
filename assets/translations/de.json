@@ -539,7 +539,8 @@
         "gps_gaps": {
             "one": "1 Abschnitt ohne GPS-Empfang, als Luftlinie gezählt.",
             "other": "{} Abschnitte ohne GPS-Empfang, als Luftlinie gezählt."
-        }
+        },
+        "no_track": "Der Streckenverlauf dieser Fahrt wurde nicht gespeichert (keine GPS-Punkte), daher gibt es keine Karte."
     },
     "achievements": {
         "title": "Erfolge",
@@ -1183,6 +1184,9 @@
         "publish_need_60": "Um diese Route zu veröffentlichen, musst du mindestens 60 % ihrer km gefahren sein.",
         "publish_rejected_reason": "Grund: {reason}",
         "mod_approved_msg": "Route veröffentlicht. Der Autor wurde benachrichtigt.",
-        "mod_rejected_msg": "Route abgelehnt. Der Autor wurde benachrichtigt."
+        "mod_rejected_msg": "Route abgelehnt. Der Autor wurde benachrichtigt.",
+        "warn_far_severe": "Der Start liegt {km} km ({time}) von deinem Ausgangspunkt entfernt: Das ist keine Tagestour von zu Hause aus.",
+        "start_at_route": "Am Start der Route beginnen",
+        "route_start": "Start der Route"
     }
 }

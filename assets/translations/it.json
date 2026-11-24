@@ -539,7 +539,8 @@
         "gps_gaps": {
             "one": "1 tratto senza copertura GPS, contato in linea retta.",
             "other": "{} tratti senza copertura GPS, contati in linea retta."
-        }
+        },
+        "no_track": "Il percorso di questa uscita non è stato salvato (nessun punto GPS), quindi non c’è nessuna mappa da mostrare."
     },
     "achievements": {
         "title": "Traguardi",
@@ -1183,6 +1184,9 @@
         "publish_need_60": "Per pubblicare questo percorso devi averne percorso almeno il 60 % dei km.",
         "publish_rejected_reason": "Motivo: {reason}",
         "mod_approved_msg": "Percorso pubblicato. L’autore è stato avvisato.",
-        "mod_rejected_msg": "Percorso rifiutato. L’autore è stato avvisato."
+        "mod_rejected_msg": "Percorso rifiutato. L’autore è stato avvisato.",
+        "warn_far_severe": "L’inizio è a {km} km ({time}) dalla tua partenza: non è un percorso da fare in giornata partendo da casa.",
+        "start_at_route": "Partire dall’inizio del percorso",
+        "route_start": "Partenza del percorso"
     }
 }

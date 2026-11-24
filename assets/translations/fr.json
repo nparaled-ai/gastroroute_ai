@@ -539,7 +539,8 @@
         "gps_gaps": {
             "one": "1 section sans couverture GPS, comptée en ligne droite.",
             "other": "{} sections sans couverture GPS, comptées en ligne droite."
-        }
+        },
+        "no_track": "Le parcours de cette sortie n’a pas été enregistré (aucun point GPS), il n’y a donc pas de carte à afficher."
     },
     "achievements": {
         "title": "Trophées",
@@ -1183,6 +1184,9 @@
         "publish_need_60": "Pour publier cet itinéraire, il faut en avoir parcouru au moins 60 % des km.",
         "publish_rejected_reason": "Motif : {reason}",
         "mod_approved_msg": "Itinéraire publié. Son auteur a été prévenu.",
-        "mod_rejected_msg": "Itinéraire refusé. Son auteur a été prévenu."
+        "mod_rejected_msg": "Itinéraire refusé. Son auteur a été prévenu.",
+        "warn_far_severe": "Le début est à {km} km ({time}) de votre départ : ce n’est pas un parcours à faire dans la journée depuis chez vous.",
+        "start_at_route": "Partir du début du parcours",
+        "route_start": "Départ du parcours"
     }
 }

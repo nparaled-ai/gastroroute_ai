@@ -539,7 +539,8 @@
         "gps_gaps": {
             "one": "1 troço sem cobertura GPS, contado em linha reta.",
             "other": "{} troços sem cobertura GPS, contados em linha reta."
-        }
+        },
+        "no_track": "O percurso desta saída não foi guardado (sem pontos GPS), por isso não há mapa para mostrar."
     },
     "achievements": {
         "title": "Conquistas",
@@ -1183,6 +1184,9 @@
         "publish_need_60": "Para publicar esta rota é preciso ter percorrido pelo menos 60 % dos seus km.",
         "publish_rejected_reason": "Motivo: {reason}",
         "mod_approved_msg": "Rota publicada. O autor foi avisado.",
-        "mod_rejected_msg": "Rota rejeitada. O autor foi avisado."
+        "mod_rejected_msg": "Rota rejeitada. O autor foi avisado.",
+        "warn_far_severe": "O início fica a {km} km ({time}) da tua saída: não é um percurso para fazer num dia a partir de casa.",
+        "start_at_route": "Começar na saída do percurso",
+        "route_start": "Saída do percurso"
     }
 }

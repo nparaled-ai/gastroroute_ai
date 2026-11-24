@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'core/api/api_client.dart';
+import 'core/storage/auth_storage.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router.dart';
 import 'core/services/push_notification_service.dart';
@@ -54,6 +55,8 @@ class _GastroRouteAppState extends State<GastroRouteApp> {
     // Con el idioma ya cargado (y cada vez que cambia), los canales de
     // notificación de Android con su texto traducido.
     final locale = context.locale;
+    ApiClient.appLanguage = locale.languageCode;
+    AuthStorage.saveLanguage(locale.languageCode);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && locale == context.locale) {
         PushNotificationService.refreshChannelTexts();
