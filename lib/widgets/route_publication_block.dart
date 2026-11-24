@@ -136,18 +136,19 @@ class _RoutePublicationBlockState extends State<RoutePublicationBlock> {
       return _box(AppColors.cyan, Icons.verified_outlined, 'catalog.publish_published'.tr());
     }
 
+    // Rechazada: la decision es definitiva, no hay boton para volver a pedirla.
+    if (_status == 'rejected') {
+      return _box(
+        AppColors.error,
+        Icons.block,
+        'catalog.publish_rejected'.tr() +
+            ((widget.reason ?? '').isNotEmpty
+                ? '\n${'catalog.publish_rejected_reason'.tr(namedArgs: {'reason': widget.reason!})}'
+                : ''),
+      );
+    }
+
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      if (_status == 'rejected')
-        Padding(
-          padding: const EdgeInsets.only(bottom: 6),
-          child: Text(
-            'catalog.publish_rejected'.tr() +
-                ((widget.reason ?? '').isNotEmpty
-                    ? '\n${'catalog.publish_rejected_reason'.tr(namedArgs: {'reason': widget.reason!})}'
-                    : ''),
-            style: const TextStyle(color: AppColors.error, fontSize: 13, height: 1.4),
-          ),
-        ),
       OutlinedButton.icon(
         onPressed: _publishing ? null : _request,
         icon: _publishing

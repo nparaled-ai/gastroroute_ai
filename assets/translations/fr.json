@@ -1114,7 +1114,7 @@
         "publish_help": "Tous les motards la voient. L’administrateur la vérifie avant publication.",
         "publish_pending": "Publication en attente de validation. Un administrateur la vérifiera avant qu’elle apparaisse dans Routes moto.",
         "publish_published": "Itinéraire publié dans Routes moto. Les autres motards peuvent maintenant le voir et le rouler.",
-        "publish_rejected": "Publication refusée. Vous pouvez corriger l’itinéraire et la redemander.",
+        "publish_rejected": "Publication refusée. Cet itinéraire ne peut plus être publié.",
         "mod_comments": "Commentaires d’itinéraires",
         "mod_route_draft": "Rempli automatiquement : vérifiez",
         "mod_name": "Nom",

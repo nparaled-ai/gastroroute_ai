@@ -1114,7 +1114,7 @@
         "publish_help": "La vedono tutti i motociclisti. L’amministratore la controlla prima della pubblicazione.",
         "publish_pending": "Pubblicazione in attesa di revisione. Un amministratore la controllerà prima che compaia in Percorsi in moto.",
         "publish_published": "Percorso pubblicato in Percorsi in moto. Gli altri motociclisti possono ora vederlo e farlo.",
-        "publish_rejected": "Pubblicazione rifiutata. Puoi correggere il percorso e richiederla di nuovo.",
+        "publish_rejected": "Pubblicazione rifiutata. Questo percorso non può essere pubblicato di nuovo.",
         "mod_comments": "Commenti dei percorsi",
         "mod_route_draft": "Compilato automaticamente: controllalo",
         "mod_name": "Nome",

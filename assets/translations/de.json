@@ -1114,7 +1114,7 @@
         "publish_help": "Alle Fahrer sehen sie. Der Administrator prüft sie vor der Veröffentlichung.",
         "publish_pending": "Veröffentlichung wartet auf Prüfung. Ein Administrator prüft sie, bevor sie in den Motorradrouten erscheint.",
         "publish_published": "Route in den Motorradrouten veröffentlicht. Andere Fahrer können sie jetzt sehen und fahren.",
-        "publish_rejected": "Veröffentlichung abgelehnt. Du kannst die Route verbessern und erneut anfragen.",
+        "publish_rejected": "Veröffentlichung abgelehnt. Diese Route kann nicht erneut veröffentlicht werden.",
         "mod_comments": "Routenkommentare",
         "mod_route_draft": "Automatisch ausgefüllt: bitte prüfen",
         "mod_name": "Name",

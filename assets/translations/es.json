@@ -1114,7 +1114,7 @@
         "publish_help": "La ven todos los moteros. La revisa el administrador antes de publicarse.",
         "publish_pending": "Publicación pendiente de revisión. Un administrador la revisará antes de que aparezca en Rutas moteras.",
         "publish_published": "Ruta publicada en Rutas moteras. Ya pueden verla y hacerla otros moteros.",
-        "publish_rejected": "Publicación rechazada. Puedes corregir la ruta y volver a pedirla.",
+        "publish_rejected": "Publicación rechazada. Esta ruta no se puede volver a publicar.",
         "mod_comments": "Comentarios de rutas",
         "mod_route_draft": "Rellenado automáticamente: revísalo",
         "mod_name": "Nombre",

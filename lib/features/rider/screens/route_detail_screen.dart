@@ -1002,6 +1002,29 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       );
     }
 
+    // Rechazada: la decision es definitiva, no hay boton para volver a pedirla.
+    if (status == 'rejected') {
+      final motivo = (_route?['publication_reason'] ?? '').toString();
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.error.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(children: [
+          const Icon(Icons.block, color: AppColors.error, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'catalog.publish_rejected'.tr() +
+                  (motivo.isNotEmpty ? '\n${'catalog.publish_rejected_reason'.tr(namedArgs: {'reason': motivo})}' : ''),
+              style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w700, height: 1.4),
+            ),
+          ),
+        ]),
+      );
+    }
+
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       if (status == 'rejected')
         Padding(

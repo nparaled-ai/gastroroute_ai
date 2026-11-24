@@ -1114,7 +1114,7 @@
         "publish_help": "Todos os motociclistas a veem. O administrador revê antes de publicar.",
         "publish_pending": "Publicação pendente de revisão. Um administrador vai revê-la antes de aparecer em Rotas de moto.",
         "publish_published": "Rota publicada em Rotas de moto. Outros motociclistas já a podem ver e fazer.",
-        "publish_rejected": "Publicação rejeitada. Podes corrigir a rota e pedi-la de novo.",
+        "publish_rejected": "Publicação rejeitada. Esta rota não pode ser publicada de novo.",
         "mod_comments": "Comentários de rotas",
         "mod_route_draft": "Preenchido automaticamente: confirma",
         "mod_name": "Nome",

@@ -1114,7 +1114,7 @@
         "publish_help": "All riders can see it. The administrator reviews it before it goes live.",
         "publish_pending": "Publication pending review. An administrator will check it before it appears in Motorcycle routes.",
         "publish_published": "Route published in Motorcycle routes. Other riders can now see it and ride it.",
-        "publish_rejected": "Publication rejected. You can fix the route and request it again.",
+        "publish_rejected": "Publication rejected. This route cannot be published again.",
         "mod_comments": "Route comments",
         "mod_route_draft": "Filled in automatically: check it",
         "mod_name": "Name",
