@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../widgets/route_map_image.dart';
+import '../../../widgets/route_publication_block.dart';
 import '../providers/route_tracking_service.dart';
 import '../providers/achievement_service.dart';
 import '../providers/route_service.dart';
@@ -227,6 +228,17 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
                 icon: Icons.signal_cellular_connected_no_internet_0_bar,
                 color: AppColors.grey,
                 text: 'summary.gps_gaps'.plural(gaps),
+              ),
+            ],
+
+            // Publicar la ruta en Rutas moteras: el momento natural es al acabar de rodarla
+            if (rejected == null && _route['can_publish'] == true) ...[
+              const SizedBox(height: 20),
+              RoutePublicationBlock(
+                routeId: (_route['id'] as num).toInt(),
+                status: _route['publication_status'] as String?,
+                reason: _route['publication_reason'] as String?,
+                catalogRouteId: (_route['catalog_route_id'] as num?)?.toInt(),
               ),
             ],
 
