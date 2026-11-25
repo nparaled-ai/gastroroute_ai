@@ -1008,7 +1008,7 @@
         "points": "Points ajoutés",
         "closed": "Lieux signalés fermés",
         "soon": "Bientôt",
-        "footer": "Rien n'est publié tant que tu ne l'approuves pas.",
+        "footer": "Les commentaires et les itinéraires qui demandent à entrer dans « Routes moto » ne sont publiés qu’après votre approbation. Les itinéraires publiés pour tous sont en ligne immédiatement : vous les voyez dans « Itinéraires publiés » et pouvez bloquer le compte de qui abuse.",
         "tab_pending": "En attente",
         "tab_reviewed": "Relus",
         "approve": "Approuver",
@@ -1038,7 +1038,20 @@
         "parking_no": "Parking moto : non",
         "parking_unknown": "Parking : non indiqué",
         "says_closed": "Dit que ça n'existe plus ou est fermé",
-        "translation": "Traduction : {text}"
+        "translation": "Traduction : {text}",
+        "public_routes": "Itinéraires publiés",
+        "public_routes_empty": "Aucun itinéraire publié pour tous.",
+        "public_route": "Itinéraire publié",
+        "author": "Auteur",
+        "author_public_routes": "Itinéraires publics de ce motard : {n}",
+        "account_blocked": "Compte bloqué",
+        "block_account": "Bloquer le compte",
+        "block": "Bloquer",
+        "unblock": "Débloquer",
+        "block_title": "Bloquer @{nick} ?",
+        "block_body": "Cette personne ne pourra plus se connecter, ses sessions seront fermées et ses itinéraires publiés ne seront plus visibles. Le motif lui sera indiqué lors d’une tentative de connexion. Vous pourrez débloquer le compte plus tard.",
+        "block_reason": "Motif (obligatoire)",
+        "blocked_ok": "Compte bloqué."
     },
     "catalog": {
         "title": "Routes moto",
@@ -1195,5 +1208,35 @@
         "warn_far_severe": "Le début est à {km} km ({time}) de votre départ : ce n’est pas un parcours à faire dans la journée depuis chez vous.",
         "start_at_route": "Partir du début du parcours",
         "route_start": "Départ du parcours"
+    },
+    "legal": {
+        "terms": "Conditions d’utilisation",
+        "privacy": "Politique de confidentialité",
+        "version": "Version",
+        "must_accept": "Pour créer votre compte, vous devez accepter les conditions et la politique de confidentialité.",
+        "accept_prefix": "J’ai lu et j’accepte les",
+        "and": "et la",
+        "accept_suffix": ", et je confirme avoir au moins 16 ans.",
+        "consent_title": "Avant de créer votre compte",
+        "consent_body": "Pour créer votre compte avec Google, vous devez accepter les conditions d’utilisation et la politique de confidentialité, et confirmer avoir au moins 16 ans.",
+        "consent_accept": "J’accepte et je continue"
+    },
+    "account": {
+        "title": "Compte et confidentialité",
+        "change_password": "Changer le mot de passe",
+        "change_password_desc": "Vos autres sessions ouvertes seront fermées.",
+        "change_password_note": "En la changeant, nous fermons vos sessions sur les autres appareils.",
+        "current_password": "Mot de passe actuel",
+        "new_password": "Nouveau mot de passe",
+        "repeat_password": "Répétez le nouveau mot de passe",
+        "change": "Changer",
+        "password_changed": "Mot de passe modifié. Vos autres sessions ont été fermées.",
+        "password_short": "Le nouveau mot de passe doit comporter au moins 8 caractères.",
+        "password_mismatch": "Les nouveaux mots de passe ne correspondent pas.",
+        "delete": "Supprimer le compte",
+        "delete_desc": "Supprime votre compte et toutes vos données. Action irréversible.",
+        "delete_warning": "Votre compte, votre profil, vos motos, itinéraires, sorties, amitiés et notes seront supprimés. Action irréversible.",
+        "delete_confirm_password": "Saisissez votre mot de passe pour confirmer",
+        "delete_final": "Supprimer définitivement"
     }
 }

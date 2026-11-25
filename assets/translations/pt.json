@@ -1008,7 +1008,7 @@
         "points": "Pontos adicionados",
         "closed": "Locais dados como fechados",
         "soon": "Brevemente",
-        "footer": "Nada é publicado até o aprovares.",
+        "footer": "Os comentários e as rotas que pedem para entrar em «Rotas de moto» não são publicados até os aprovares. As rotas publicadas para todos ficam logo online: vês em «Rotas publicadas» e podes bloquear a conta de quem abusar.",
         "tab_pending": "Pendentes",
         "tab_reviewed": "Revistos",
         "approve": "Aprovar",
@@ -1038,7 +1038,20 @@
         "parking_no": "Estacionamento para a mota: não",
         "parking_unknown": "Estacionamento: não indicado",
         "says_closed": "Diz que já não existe ou está fechado",
-        "translation": "Tradução: {text}"
+        "translation": "Tradução: {text}",
+        "public_routes": "Rotas publicadas",
+        "public_routes_empty": "Não há rotas publicadas para todos.",
+        "public_route": "Rota publicada",
+        "author": "Autor",
+        "author_public_routes": "Rotas públicas deste motociclista: {n}",
+        "account_blocked": "Conta bloqueada",
+        "block_account": "Bloquear a conta",
+        "block": "Bloquear",
+        "unblock": "Desbloquear",
+        "block_title": "Bloquear @{nick}?",
+        "block_body": "Não poderá entrar, as suas sessões serão terminadas e as suas rotas publicadas deixarão de ser vistas. O motivo ser-lhe-á comunicado ao tentar entrar. Poderás desbloquear a conta mais tarde.",
+        "block_reason": "Motivo (obrigatório)",
+        "blocked_ok": "Conta bloqueada."
     },
     "catalog": {
         "title": "Rotas de moto",
@@ -1195,5 +1208,35 @@
         "warn_far_severe": "O início fica a {km} km ({time}) da tua saída: não é um percurso para fazer num dia a partir de casa.",
         "start_at_route": "Começar na saída do percurso",
         "route_start": "Saída do percurso"
+    },
+    "legal": {
+        "terms": "Termos de utilização",
+        "privacy": "Política de privacidade",
+        "version": "Versão",
+        "must_accept": "Para criar a tua conta tens de aceitar os termos e a política de privacidade.",
+        "accept_prefix": "Li e aceito os",
+        "and": "e a",
+        "accept_suffix": ", e confirmo que tenho pelo menos 16 anos.",
+        "consent_title": "Antes de criar a tua conta",
+        "consent_body": "Para criar a tua conta com a Google tens de aceitar os termos de utilização e a política de privacidade e confirmar que tens pelo menos 16 anos.",
+        "consent_accept": "Aceito e continuo"
+    },
+    "account": {
+        "title": "Conta e privacidade",
+        "change_password": "Alterar palavra-passe",
+        "change_password_desc": "As outras sessões abertas serão terminadas.",
+        "change_password_note": "Ao alterá-la, terminamos as tuas sessões noutros dispositivos.",
+        "current_password": "Palavra-passe atual",
+        "new_password": "Nova palavra-passe",
+        "repeat_password": "Repete a nova palavra-passe",
+        "change": "Alterar",
+        "password_changed": "Palavra-passe alterada. As outras sessões foram terminadas.",
+        "password_short": "A nova palavra-passe deve ter pelo menos 8 caracteres.",
+        "password_mismatch": "As novas palavras-passe não coincidem.",
+        "delete": "Eliminar conta",
+        "delete_desc": "Apaga a tua conta e todos os teus dados. Não se pode desfazer.",
+        "delete_warning": "Serão apagados a tua conta, o perfil, as motas, as rotas, as saídas, as amizades e as avaliações. Não se pode desfazer.",
+        "delete_confirm_password": "Escreve a tua palavra-passe para confirmar",
+        "delete_final": "Eliminar para sempre"
     }
 }

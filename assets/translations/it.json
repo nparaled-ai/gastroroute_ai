@@ -1008,7 +1008,7 @@
         "points": "Punti aggiunti",
         "closed": "Luoghi segnalati come chiusi",
         "soon": "Prossimamente",
-        "footer": "Niente viene pubblicato finché non lo approvi tu.",
+        "footer": "I commenti e i percorsi che chiedono di entrare in «Percorsi in moto» non vengono pubblicati finché non li approvi. I percorsi pubblicati per tutti vanno online subito: li vedi in «Percorsi pubblicati» e puoi bloccare l’account di chi abusa.",
         "tab_pending": "In attesa",
         "tab_reviewed": "Rivisti",
         "approve": "Approva",
@@ -1038,7 +1038,20 @@
         "parking_no": "Parcheggio moto: no",
         "parking_unknown": "Parcheggio: non indicato",
         "says_closed": "Dice che non esiste più o è chiuso",
-        "translation": "Traduzione: {text}"
+        "translation": "Traduzione: {text}",
+        "public_routes": "Percorsi pubblicati",
+        "public_routes_empty": "Non ci sono percorsi pubblicati per tutti.",
+        "public_route": "Percorso pubblicato",
+        "author": "Autore",
+        "author_public_routes": "Percorsi pubblici di questo motociclista: {n}",
+        "account_blocked": "Account bloccato",
+        "block_account": "Blocca l’account",
+        "block": "Blocca",
+        "unblock": "Sblocca",
+        "block_title": "Bloccare @{nick}?",
+        "block_body": "Non potrà accedere, le sue sessioni verranno chiuse e i suoi percorsi pubblicati non saranno più visibili. Il motivo le verrà comunicato quando proverà ad accedere. Potrai sbloccare l’account in seguito.",
+        "block_reason": "Motivo (obbligatorio)",
+        "blocked_ok": "Account bloccato."
     },
     "catalog": {
         "title": "Percorsi in moto",
@@ -1195,5 +1208,35 @@
         "warn_far_severe": "L’inizio è a {km} km ({time}) dalla tua partenza: non è un percorso da fare in giornata partendo da casa.",
         "start_at_route": "Partire dall’inizio del percorso",
         "route_start": "Partenza del percorso"
+    },
+    "legal": {
+        "terms": "Termini di utilizzo",
+        "privacy": "Informativa sulla privacy",
+        "version": "Versione",
+        "must_accept": "Per creare il tuo account devi accettare i termini e l’informativa sulla privacy.",
+        "accept_prefix": "Ho letto e accetto i",
+        "and": "e l’",
+        "accept_suffix": " e confermo di avere almeno 16 anni.",
+        "consent_title": "Prima di creare il tuo account",
+        "consent_body": "Per creare il tuo account con Google devi accettare i termini di utilizzo e l’informativa sulla privacy e confermare di avere almeno 16 anni.",
+        "consent_accept": "Accetto e continuo"
+    },
+    "account": {
+        "title": "Account e privacy",
+        "change_password": "Cambia password",
+        "change_password_desc": "Le altre sessioni aperte verranno chiuse.",
+        "change_password_note": "Cambiandola, chiudiamo le tue sessioni su altri dispositivi.",
+        "current_password": "Password attuale",
+        "new_password": "Nuova password",
+        "repeat_password": "Ripeti la nuova password",
+        "change": "Cambia",
+        "password_changed": "Password cambiata. Le altre sessioni sono state chiuse.",
+        "password_short": "La nuova password deve avere almeno 8 caratteri.",
+        "password_mismatch": "Le nuove password non coincidono.",
+        "delete": "Elimina account",
+        "delete_desc": "Elimina il tuo account e tutti i tuoi dati. Non si può annullare.",
+        "delete_warning": "Verranno eliminati il tuo account, il profilo, le moto, i percorsi, le uscite, le amicizie e le valutazioni. Non si può annullare.",
+        "delete_confirm_password": "Scrivi la tua password per confermare",
+        "delete_final": "Elimina per sempre"
     }
 }

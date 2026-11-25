@@ -87,10 +87,40 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Cuenta NUEVA de Google: antes de crearla hay que aceptar los terminos y la politica de privacidad.
+  Future<bool> _askConsent() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('legal.consent_title'.tr()),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('legal.consent_body'.tr(), style: const TextStyle(color: AppColors.greyText, fontSize: 14, height: 1.45)),
+          const SizedBox(height: 12),
+          TextButton(onPressed: () => context.push('/legal/terms'), child: Text('legal.terms'.tr())),
+          TextButton(onPressed: () => context.push('/legal/privacy'), child: Text('legal.privacy'.tr())),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('common.cancel'.tr())),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('legal.consent_accept'.tr())),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
   Future<void> _loginWithGoogle() async {
     setState(() { _loadingGoogle = true; _error = null; });
-    final result = await GoogleAuthService.signIn();
+    var result = await GoogleAuthService.signIn();
     if (!mounted) return;
+
+    if (result['consent_required'] == true) {
+      setState(() => _loadingGoogle = false);
+      if (!await _askConsent() || !mounted) return;
+      setState(() => _loadingGoogle = true);
+      result = await GoogleAuthService.signIn(acceptTerms: true);
+      if (!mounted) return;
+    }
     setState(() => _loadingGoogle = false);
 
     if (result['cancelled'] == true) return;

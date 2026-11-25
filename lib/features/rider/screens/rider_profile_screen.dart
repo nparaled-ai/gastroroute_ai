@@ -204,6 +204,15 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
             )
           else
             ...motos.map((moto) => _MotoCard(moto: moto)),
+
+          // Cuenta y privacidad: cambiar contraseña, eliminar la cuenta, términos y política (lo exige la ley).
+          const SizedBox(height: 24),
+          OutlinedButton.icon(
+            onPressed: () => context.push('/rider/account'),
+            icon: const Icon(Icons.shield_outlined),
+            label: Text('account.title'.tr()),
+            style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+          ),
         ],
       ),
     );

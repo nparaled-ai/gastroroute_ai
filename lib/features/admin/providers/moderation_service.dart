@@ -124,4 +124,43 @@ class ModerationService {
       return false;
     }
   }
+
+  /// Rutas publicadas para todos (solo lectura). null si falló.
+  static Future<List<Map<String, dynamic>>?> publicRoutes() async {
+    try {
+      final r = await ApiClient.dio.get('/admin/moderation/public-routes');
+      return List<Map<String, dynamic>>.from(
+          (r.data['routes'] as List).map((e) => Map<String, dynamic>.from(e as Map)));
+    } on DioException {
+      return null;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> publicRoute(int id) async {
+    try {
+      final r = await ApiClient.dio.get('/admin/moderation/public-routes/$id');
+      return Map<String, dynamic>.from(r.data as Map);
+    } on DioException {
+      return null;
+    }
+  }
+
+  /// Bloquea la cuenta de un usuario. null = hecho; si no, el motivo del fallo.
+  static Future<String?> blockUser(int userId, String reason) async {
+    try {
+      await ApiClient.dio.post('/admin/moderation/users/$userId/block', data: {'reason': reason});
+      return null;
+    } on DioException catch (e) {
+      return e.response?.data is Map ? '${e.response?.data['message'] ?? 'error'}' : 'error';
+    }
+  }
+
+  static Future<String?> unblockUser(int userId) async {
+    try {
+      await ApiClient.dio.post('/admin/moderation/users/$userId/unblock');
+      return null;
+    } on DioException catch (e) {
+      return e.response?.data is Map ? '${e.response?.data['message'] ?? 'error'}' : 'error';
+    }
+  }
 }

@@ -104,6 +104,12 @@ class _ModerationHomeScreenState extends State<ModerationHomeScreen> {
               },
             ),
             _Tile(
+              icon: Icons.public,
+              label: 'moderation.public_routes'.tr(),
+              count: 0,
+              onTap: () => context.push('/admin/moderation/public-routes'),
+            ),
+            _Tile(
               icon: Icons.storefront_outlined,
               label: 'moderation.partners'.tr(),
               count: c['partners'] ?? 0,

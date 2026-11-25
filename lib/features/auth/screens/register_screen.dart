@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/auth_service.dart';
@@ -17,11 +18,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nicknameController = TextEditingController();
   bool _loading  = false;
   bool _obscure  = true;
+  // Terminos, politica de privacidad y edad minima: sin marcarla no se crea la cuenta (RGPD arts. 7 y 8).
+  bool _accepted = false;
+  late final TapGestureRecognizer _termsTap = TapGestureRecognizer()..onTap = () => context.push('/legal/terms');
+  late final TapGestureRecognizer _privacyTap = TapGestureRecognizer()..onTap = () => context.push('/legal/privacy');
   String? _error;
   String? _success;
 
   @override
   void dispose() {
+    _termsTap.dispose();
+    _privacyTap.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _nicknameController.dispose();
@@ -29,12 +36,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _register() async {
+    if (!_accepted) {
+      setState(() => _error = 'legal.must_accept'.tr());
+      return;
+    }
     setState(() { _loading = true; _error = null; _success = null; });
 
     final result = await AuthService.registerRider(
       email:    _emailController.text.trim(),
       password: _passwordController.text,
       nickname: _nicknameController.text.trim(),
+      acceptTerms: _accepted,
     );
 
     if (!mounted) return;
@@ -137,6 +149,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),
+              ),
+
+              const SizedBox(height: 16),
+              // Casilla de aceptacion: terminos + politica + edad minima, con enlaces a los textos.
+              InkWell(
+                onTap: () => setState(() => _accepted = !_accepted),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Checkbox(
+                    value: _accepted,
+                    onChanged: (v) => setState(() => _accepted = v ?? false),
+                    activeColor: AppColors.orange,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      // Un solo parrafo, con los dos enlaces dentro: el texto fluye y la coma no queda suelta.
+                      child: Text.rich(TextSpan(
+                        style: const TextStyle(color: AppColors.greyText, fontSize: 13, height: 1.4),
+                        children: [
+                          TextSpan(text: '${'legal.accept_prefix'.tr()} '),
+                          TextSpan(
+                            text: 'legal.terms'.tr(),
+                            style: const TextStyle(color: AppColors.cyan, decoration: TextDecoration.underline),
+                            recognizer: _termsTap,
+                          ),
+                          TextSpan(text: 'legal.and'.tr().endsWith('’') ? ' ${'legal.and'.tr()}' : ' ${'legal.and'.tr()} '),
+                          TextSpan(
+                            text: 'legal.privacy'.tr(),
+                            style: const TextStyle(color: AppColors.cyan, decoration: TextDecoration.underline),
+                            recognizer: _privacyTap,
+                          ),
+                          TextSpan(text: 'legal.accept_suffix'.tr()),
+                        ],
+                      )),
+                    ),
+                  ),
+                ]),
               ),
 
               if (_error != null) ...[

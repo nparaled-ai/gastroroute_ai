@@ -98,12 +98,14 @@ class AuthService {
     required String email,
     required String password,
     required String nickname,
+    required bool acceptTerms,
   }) async {
     try {
       final response = await ApiClient.dio.post('/auth/register/rider', data: {
         'email':    email,
         'password': password,
         'nickname': nickname,
+        'accept_terms': acceptTerms,
       });
 
       final data = response.data;

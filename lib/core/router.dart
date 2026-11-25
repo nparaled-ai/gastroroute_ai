@@ -11,6 +11,9 @@ import '../features/admin/screens/moderation_comments_screen.dart';
 import '../features/admin/screens/moderation_routes_screen.dart';
 import '../features/admin/screens/similar_routes_screen.dart';
 import '../features/admin/screens/moderation_catalog_comments_screen.dart';
+import '../features/admin/screens/moderation_public_routes_screen.dart';
+import '../features/legal/legal_screen.dart';
+import '../features/rider/screens/account_screen.dart';
 import '../features/rider/screens/catalog_screen.dart';
 import '../features/rider/screens/catalog_detail_screen.dart';
 import '../features/rider/screens/catalog_plan_screen.dart';
@@ -78,6 +81,24 @@ final router = GoRouter(
         routeId: int.parse(state.pathParameters['id']!),
         title: '${(state.extra as Map<String, dynamic>?)?['title'] ?? ''}',
       ),
+    ),
+    GoRoute(
+      path: '/admin/moderation/public-routes',
+      builder: (context, state) => const ModerationPublicRoutesScreen(),
+    ),
+    GoRoute(
+      path: '/admin/moderation/public-routes/:id',
+      builder: (context, state) =>
+          ModerationPublicRouteDetailScreen(routeId: int.parse(state.pathParameters['id']!)),
+    ),
+    // Terminos y politica de privacidad: publicas (se leen antes de registrarse).
+    GoRoute(
+      path: '/legal/:doc',
+      builder: (context, state) => LegalScreen(doc: state.pathParameters['doc'] ?? 'terms'),
+    ),
+    GoRoute(
+      path: '/rider/account',
+      builder: (context, state) => const AccountScreen(),
     ),
     GoRoute(
       path: '/admin/moderation/catalog-comments',
@@ -264,6 +285,7 @@ final router = GoRouter(
                        state.matchedLocation == '/verify-email' ||
                        state.matchedLocation == '/select-role' ||
                        state.matchedLocation == '/forgot-password' ||
+                       state.matchedLocation.startsWith('/legal/') ||
                        state.matchedLocation.startsWith('/reset-password');
 
     if (!isLoggedIn && !isAuth && !isSplash) return '/login';

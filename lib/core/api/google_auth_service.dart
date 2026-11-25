@@ -9,7 +9,9 @@ class GoogleAuthService {
     serverClientId: '1063655022495-5763pug6e9bsqduiipdnb3os514n1n5v.apps.googleusercontent.com',
   );
 
-  static Future<Map<String, dynamic>> signIn() async {
+  /// [acceptTerms]: la cuenta NUEVA de Google necesita aceptar los terminos y la politica. La primera llamada va sin
+  /// ella; si el servidor contesta 428 (`consent_required`) la pantalla pregunta y vuelve a llamar con `true`.
+  static Future<Map<String, dynamic>> signIn({bool acceptTerms = false}) async {
     try {
       final account = await _googleSignIn.signIn();
       if (account == null) return {'cancelled': true};
@@ -20,6 +22,7 @@ class GoogleAuthService {
 
       final response = await ApiClient.dio.post('/auth/google', data: {
         'id_token': idToken,
+        if (acceptTerms) 'accept_terms': true,
       });
 
       final data = response.data;
@@ -43,6 +46,9 @@ class GoogleAuthService {
       return {'success': true, 'role': data['user']['active_role']};
 
     } on DioException catch (e) {
+      if (e.response?.statusCode == 428 && e.response?.data is Map && e.response?.data['consent_required'] == true) {
+        return {'consent_required': true};
+      }
       return {'error': e.response?.data['message'] ?? 'common.connection_error'.tr()};
     } catch (e) {
       return {'error': 'errors.google_login'.tr()};

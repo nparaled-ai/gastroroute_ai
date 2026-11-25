@@ -1008,7 +1008,7 @@
         "points": "Puntos añadidos",
         "closed": "Sitios dados por cerrados",
         "soon": "Próximamente",
-        "footer": "Nada se publica hasta que lo apruebas tú.",
+        "footer": "Los comentarios y las rutas que piden entrar en «Rutas moteras» no se publican hasta que los apruebes. Las rutas publicadas para todos salen al momento: las ves en «Rutas publicadas» y puedes bloquear la cuenta de quien abuse.",
         "tab_pending": "Pendientes",
         "tab_reviewed": "Revisados",
         "approve": "Aprobar",
@@ -1038,7 +1038,20 @@
         "parking_no": "Aparcamiento para la moto: no",
         "parking_unknown": "Aparcamiento: sin indicar",
         "says_closed": "Dice que ya no existe o está cerrado",
-        "translation": "Traducción: {text}"
+        "translation": "Traducción: {text}",
+        "public_routes": "Rutas publicadas",
+        "public_routes_empty": "No hay rutas publicadas para todos.",
+        "public_route": "Ruta publicada",
+        "author": "Autor",
+        "author_public_routes": "Rutas públicas de este motero: {n}",
+        "account_blocked": "Cuenta bloqueada",
+        "block_account": "Bloquear la cuenta",
+        "block": "Bloquear",
+        "unblock": "Desbloquear",
+        "block_title": "¿Bloquear a @{nick}?",
+        "block_body": "No podrá entrar, se cerrarán sus sesiones y sus rutas publicadas dejarán de verse. Se le dirá el motivo al intentar entrar. Puedes desbloquearla después.",
+        "block_reason": "Motivo (obligatorio)",
+        "blocked_ok": "Cuenta bloqueada."
     },
     "catalog": {
         "title": "Rutas moteras",
@@ -1195,5 +1208,35 @@
         "warn_far_severe": "El inicio está a {km} km ({time}) de tu salida: no es una ruta para hacer en un día saliendo de casa.",
         "start_at_route": "Empezar en la salida de la ruta",
         "route_start": "Salida de la ruta"
+    },
+    "legal": {
+        "terms": "Términos de uso",
+        "privacy": "Política de privacidad",
+        "version": "Versión",
+        "must_accept": "Para crear tu cuenta tienes que aceptar los términos y la política de privacidad.",
+        "accept_prefix": "He leído y acepto los",
+        "and": "y la",
+        "accept_suffix": ", y confirmo que tengo al menos 16 años.",
+        "consent_title": "Antes de crear tu cuenta",
+        "consent_body": "Para crear tu cuenta con Google tienes que aceptar los términos de uso y la política de privacidad, y confirmar que tienes al menos 16 años.",
+        "consent_accept": "Acepto y continúo"
+    },
+    "account": {
+        "title": "Cuenta y privacidad",
+        "change_password": "Cambiar contraseña",
+        "change_password_desc": "Se cerrarán las demás sesiones abiertas.",
+        "change_password_note": "Al cambiarla, cerramos tus sesiones en otros dispositivos.",
+        "current_password": "Contraseña actual",
+        "new_password": "Contraseña nueva",
+        "repeat_password": "Repite la contraseña nueva",
+        "change": "Cambiar",
+        "password_changed": "Contraseña cambiada. Se han cerrado las demás sesiones.",
+        "password_short": "La contraseña nueva debe tener al menos 8 caracteres.",
+        "password_mismatch": "Las contraseñas nuevas no coinciden.",
+        "delete": "Eliminar cuenta",
+        "delete_desc": "Borra tu cuenta y todos tus datos. No se puede deshacer.",
+        "delete_warning": "Se borrarán tu cuenta, tu perfil, tus motos, tus rutas, tus rodadas, tus amistades y tus valoraciones. No se puede deshacer.",
+        "delete_confirm_password": "Escribe tu contraseña para confirmar",
+        "delete_final": "Eliminar para siempre"
     }
 }

@@ -1008,7 +1008,7 @@
         "points": "Added points",
         "closed": "Places reported closed",
         "soon": "Coming soon",
-        "footer": "Nothing is published until you approve it.",
+        "footer": "Comments and routes requesting to join “Motorcycle routes” are not published until you approve them. Routes published for everyone go live immediately: you see them in “Published routes” and can block the account of anyone who abuses.",
         "tab_pending": "Pending",
         "tab_reviewed": "Reviewed",
         "approve": "Approve",
@@ -1038,7 +1038,20 @@
         "parking_no": "Bike parking: no",
         "parking_unknown": "Parking: not stated",
         "says_closed": "Says it no longer exists or is closed",
-        "translation": "Translation: {text}"
+        "translation": "Translation: {text}",
+        "public_routes": "Published routes",
+        "public_routes_empty": "There are no routes published for everyone.",
+        "public_route": "Published route",
+        "author": "Author",
+        "author_public_routes": "Public routes by this rider: {n}",
+        "account_blocked": "Account blocked",
+        "block_account": "Block the account",
+        "block": "Block",
+        "unblock": "Unblock",
+        "block_title": "Block @{nick}?",
+        "block_body": "They will not be able to log in, their sessions will be closed and their published routes will be hidden. They will be told the reason when they try to log in. You can unblock the account later.",
+        "block_reason": "Reason (required)",
+        "blocked_ok": "Account blocked."
     },
     "catalog": {
         "title": "Motorcycle routes",
@@ -1195,5 +1208,35 @@
         "warn_far_severe": "The start is {km} km ({time}) from where you set off: this is not a route for a day out from home.",
         "start_at_route": "Start at the route’s start",
         "route_start": "Route start"
+    },
+    "legal": {
+        "terms": "Terms of use",
+        "privacy": "Privacy policy",
+        "version": "Version",
+        "must_accept": "To create your account you must accept the terms and the privacy policy.",
+        "accept_prefix": "I have read and accept the",
+        "and": "and the",
+        "accept_suffix": ", and I confirm that I am at least 16 years old.",
+        "consent_title": "Before creating your account",
+        "consent_body": "To create your account with Google you must accept the terms of use and the privacy policy, and confirm that you are at least 16 years old.",
+        "consent_accept": "I accept and continue"
+    },
+    "account": {
+        "title": "Account and privacy",
+        "change_password": "Change password",
+        "change_password_desc": "Your other open sessions will be closed.",
+        "change_password_note": "When you change it, we sign you out of other devices.",
+        "current_password": "Current password",
+        "new_password": "New password",
+        "repeat_password": "Repeat the new password",
+        "change": "Change",
+        "password_changed": "Password changed. Your other sessions have been closed.",
+        "password_short": "The new password must be at least 8 characters long.",
+        "password_mismatch": "The new passwords do not match.",
+        "delete": "Delete account",
+        "delete_desc": "Deletes your account and all your data. It cannot be undone.",
+        "delete_warning": "Your account, profile, bikes, routes, rides, friendships and ratings will be deleted. This cannot be undone.",
+        "delete_confirm_password": "Type your password to confirm",
+        "delete_final": "Delete forever"
     }
 }

@@ -86,6 +86,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'friend_request':  return Icons.person_add_outlined;
       case 'friend_accepted': return Icons.people;
       case 'friend_rejected': return Icons.person_remove_outlined;
+      case 'moderation_public_route': return Icons.public;
       case 'route_shared':    return Icons.group_outlined;      // de un AMIGO
       case 'route_shared_public': return Icons.public;          // de alguien de tu ZONA
       case 'route_join':      return Icons.check_circle_outline;
@@ -101,6 +102,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'friend_request':  return AppColors.orange;
       case 'friend_accepted': return AppColors.cyan;
       case 'friend_rejected': return AppColors.error;
+      case 'moderation_public_route': return AppColors.gold;
       case 'route_shared':    return AppColors.cyan;
       case 'route_shared_public': return AppColors.gold;
       case 'route_join':      return AppColors.gold;
@@ -136,6 +138,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     if (type == 'friend_request' || type == 'friend_accepted' || type == 'friend_rejected') {
       context.push('/rider/friends');
+      return;
+    }
+
+    // Aviso a moderación: alguien ha publicado una ruta para todos. Lleva a verla (solo lectura) y a su autor.
+    if (type == 'moderation_public_route' && extra['route_id'] != null) {
+      context.push('/admin/moderation/public-routes/${extra['route_id']}');
       return;
     }
 

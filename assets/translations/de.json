@@ -1008,7 +1008,7 @@
         "points": "Hinzugefügte Punkte",
         "closed": "Als geschlossen gemeldete Orte",
         "soon": "Demnächst",
-        "footer": "Nichts wird veröffentlicht, bevor du es freigibst.",
+        "footer": "Kommentare und Routen, die in die „Motorradrouten“ aufgenommen werden wollen, werden erst nach deiner Freigabe veröffentlicht. Für alle veröffentlichte Routen gehen sofort online: Du siehst sie unter „Veröffentlichte Routen“ und kannst das Konto bei Missbrauch sperren.",
         "tab_pending": "Offen",
         "tab_reviewed": "Geprüft",
         "approve": "Freigeben",
@@ -1038,7 +1038,20 @@
         "parking_no": "Motorradparkplatz: nein",
         "parking_unknown": "Parken: keine Angabe",
         "says_closed": "Sagt, es existiert nicht mehr oder ist geschlossen",
-        "translation": "Übersetzung: {text}"
+        "translation": "Übersetzung: {text}",
+        "public_routes": "Veröffentlichte Routen",
+        "public_routes_empty": "Es gibt keine für alle veröffentlichten Routen.",
+        "public_route": "Veröffentlichte Route",
+        "author": "Autor",
+        "author_public_routes": "Öffentliche Routen dieses Fahrers: {n}",
+        "account_blocked": "Konto gesperrt",
+        "block_account": "Konto sperren",
+        "block": "Sperren",
+        "unblock": "Entsperren",
+        "block_title": "@{nick} sperren?",
+        "block_body": "Die Person kann sich nicht mehr anmelden, ihre Sitzungen werden beendet und ihre veröffentlichten Routen ausgeblendet. Der Grund wird beim Anmeldeversuch genannt. Du kannst das Konto später entsperren.",
+        "block_reason": "Grund (erforderlich)",
+        "blocked_ok": "Konto gesperrt."
     },
     "catalog": {
         "title": "Motorradrouten",
@@ -1195,5 +1208,35 @@
         "warn_far_severe": "Der Start liegt {km} km ({time}) von deinem Ausgangspunkt entfernt: Das ist keine Tagestour von zu Hause aus.",
         "start_at_route": "Am Start der Route beginnen",
         "route_start": "Start der Route"
+    },
+    "legal": {
+        "terms": "Nutzungsbedingungen",
+        "privacy": "Datenschutzerklärung",
+        "version": "Version",
+        "must_accept": "Um dein Konto zu erstellen, musst du die Bedingungen und die Datenschutzerklärung akzeptieren.",
+        "accept_prefix": "Ich akzeptiere die",
+        "and": "und die",
+        "accept_suffix": " und bestätige, dass ich mindestens 16 Jahre alt bin.",
+        "consent_title": "Bevor du dein Konto erstellst",
+        "consent_body": "Um dein Konto mit Google zu erstellen, musst du die Nutzungsbedingungen und die Datenschutzerklärung akzeptieren und bestätigen, dass du mindestens 16 Jahre alt bist.",
+        "consent_accept": "Akzeptieren und weiter"
+    },
+    "account": {
+        "title": "Konto und Datenschutz",
+        "change_password": "Passwort ändern",
+        "change_password_desc": "Deine anderen offenen Sitzungen werden beendet.",
+        "change_password_note": "Beim Ändern melden wir dich auf anderen Geräten ab.",
+        "current_password": "Aktuelles Passwort",
+        "new_password": "Neues Passwort",
+        "repeat_password": "Neues Passwort wiederholen",
+        "change": "Ändern",
+        "password_changed": "Passwort geändert. Deine anderen Sitzungen wurden beendet.",
+        "password_short": "Das neue Passwort muss mindestens 8 Zeichen lang sein.",
+        "password_mismatch": "Die neuen Passwörter stimmen nicht überein.",
+        "delete": "Konto löschen",
+        "delete_desc": "Löscht dein Konto und alle deine Daten. Das kann nicht rückgängig gemacht werden.",
+        "delete_warning": "Dein Konto, dein Profil, deine Motorräder, Routen, Fahrten, Freundschaften und Bewertungen werden gelöscht. Das kann nicht rückgängig gemacht werden.",
+        "delete_confirm_password": "Gib dein Passwort zur Bestätigung ein",
+        "delete_final": "Endgültig löschen"
     }
 }
