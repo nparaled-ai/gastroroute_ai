@@ -1255,7 +1255,8 @@
         "mod_rejected_msg": "Route abgelehnt. Der Autor wurde benachrichtigt.",
         "warn_far_severe": "Der Start liegt {km} km ({time}) von deinem Ausgangspunkt entfernt: Das ist keine Tagestour von zu Hause aus.",
         "start_at_route": "Am Start der Route beginnen",
-        "route_start": "Start der Route"
+        "route_start": "Start der Route",
+        "publish_removed": "Diese Route wurde von der Moderation aus den Motorradrouten entfernt. Wenn du glaubst, dass es ein Irrtum ist, schreibe uns: Die E-Mail steht im Rechtlichen Hinweis."
     },
     "legal": {
         "terms": "Nutzungsbedingungen",

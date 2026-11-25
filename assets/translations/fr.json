@@ -1255,7 +1255,8 @@
         "mod_rejected_msg": "Itinéraire refusé. Son auteur a été prévenu.",
         "warn_far_severe": "Le début est à {km} km ({time}) de votre départ : ce n’est pas un parcours à faire dans la journée depuis chez vous.",
         "start_at_route": "Partir du début du parcours",
-        "route_start": "Départ du parcours"
+        "route_start": "Départ du parcours",
+        "publish_removed": "Cet itinéraire a été retiré de Routes moto par la modération. Si vous pensez qu’il s’agit d’une erreur, écrivez-nous : l’e-mail figure dans les Mentions légales."
     },
     "legal": {
         "terms": "Conditions d’utilisation",

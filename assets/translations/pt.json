@@ -1255,7 +1255,8 @@
         "mod_rejected_msg": "Rota rejeitada. O autor foi avisado.",
         "warn_far_severe": "O início fica a {km} km ({time}) da tua saída: não é um percurso para fazer num dia a partir de casa.",
         "start_at_route": "Começar na saída do percurso",
-        "route_start": "Saída do percurso"
+        "route_start": "Saída do percurso",
+        "publish_removed": "Esta rota foi retirada de Rotas de moto pela moderação. Se achas que é um engano, escreve-nos: o e-mail está no Aviso legal."
     },
     "legal": {
         "terms": "Termos de utilização",

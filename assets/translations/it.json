@@ -1255,7 +1255,8 @@
         "mod_rejected_msg": "Percorso rifiutato. L’autore è stato avvisato.",
         "warn_far_severe": "L’inizio è a {km} km ({time}) dalla tua partenza: non è un percorso da fare in giornata partendo da casa.",
         "start_at_route": "Partire dall’inizio del percorso",
-        "route_start": "Partenza del percorso"
+        "route_start": "Partenza del percorso",
+        "publish_removed": "Questo percorso è stato rimosso da Percorsi in moto dalla moderazione. Se pensi che sia un errore, scrivici: l’email è nell’Avviso legale."
     },
     "legal": {
         "terms": "Termini di utilizzo",

@@ -1002,6 +1002,25 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       );
     }
 
+    // Retirada por moderacion tras una denuncia: no esta publicada y no hay boton para volver a pedirla.
+    if (status == 'removed') {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.error.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(children: [
+          const Icon(Icons.visibility_off_outlined, color: AppColors.error, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text('catalog.publish_removed'.tr(),
+                style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w700, height: 1.4)),
+          ),
+        ]),
+      );
+    }
+
     // Rechazada: la decision es definitiva, no hay boton para volver a pedirla.
     if (status == 'rejected') {
       final motivo = (_route?['publication_reason'] ?? '').toString();

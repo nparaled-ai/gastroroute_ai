@@ -1255,7 +1255,8 @@
         "mod_rejected_msg": "Ruta rechazada. Se ha avisado a su autor.",
         "warn_far_severe": "El inicio está a {km} km ({time}) de tu salida: no es una ruta para hacer en un día saliendo de casa.",
         "start_at_route": "Empezar en la salida de la ruta",
-        "route_start": "Salida de la ruta"
+        "route_start": "Salida de la ruta",
+        "publish_removed": "Esta ruta fue retirada de Rutas moteras por moderación. Si crees que es un error, escríbenos: el correo está en el Aviso legal."
     },
     "legal": {
         "terms": "Términos de uso",

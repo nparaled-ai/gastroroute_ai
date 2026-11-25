@@ -1255,7 +1255,8 @@
         "mod_rejected_msg": "Route rejected. Its author has been notified.",
         "warn_far_severe": "The start is {km} km ({time}) from where you set off: this is not a route for a day out from home.",
         "start_at_route": "Start at the route’s start",
-        "route_start": "Route start"
+        "route_start": "Route start",
+        "publish_removed": "This route was removed from Motorcycle routes by moderation. If you think this is a mistake, write to us: the email is in the Legal notice."
     },
     "legal": {
         "terms": "Terms of use",
