@@ -58,6 +58,11 @@ class AccountScreen extends StatelessWidget {
             onTap: () => _changePassword(context),
           ),
           _Tile(
+            icon: Icons.business_outlined,
+            title: 'legal.notice'.tr(),
+            onTap: () => context.push('/legal/notice'),
+          ),
+          _Tile(
             icon: Icons.description_outlined,
             title: 'legal.terms'.tr(),
             onTap: () => context.push('/legal/terms'),

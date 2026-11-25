@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/api/auth_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/legal_links.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -264,7 +265,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
+              const LegalLinks(),
+              const SizedBox(height: 24),
             ],
           ),
         ),

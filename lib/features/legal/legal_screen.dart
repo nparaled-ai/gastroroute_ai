@@ -53,7 +53,11 @@ class _LegalScreenState extends State<LegalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.doc == 'terms' ? 'legal.terms'.tr() : 'legal.privacy'.tr();
+    final title = switch (widget.doc) {
+      'terms' => 'legal.terms'.tr(),
+      'notice' => 'legal.notice'.tr(),
+      _ => 'legal.privacy'.tr(),
+    };
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(

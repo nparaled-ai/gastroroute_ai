@@ -1236,10 +1236,11 @@
         "consent_body": "Para crear tu cuenta con Google tienes que aceptar los términos de uso y la política de privacidad, y confirmar que tienes al menos 16 años.",
         "consent_accept": "Acepto y continúo",
         "reaccept_title": "Antes de seguir",
-        "reaccept_body": "Hemos actualizado cómo guardamos tu aceptación de los términos y de la política de privacidad. Para seguir usando la aplicación necesitamos que los aceptes de nuevo.",
+        "reaccept_body": "Hemos actualizado los términos de uso o la política de privacidad. Para seguir usando la aplicación necesitamos que los aceptes de nuevo.",
         "reaccept_button": "Aceptar y continuar",
         "reaccept_decline": "No acepto, cerrar sesión",
-        "reaccept_must": "Para continuar tienes que aceptar los términos y la política de privacidad."
+        "reaccept_must": "Para continuar tienes que aceptar los términos y la política de privacidad.",
+        "notice": "Aviso legal"
     },
     "account": {
         "title": "Cuenta y privacidad",

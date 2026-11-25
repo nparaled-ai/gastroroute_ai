@@ -1236,10 +1236,11 @@
         "consent_body": "Pour créer votre compte avec Google, vous devez accepter les conditions d’utilisation et la politique de confidentialité, et confirmer avoir au moins 16 ans.",
         "consent_accept": "J’accepte et je continue",
         "reaccept_title": "Avant de continuer",
-        "reaccept_body": "Nous avons mis à jour la façon dont nous enregistrons votre acceptation des conditions et de la politique de confidentialité. Pour continuer à utiliser l’application, nous avons besoin que vous les acceptiez à nouveau.",
+        "reaccept_body": "Nous avons mis à jour les conditions d’utilisation ou la politique de confidentialité. Pour continuer à utiliser l’application, nous avons besoin que vous les acceptiez à nouveau.",
         "reaccept_button": "Accepter et continuer",
         "reaccept_decline": "Je n’accepte pas, me déconnecter",
-        "reaccept_must": "Pour continuer, vous devez accepter les conditions et la politique de confidentialité."
+        "reaccept_must": "Pour continuer, vous devez accepter les conditions et la politique de confidentialité.",
+        "notice": "Mentions légales"
     },
     "account": {
         "title": "Compte et confidentialité",

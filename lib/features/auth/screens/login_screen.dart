@@ -7,6 +7,7 @@ import '../../../core/api/google_auth_service.dart';
 import '../../../core/services/push_notification_service.dart';
 import '../../../core/storage/auth_storage.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/legal_links.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -330,7 +331,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
+              const LegalLinks(),
+              const SizedBox(height: 24),
             ],
           ),
         ),
