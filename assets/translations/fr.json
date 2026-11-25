@@ -1256,7 +1256,7 @@
         "password_mismatch": "Les nouveaux mots de passe ne correspondent pas.",
         "delete": "Supprimer le compte",
         "delete_desc": "Supprime votre compte et toutes vos données. Action irréversible.",
-        "delete_warning": "Votre compte, votre profil, vos motos, itinéraires, sorties, amitiés et notes seront supprimés. Action irréversible.",
+        "delete_warning": "Votre compte, votre profil, vos motos, itinéraires, sorties, amitiés et notes seront supprimés. Action irréversible. Pendant 12 mois, nous conserverons une empreinte chiffrée de votre e-mail (pas l’e-mail lui-même) pour éviter les abus de l’offre de bienvenue gratuite.",
         "delete_confirm_password": "Saisissez votre mot de passe pour confirmer",
         "delete_final": "Supprimer définitivement"
     }

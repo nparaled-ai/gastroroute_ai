@@ -1256,7 +1256,7 @@
         "password_mismatch": "The new passwords do not match.",
         "delete": "Delete account",
         "delete_desc": "Deletes your account and all your data. It cannot be undone.",
-        "delete_warning": "Your account, profile, bikes, routes, rides, friendships and ratings will be deleted. This cannot be undone.",
+        "delete_warning": "Your account, profile, bikes, routes, rides, friendships and ratings will be deleted. This cannot be undone. For 12 months we will keep an encrypted fingerprint of your email (not the email itself) to prevent abuse of the free welcome allowance.",
         "delete_confirm_password": "Type your password to confirm",
         "delete_final": "Delete forever"
     }

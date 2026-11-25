@@ -1256,7 +1256,7 @@
         "password_mismatch": "As novas palavras-passe não coincidem.",
         "delete": "Eliminar conta",
         "delete_desc": "Apaga a tua conta e todos os teus dados. Não se pode desfazer.",
-        "delete_warning": "Serão apagados a tua conta, o perfil, as motas, as rotas, as saídas, as amizades e as avaliações. Não se pode desfazer.",
+        "delete_warning": "Serão apagados a tua conta, o perfil, as motas, as rotas, as saídas, as amizades e as avaliações. Não se pode desfazer. Durante 12 meses guardaremos uma impressão digital cifrada do teu e-mail (não o e-mail em si) para evitar abusos da oferta de boas-vindas gratuita.",
         "delete_confirm_password": "Escreve a tua palavra-passe para confirmar",
         "delete_final": "Eliminar para sempre"
     }

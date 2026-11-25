@@ -1256,7 +1256,7 @@
         "password_mismatch": "Die neuen Passwörter stimmen nicht überein.",
         "delete": "Konto löschen",
         "delete_desc": "Löscht dein Konto und alle deine Daten. Das kann nicht rückgängig gemacht werden.",
-        "delete_warning": "Dein Konto, dein Profil, deine Motorräder, Routen, Fahrten, Freundschaften und Bewertungen werden gelöscht. Das kann nicht rückgängig gemacht werden.",
+        "delete_warning": "Dein Konto, dein Profil, deine Motorräder, Routen, Fahrten, Freundschaften und Bewertungen werden gelöscht. Das kann nicht rückgängig gemacht werden. 12 Monate lang speichern wir einen verschlüsselten Fingerabdruck deiner E-Mail-Adresse (nicht die Adresse selbst), um Missbrauch des kostenlosen Willkommenskontingents zu verhindern.",
         "delete_confirm_password": "Gib dein Passwort zur Bestätigung ein",
         "delete_final": "Endgültig löschen"
     }

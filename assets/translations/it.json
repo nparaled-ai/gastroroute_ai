@@ -1256,7 +1256,7 @@
         "password_mismatch": "Le nuove password non coincidono.",
         "delete": "Elimina account",
         "delete_desc": "Elimina il tuo account e tutti i tuoi dati. Non si può annullare.",
-        "delete_warning": "Verranno eliminati il tuo account, il profilo, le moto, i percorsi, le uscite, le amicizie e le valutazioni. Non si può annullare.",
+        "delete_warning": "Verranno eliminati il tuo account, il profilo, le moto, i percorsi, le uscite, le amicizie e le valutazioni. Non si può annullare. Per 12 mesi conserveremo un’impronta cifrata della tua email (non l’email stessa) per evitare abusi dell’offerta di benvenuto gratuita.",
         "delete_confirm_password": "Scrivi la tua password per confermare",
         "delete_final": "Elimina per sempre"
     }

@@ -1256,7 +1256,7 @@
         "password_mismatch": "Las contraseñas nuevas no coinciden.",
         "delete": "Eliminar cuenta",
         "delete_desc": "Borra tu cuenta y todos tus datos. No se puede deshacer.",
-        "delete_warning": "Se borrarán tu cuenta, tu perfil, tus motos, tus rutas, tus rodadas, tus amistades y tus valoraciones. No se puede deshacer.",
+        "delete_warning": "Se borrarán tu cuenta, tu perfil, tus motos, tus rutas, tus rodadas, tus amistades y tus valoraciones. No se puede deshacer. Durante 12 meses guardaremos una huella cifrada de tu correo (no el correo) para evitar abusos de la bienvenida gratuita.",
         "delete_confirm_password": "Escribe tu contraseña para confirmar",
         "delete_final": "Eliminar para siempre"
     }
