@@ -1051,7 +1051,22 @@
         "block_title": "¿Bloquear a @{nick}?",
         "block_body": "No podrá entrar, se cerrarán sus sesiones y sus rutas publicadas dejarán de verse. Se le dirá el motivo al intentar entrar. Puedes desbloquearla después.",
         "block_reason": "Motivo (obligatorio)",
-        "blocked_ok": "Cuenta bloqueada."
+        "blocked_ok": "Cuenta bloqueada.",
+        "warn_author": "Avisar al autor",
+        "warn_title": "Avisar a @{nick}",
+        "warn_body": "Le llegará como notificación al móvil. No bloquea la cuenta. Elige una plantilla o escribe el texto a mano.",
+        "warn_text": "Texto del aviso",
+        "warn_send": "Enviar aviso",
+        "warn_sent": "Aviso enviado.",
+        "warn_lang_note": "Si no cambias la plantilla, la recibirá en su idioma.",
+        "warnings_sent": "Avisos enviados: {n}",
+        "tpl_name_content": "Contenido",
+        "tpl_name_last": "Último aviso",
+        "tpl_name_title": "Título",
+        "tpl_name_free": "Texto libre",
+        "tpl_content": "Hemos revisado tu ruta publicada «{route}» y no cumple las normas de uso. Corrígela o retírala. Si se repite, tu cuenta podrá bloquearse.",
+        "tpl_last": "Es tu último aviso. Si vuelves a publicar contenido que incumple las normas, bloquearemos tu cuenta.",
+        "tpl_title": "El título o la descripción de tu ruta «{route}» no es adecuado. Cámbialo, por favor."
     },
     "catalog": {
         "title": "Rutas moteras",

@@ -1051,7 +1051,22 @@
         "block_title": "Block @{nick}?",
         "block_body": "They will not be able to log in, their sessions will be closed and their published routes will be hidden. They will be told the reason when they try to log in. You can unblock the account later.",
         "block_reason": "Reason (required)",
-        "blocked_ok": "Account blocked."
+        "blocked_ok": "Account blocked.",
+        "warn_author": "Warn the author",
+        "warn_title": "Warn @{nick}",
+        "warn_body": "They will get it as a notification on their phone. It does not block the account. Pick a template or write the text by hand.",
+        "warn_text": "Notice text",
+        "warn_send": "Send notice",
+        "warn_sent": "Notice sent.",
+        "warn_lang_note": "If you do not change the template, they will get it in their own language.",
+        "warnings_sent": "Notices sent: {n}",
+        "tpl_name_content": "Content",
+        "tpl_name_last": "Last warning",
+        "tpl_name_title": "Title",
+        "tpl_name_free": "Free text",
+        "tpl_content": "We have reviewed your published route “{route}” and it does not follow the rules of use. Please fix or remove it. If it happens again, your account may be blocked.",
+        "tpl_last": "This is your last warning. If you publish content that breaks the rules again, we will block your account.",
+        "tpl_title": "The title or description of your route “{route}” is not appropriate. Please change it."
     },
     "catalog": {
         "title": "Motorcycle routes",

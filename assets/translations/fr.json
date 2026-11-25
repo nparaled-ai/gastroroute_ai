@@ -1051,7 +1051,22 @@
         "block_title": "Bloquer @{nick} ?",
         "block_body": "Cette personne ne pourra plus se connecter, ses sessions seront fermées et ses itinéraires publiés ne seront plus visibles. Le motif lui sera indiqué lors d’une tentative de connexion. Vous pourrez débloquer le compte plus tard.",
         "block_reason": "Motif (obligatoire)",
-        "blocked_ok": "Compte bloqué."
+        "blocked_ok": "Compte bloqué.",
+        "warn_author": "Avertir l’auteur",
+        "warn_title": "Avertir @{nick}",
+        "warn_body": "La personne le recevra comme notification sur son mobile. Cela ne bloque pas le compte. Choisissez un modèle ou écrivez le texte à la main.",
+        "warn_text": "Texte de l’avis",
+        "warn_send": "Envoyer l’avis",
+        "warn_sent": "Avis envoyé.",
+        "warn_lang_note": "Si vous ne modifiez pas le modèle, la personne le recevra dans sa langue.",
+        "warnings_sent": "Avis envoyés : {n}",
+        "tpl_name_content": "Contenu",
+        "tpl_name_last": "Dernier avertissement",
+        "tpl_name_title": "Titre",
+        "tpl_name_free": "Texte libre",
+        "tpl_content": "Nous avons examiné votre itinéraire publié « {route} » : il ne respecte pas les règles d’utilisation. Corrigez-le ou retirez-le. En cas de récidive, votre compte pourra être bloqué.",
+        "tpl_last": "C’est votre dernier avertissement. Si vous publiez à nouveau un contenu contraire aux règles, nous bloquerons votre compte.",
+        "tpl_title": "Le titre ou la description de votre itinéraire « {route} » n’est pas approprié. Veuillez le modifier."
     },
     "catalog": {
         "title": "Routes moto",

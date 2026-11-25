@@ -134,6 +134,86 @@ class _ModerationPublicRouteDetailScreenState extends State<ModerationPublicRout
     });
   }
 
+  /// Aviso al autor antes de bloquear: plantilla editable o texto libre; le llega al móvil como notificación.
+  Future<void> _warn() async {
+    final author = Map<String, dynamic>.from(_r!['author'] as Map);
+    final routeTitle = '${_r!['title'] ?? ''}';
+    String? template = 'content';
+    String original = 'moderation.tpl_content'.tr(namedArgs: {'route': routeTitle});
+    final text = TextEditingController(text: original);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(builder: (ctx, setS) {
+        void pick(String? t) {
+          setS(() {
+            template = t;
+            original = t == null ? '' : 'moderation.tpl_$t'.tr(namedArgs: {'route': routeTitle});
+            text.text = original;
+          });
+        }
+
+        Widget chip(String? t, String label) => ChoiceChip(
+              label: Text(label),
+              selected: template == t,
+              onSelected: (_) => pick(t),
+            );
+        return AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text('moderation.warn_title'.tr(namedArgs: {'nick': '${author['nickname']}'})),
+          content: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('moderation.warn_body'.tr(),
+                  style: const TextStyle(color: AppColors.greyText, fontSize: 13, height: 1.4)),
+              const SizedBox(height: 10),
+              Wrap(spacing: 6, runSpacing: 4, children: [
+                chip('content', 'moderation.tpl_name_content'.tr()),
+                chip('last', 'moderation.tpl_name_last'.tr()),
+                chip('title', 'moderation.tpl_name_title'.tr()),
+                chip(null, 'moderation.tpl_name_free'.tr()),
+              ]),
+              const SizedBox(height: 10),
+              TextField(
+                controller: text,
+                maxLines: 6,
+                minLines: 3,
+                maxLength: 500,
+                style: const TextStyle(color: AppColors.white, fontSize: 14),
+                decoration: InputDecoration(labelText: 'moderation.warn_text'.tr()),
+              ),
+              if (template != null)
+                Text('moderation.warn_lang_note'.tr(),
+                    style: const TextStyle(color: AppColors.grey, fontSize: 11.5, height: 1.35)),
+            ]),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('common.cancel'.tr())),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, text.text.trim().length >= 5),
+              child: Text('moderation.warn_send'.tr()),
+            ),
+          ],
+        );
+      }),
+    );
+    if (ok != true) return;
+
+    // Plantilla sin tocar: el servidor la escribe en el idioma de quien la recibe. Editada o libre: va tal cual.
+    final unedited = template != null && text.text.trim() == original.trim();
+    final err = await ModerationService.warnUser(
+      author['id'] as int,
+      template: unedited ? template : null,
+      message: unedited ? null : text.text.trim(),
+      routeId: widget.routeId,
+    );
+    if (!mounted) return;
+    if (err != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err), backgroundColor: AppColors.error));
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('moderation.warn_sent'.tr())));
+    _load();
+  }
+
   Future<void> _block() async {
     final author = Map<String, dynamic>.from(_r!['author'] as Map);
     final reason = TextEditingController();
@@ -236,7 +316,11 @@ class _ModerationPublicRouteDetailScreenState extends State<ModerationPublicRout
                         ]),
                       ),
                     const Divider(color: AppColors.greyDark, height: 32),
-                    _Author(author: Map<String, dynamic>.from(r['author'] as Map), onBlock: _block, onUnblock: _unblock),
+                    _Author(
+                        author: Map<String, dynamic>.from(r['author'] as Map),
+                        onBlock: _block,
+                        onUnblock: _unblock,
+                        onWarn: _warn),
                   ],
                 ),
     );
@@ -247,7 +331,8 @@ class _Author extends StatelessWidget {
   final Map<String, dynamic> author;
   final VoidCallback onBlock;
   final VoidCallback onUnblock;
-  const _Author({required this.author, required this.onBlock, required this.onUnblock});
+  final VoidCallback onWarn;
+  const _Author({required this.author, required this.onBlock, required this.onUnblock, required this.onWarn});
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +359,30 @@ class _Author extends StatelessWidget {
           Text('${'moderation.account_blocked'.tr()}${(author['blocked_reason'] ?? '').toString().isNotEmpty ? ': ${author['blocked_reason']}' : ''}',
               style: const TextStyle(color: AppColors.error, fontSize: 13)),
         ],
+        if ((author['warnings'] as List? ?? const []).isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text('moderation.warnings_sent'.tr(namedArgs: {'n': '${(author['warnings'] as List).length}'}),
+              style: const TextStyle(color: AppColors.orange, fontSize: 13, fontWeight: FontWeight.w700)),
+          for (final w in (author['warnings'] as List).take(3))
+            Padding(
+              padding: const EdgeInsets.only(top: 3),
+              child: Text('· ${(w as Map)['message']}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: AppColors.greyText, fontSize: 12, height: 1.3)),
+            ),
+        ],
         const SizedBox(height: 14),
+        if (!blocked) ...[
+          OutlinedButton.icon(
+            onPressed: onWarn,
+            style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.orange, side: const BorderSide(color: AppColors.orange)),
+            icon: const Icon(Icons.campaign_outlined),
+            label: Text('moderation.warn_author'.tr()),
+          ),
+          const SizedBox(height: 8),
+        ],
         blocked
             ? OutlinedButton.icon(
                 onPressed: onUnblock,

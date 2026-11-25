@@ -163,4 +163,19 @@ class ModerationService {
       return e.response?.data is Map ? '${e.response?.data['message'] ?? 'error'}' : 'error';
     }
   }
+
+  /// Aviso de moderación a un motero (le llega como notificación). Con [template] y sin tocar el texto se escribe
+  /// en el idioma de quien lo recibe; con [message] va tal cual. null = enviado; si no, el motivo del fallo.
+  static Future<String?> warnUser(int userId, {String? template, String? message, int? routeId}) async {
+    try {
+      await ApiClient.dio.post('/admin/moderation/users/$userId/warn', data: {
+        if (template != null) 'template': template,
+        if (message != null) 'message': message,
+        if (routeId != null) 'route_id': routeId,
+      });
+      return null;
+    } on DioException catch (e) {
+      return e.response?.data is Map ? '${e.response?.data['message'] ?? 'error'}' : 'error';
+    }
+  }
 }

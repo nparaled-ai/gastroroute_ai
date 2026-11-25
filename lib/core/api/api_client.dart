@@ -45,7 +45,7 @@ class ApiClient {
           // Cuenta BLOQUEADA por moderación (con la sesión abierta): se cierra la sesión y se vuelve al login.
           final d = error.response?.data;
           if (error.response?.statusCode == 403 && d is Map && d['blocked'] == true &&
-              error.requestOptions.path != '/auth/login') {
+              !['/auth/login', '/auth/register', '/auth/google'].any(error.requestOptions.path.startsWith)) {
             await _storage.delete(key: 'access_token');
             onUnauthorized?.call();
           }

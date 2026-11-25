@@ -1051,7 +1051,22 @@
         "block_title": "Bloquear @{nick}?",
         "block_body": "Não poderá entrar, as suas sessões serão terminadas e as suas rotas publicadas deixarão de ser vistas. O motivo ser-lhe-á comunicado ao tentar entrar. Poderás desbloquear a conta mais tarde.",
         "block_reason": "Motivo (obrigatório)",
-        "blocked_ok": "Conta bloqueada."
+        "blocked_ok": "Conta bloqueada.",
+        "warn_author": "Avisar o autor",
+        "warn_title": "Avisar @{nick}",
+        "warn_body": "Chegará como notificação ao telemóvel. Não bloqueia a conta. Escolhe um modelo ou escreve o texto à mão.",
+        "warn_text": "Texto do aviso",
+        "warn_send": "Enviar aviso",
+        "warn_sent": "Aviso enviado.",
+        "warn_lang_note": "Se não alterares o modelo, ela recebê-lo-á no seu idioma.",
+        "warnings_sent": "Avisos enviados: {n}",
+        "tpl_name_content": "Conteúdo",
+        "tpl_name_last": "Último aviso",
+        "tpl_name_title": "Título",
+        "tpl_name_free": "Texto livre",
+        "tpl_content": "Analisámos a tua rota publicada «{route}» e não cumpre as regras de utilização. Corrige-a ou retira-a. Se se repetir, a tua conta poderá ser bloqueada.",
+        "tpl_last": "Este é o teu último aviso. Se voltares a publicar conteúdo que viole as regras, bloquearemos a tua conta.",
+        "tpl_title": "O título ou a descrição da tua rota «{route}» não é adequado. Altera-o, por favor."
     },
     "catalog": {
         "title": "Rotas de moto",

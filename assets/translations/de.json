@@ -1051,7 +1051,22 @@
         "block_title": "@{nick} sperren?",
         "block_body": "Die Person kann sich nicht mehr anmelden, ihre Sitzungen werden beendet und ihre veröffentlichten Routen ausgeblendet. Der Grund wird beim Anmeldeversuch genannt. Du kannst das Konto später entsperren.",
         "block_reason": "Grund (erforderlich)",
-        "blocked_ok": "Konto gesperrt."
+        "blocked_ok": "Konto gesperrt.",
+        "warn_author": "Autor verwarnen",
+        "warn_title": "@{nick} verwarnen",
+        "warn_body": "Die Person erhält den Hinweis als Benachrichtigung auf dem Handy. Das Konto wird nicht gesperrt. Wähle eine Vorlage oder schreibe den Text selbst.",
+        "warn_text": "Text des Hinweises",
+        "warn_send": "Hinweis senden",
+        "warn_sent": "Hinweis gesendet.",
+        "warn_lang_note": "Wenn du die Vorlage nicht änderst, erhält die Person sie in ihrer Sprache.",
+        "warnings_sent": "Gesendete Hinweise: {n}",
+        "tpl_name_content": "Inhalt",
+        "tpl_name_last": "Letzte Warnung",
+        "tpl_name_title": "Titel",
+        "tpl_name_free": "Freitext",
+        "tpl_content": "Wir haben deine veröffentlichte Route „{route}“ geprüft; sie verstößt gegen die Nutzungsregeln. Bitte korrigiere oder entferne sie. Bei Wiederholung kann dein Konto gesperrt werden.",
+        "tpl_last": "Das ist deine letzte Warnung. Wenn du erneut Inhalte veröffentlichst, die gegen die Regeln verstoßen, sperren wir dein Konto.",
+        "tpl_title": "Der Titel oder die Beschreibung deiner Route „{route}“ ist nicht angemessen. Bitte ändere ihn."
     },
     "catalog": {
         "title": "Motorradrouten",

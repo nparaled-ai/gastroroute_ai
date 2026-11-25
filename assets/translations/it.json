@@ -1051,7 +1051,22 @@
         "block_title": "Bloccare @{nick}?",
         "block_body": "Non potrà accedere, le sue sessioni verranno chiuse e i suoi percorsi pubblicati non saranno più visibili. Il motivo le verrà comunicato quando proverà ad accedere. Potrai sbloccare l’account in seguito.",
         "block_reason": "Motivo (obbligatorio)",
-        "blocked_ok": "Account bloccato."
+        "blocked_ok": "Account bloccato.",
+        "warn_author": "Avvisa l’autore",
+        "warn_title": "Avvisa @{nick}",
+        "warn_body": "La persona lo riceverà come notifica sul telefono. Non blocca l’account. Scegli un modello o scrivi il testo a mano.",
+        "warn_text": "Testo dell’avviso",
+        "warn_send": "Invia avviso",
+        "warn_sent": "Avviso inviato.",
+        "warn_lang_note": "Se non modifichi il modello, lo riceverà nella sua lingua.",
+        "warnings_sent": "Avvisi inviati: {n}",
+        "tpl_name_content": "Contenuto",
+        "tpl_name_last": "Ultimo avviso",
+        "tpl_name_title": "Titolo",
+        "tpl_name_free": "Testo libero",
+        "tpl_content": "Abbiamo esaminato il tuo percorso pubblicato «{route}» e non rispetta le regole di utilizzo. Correggilo o rimuovilo. Se si ripete, il tuo account potrà essere bloccato.",
+        "tpl_last": "È il tuo ultimo avviso. Se pubblichi di nuovo contenuti che violano le regole, bloccheremo il tuo account.",
+        "tpl_title": "Il titolo o la descrizione del tuo percorso «{route}» non è adeguato. Cambialo, per favore."
     },
     "catalog": {
         "title": "Percorsi in moto",

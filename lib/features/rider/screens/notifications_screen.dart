@@ -87,6 +87,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'friend_accepted': return Icons.people;
       case 'friend_rejected': return Icons.person_remove_outlined;
       case 'moderation_public_route': return Icons.public;
+      case 'moderation_warning': return Icons.report_gmailerrorred;
       case 'route_shared':    return Icons.group_outlined;      // de un AMIGO
       case 'route_shared_public': return Icons.public;          // de alguien de tu ZONA
       case 'route_join':      return Icons.check_circle_outline;
@@ -103,6 +104,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'friend_accepted': return AppColors.cyan;
       case 'friend_rejected': return AppColors.error;
       case 'moderation_public_route': return AppColors.gold;
+      case 'moderation_warning': return AppColors.error;
       case 'route_shared':    return AppColors.cyan;
       case 'route_shared_public': return AppColors.gold;
       case 'route_join':      return AppColors.gold;
