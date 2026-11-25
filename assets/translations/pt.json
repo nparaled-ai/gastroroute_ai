@@ -1085,7 +1085,20 @@
             "hide_body": "Será ocultado e o autor receberá o motivo e como recorrer.",
             "hide_reason": "Motivo (obrigatório)",
             "resolved": "Denúncia resolvida.",
-            "curated": "Rota do catálogo GastroRouteAI"
+            "curated": "Rota do catálogo GastroRouteAI",
+            "tab_pending": "Pendentes",
+            "tab_resolved": "Resolvidas",
+            "decision_label": "Decisão",
+            "decision_dismissed": "Descartada",
+            "decision_hidden": "Conteúdo ocultado",
+            "decision_warned": "Autor avisado",
+            "decision_blocked": "Conta bloqueada",
+            "restored_badge": "Restaurado",
+            "restore": "Restaurar",
+            "restore_title": "Restaurar conteúdo",
+            "restore_body": "Voltará a ser publicado e o autor receberá um aviso. Fica registado quem o restaurou.",
+            "restore_note": "Nota (opcional)",
+            "restored_ok": "Conteúdo restaurado."
         }
     },
     "catalog": {

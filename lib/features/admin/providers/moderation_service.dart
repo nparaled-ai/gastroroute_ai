@@ -180,9 +180,10 @@ class ModerationService {
   }
 
   /// Denuncias pendientes. null si falló.
-  static Future<List<Map<String, dynamic>>?> reports() async {
+  static Future<List<Map<String, dynamic>>?> reports({bool resolved = false}) async {
     try {
-      final r = await ApiClient.dio.get('/admin/moderation/reports');
+      final r = await ApiClient.dio.get('/admin/moderation/reports',
+          queryParameters: {if (resolved) 'status': 'resolved'});
       return List<Map<String, dynamic>>.from(
           (r.data['reports'] as List).map((e) => Map<String, dynamic>.from(e as Map)));
     } on DioException {
@@ -196,6 +197,16 @@ class ModerationService {
       return Map<String, dynamic>.from(r.data as Map);
     } on DioException {
       return null;
+    }
+  }
+
+  /// Vuelve a publicar lo que se ocultó por una denuncia. null = hecho; si no, el fallo.
+  static Future<String?> restoreReport(int id, {String? note}) async {
+    try {
+      await ApiClient.dio.post('/admin/moderation/reports/$id/restore', data: {if (note != null) 'note': note});
+      return null;
+    } on DioException catch (e) {
+      return e.response?.data is Map ? '${e.response?.data['message'] ?? 'error'}' : 'error';
     }
   }
 

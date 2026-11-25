@@ -16,6 +16,7 @@ class ModerationReportsScreen extends StatefulWidget {
 class _ModerationReportsScreenState extends State<ModerationReportsScreen> {
   List<Map<String, dynamic>>? _items;
   bool _loading = true;
+  bool _resolved = false; // false = pendientes, true = ya decididas
 
   @override
   void initState() {
@@ -24,7 +25,7 @@ class _ModerationReportsScreenState extends State<ModerationReportsScreen> {
   }
 
   Future<void> _load() async {
-    final r = await ModerationService.reports();
+    final r = await ModerationService.reports(resolved: _resolved);
     if (!mounted) return;
     setState(() {
       _items = r;
@@ -42,6 +43,37 @@ class _ModerationReportsScreenState extends State<ModerationReportsScreen> {
         title: Text('moderation.reports.title'.tr(),
             style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w800)),
         iconTheme: const IconThemeData(color: AppColors.white),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+            child: Row(children: [
+              ChoiceChip(
+                label: Text('moderation.reports.tab_pending'.tr()),
+                selected: !_resolved,
+                onSelected: (_) {
+                  setState(() {
+                    _resolved = false;
+                    _loading = true;
+                  });
+                  _load();
+                },
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: Text('moderation.reports.tab_resolved'.tr()),
+                selected: _resolved,
+                onSelected: (_) {
+                  setState(() {
+                    _resolved = true;
+                    _loading = true;
+                  });
+                  _load();
+                },
+              ),
+            ]),
+          ),
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: AppColors.orange))
@@ -92,6 +124,18 @@ class _ModerationReportsScreenState extends State<ModerationReportsScreen> {
                                   const SizedBox(height: 4),
                                   Text('report.reasons.${r['reason']}'.tr(),
                                       style: const TextStyle(color: AppColors.greyText, fontSize: 13)),
+                                  if (_resolved)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 6),
+                                      child: Text(
+                                          r['restored'] == true
+                                              ? 'moderation.reports.restored_badge'.tr()
+                                              : 'moderation.reports.decision_${r['decision']}'.tr(),
+                                          style: TextStyle(
+                                              color: r['restored'] == true ? AppColors.cyan : AppColors.orange,
+                                              fontSize: 12.5,
+                                              fontWeight: FontWeight.w700)),
+                                    ),
                                 ]),
                               ),
                             ),
@@ -213,6 +257,22 @@ class _ModerationReportDetailScreenState extends State<ModerationReportDetailScr
     _finish('blocked');
   }
 
+  Future<void> _restore() async {
+    final note = await _ask('moderation.reports.restore_title'.tr(), 'moderation.reports.restore_body'.tr(),
+        'moderation.reports.restore_note'.tr(), min: 0);
+    if (note == null) return;
+    setState(() => _busy = true);
+    final err = await ModerationService.restoreReport(widget.reportId, note: note.isEmpty ? null : note);
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (err != null) {
+      _snack(err, error: true);
+      return;
+    }
+    _snack('moderation.reports.restored_ok'.tr());
+    context.pop();
+  }
+
   Widget _label(String t) => Padding(
         padding: const EdgeInsets.only(top: 14, bottom: 4),
         child: Text(t, style: const TextStyle(color: AppColors.grey, fontSize: 12)),
@@ -312,8 +372,29 @@ class _ModerationReportDetailScreenState extends State<ModerationReportDetailScr
                         label: Text('moderation.block_account'.tr()),
                       ),
                     ],
-                  ] else
-                    Text('moderation.reports.resolved'.tr(), style: const TextStyle(color: AppColors.greyText)),
+                  ] else ...[
+                    _label('moderation.reports.decision_label'.tr()),
+                    Text(
+                        r['restored_at'] != null
+                            ? 'moderation.reports.restored_badge'.tr()
+                            : 'moderation.reports.decision_${r['decision']}'.tr(),
+                        style: const TextStyle(color: AppColors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+                    if ('${r['decision_note'] ?? ''}'.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text('${r['decision_note']}', style: const TextStyle(color: AppColors.greyText, fontSize: 13)),
+                      ),
+                    if (r['can_restore'] == true) ...[
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: _busy ? null : _restore,
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.cyan, side: const BorderSide(color: AppColors.cyan)),
+                        icon: const Icon(Icons.visibility_outlined),
+                        label: Text('moderation.reports.restore'.tr()),
+                      ),
+                    ],
+                  ],
                 ]),
     );
   }

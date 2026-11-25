@@ -1085,7 +1085,20 @@
             "hide_body": "It will be hidden and the author will receive the reason and how to appeal.",
             "hide_reason": "Reason (required)",
             "resolved": "Report resolved.",
-            "curated": "GastroRouteAI catalogue route"
+            "curated": "GastroRouteAI catalogue route",
+            "tab_pending": "Pending",
+            "tab_resolved": "Resolved",
+            "decision_label": "Decision",
+            "decision_dismissed": "Dismissed",
+            "decision_hidden": "Content hidden",
+            "decision_warned": "Author warned",
+            "decision_blocked": "Account blocked",
+            "restored_badge": "Restored",
+            "restore": "Restore",
+            "restore_title": "Restore content",
+            "restore_body": "It will be published again and the author will receive a notice. Who restored it is recorded.",
+            "restore_note": "Note (optional)",
+            "restored_ok": "Content restored."
         }
     },
     "catalog": {

@@ -1085,7 +1085,20 @@
             "hide_body": "Er wird ausgeblendet und der Autor erhält den Grund und wie er Einspruch einlegen kann.",
             "hide_reason": "Grund (erforderlich)",
             "resolved": "Meldung erledigt.",
-            "curated": "Route aus dem GastroRouteAI-Katalog"
+            "curated": "Route aus dem GastroRouteAI-Katalog",
+            "tab_pending": "Offen",
+            "tab_resolved": "Erledigt",
+            "decision_label": "Entscheidung",
+            "decision_dismissed": "Abgewiesen",
+            "decision_hidden": "Inhalt ausgeblendet",
+            "decision_warned": "Autor verwarnt",
+            "decision_blocked": "Konto gesperrt",
+            "restored_badge": "Wiederhergestellt",
+            "restore": "Wiederherstellen",
+            "restore_title": "Inhalt wiederherstellen",
+            "restore_body": "Er wird wieder veröffentlicht und der Autor erhält einen Hinweis. Es wird festgehalten, wer ihn wiederhergestellt hat.",
+            "restore_note": "Notiz (optional)",
+            "restored_ok": "Inhalt wiederhergestellt."
         }
     },
     "catalog": {

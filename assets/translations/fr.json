@@ -1085,7 +1085,20 @@
             "hide_body": "Il sera masqué et l’auteur recevra le motif et la marche à suivre pour contester.",
             "hide_reason": "Motif (obligatoire)",
             "resolved": "Signalement traité.",
-            "curated": "Itinéraire du catalogue GastroRouteAI"
+            "curated": "Itinéraire du catalogue GastroRouteAI",
+            "tab_pending": "En attente",
+            "tab_resolved": "Traités",
+            "decision_label": "Décision",
+            "decision_dismissed": "Écarté",
+            "decision_hidden": "Contenu masqué",
+            "decision_warned": "Auteur averti",
+            "decision_blocked": "Compte bloqué",
+            "restored_badge": "Rétabli",
+            "restore": "Rétablir",
+            "restore_title": "Rétablir le contenu",
+            "restore_body": "Il sera de nouveau publié et l’auteur recevra un avis. Qui l’a rétabli est enregistré.",
+            "restore_note": "Note (facultative)",
+            "restored_ok": "Contenu rétabli."
         }
     },
     "catalog": {

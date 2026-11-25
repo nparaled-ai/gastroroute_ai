@@ -92,6 +92,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'report_dismissed':
       case 'report_actioned': return Icons.outlined_flag;
       case 'content_hidden': return Icons.visibility_off_outlined;
+      case 'content_restored': return Icons.visibility_outlined;
       case 'moderation_warning': return Icons.report_gmailerrorred;
       case 'route_shared':    return Icons.group_outlined;      // de un AMIGO
       case 'route_shared_public': return Icons.public;          // de alguien de tu ZONA
@@ -111,6 +112,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'moderation_public_route': return AppColors.gold;
       case 'moderation_report': return AppColors.orange;
       case 'content_hidden': return AppColors.error;
+      case 'content_restored': return AppColors.cyan;
       case 'moderation_warning': return AppColors.error;
       case 'route_shared':    return AppColors.cyan;
       case 'route_shared_public': return AppColors.gold;

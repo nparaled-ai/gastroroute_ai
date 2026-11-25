@@ -1085,7 +1085,20 @@
             "hide_body": "Verrà nascosto e l’autore riceverà il motivo e come presentare ricorso.",
             "hide_reason": "Motivo (obbligatorio)",
             "resolved": "Segnalazione risolta.",
-            "curated": "Percorso del catalogo GastroRouteAI"
+            "curated": "Percorso del catalogo GastroRouteAI",
+            "tab_pending": "In sospeso",
+            "tab_resolved": "Risolte",
+            "decision_label": "Decisione",
+            "decision_dismissed": "Respinta",
+            "decision_hidden": "Contenuto nascosto",
+            "decision_warned": "Autore avvisato",
+            "decision_blocked": "Account bloccato",
+            "restored_badge": "Ripristinato",
+            "restore": "Ripristina",
+            "restore_title": "Ripristina contenuto",
+            "restore_body": "Verrà pubblicato di nuovo e l’autore riceverà un avviso. Viene registrato chi lo ha ripristinato.",
+            "restore_note": "Nota (facoltativa)",
+            "restored_ok": "Contenuto ripristinato."
         }
     },
     "catalog": {
