@@ -50,4 +50,14 @@ class AccountService {
     final m = e.response?.data is Map ? e.response?.data['message'] : null;
     return m is String ? m : 'common.connection_error'.tr();
   }
+
+  /// Acepta de nuevo los términos y la política (la prueba queda guardada en el servidor).
+  static Future<Map<String, dynamic>> acceptTerms() async {
+    try {
+      await ApiClient.dio.post('/auth/accept-terms', data: {'accept_terms': true});
+      return {'ok': true};
+    } on DioException catch (e) {
+      return {'error': _mensaje(e)};
+    }
+  }
 }

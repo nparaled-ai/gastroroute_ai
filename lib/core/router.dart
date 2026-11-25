@@ -13,6 +13,7 @@ import '../features/admin/screens/similar_routes_screen.dart';
 import '../features/admin/screens/moderation_catalog_comments_screen.dart';
 import '../features/admin/screens/moderation_public_routes_screen.dart';
 import '../features/legal/legal_screen.dart';
+import '../features/legal/consent_screen.dart';
 import '../features/rider/screens/account_screen.dart';
 import '../features/rider/screens/catalog_screen.dart';
 import '../features/rider/screens/catalog_detail_screen.dart';
@@ -92,6 +93,10 @@ final router = GoRouter(
           ModerationPublicRouteDetailScreen(routeId: int.parse(state.pathParameters['id']!)),
     ),
     // Terminos y politica de privacidad: publicas (se leen antes de registrarse).
+    GoRoute(
+      path: '/consent',
+      builder: (context, state) => ConsentScreen(next: state.uri.queryParameters['next'] ?? '/rider/home'),
+    ),
     GoRoute(
       path: '/legal/:doc',
       builder: (context, state) => LegalScreen(doc: state.pathParameters['doc'] ?? 'terms'),

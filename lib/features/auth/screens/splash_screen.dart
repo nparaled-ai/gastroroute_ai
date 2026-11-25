@@ -35,7 +35,8 @@ class _SplashScreenState extends State<SplashScreen>
     final role       = await AuthStorage.getRole();
     if (!mounted) return;
     // Cada perfil a su pantalla (antes solo el de motero entraba solo).
-    final home = isLoggedIn ? homeForRole(role) : null;
+    final home = isLoggedIn ? await entryRoute(role) : null;
+    if (!mounted) return;
     context.go(home ?? '/login');
   }
 

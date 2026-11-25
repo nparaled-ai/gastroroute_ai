@@ -82,8 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (result['success'] == true) {
       final role = result['role'];
       PushNotificationService.registerToken();
-      final home = homeForRole(role);
-      if (home != null) context.go(home);
+      final home = await entryRoute(role);
+      if (home != null && mounted) context.go(home);
     }
   }
 
@@ -144,8 +144,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     if (result['success'] == true) {
       PushNotificationService.registerToken();
-      final home = homeForRole(result['role']);
-      if (home != null) context.go(home);
+      final home = await entryRoute(result['role']);
+      if (home != null && mounted) context.go(home);
     }
   }
 

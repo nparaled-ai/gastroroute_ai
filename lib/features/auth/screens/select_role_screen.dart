@@ -83,7 +83,9 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
       // se hacía con un único perfil y quien tenía dos no recibía ninguno.
       PushNotificationService.registerToken();
       // Cada perfil a su pantalla; el de partner aún no tiene (vuelve al login).
-      context.go(homeForRole(role) ?? '/login');
+      final home = await entryRoute(role);
+      if (!mounted) return;
+      context.go(home ?? '/login');
     }
   }
 

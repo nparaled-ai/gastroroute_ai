@@ -1234,7 +1234,12 @@
         "accept_suffix": ", and I confirm that I am at least 16 years old.",
         "consent_title": "Before creating your account",
         "consent_body": "To create your account with Google you must accept the terms of use and the privacy policy, and confirm that you are at least 16 years old.",
-        "consent_accept": "I accept and continue"
+        "consent_accept": "I accept and continue",
+        "reaccept_title": "Before you continue",
+        "reaccept_body": "We have updated how we record your acceptance of the terms and the privacy policy. To keep using the app we need you to accept them again.",
+        "reaccept_button": "Accept and continue",
+        "reaccept_decline": "I do not accept, sign out",
+        "reaccept_must": "To continue you must accept the terms and the privacy policy."
     },
     "account": {
         "title": "Account and privacy",

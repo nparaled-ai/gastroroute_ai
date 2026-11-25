@@ -1234,7 +1234,12 @@
         "accept_suffix": " und bestätige, dass ich mindestens 16 Jahre alt bin.",
         "consent_title": "Bevor du dein Konto erstellst",
         "consent_body": "Um dein Konto mit Google zu erstellen, musst du die Nutzungsbedingungen und die Datenschutzerklärung akzeptieren und bestätigen, dass du mindestens 16 Jahre alt bist.",
-        "consent_accept": "Akzeptieren und weiter"
+        "consent_accept": "Akzeptieren und weiter",
+        "reaccept_title": "Bevor du weitermachst",
+        "reaccept_body": "Wir haben aktualisiert, wie wir deine Zustimmung zu den Bedingungen und zur Datenschutzerklärung festhalten. Um die App weiter zu nutzen, musst du sie erneut akzeptieren.",
+        "reaccept_button": "Akzeptieren und weiter",
+        "reaccept_decline": "Ich akzeptiere nicht, abmelden",
+        "reaccept_must": "Um fortzufahren, musst du die Bedingungen und die Datenschutzerklärung akzeptieren."
     },
     "account": {
         "title": "Konto und Datenschutz",
