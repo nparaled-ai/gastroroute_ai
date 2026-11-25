@@ -86,7 +86,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'friend_request':  return Icons.person_add_outlined;
       case 'friend_accepted': return Icons.people;
       case 'friend_rejected': return Icons.person_remove_outlined;
-      case 'route_shared':    return Icons.route;
+      case 'route_shared':    return Icons.group_outlined;      // de un AMIGO
+      case 'route_shared_public': return Icons.public;          // de alguien de tu ZONA
       case 'route_join':      return Icons.check_circle_outline;
       case 'route_declined':  return Icons.cancel_outlined;
       case 'route_departure': return Icons.alarm;
@@ -101,6 +102,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'friend_accepted': return AppColors.cyan;
       case 'friend_rejected': return AppColors.error;
       case 'route_shared':    return AppColors.cyan;
+      case 'route_shared_public': return AppColors.gold;
       case 'route_join':      return AppColors.gold;
       case 'route_declined':  return AppColors.error;
       case 'route_departure': return AppColors.orange;
@@ -214,6 +216,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     final n    = _notifications[i];
                     final type = n['type'] as String? ?? '';
                     final read = n['read'] == true || n['read'] == 1;
+                    // Una ruta compartida por un AMIGO y una publicada por alguien de tu ZONA no son lo mismo: icono
+                    // y color distintos (el texto también lo dice).
+                    final nData = n['data'];
+                    final look = (type == 'route_shared' && nData is Map && nData['type'] == 'public')
+                        ? 'route_shared_public'
+                        : type;
 
                     return Dismissible(
                       key: ValueKey(n['id']),
@@ -236,10 +244,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               Container(
                                 width: 44, height: 44,
                                 decoration: BoxDecoration(
-                                  color: _colorFor(type).withOpacity(0.15),
+                                  color: _colorFor(look).withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Icon(_iconFor(type), color: _colorFor(type), size: 22),
+                                child: Icon(_iconFor(look), color: _colorFor(look), size: 22),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
