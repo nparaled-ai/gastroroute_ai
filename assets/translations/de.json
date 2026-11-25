@@ -1066,7 +1066,27 @@
         "tpl_name_free": "Freitext",
         "tpl_content": "Wir haben deine veröffentlichte Route „{route}“ geprüft; sie verstößt gegen die Nutzungsregeln. Bitte korrigiere oder entferne sie. Bei Wiederholung kann dein Konto gesperrt werden.",
         "tpl_last": "Das ist deine letzte Warnung. Wenn du erneut Inhalte veröffentlichst, die gegen die Regeln verstoßen, sperren wir dein Konto.",
-        "tpl_title": "Der Titel oder die Beschreibung deiner Route „{route}“ ist nicht angemessen. Bitte ändere ihn."
+        "tpl_title": "Der Titel oder die Beschreibung deiner Route „{route}“ ist nicht angemessen. Bitte ändere ihn.",
+        "reports": {
+            "title": "Meldungen",
+            "empty": "Keine offenen Meldungen.",
+            "detail_title": "Meldung",
+            "type_route": "Route in Motorradrouten",
+            "type_comment": "Kommentar",
+            "content": "Gemeldeter Inhalt",
+            "details": "Erklärung",
+            "reporter": "Gemeldet von: @{nick}",
+            "reporter_stats": "{total} Meldungen · {dismissed} abgewiesen",
+            "same_target": "{n} Meldungen zum selben Inhalt",
+            "already_hidden": "Bereits ausgeblendet.",
+            "dismiss": "Meldung abweisen",
+            "hide": "Ausblenden",
+            "hide_title": "Inhalt ausblenden",
+            "hide_body": "Er wird ausgeblendet und der Autor erhält den Grund und wie er Einspruch einlegen kann.",
+            "hide_reason": "Grund (erforderlich)",
+            "resolved": "Meldung erledigt.",
+            "curated": "Route aus dem GastroRouteAI-Katalog"
+        }
     },
     "catalog": {
         "title": "Motorradrouten",
@@ -1259,5 +1279,26 @@
         "delete_warning": "Dein Konto, dein Profil, deine Motorräder, Routen, Fahrten, Freundschaften und Bewertungen werden gelöscht. Das kann nicht rückgängig gemacht werden. 12 Monate lang speichern wir einen verschlüsselten Fingerabdruck deiner E-Mail-Adresse (nicht die Adresse selbst), um Missbrauch des kostenlosen Willkommenskontingents zu verhindern.",
         "delete_confirm_password": "Gib dein Passwort zur Bestätigung ein",
         "delete_final": "Endgültig löschen"
+    },
+    "report": {
+        "menu": "Melden",
+        "route_title": "Route melden",
+        "comment_title": "Kommentar melden",
+        "intro": "Sag uns, was nicht stimmt. Ein Moderator prüft es und wir informieren dich über die Entscheidung.",
+        "reason_label": "Grund",
+        "details": "Erkläre warum (mindestens 10 Zeichen)",
+        "good_faith": "Ich erkläre nach bestem Wissen, dass meine Angaben richtig und vollständig sind.",
+        "send": "Meldung senden",
+        "sent": "Meldung gesendet. Danke.",
+        "too_short": "Schreibe mindestens 10 Zeichen.",
+        "must_confirm": "Bestätige die Erklärung nach bestem Wissen.",
+        "reasons": {
+            "offensive": "Beleidigender oder rechtswidriger Inhalt",
+            "personal_data": "Personenbezogene Daten",
+            "misleading": "Irreführend oder Spam",
+            "dangerous": "Gefährliche, gesperrte Route oder über Privatgelände",
+            "copyright": "Urheberrecht",
+            "other": "Sonstiges"
+        }
     }
 }

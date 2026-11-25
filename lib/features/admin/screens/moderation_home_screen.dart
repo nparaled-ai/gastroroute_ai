@@ -104,6 +104,15 @@ class _ModerationHomeScreenState extends State<ModerationHomeScreen> {
               },
             ),
             _Tile(
+              icon: Icons.flag_outlined,
+              label: 'moderation.reports.title'.tr(),
+              count: c['reports'] ?? 0,
+              onTap: () async {
+                await context.push('/admin/moderation/reports');
+                _load();
+              },
+            ),
+            _Tile(
               icon: Icons.public,
               label: 'moderation.public_routes'.tr(),
               count: 0,

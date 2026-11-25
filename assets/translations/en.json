@@ -1066,7 +1066,27 @@
         "tpl_name_free": "Free text",
         "tpl_content": "We have reviewed your published route “{route}” and it does not follow the rules of use. Please fix or remove it. If it happens again, your account may be blocked.",
         "tpl_last": "This is your last warning. If you publish content that breaks the rules again, we will block your account.",
-        "tpl_title": "The title or description of your route “{route}” is not appropriate. Please change it."
+        "tpl_title": "The title or description of your route “{route}” is not appropriate. Please change it.",
+        "reports": {
+            "title": "Reports",
+            "empty": "There are no pending reports.",
+            "detail_title": "Report",
+            "type_route": "Route in Motorcycle routes",
+            "type_comment": "Comment",
+            "content": "Reported content",
+            "details": "Explanation",
+            "reporter": "Reported by: @{nick}",
+            "reporter_stats": "{total} reports made · {dismissed} dismissed",
+            "same_target": "{n} reports about the same thing",
+            "already_hidden": "It is already hidden.",
+            "dismiss": "Dismiss report",
+            "hide": "Hide",
+            "hide_title": "Hide content",
+            "hide_body": "It will be hidden and the author will receive the reason and how to appeal.",
+            "hide_reason": "Reason (required)",
+            "resolved": "Report resolved.",
+            "curated": "GastroRouteAI catalogue route"
+        }
     },
     "catalog": {
         "title": "Motorcycle routes",
@@ -1259,5 +1279,26 @@
         "delete_warning": "Your account, profile, bikes, routes, rides, friendships and ratings will be deleted. This cannot be undone. For 12 months we will keep an encrypted fingerprint of your email (not the email itself) to prevent abuse of the free welcome allowance.",
         "delete_confirm_password": "Type your password to confirm",
         "delete_final": "Delete forever"
+    },
+    "report": {
+        "menu": "Report",
+        "route_title": "Report route",
+        "comment_title": "Report comment",
+        "intro": "Tell us what is wrong. A moderator will review it and we will let you know the decision.",
+        "reason_label": "Reason",
+        "details": "Explain why (at least 10 characters)",
+        "good_faith": "I declare in good faith that what I say is accurate and complete.",
+        "send": "Send report",
+        "sent": "Report sent. Thank you.",
+        "too_short": "Write at least 10 characters.",
+        "must_confirm": "Tick the good-faith declaration.",
+        "reasons": {
+            "offensive": "Offensive or illegal content",
+            "personal_data": "Personal data",
+            "misleading": "Misleading or spam",
+            "dangerous": "Dangerous route, closed or through private land",
+            "copyright": "Copyright",
+            "other": "Other"
+        }
     }
 }

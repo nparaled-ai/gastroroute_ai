@@ -12,6 +12,7 @@ import '../features/admin/screens/moderation_routes_screen.dart';
 import '../features/admin/screens/similar_routes_screen.dart';
 import '../features/admin/screens/moderation_catalog_comments_screen.dart';
 import '../features/admin/screens/moderation_public_routes_screen.dart';
+import '../features/admin/screens/moderation_reports_screen.dart';
 import '../features/legal/legal_screen.dart';
 import '../features/legal/consent_screen.dart';
 import '../features/rider/screens/account_screen.dart';
@@ -82,6 +83,15 @@ final router = GoRouter(
         routeId: int.parse(state.pathParameters['id']!),
         title: '${(state.extra as Map<String, dynamic>?)?['title'] ?? ''}',
       ),
+    ),
+    GoRoute(
+      path: '/admin/moderation/reports',
+      builder: (context, state) => const ModerationReportsScreen(),
+    ),
+    GoRoute(
+      path: '/admin/moderation/reports/:id',
+      builder: (context, state) =>
+          ModerationReportDetailScreen(reportId: int.parse(state.pathParameters['id']!)),
     ),
     GoRoute(
       path: '/admin/moderation/public-routes',

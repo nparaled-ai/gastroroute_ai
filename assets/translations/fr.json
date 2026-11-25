@@ -1066,7 +1066,27 @@
         "tpl_name_free": "Texte libre",
         "tpl_content": "Nous avons examiné votre itinéraire publié « {route} » : il ne respecte pas les règles d’utilisation. Corrigez-le ou retirez-le. En cas de récidive, votre compte pourra être bloqué.",
         "tpl_last": "C’est votre dernier avertissement. Si vous publiez à nouveau un contenu contraire aux règles, nous bloquerons votre compte.",
-        "tpl_title": "Le titre ou la description de votre itinéraire « {route} » n’est pas approprié. Veuillez le modifier."
+        "tpl_title": "Le titre ou la description de votre itinéraire « {route} » n’est pas approprié. Veuillez le modifier.",
+        "reports": {
+            "title": "Signalements",
+            "empty": "Aucun signalement en attente.",
+            "detail_title": "Signalement",
+            "type_route": "Itinéraire de Routes moto",
+            "type_comment": "Commentaire",
+            "content": "Contenu signalé",
+            "details": "Explication",
+            "reporter": "Signalé par : @{nick}",
+            "reporter_stats": "{total} signalements faits · {dismissed} écartés",
+            "same_target": "{n} signalements sur le même contenu",
+            "already_hidden": "Déjà masqué.",
+            "dismiss": "Écarter le signalement",
+            "hide": "Masquer",
+            "hide_title": "Masquer le contenu",
+            "hide_body": "Il sera masqué et l’auteur recevra le motif et la marche à suivre pour contester.",
+            "hide_reason": "Motif (obligatoire)",
+            "resolved": "Signalement traité.",
+            "curated": "Itinéraire du catalogue GastroRouteAI"
+        }
     },
     "catalog": {
         "title": "Routes moto",
@@ -1259,5 +1279,26 @@
         "delete_warning": "Votre compte, votre profil, vos motos, itinéraires, sorties, amitiés et notes seront supprimés. Action irréversible. Pendant 12 mois, nous conserverons une empreinte chiffrée de votre e-mail (pas l’e-mail lui-même) pour éviter les abus de l’offre de bienvenue gratuite.",
         "delete_confirm_password": "Saisissez votre mot de passe pour confirmer",
         "delete_final": "Supprimer définitivement"
+    },
+    "report": {
+        "menu": "Signaler",
+        "route_title": "Signaler l’itinéraire",
+        "comment_title": "Signaler le commentaire",
+        "intro": "Dites-nous ce qui ne va pas. Un modérateur l’examinera et nous vous informerons de la décision.",
+        "reason_label": "Motif",
+        "details": "Expliquez pourquoi (10 caractères minimum)",
+        "good_faith": "Je déclare de bonne foi que ce que j’indique est exact et complet.",
+        "send": "Envoyer le signalement",
+        "sent": "Signalement envoyé. Merci.",
+        "too_short": "Écrivez au moins 10 caractères.",
+        "must_confirm": "Cochez la déclaration de bonne foi.",
+        "reasons": {
+            "offensive": "Contenu offensant ou illégal",
+            "personal_data": "Données personnelles",
+            "misleading": "Trompeur ou spam",
+            "dangerous": "Itinéraire dangereux, fermé ou sur terrain privé",
+            "copyright": "Droits d’auteur",
+            "other": "Autre"
+        }
     }
 }

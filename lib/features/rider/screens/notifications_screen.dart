@@ -87,6 +87,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'friend_accepted': return Icons.people;
       case 'friend_rejected': return Icons.person_remove_outlined;
       case 'moderation_public_route': return Icons.public;
+      case 'moderation_report': return Icons.flag_outlined;
+      case 'report_received':
+      case 'report_dismissed':
+      case 'report_actioned': return Icons.outlined_flag;
+      case 'content_hidden': return Icons.visibility_off_outlined;
       case 'moderation_warning': return Icons.report_gmailerrorred;
       case 'route_shared':    return Icons.group_outlined;      // de un AMIGO
       case 'route_shared_public': return Icons.public;          // de alguien de tu ZONA
@@ -104,6 +109,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'friend_accepted': return AppColors.cyan;
       case 'friend_rejected': return AppColors.error;
       case 'moderation_public_route': return AppColors.gold;
+      case 'moderation_report': return AppColors.orange;
+      case 'content_hidden': return AppColors.error;
       case 'moderation_warning': return AppColors.error;
       case 'route_shared':    return AppColors.cyan;
       case 'route_shared_public': return AppColors.gold;
@@ -140,6 +147,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     if (type == 'friend_request' || type == 'friend_accepted' || type == 'friend_rejected') {
       context.push('/rider/friends');
+      return;
+    }
+
+    // Aviso a moderación: hay denuncias por revisar.
+    if (type == 'moderation_report') {
+      context.push('/admin/moderation/reports');
       return;
     }
 

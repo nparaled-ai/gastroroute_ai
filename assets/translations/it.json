@@ -1066,7 +1066,27 @@
         "tpl_name_free": "Testo libero",
         "tpl_content": "Abbiamo esaminato il tuo percorso pubblicato «{route}» e non rispetta le regole di utilizzo. Correggilo o rimuovilo. Se si ripete, il tuo account potrà essere bloccato.",
         "tpl_last": "È il tuo ultimo avviso. Se pubblichi di nuovo contenuti che violano le regole, bloccheremo il tuo account.",
-        "tpl_title": "Il titolo o la descrizione del tuo percorso «{route}» non è adeguato. Cambialo, per favore."
+        "tpl_title": "Il titolo o la descrizione del tuo percorso «{route}» non è adeguato. Cambialo, per favore.",
+        "reports": {
+            "title": "Segnalazioni",
+            "empty": "Nessuna segnalazione in sospeso.",
+            "detail_title": "Segnalazione",
+            "type_route": "Percorso di Percorsi in moto",
+            "type_comment": "Commento",
+            "content": "Contenuto segnalato",
+            "details": "Spiegazione",
+            "reporter": "Segnalato da: @{nick}",
+            "reporter_stats": "{total} segnalazioni fatte · {dismissed} respinte",
+            "same_target": "{n} segnalazioni sullo stesso contenuto",
+            "already_hidden": "È già nascosto.",
+            "dismiss": "Respingi segnalazione",
+            "hide": "Nascondi",
+            "hide_title": "Nascondi contenuto",
+            "hide_body": "Verrà nascosto e l’autore riceverà il motivo e come presentare ricorso.",
+            "hide_reason": "Motivo (obbligatorio)",
+            "resolved": "Segnalazione risolta.",
+            "curated": "Percorso del catalogo GastroRouteAI"
+        }
     },
     "catalog": {
         "title": "Percorsi in moto",
@@ -1259,5 +1279,26 @@
         "delete_warning": "Verranno eliminati il tuo account, il profilo, le moto, i percorsi, le uscite, le amicizie e le valutazioni. Non si può annullare. Per 12 mesi conserveremo un’impronta cifrata della tua email (non l’email stessa) per evitare abusi dell’offerta di benvenuto gratuita.",
         "delete_confirm_password": "Scrivi la tua password per confermare",
         "delete_final": "Elimina per sempre"
+    },
+    "report": {
+        "menu": "Segnala",
+        "route_title": "Segnala percorso",
+        "comment_title": "Segnala commento",
+        "intro": "Dicci cosa non va. Un moderatore lo esaminerà e ti faremo sapere la decisione.",
+        "reason_label": "Motivo",
+        "details": "Spiega perché (almeno 10 caratteri)",
+        "good_faith": "Dichiaro in buona fede che quanto indico è corretto e completo.",
+        "send": "Invia segnalazione",
+        "sent": "Segnalazione inviata. Grazie.",
+        "too_short": "Scrivi almeno 10 caratteri.",
+        "must_confirm": "Spunta la dichiarazione di buona fede.",
+        "reasons": {
+            "offensive": "Contenuto offensivo o illegale",
+            "personal_data": "Dati personali",
+            "misleading": "Ingannevole o spam",
+            "dangerous": "Percorso pericoloso, chiuso o su proprietà privata",
+            "copyright": "Diritti d’autore",
+            "other": "Altro"
+        }
     }
 }

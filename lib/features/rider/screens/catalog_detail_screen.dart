@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../widgets/report_dialog.dart';
 import '../providers/catalog_service.dart';
 import 'catalog_screen.dart' show categoryColor, seasonColor;
 
@@ -114,6 +115,25 @@ class _CatalogDetailScreenState extends State<CatalogDetailScreen> {
         ),
         title: Text('catalog.title'.tr(),
             style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
+        actions: [
+          // Denunciar: discreto, en el menú de tres puntos (no si la ruta es tuya).
+          if (r != null && (r['mine'] as Map? ?? const {})['is_author'] != true)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: AppColors.grey),
+              color: AppColors.surface,
+              onSelected: (_) => showReportDialog(context, targetType: 'catalog_route', targetId: widget.id),
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: 'report',
+                  child: Row(children: [
+                    const Icon(Icons.outlined_flag, size: 18, color: AppColors.grey),
+                    const SizedBox(width: 8),
+                    Text('report.route_title'.tr(), style: const TextStyle(color: AppColors.white)),
+                  ]),
+                ),
+              ],
+            ),
+        ],
       ),
       body: r == null
           ? Center(
@@ -340,6 +360,11 @@ class _CommentTile extends StatelessWidget {
         const SizedBox(height: 6),
         Text('${c['comment']}',
             style: const TextStyle(color: AppColors.white, fontSize: 14, height: 1.4)),
+        if (c['is_mine'] != true && c['id'] != null)
+          Align(
+            alignment: Alignment.centerRight,
+            child: ReportLink(targetType: 'catalog_comment', targetId: (c['id'] as num).toInt()),
+          ),
       ]),
     );
   }

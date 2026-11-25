@@ -1066,7 +1066,27 @@
         "tpl_name_free": "Texto libre",
         "tpl_content": "Hemos revisado tu ruta publicada «{route}» y no cumple las normas de uso. Corrígela o retírala. Si se repite, tu cuenta podrá bloquearse.",
         "tpl_last": "Es tu último aviso. Si vuelves a publicar contenido que incumple las normas, bloquearemos tu cuenta.",
-        "tpl_title": "El título o la descripción de tu ruta «{route}» no es adecuado. Cámbialo, por favor."
+        "tpl_title": "El título o la descripción de tu ruta «{route}» no es adecuado. Cámbialo, por favor.",
+        "reports": {
+            "title": "Denuncias",
+            "empty": "No hay denuncias pendientes.",
+            "detail_title": "Denuncia",
+            "type_route": "Ruta de Rutas moteras",
+            "type_comment": "Comentario",
+            "content": "Contenido denunciado",
+            "details": "Explicación",
+            "reporter": "Denunciante: @{nick}",
+            "reporter_stats": "{total} denuncias hechas · {dismissed} descartadas",
+            "same_target": "{n} denuncias sobre lo mismo",
+            "already_hidden": "Ya está oculto.",
+            "dismiss": "Descartar denuncia",
+            "hide": "Ocultar",
+            "hide_title": "Ocultar contenido",
+            "hide_body": "Se ocultará y el autor recibirá el motivo y cómo recurrir.",
+            "hide_reason": "Motivo (obligatorio)",
+            "resolved": "Denuncia resuelta.",
+            "curated": "Ruta del catálogo de GastroRouteAI"
+        }
     },
     "catalog": {
         "title": "Rutas moteras",
@@ -1259,5 +1279,26 @@
         "delete_warning": "Se borrarán tu cuenta, tu perfil, tus motos, tus rutas, tus rodadas, tus amistades y tus valoraciones. No se puede deshacer. Durante 12 meses guardaremos una huella cifrada de tu correo (no el correo) para evitar abusos de la bienvenida gratuita.",
         "delete_confirm_password": "Escribe tu contraseña para confirmar",
         "delete_final": "Eliminar para siempre"
+    },
+    "report": {
+        "menu": "Denunciar",
+        "route_title": "Denunciar ruta",
+        "comment_title": "Denunciar comentario",
+        "intro": "Cuéntanos qué no está bien. Un moderador lo revisará y te avisaremos de la decisión.",
+        "reason_label": "Motivo",
+        "details": "Explica por qué (mínimo 10 caracteres)",
+        "good_faith": "Declaro de buena fe que lo que cuento es cierto y completo.",
+        "send": "Enviar denuncia",
+        "sent": "Denuncia enviada. Gracias.",
+        "too_short": "Escribe al menos 10 caracteres.",
+        "must_confirm": "Marca la declaración de buena fe.",
+        "reasons": {
+            "offensive": "Contenido ofensivo o ilegal",
+            "personal_data": "Datos personales",
+            "misleading": "Engañoso o spam",
+            "dangerous": "Ruta peligrosa, cerrada o por zona privada",
+            "copyright": "Derechos de autor",
+            "other": "Otro"
+        }
     }
 }
