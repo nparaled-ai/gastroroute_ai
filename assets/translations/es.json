@@ -423,7 +423,10 @@
         "source_maps": "Maps",
         "source_gpx": "GPX",
         "from": "De: {quien}",
-        "source_catalog": "Rutas moteras"
+        "source_catalog": "Rutas moteras",
+        "offline_title": "Sin conexión",
+        "offline_body": "No podemos cargar tus rutas ahora. No se han perdido: vuelve a intentarlo cuando tengas cobertura.",
+        "offline_retry": "Reintentar"
     },
     "friends_screen": {
         "title": "Amigos",
@@ -671,7 +674,11 @@
         "weather_prefix_now": "Ahora · ",
         "cannot_go": "❌ No puede ir",
         "all_friends_invited": "Todos tus amigos ya han sido invitados.",
-        "get_to_start": "Cómo llegar a la salida"
+        "get_to_start": "Cómo llegar a la salida",
+        "delete_route": "Eliminar ruta",
+        "delete_title": "¿Eliminar esta ruta?",
+        "delete_body": "Se borra de tus rutas y no se puede deshacer. Tampoco recuperas la ruta de IA que gastaste.",
+        "delete_confirm": "Eliminar"
     },
     "refine": {
         "title": "Afinar la ruta",

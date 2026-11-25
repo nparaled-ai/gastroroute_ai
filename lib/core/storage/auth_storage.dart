@@ -51,10 +51,13 @@ class AuthStorage {
       await _storage.read(key: _keyLanguage);
 
   // Recordar credenciales (SharedPreferences - más fiable que SecureStorage para esto)
+  // Solo se recuerda el CORREO. La contraseña NO se guarda nunca (antes se guardaba en claro en las
+  // preferencias del móvil); la sesión dura 60 días y no hace falta volver a escribirla. El parámetro `password`
+  // se conserva para no tocar a quien llama, y se ignora.
   static Future<void> saveCredentials(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('saved_email', email);
-    await prefs.setString('saved_password', password);
+    await prefs.remove('saved_password');   // borra la que dejaron versiones anteriores
     await prefs.setBool('remember_me', true);
   }
 
@@ -68,9 +71,10 @@ class AuthStorage {
   static Future<Map<String, String?>> getSavedCredentials() async {
     final prefs = await SharedPreferences.getInstance();
     final rememberMe = prefs.getBool('remember_me') ?? false;
+    await prefs.remove('saved_password');   // limpieza de la contraseña guardada por versiones anteriores
     return {
       'email':       rememberMe ? prefs.getString('saved_email') : null,
-      'password':    rememberMe ? prefs.getString('saved_password') : null,
+      'password':    null,
       'remember_me': rememberMe ? 'true' : 'false',
     };
   }

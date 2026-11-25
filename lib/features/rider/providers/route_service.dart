@@ -113,6 +113,16 @@ class RouteService {
     }
   }
 
+  /// Borra una ruta guardada. `{'ok': true}` o `{'error': motivo}` (compartida, publicada, rodada…).
+  static Future<Map<String, dynamic>> deleteRoute(int id) async {
+    try {
+      await ApiClient.dio.delete('/rider/routes/$id');
+      return {'ok': true};
+    } on DioException catch (e) {
+      return {'error': e.response?.data?['message'] ?? 'common.connection_error'.tr()};
+    }
+  }
+
   static Future<Map<String, dynamic>> getRoute(int id) async {
     try {
       final response = await ApiClient.dio.get('/rider/routes/$id');

@@ -423,7 +423,10 @@
         "source_maps": "Maps",
         "source_gpx": "GPX",
         "from": "Da: {quien}",
-        "source_catalog": "Percorsi in moto"
+        "source_catalog": "Percorsi in moto",
+        "offline_title": "Nessuna connessione",
+        "offline_body": "Non riusciamo a caricare i tuoi percorsi ora. Non sono persi: riprova quando hai copertura.",
+        "offline_retry": "Riprova"
     },
     "friends_screen": {
         "title": "Amici",
@@ -671,7 +674,11 @@
         "weather_prefix_now": "Adesso · ",
         "cannot_go": "❌ Non può venire",
         "all_friends_invited": "Tutti i tuoi amici sono già stati invitati.",
-        "get_to_start": "Come arrivare alla partenza"
+        "get_to_start": "Come arrivare alla partenza",
+        "delete_route": "Elimina percorso",
+        "delete_title": "Eliminare questo percorso?",
+        "delete_body": "Viene rimosso dai tuoi percorsi e non si può annullare. Il percorso IA usato non viene restituito.",
+        "delete_confirm": "Elimina"
     },
     "refine": {
         "title": "Rifinire il percorso",

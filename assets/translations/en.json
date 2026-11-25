@@ -423,7 +423,10 @@
         "source_maps": "Maps",
         "source_gpx": "GPX",
         "from": "From: {quien}",
-        "source_catalog": "Motorcycle routes"
+        "source_catalog": "Motorcycle routes",
+        "offline_title": "No connection",
+        "offline_body": "We cannot load your routes right now. They are not lost: try again when you have signal.",
+        "offline_retry": "Try again"
     },
     "friends_screen": {
         "title": "Friends",
@@ -671,7 +674,11 @@
         "weather_prefix_now": "Now · ",
         "cannot_go": "❌ Can’t make it",
         "all_friends_invited": "All your friends have already been invited.",
-        "get_to_start": "How to get to the start"
+        "get_to_start": "How to get to the start",
+        "delete_route": "Delete route",
+        "delete_title": "Delete this route?",
+        "delete_body": "It is removed from your routes and cannot be undone. The AI route you used is not given back either.",
+        "delete_confirm": "Delete"
     },
     "refine": {
         "title": "Fine-tune the route",

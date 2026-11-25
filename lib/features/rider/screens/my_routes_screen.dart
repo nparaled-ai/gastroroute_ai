@@ -29,6 +29,9 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
 
   bool _loading = true;
 
+  /// Sin conexión (o el servidor no responde): se dice, en vez de enseñar «no tienes rutas».
+  bool _offline = false;
+
   /// Rodadas de hoy, para el número de la pestaña.
   int get _riddenToday {
     final now = DateTime.now();
@@ -73,7 +76,18 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
 
     final routes = results[0] as Map<String, dynamic>;
 
+    // Un fallo de red NO es «no tienes rutas»: se conserva lo que había y se avisa con un «sin conexión» y un
+    // botón de reintentar (probado con el modo avión: la lista salía vacía como si se hubieran perdido las rutas).
+    if (routes['error'] != null) {
+      setState(() {
+        _offline = true;
+        _loading = false;
+      });
+      return;
+    }
+
     setState(() {
+      _offline = false;
       _upcoming = List<Map<String, dynamic>>.from(routes['upcoming'] ?? []);
       _notDone  = List<Map<String, dynamic>>.from(routes['not_done'] ?? []);
       _received = List<Map<String, dynamic>>.from(routes['received'] ?? []);
@@ -181,7 +195,9 @@ class _MyRoutesScreenState extends State<MyRoutesScreen>
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: AppColors.orange))
-          : TabBarView(
+          : _offline
+              ? _OfflineNotice(onRetry: _loadRoutes)
+              : TabBarView(
               controller: _tabController,
               children: [
                 _RouteList(
@@ -1165,5 +1181,37 @@ class _SourceChip extends StatelessWidget {
     };
 
     return _Chip(icon, label, AppColors.cyan);
+  }
+}
+
+/// «Sin conexión», con reintentar. Es lo que hay que ver cuando falla la red, no una lista vacía.
+class _OfflineNotice extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _OfflineNotice({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.wifi_off_rounded, size: 56, color: AppColors.grey),
+          const SizedBox(height: 16),
+          Text('my_routes.offline_title'.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          Text('my_routes.offline_body'.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.4)),
+          const SizedBox(height: 20),
+          OutlinedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: Text('my_routes.offline_retry'.tr()),
+          ),
+        ]),
+      ),
+    );
   }
 }

@@ -63,6 +63,9 @@ class RouteAssistantService {
       final response = await ApiClient.dio.post(
         '/rider/routes/options',
         data: payload,
+        // 90 s y no los 30 por defecto: el servidor consulta a la IA y verifica los sitios en Google, y una
+        // petición larga se cortaba en la app con «error de conexión» mientras el servidor seguía gastando.
+        options: Options(receiveTimeout: const Duration(seconds: 90)),
       );
 
       return {

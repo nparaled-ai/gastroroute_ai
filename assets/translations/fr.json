@@ -423,7 +423,10 @@
         "source_maps": "Maps",
         "source_gpx": "GPX",
         "from": "De : {quien}",
-        "source_catalog": "Routes moto"
+        "source_catalog": "Routes moto",
+        "offline_title": "Pas de connexion",
+        "offline_body": "Impossible de charger vos itinéraires pour le moment. Ils ne sont pas perdus : réessayez quand vous aurez du réseau.",
+        "offline_retry": "Réessayer"
     },
     "friends_screen": {
         "title": "Amis",
@@ -671,7 +674,11 @@
         "weather_prefix_now": "Maintenant · ",
         "cannot_go": "❌ Ne peut pas venir",
         "all_friends_invited": "Tous vos amis ont déjà été invités.",
-        "get_to_start": "Comment rejoindre le départ"
+        "get_to_start": "Comment rejoindre le départ",
+        "delete_route": "Supprimer l’itinéraire",
+        "delete_title": "Supprimer cet itinéraire ?",
+        "delete_body": "Elle sera supprimée de vos itinéraires, sans retour possible. L’itinéraire IA utilisé n’est pas restitué.",
+        "delete_confirm": "Supprimer"
     },
     "refine": {
         "title": "Affiner l'itinéraire",

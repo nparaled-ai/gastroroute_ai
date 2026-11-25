@@ -423,7 +423,10 @@
         "source_maps": "Maps",
         "source_gpx": "GPX",
         "from": "Von: {quien}",
-        "source_catalog": "Motorradrouten"
+        "source_catalog": "Motorradrouten",
+        "offline_title": "Keine Verbindung",
+        "offline_body": "Deine Routen können gerade nicht geladen werden. Sie sind nicht verloren: Versuche es erneut, sobald du Empfang hast.",
+        "offline_retry": "Erneut versuchen"
     },
     "friends_screen": {
         "title": "Freunde",
@@ -671,7 +674,11 @@
         "weather_prefix_now": "Jetzt · ",
         "cannot_go": "❌ Kann nicht mitfahren",
         "all_friends_invited": "Alle deine Freunde wurden bereits eingeladen.",
-        "get_to_start": "Anfahrt zum Start"
+        "get_to_start": "Anfahrt zum Start",
+        "delete_route": "Route löschen",
+        "delete_title": "Diese Route löschen?",
+        "delete_body": "Sie wird aus deinen Routen entfernt und kann nicht wiederhergestellt werden. Die verbrauchte KI-Route bekommst du nicht zurück.",
+        "delete_confirm": "Löschen"
     },
     "refine": {
         "title": "Route verfeinern",

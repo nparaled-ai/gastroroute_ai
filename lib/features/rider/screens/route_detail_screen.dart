@@ -1692,10 +1692,60 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       ),
                     ],
 
+                    // ── Eliminar (ruta propia, privada, sin rodar ni compartir) ──
+                    // Decidido el 25-11-2026: se puede borrar si no se ha compartido ni publicado ni rodado. El
+                    // servidor repite la comprobación y explica el motivo si no se puede.
+                    if (_isOwner &&
+                        _route!['visibility'] == 'private' &&
+                        !_hasBeenRidden &&
+                        !_isTrackingThisRoute &&
+                        _route!['publication_status'] == null) ...[
+                      const SizedBox(height: 12),
+                      TextButton.icon(
+                        onPressed: _confirmDelete,
+                        icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+                        label: Text('route_detail.delete_route'.tr(),
+                            style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
+                      ),
+                    ],
+
                     const SizedBox(height: 32),
                   ]),
                 ),
     );
+  }
+
+  /// Pregunta y borra la ruta; si el servidor no deja (compartida, rodada…), enseña el motivo.
+  Future<void> _confirmDelete() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('route_detail.delete_title'.tr()),
+        content: Text('route_detail.delete_body'.tr()),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('common.cancel'.tr())),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('route_detail.delete_confirm'.tr(), style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    final result = await RouteService.deleteRoute(widget.routeId);
+    if (!mounted) return;
+
+    if (result['error'] != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('${result['error']}'),
+        backgroundColor: AppColors.error,
+      ));
+      return;
+    }
+
+    routeListRefresh.value++;
+    context.pop();
   }
 
   Widget _buildOwner() {

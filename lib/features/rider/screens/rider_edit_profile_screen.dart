@@ -63,7 +63,9 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     _bioController      = TextEditingController(text: widget.profile['bio'] ?? '');
     _provinceController = TextEditingController(text: widget.profile['province'] ?? '');
     _experienceLevel    = widget.profile['experience_level'] ?? 'novato';
-    _language           = widget.profile['language'] ?? 'es';
+    // Sin idioma guardado (cuenta nueva) se parte del de la pantalla, no de «es»: antes, al guardar el perfil sin
+    // tocar nada, toda la app pasaba a castellano aunque se estuviera usando en inglés.
+    _language           = widget.profile['language'] ?? ApiClient.appLanguage ?? 'es';
     _gender             = widget.profile['gender'];
     _avatarUrl          = widget.profile['avatar_url'];
     _notificationRadius = (widget.profile['notification_radius_km'] as num?)?.toInt() ?? 100;

@@ -423,7 +423,10 @@
         "source_maps": "Maps",
         "source_gpx": "GPX",
         "from": "De: {quien}",
-        "source_catalog": "Rotas de moto"
+        "source_catalog": "Rotas de moto",
+        "offline_title": "Sem ligação",
+        "offline_body": "Não conseguimos carregar as tuas rotas agora. Não se perderam: tenta de novo quando tiveres cobertura.",
+        "offline_retry": "Tentar de novo"
     },
     "friends_screen": {
         "title": "Amigos",
@@ -671,7 +674,11 @@
         "weather_prefix_now": "Agora · ",
         "cannot_go": "❌ Não pode ir",
         "all_friends_invited": "Todos os teus amigos já foram convidados.",
-        "get_to_start": "Como chegar à saída"
+        "get_to_start": "Como chegar à saída",
+        "delete_route": "Eliminar rota",
+        "delete_title": "Eliminar esta rota?",
+        "delete_body": "É removida das tuas rotas e não se pode desfazer. A rota de IA gasta também não é devolvida.",
+        "delete_confirm": "Eliminar"
     },
     "refine": {
         "title": "Afinar a rota",
