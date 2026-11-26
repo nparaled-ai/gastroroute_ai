@@ -4,6 +4,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 // Callback que el router registra al iniciarse para redirigir al login sin dependencia circular
 void Function()? onUnauthorized;
 
+/// Cupo de rutas con IA agotado (403 con `quota_reached`): la app enseña un aviso claro, con la fecha en que se repone.
+void Function(Map data)? onQuotaReached;
+
 class ApiClient {
   static const String baseUrl = 'http://192.168.1.14:8000/api/v1';
 
@@ -48,6 +51,9 @@ class ApiClient {
               !['/auth/login', '/auth/register', '/auth/google'].any(error.requestOptions.path.startsWith)) {
             await _storage.delete(key: 'access_token');
             onUnauthorized?.call();
+          }
+          if (error.response?.statusCode == 403 && d is Map && d['quota_reached'] == true) {
+            onQuotaReached?.call(d);
           }
           return handler.next(error);
         },

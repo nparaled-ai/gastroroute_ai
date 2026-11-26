@@ -1314,5 +1314,9 @@
             "copyright": "Diritti d’autore",
             "other": "Altro"
         }
+    },
+    "quota": {
+        "title": "Percorsi IA esauriti",
+        "ok": "Capito"
     }
 }

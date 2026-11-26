@@ -1314,5 +1314,9 @@
             "copyright": "Copyright",
             "other": "Other"
         }
+    },
+    "quota": {
+        "title": "AI routes used up",
+        "ok": "Got it"
     }
 }

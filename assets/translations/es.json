@@ -1314,5 +1314,9 @@
             "copyright": "Derechos de autor",
             "other": "Otro"
         }
+    },
+    "quota": {
+        "title": "Rutas con IA agotadas",
+        "ok": "Entendido"
     }
 }

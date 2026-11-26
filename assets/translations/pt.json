@@ -1314,5 +1314,9 @@
             "copyright": "Direitos de autor",
             "other": "Outro"
         }
+    },
+    "quota": {
+        "title": "Rotas com IA esgotadas",
+        "ok": "Entendido"
     }
 }

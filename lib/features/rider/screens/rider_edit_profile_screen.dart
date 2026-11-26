@@ -110,8 +110,10 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       }
 
       // Obtener posición
+      // Con tope de tiempo: sin satélites a la vista se quedaba esperando para siempre.
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+        locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 15)),
       );
 
       // Geocodificación inversa via backend
@@ -124,7 +126,8 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty) {
         setState(() {
-          _provinceController.text = data[0]['description'] as String;
+          // Solo localidad y provincia: el perfil se ve en público y la calle y el número sobran.
+          _provinceController.text = (data[0]['area'] ?? data[0]['description']) as String;
           _locationValidated = true;
           _locationSuggestions = [];
         });

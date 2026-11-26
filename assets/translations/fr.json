@@ -1314,5 +1314,9 @@
             "copyright": "Droits d’auteur",
             "other": "Autre"
         }
+    },
+    "quota": {
+        "title": "Itinéraires IA épuisés",
+        "ok": "Compris"
     }
 }

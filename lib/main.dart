@@ -16,6 +16,19 @@ void main() async {
   await PushNotificationService.init();
 
   onUnauthorized = () => router.go('/login');
+  // Cupo agotado: un aviso que se lee (no una barra de 2 s), con la fecha en que se repone.
+  onQuotaReached = (d) {
+    final ctx = router.routerDelegate.navigatorKey.currentContext;
+    if (ctx == null) return;
+    showDialog<void>(
+      context: ctx,
+      builder: (c) => AlertDialog(
+        title: Text('quota.title'.tr()),
+        content: Text('${d['message'] ?? ''}'),
+        actions: [TextButton(onPressed: () => Navigator.pop(c), child: Text('quota.ok'.tr()))],
+      ),
+    );
+  };
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(

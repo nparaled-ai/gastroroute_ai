@@ -1314,5 +1314,9 @@
             "copyright": "Urheberrecht",
             "other": "Sonstiges"
         }
+    },
+    "quota": {
+        "title": "KI-Routen aufgebraucht",
+        "ok": "Verstanden"
     }
 }
