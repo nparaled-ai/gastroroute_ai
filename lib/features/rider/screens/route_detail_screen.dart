@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -1275,11 +1274,11 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(colors: [
-                          AppColors.orange.withOpacity(0.2),
+                          AppColors.orange.withValues(alpha: 0.2),
                           AppColors.surface,
                         ]),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.orange.withOpacity(0.3)),
+                        border: Border.all(color: AppColors.orange.withValues(alpha: 0.3)),
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(_route!['title'] ?? '',
@@ -1528,9 +1527,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: AppColors.grey.withOpacity(0.1),
+                            color: AppColors.grey.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.grey.withOpacity(0.3)),
+                            border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
                           ),
                           child: Row(children: [
                             const Icon(Icons.cancel_outlined, color: AppColors.grey, size: 20),
@@ -1800,7 +1799,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.orange.withOpacity(0.15),
+                color: AppColors.orange.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text('Tú',
@@ -1821,9 +1820,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.cyan.withOpacity(0.12),
+          color: AppColors.cyan.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.cyan.withOpacity(0.3)),
+          border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
         ),
         child: Row(children: [
           const Icon(Icons.event, color: AppColors.cyan, size: 16),
@@ -1922,9 +1921,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.cyan.withOpacity(0.1),
+                  color: AppColors.cyan.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.cyan.withOpacity(0.3)),
+                  border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
                 ),
                 child: _refreshingWeather
                     ? const SizedBox(
@@ -1953,7 +1952,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
               color: needsFuel
-                  ? AppColors.error.withOpacity(0.4)
+                  ? AppColors.error.withValues(alpha: 0.4)
                   : AppColors.greyDark),
         ),
         child: Row(children: [
@@ -2046,9 +2045,9 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: AppColors.cyan.withOpacity(0.1),
+          color: AppColors.cyan.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.cyan.withOpacity(0.3)),
+          border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.person_add_outlined, color: AppColors.cyan, size: 14),
@@ -2105,9 +2104,9 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, color: color, size: 13),
@@ -2151,7 +2150,7 @@ class _ParticipantRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: badgeColor.withOpacity(0.25)),
+        border: Border.all(color: badgeColor.withValues(alpha: 0.25)),
       ),
       child: Row(children: [
         RiderAvatar(
@@ -2174,9 +2173,9 @@ class _ParticipantRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
-            color: badgeColor.withOpacity(0.1),
+            color: badgeColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: badgeColor.withOpacity(0.3)),
+            border: Border.all(color: badgeColor.withValues(alpha: 0.3)),
           ),
           child: Text(badgeText,
               style: TextStyle(
@@ -2315,11 +2314,12 @@ class _ShareBottomSheetState extends State<_ShareBottomSheet> {
           if (_friends.isNotEmpty)
             GestureDetector(
               onTap: () => setState(() {
-                if (_selected.length == _friends.length)
+                if (_selected.length == _friends.length) {
                   _selected.clear();
-                else
+                } else {
                   _selected =
                       _friends.map((f) => f['user_id'] as int).toSet();
+                }
               }),
               child: Text(
                   _selected.length == _friends.length
@@ -2372,17 +2372,19 @@ class _ShareBottomSheetState extends State<_ShareBottomSheet> {
                     activeColor: AppColors.cyan,
                     side: const BorderSide(color: AppColors.grey),
                     onChanged: (_) => setState(() {
-                      if (chk)
+                      if (chk) {
                         _selected.remove(uid);
-                      else
+                      } else {
                         _selected.add(uid);
+                      }
                     }),
                   ),
                   onTap: () => setState(() {
-                    if (chk)
+                    if (chk) {
                       _selected.remove(uid);
-                    else
+                    } else {
                       _selected.add(uid);
+                    }
                   }),
                 );
               },
@@ -2439,16 +2441,16 @@ class _OptionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.35)),
+          border: Border.all(color: color.withValues(alpha: 0.35)),
         ),
         child: Row(children: [
           Container(
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
+                color: color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10)),
             child: Icon(icon, color: color, size: 22),
           ),
@@ -2570,8 +2572,11 @@ class _RepeatShareBottomSheetState extends State<_RepeatShareBottomSheet> {
       if (_friends.isNotEmpty)
         GestureDetector(
           onTap: () => setState(() {
-            if (_selected.length == _friends.length) _selected.clear();
-            else _selected = _friends.map((f) => f['user_id'] as int).toSet();
+            if (_selected.length == _friends.length) {
+              _selected.clear();
+            } else {
+              _selected = _friends.map((f) => f['user_id'] as int).toSet();
+            }
           }),
           child: Text(
               _selected.length == _friends.length
@@ -2608,11 +2613,19 @@ class _RepeatShareBottomSheetState extends State<_RepeatShareBottomSheet> {
                 value: chk, activeColor: AppColors.cyan,
                 side: const BorderSide(color: AppColors.grey),
                 onChanged: (_) => setState(() {
-                  if (chk) _selected.remove(uid); else _selected.add(uid);
+                  if (chk) {
+                    _selected.remove(uid);
+                  } else {
+                    _selected.add(uid);
+                  }
                 }),
               ),
               onTap: () => setState(() {
-                if (chk) _selected.remove(uid); else _selected.add(uid);
+                if (chk) {
+                  _selected.remove(uid);
+                } else {
+                  _selected.add(uid);
+                }
               }),
             );
           },

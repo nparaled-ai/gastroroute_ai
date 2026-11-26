@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../features/rider/providers/route_service.dart';
 
@@ -67,7 +66,7 @@ class RouteWaypointsView extends StatelessWidget {
         'lng': originLng,
         'name': route['origin'] ?? '',
         'estimated_minutes_from_start': 0,
-        if (departure != null) 'estimated_arrival_time': departure,
+        'estimated_arrival_time': ?departure,
       },
       ...middle,
       {
@@ -149,7 +148,9 @@ class RouteWaypointsView extends StatelessWidget {
       final wpNote = (wp['note'] ?? '').toLowerCase();
 
       if (wpName.contains('repostaje') || wpName.contains('gasolinera') ||
-          wpName.contains('repostar') || wpNote.contains('repostar antes')) continue;
+          wpName.contains('repostar') || wpNote.contains('repostar antes')) {
+        continue;
+      }
 
       // Lo que manda es la marca `type` que pone el servidor (idioma aparte): las
       // palabras de abajo son el respaldo de las rutas guardadas antes de ella.
@@ -157,10 +158,14 @@ class RouteWaypointsView extends StatelessWidget {
 
       if (_dinnerStop != null && (tipo == 'comida' || wpName.contains('comida') || wpName.contains('comer') ||
           wpName.contains('dinner') || wpNote.contains('parada para comer') ||
-          wpNote.contains('comida'))) continue;
+          wpNote.contains('comida'))) {
+        continue;
+      }
 
       if (_lunchStop != null && (tipo == 'almuerzo' || wpName.contains('almuerzo') || wpName.contains('lunch') ||
-          wpNote.contains('almuerzo') || wpNote.contains('parada para almorzar'))) continue;
+          wpNote.contains('almuerzo') || wpNote.contains('parada para almorzar'))) {
+        continue;
+      }
 
       final isFirst = i == 0;
       final isLast  = i == _waypoints.length - 1;
@@ -285,7 +290,7 @@ class _WaypointRow extends StatelessWidget {
             color: isFirst || isLast ? AppColors.orange : isMeal ? _accent : AppColors.surface,
             shape: BoxShape.circle,
             border: Border.all(color: isFirst || isLast ? AppColors.orange : isMeal ? _accent : AppColors.greyDark),
-            boxShadow: isMeal ? [BoxShadow(color: _accent.withOpacity(0.5), blurRadius: 8, spreadRadius: 2)] : null,
+            boxShadow: isMeal ? [BoxShadow(color: _accent.withValues(alpha: 0.5), blurRadius: 8, spreadRadius: 2)] : null,
           ),
           child: Center(
             child: isFirst ? const Text('🏁', style: TextStyle(fontSize: 14))
@@ -305,9 +310,9 @@ class _WaypointRow extends StatelessWidget {
               ? Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _accent.withOpacity(0.08),
+                    color: _accent.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _accent.withOpacity(0.5)),
+                    border: Border.all(color: _accent.withValues(alpha: 0.5)),
                   ),
                   child: _content(_accent),
                 )
@@ -378,7 +383,7 @@ class _FuelStopRow extends StatelessWidget {
         Container(
           width: 32, height: 32,
           decoration: BoxDecoration(
-            color: AppColors.gold.withOpacity(0.15),
+            color: AppColors.gold.withValues(alpha: 0.15),
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.gold),
           ),
@@ -424,7 +429,7 @@ class _MealStopRow extends StatelessWidget {
           width: 36, height: 36,
           decoration: BoxDecoration(
             color: color, shape: BoxShape.circle,
-            boxShadow: [BoxShadow(color: color.withOpacity(0.4), blurRadius: 8, spreadRadius: 2)],
+            boxShadow: [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 8, spreadRadius: 2)],
           ),
           child: Center(child: Icon(icon, color: Colors.white, size: 18)),
         ),
@@ -436,9 +441,9 @@ class _MealStopRow extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
+            color: color.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.4)),
+            border: Border.all(color: color.withValues(alpha: 0.4)),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
@@ -447,7 +452,7 @@ class _MealStopRow extends StatelessWidget {
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(Icons.access_time, color: color, size: 11),
                     const SizedBox(width: 3),
@@ -515,8 +520,8 @@ class _TimeBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(Icons.access_time, color: color, size: 12),
@@ -562,8 +567,8 @@ class _WeatherBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: _color.withOpacity(0.1), borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: _color.withOpacity(0.3)),
+        color: _color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _color.withValues(alpha: 0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(_icon, color: _color, size: 13),

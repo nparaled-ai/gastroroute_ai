@@ -274,7 +274,6 @@ class _RiderHomeScreenState extends State<RiderHomeScreen> {
     // Filtrar aceptadas y rechazadas ya vistas
     final prefs    = await SharedPreferences.getInstance();
     final seenIds  = prefs.getStringList('seen_accepted_requests') ?? [];
-    final seenRouteIds = prefs.getStringList('seen_received_routes') ?? [];
     final unseenNotifications = sent.where((s) =>
         (s['status'] == 'accepted' || s['status'] == 'rejected') &&
         !seenIds.contains('${s['friendship_id']}'),
@@ -609,7 +608,7 @@ class _QuickAccessCard extends StatelessWidget {
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: badge > 0 ? AppColors.error.withOpacity(0.6) : AppColors.greyDark,
+            color: badge > 0 ? AppColors.error.withValues(alpha: 0.6) : AppColors.greyDark,
             width: badge > 0 ? 1.5 : 1,
           ),
         ),
@@ -621,7 +620,7 @@ class _QuickAccessCard extends StatelessWidget {
                 Container(
                   width: 52, height: 52,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
+                    color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(icon, color: color, size: 28),

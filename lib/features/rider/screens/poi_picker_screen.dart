@@ -83,7 +83,7 @@ class _PoiPickerScreenState extends State<PoiPickerScreen> {
   List<Map<String, dynamic>> _categories = [];
 
   /// Los elegidos, completos. El orden es el de elección.
-  late List<Map<String, dynamic>> _selected =
+  late final List<Map<String, dynamic>> _selected =
       List<Map<String, dynamic>>.from(widget.selected);
 
   bool _loading = true;

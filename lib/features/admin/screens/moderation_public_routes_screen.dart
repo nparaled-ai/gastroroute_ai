@@ -342,7 +342,7 @@ class _Author extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: blocked ? AppColors.error.withOpacity(0.5) : AppColors.greyDark),
+        border: Border.all(color: blocked ? AppColors.error.withValues(alpha: 0.5) : AppColors.greyDark),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('moderation.author'.tr(), style: const TextStyle(color: AppColors.grey, fontSize: 12)),

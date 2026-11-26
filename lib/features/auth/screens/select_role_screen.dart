@@ -120,7 +120,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: isSelected ? color.withOpacity(0.15) : AppColors.surface,
+                      color: isSelected ? color.withValues(alpha: 0.15) : AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: isSelected ? color : AppColors.greyDark, width: isSelected ? 2 : 1),
                     ),
@@ -128,7 +128,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                       children: [
                         Container(
                           width: 52, height: 52,
-                          decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                          decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
                           child: Icon(config['icon'] as IconData, color: color, size: 28),
                         ),
                         const SizedBox(width: 16),

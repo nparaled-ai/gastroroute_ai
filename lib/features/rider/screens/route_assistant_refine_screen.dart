@@ -1179,7 +1179,7 @@ class _RouteAssistantRefineScreenState
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
                           color: _lunchKind == clase
-                              ? AppColors.orange.withOpacity(0.15)
+                              ? AppColors.orange.withValues(alpha: 0.15)
                               : AppColors.surface,
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(

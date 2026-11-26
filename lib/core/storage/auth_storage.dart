@@ -9,9 +9,6 @@ class AuthStorage {
   static const _keyUserId          = 'user_id';
   static const _keyEmail           = 'email';
   static const _keyLanguage        = 'language';
-  static const _keySavedEmail      = 'saved_email';
-  static const _keySavedPassword   = 'saved_password';
-  static const _keyRememberMe      = 'remember_me';
 
   // Token
   static Future<void> saveToken(String token) async =>

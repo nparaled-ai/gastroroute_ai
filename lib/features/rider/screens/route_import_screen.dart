@@ -22,7 +22,6 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
   bool   _loading     = false;
   String? _error;
   int?   _motoId;
-  String? _motoLabel;
   List<Map<String, dynamic>> _motos = [];
   String? _departureDate;
   String  _departureTime = '09:00';
@@ -82,7 +81,6 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
     if (primary.isNotEmpty) {
       setState(() {
         _motoId    = primary['id'];
-        _motoLabel = '${primary['brand']} ${primary['model'] ?? ''}'.trim();
       });
     }
   }
@@ -251,7 +249,7 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
           Container(
             width: 32, height: 32,
             decoration: BoxDecoration(
-              color: step.color.withOpacity(0.15),
+              color: step.color.withValues(alpha: 0.15),
               shape: BoxShape.circle,
               border: Border.all(color: step.color),
             ),
@@ -278,9 +276,9 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: step.color.withOpacity(0.08),
+              color: step.color.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: step.color.withOpacity(0.3)),
+              border: Border.all(color: step.color.withValues(alpha: 0.3)),
             ),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Icon(Icons.lightbulb_outline, color: step.color, size: 16),
@@ -315,9 +313,9 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
   padding: const EdgeInsets.all(12),
   margin: const EdgeInsets.only(bottom: 12),
   decoration: BoxDecoration(
-  color: AppColors.error.withOpacity(0.1),
+  color: AppColors.error.withValues(alpha: 0.1),
   borderRadius: BorderRadius.circular(10),
-  border: Border.all(color: AppColors.error.withOpacity(0.4)),
+  border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
   ),
   child: Row(children: [
   const Icon(Icons.error_outline, color: AppColors.error, size: 18),
@@ -374,9 +372,9 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
   child: Container(
   padding: const EdgeInsets.all(14),
   decoration: BoxDecoration(
-      color: AppColors.cyan.withOpacity(0.1),
+      color: AppColors.cyan.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: AppColors.cyan.withOpacity(0.3)),
+    border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
   ),
   child: const Icon(Icons.content_paste, color: AppColors.cyan, size: 20),
   ),
@@ -480,11 +478,7 @@ class _RouteImportScreenState extends State<RouteImportScreen> {
                     child: Text('${m['brand']} ${m['model'] ?? ''}'.trim(),
                         style: const TextStyle(color: AppColors.white, fontSize: 13)),
                   )).toList(),
-                  onChanged: (val) => setState(() {
-                    _motoId = val;
-                    final m = _motos.firstWhere((m) => m['id'] == val, orElse: () => {});
-                    _motoLabel = m.isNotEmpty ? '${m['brand']} ${m['model'] ?? ''}'.trim() : null;
-                  }),
+                  onChanged: (val) => setState(() => _motoId = val),
                 ),
               ),
             ),
@@ -568,7 +562,7 @@ class _GoogleMapsIllustration extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8)],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 8)],
               ),
               child: Row(children: [
                 Icon(Icons.search, color: Color(0xFF4285F4), size: 18),
@@ -583,7 +577,7 @@ class _GoogleMapsIllustration extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8)],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 8)],
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('import.mock_my_route'.tr(), style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w700, fontSize: 14)),
@@ -613,7 +607,7 @@ class _GoogleMapsIllustration extends StatelessWidget {
                 color: const Color(0xFFEA4335),
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 4)],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 4)],
               ),
               child: const Icon(Icons.place, color: Colors.white, size: 14),
             ),
@@ -644,7 +638,7 @@ class _ShareButtonIllustration extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8)],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 8)],
             ),
             child: Column(children: [
               Text('import.mock_found'.tr(), style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w700)),
@@ -673,9 +667,9 @@ class _ShareButtonIllustration extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.orange.withOpacity(0.15),
+                color: AppColors.orange.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.orange.withOpacity(0.4)),
+                border: Border.all(color: AppColors.orange.withValues(alpha: 0.4)),
               ),
               child: Row(children: [
                 const Icon(Icons.arrow_upward, color: AppColors.orange, size: 16),
@@ -737,9 +731,9 @@ class _CopyLinkIllustration extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.cyan.withOpacity(0.15),
+              color: AppColors.cyan.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.cyan.withOpacity(0.4)),
+              border: Border.all(color: AppColors.cyan.withValues(alpha: 0.4)),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               const Icon(Icons.copy, color: AppColors.cyan, size: 16),
@@ -838,9 +832,9 @@ class _GoogleMapButton extends StatelessWidget {
       Container(
         width: 44, height: 44,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           shape: BoxShape.circle,
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Icon(icon, color: color, size: 22),
       ),
@@ -862,7 +856,7 @@ class _ShareOption extends StatelessWidget {
       Container(
         width: 48, height: 48,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.15),
+          color: color.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: color, size: 24),
@@ -884,9 +878,9 @@ class _ResultChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, color: color, size: 13),

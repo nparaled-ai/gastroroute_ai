@@ -32,8 +32,8 @@ class AccountService {
   static Future<Map<String, dynamic>> deleteAccount({String? password, String? confirm}) async {
     try {
       final r = await ApiClient.dio.delete('/auth/account', data: {
-        if (password != null) 'password': password,
-        if (confirm != null) 'confirm': confirm,
+        'password': ?password,
+        'confirm': ?confirm,
       });
       return {'ok': true, 'message': r.data['message']};
     } on DioException catch (e) {

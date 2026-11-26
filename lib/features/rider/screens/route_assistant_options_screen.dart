@@ -687,9 +687,9 @@ class _RouteAssistantOptionsScreenState
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.error.withOpacity(0.10),
+                  color: AppColors.error.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.error.withOpacity(0.35)),
+                  border: Border.all(color: AppColors.error.withValues(alpha: 0.35)),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -717,9 +717,9 @@ class _RouteAssistantOptionsScreenState
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.orange.withOpacity(0.10),
+                  color: AppColors.orange.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.orange.withOpacity(0.35)),
+                  border: Border.all(color: AppColors.orange.withValues(alpha: 0.35)),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,

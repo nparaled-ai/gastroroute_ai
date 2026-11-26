@@ -162,11 +162,11 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
               padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
-                  AppColors.orange.withOpacity(0.2),
-                  AppColors.cyan.withOpacity(0.1),
+                  AppColors.orange.withValues(alpha: 0.2),
+                  AppColors.cyan.withValues(alpha: 0.1),
                 ]),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.orange.withOpacity(0.5)),
+                border: Border.all(color: AppColors.orange.withValues(alpha: 0.5)),
               ),
               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 const Icon(Icons.person_search_outlined, color: AppColors.orange, size: 22),
@@ -245,9 +245,9 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
           badge = Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.15),
+              color: Colors.green.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.green.withOpacity(0.4)),
+              border: Border.all(color: Colors.green.withValues(alpha: 0.4)),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               const Icon(Icons.check_circle, color: Colors.green, size: 14),
@@ -259,9 +259,9 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
           badge = Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.error.withOpacity(0.1),
+              color: AppColors.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.error.withOpacity(0.4)),
+              border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               const Icon(Icons.cancel_outlined, color: AppColors.error, size: 14),
@@ -273,9 +273,9 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
           badge = Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.gold.withOpacity(0.1),
+              color: AppColors.gold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
             ),
             child: Text('friends_screen.pending_status'.tr(), style: const TextStyle(color: AppColors.gold, fontSize: 11)),
           );
@@ -362,7 +362,7 @@ class _FriendCardWithActions extends StatelessWidget {
                   if (lang != null) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                      decoration: BoxDecoration(color: AppColors.greyDark.withOpacity(0.5), borderRadius: BorderRadius.circular(6)),
+                      decoration: BoxDecoration(color: AppColors.greyDark.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(6)),
                       child: Text(_flag(lang), style: const TextStyle(fontSize: 12)),
                     ),
                     const SizedBox(width: 6),
@@ -370,9 +370,9 @@ class _FriendCardWithActions extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: _levelColor(level).withOpacity(0.12),
+                      color: _levelColor(level).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: _levelColor(level).withOpacity(0.4)),
+                      border: Border.all(color: _levelColor(level).withValues(alpha: 0.4)),
                     ),
                     child: Text(_levelLabel(level), style: TextStyle(color: _levelColor(level), fontSize: 12, fontWeight: FontWeight.w700)),
                   ),
@@ -388,9 +388,9 @@ class _FriendCardWithActions extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.15),
+                    color: Colors.green.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.green.withOpacity(0.4)),
+                    border: Border.all(color: Colors.green.withValues(alpha: 0.4)),
                   ),
                   child: Center(child: Text('friends_screen.accept'.tr(), style: const TextStyle(color: Colors.green, fontSize: 13, fontWeight: FontWeight.w600))),
                 ),
@@ -403,9 +403,9 @@ class _FriendCardWithActions extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withOpacity(0.1),
+                    color: AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                    border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
                   ),
                   child: Center(child: Text('friends_screen.reject'.tr(), style: const TextStyle(color: AppColors.error, fontSize: 13, fontWeight: FontWeight.w600))),
                 ),
@@ -479,7 +479,7 @@ class _FriendCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                   decoration: BoxDecoration(
-                    color: AppColors.greyDark.withOpacity(0.5),
+                    color: AppColors.greyDark.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(_flag(lang), style: const TextStyle(fontSize: 12)),
@@ -489,9 +489,9 @@ class _FriendCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: _levelColor(level).withOpacity(0.12),
+                  color: _levelColor(level).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: _levelColor(level).withOpacity(0.4)),
+                  border: Border.all(color: _levelColor(level).withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   _levelLabel(level),

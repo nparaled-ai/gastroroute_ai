@@ -111,6 +111,7 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
     for (final k in _ratingKeys.values) {
       await k.currentState?.sendIfPending();
     }
+    if (!mounted) return;
 
     // Desde el historial es una consulta: se vuelve por donde se vino.
     if (widget.fromHistory) {

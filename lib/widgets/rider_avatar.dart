@@ -49,7 +49,7 @@ class RiderAvatar extends StatelessWidget {
 
   Widget _defaultAvatar() {
     return Container(
-      color: _levelColor.withOpacity(0.1),
+      color: _levelColor.withValues(alpha: 0.1),
       child: Icon(
         Icons.sports_motorsports, // icono de casco
         color: _levelColor,

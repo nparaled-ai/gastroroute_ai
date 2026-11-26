@@ -30,7 +30,6 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
   bool _photoRemoved = false;
   String? _photoUrl;
   File?   _localPhoto;
-  int?    _savedMotoId;
 
   bool get _isEditing => widget.moto != null;
 
@@ -72,7 +71,6 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
     _motoType               = m?['moto_type'];
     _offRoadTyres           = m?['off_road_tyres'] == true;
     _photoUrl               = m?['photo_url'];
-    _savedMotoId            = m?['id'];
   }
 
   @override
@@ -285,7 +283,7 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
                               ? Image.file(_localPhoto!, fit: BoxFit.cover, width: double.infinity, height: double.infinity)
                               : _photoUrl != null
                                   ? Image.network(_photoUrl!, fit: BoxFit.cover, width: double.infinity, height: double.infinity,
-                                      errorBuilder: (_, __, ___) => _photoPlaceholder())
+                                      errorBuilder: (_, _, _) => _photoPlaceholder())
                                   : _photoPlaceholder(),
                     ),
                     Positioned(
@@ -395,7 +393,7 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.orange.withOpacity(0.15) : AppColors.surface,
+                      color: isSelected ? AppColors.orange.withValues(alpha: 0.15) : AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: isSelected ? AppColors.orange : AppColors.greyDark, width: isSelected ? 2 : 1),
                     ),
@@ -417,7 +415,7 @@ class _RiderMotoFormScreenState extends State<RiderMotoFormScreen> {
               SwitchListTile.adaptive(
                 value: _offRoadTyres,
                 onChanged: (v) => setState(() => _offRoadTyres = v),
-                activeColor: AppColors.orange,
+                activeThumbColor: AppColors.orange,
                 contentPadding: EdgeInsets.zero,
                 title: Text('motos.off_road'.tr(),
                     style: const TextStyle(color: AppColors.white,

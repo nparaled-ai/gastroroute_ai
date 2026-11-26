@@ -276,9 +276,9 @@ class _LevelBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: _color.withOpacity(0.15),
+        color: _color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _color.withOpacity(0.4)),
+        border: Border.all(color: _color.withValues(alpha: 0.4)),
       ),
       child: Text(_label(context),
           style: TextStyle(color: _color, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
@@ -329,7 +329,7 @@ class _MotoCard extends StatelessWidget {
 
   Widget _motoIconBox() => Container(
     width: 48, height: 48,
-    decoration: BoxDecoration(color: AppColors.orange.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+    decoration: BoxDecoration(color: AppColors.orange.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
     child: const Icon(Icons.two_wheeler, color: AppColors.orange, size: 26),
   );
 
@@ -352,7 +352,7 @@ class _MotoCard extends StatelessWidget {
                     moto['photo_url'],
                     width: 48, height: 48,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _motoIconBox(),
+                    errorBuilder: (_, _, _) => _motoIconBox(),
                   )
                 : _motoIconBox(),
           ),
@@ -370,7 +370,7 @@ class _MotoCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppColors.orange.withOpacity(0.15),
+                          color: AppColors.orange.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text('motos.primary'.tr(),

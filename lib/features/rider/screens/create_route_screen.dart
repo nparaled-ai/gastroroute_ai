@@ -174,7 +174,7 @@ class _OptionCard extends StatelessWidget {
           border: Border.all(
             color: comingSoon
                 ? AppColors.greyDark
-                : color.withOpacity(0.4),
+                : color.withValues(alpha: 0.4),
             width: 1.5,
           ),
         ),
@@ -185,7 +185,7 @@ class _OptionCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: comingSoon
                   ? AppColors.greyDark
-                  : color.withOpacity(0.12),
+                  : color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
@@ -230,13 +230,13 @@ class _OptionCard extends StatelessWidget {
                       horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: comingSoon
-                        ? AppColors.greyDark.withOpacity(0.5)
-                        : color.withOpacity(0.1),
+                        ? AppColors.greyDark.withValues(alpha: 0.5)
+                        : color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                         color: comingSoon
                             ? AppColors.greyDark
-                            : color.withOpacity(0.3)),
+                            : color.withValues(alpha: 0.3)),
                   ),
                   child: Text(tag,
                       style: TextStyle(

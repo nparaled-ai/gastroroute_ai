@@ -91,7 +91,7 @@ class _RiderMotosScreenState extends State<RiderMotosScreen> {
 
   Widget _motoIconBox() => Container(
     width: 48, height: 48,
-    decoration: BoxDecoration(color: AppColors.orange.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+    decoration: BoxDecoration(color: AppColors.orange.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
     child: const Icon(Icons.two_wheeler, color: AppColors.orange, size: 26),
   );
 
@@ -141,7 +141,7 @@ class _RiderMotosScreenState extends State<RiderMotosScreen> {
                             moto['photo_url'],
                             width: 48, height: 48,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _motoIconBox(),
+                            errorBuilder: (_, _, _) => _motoIconBox(),
                           )
                         : _motoIconBox(),
                   ),
@@ -158,7 +158,7 @@ class _RiderMotosScreenState extends State<RiderMotosScreen> {
                               const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(color: AppColors.orange.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+                                decoration: BoxDecoration(color: AppColors.orange.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
                                 child: Text('motos.primary'.tr(),
                                     style: const TextStyle(color: AppColors.orange, fontSize: 12, fontWeight: FontWeight.w700)),
                               ),
@@ -211,9 +211,9 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

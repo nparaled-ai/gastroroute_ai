@@ -213,8 +213,11 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
 
   void _commitTitle() {
     final val = _titleCtrl.text.trim();
-    if (val.isNotEmpty) widget.result['route']['title'] = val;
-    else _titleCtrl.text = _route['title'] ?? '';
+    if (val.isNotEmpty) {
+      widget.result['route']['title'] = val;
+    } else {
+      _titleCtrl.text = _route['title'] ?? '';
+    }
     setState(() => _editingTitle = false);
   }
 
@@ -328,6 +331,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   // Opcion 1 del cuadro: guardar para mi, privada.
   Future<void> _saveOnly() async {
     if (!await _ensureSaved()) return;
+    if (!mounted) return;
     _showSaveResult();
   }
   void _showSaveResult() {
@@ -376,6 +380,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   Future<void> _shareWithFriends(List<int> selectedFriendIds) async {
     // Compartir tambien es elegir: se guarda en este momento, no antes.
     if (!await _ensureSaved()) return;
+    if (!mounted) return;
     final routeId = _savedRoute?['id'] ?? _route['id'];
     if (routeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -391,6 +396,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
 
   Future<void> _sharePublic() async {
     if (!await _ensureSaved()) return;
+    if (!mounted) return;
     final routeId = _savedRoute?['id'] ?? _route['id'];
     if (routeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -512,9 +518,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -645,7 +651,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft, end: Alignment.bottomRight,
-                colors: [AppColors.orange.withOpacity(0.3), AppColors.surface],
+                colors: [AppColors.orange.withValues(alpha: 0.3), AppColors.surface],
               ),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -807,9 +813,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: AppColors.cyan.withOpacity(0.1),
+                          color: AppColors.cyan.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppColors.cyan.withOpacity(0.3)),
+                          border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
                         ),
                         child: _refreshingWeather
                             ? const SizedBox(width: 16, height: 16,
@@ -843,7 +849,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: distKm > _fuelRangeKm!
-                            ? AppColors.error.withOpacity(0.5) : AppColors.greyDark),
+                            ? AppColors.error.withValues(alpha: 0.5) : AppColors.greyDark),
                     ),
                     child: Row(children: [
                       Icon(Icons.local_gas_station,
@@ -956,9 +962,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                   children: (_route['tags'] as List).map((tag) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
-                      color: AppColors.cyan.withOpacity(0.1),
+                      color: AppColors.cyan.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.cyan.withOpacity(0.3)),
+                      border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
                     ),
                     child: Text(tag.toString(), style: const TextStyle(color: AppColors.cyan, fontSize: 12)),
                   )).toList(),
@@ -1167,11 +1173,19 @@ value: chk,
 activeColor: AppColors.cyan,
 side: const BorderSide(color: AppColors.grey),
 onChanged: (_) => setState(() {
-if (chk) _selected.remove(uid); else _selected.add(uid);
+if (chk) {
+  _selected.remove(uid);
+} else {
+  _selected.add(uid);
+}
 }),
 ),
               onTap: () => setState(() {
-      if (chk) _selected.remove(uid); else _selected.add(uid);
+      if (chk) {
+        _selected.remove(uid);
+      } else {
+        _selected.add(uid);
+      }
               }),
           );
         },
@@ -1228,15 +1242,15 @@ class _OptionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.35)),
+          border: Border.all(color: color.withValues(alpha: 0.35)),
         ),
         child: Row(children: [
           Container(
             width: 42, height: 42,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 22),
@@ -1271,9 +1285,9 @@ class _ActionBtn extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 9),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.4)),
+          border: Border.all(color: color.withValues(alpha: 0.4)),
         ),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(icon, color: color, size: 13),
@@ -1300,7 +1314,9 @@ class _WeatherIcon extends StatelessWidget {
     if (d.contains('niebla') || d.contains('fog') || d.contains('mist')) return Icons.foggy;
     if (d.contains('muy nuboso') || d.contains('overcast') || d.contains('broken')) return Icons.cloud;
     if (d.contains('nubes') || d.contains('nublado') || d.contains('clouds') ||
-        d.contains('parcial') || d.contains('scattered') || d.contains('few')) return Icons.wb_cloudy_outlined;
+        d.contains('parcial') || d.contains('scattered') || d.contains('few')) {
+      return Icons.wb_cloudy_outlined;
+    }
     return Icons.wb_sunny_outlined;
   }
 
@@ -1322,8 +1338,8 @@ class _WeatherIcon extends StatelessWidget {
     final tempStr = temp != null ? '${temp.toStringAsFixed(0)}°' : '';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(color: _color.withOpacity(0.1), borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: _color.withOpacity(0.3))),
+      decoration: BoxDecoration(color: _color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: _color.withValues(alpha: 0.3))),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(_icon, color: _color, size: size),
         if (tempStr.isNotEmpty) ...[
@@ -1346,8 +1362,8 @@ class _StatBadge extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withOpacity(0.3))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: color.withValues(alpha: 0.3))),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(icon, color: color, size: 16),
           const SizedBox(width: 4),
@@ -1388,8 +1404,8 @@ class _SuggestionCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25))),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.25))),
       child: Row(children: [
         Icon(icon, color: color, size: 22),
         const SizedBox(width: 12),
@@ -1400,7 +1416,7 @@ class _SuggestionCard extends StatelessWidget {
         if (badge != null)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
             child: Text(badge!, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
           ),
       ]),

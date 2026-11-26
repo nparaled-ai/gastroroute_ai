@@ -182,9 +182,9 @@ class _SearchResultCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.green.withOpacity(0.1),
+          color: Colors.green.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.green.withOpacity(0.3)),
+          border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.check, color: Colors.green, size: 14),
@@ -198,9 +198,9 @@ class _SearchResultCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.gold.withOpacity(0.1),
+          color: AppColors.gold.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+          border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.schedule, color: AppColors.gold, size: 14),
@@ -216,9 +216,9 @@ class _SearchResultCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: AppColors.orange.withOpacity(0.15),
+          color: AppColors.orange.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.orange.withOpacity(0.5)),
+          border: Border.all(color: AppColors.orange.withValues(alpha: 0.5)),
         ),
         child: sending
             ? const SizedBox(width: 16, height: 16,
@@ -266,7 +266,7 @@ class _SearchResultCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                   decoration: BoxDecoration(
-                    color: AppColors.greyDark.withOpacity(0.5),
+                    color: AppColors.greyDark.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(_flag(lang), style: const TextStyle(fontSize: 12)),
@@ -275,9 +275,9 @@ class _SearchResultCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: _levelColor(level).withOpacity(0.12),
+                  color: _levelColor(level).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: _levelColor(level).withOpacity(0.4)),
+                  border: Border.all(color: _levelColor(level).withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   _levelLabel(level),

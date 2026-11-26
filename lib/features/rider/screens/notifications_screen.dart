@@ -237,7 +237,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               : ListView.separated(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: _notifications.length,
-                  separatorBuilder: (_, __) =>
+                  separatorBuilder: (_, _) =>
                       const Divider(color: AppColors.greyDark, height: 1, indent: 72),
                   itemBuilder: (context, i) {
                     final n    = _notifications[i];
@@ -263,7 +263,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       child: InkWell(
                         onTap: () => _onTap(n),
                         child: Container(
-                          color: read ? Colors.transparent : AppColors.orange.withOpacity(0.05),
+                          color: read ? Colors.transparent : AppColors.orange.withValues(alpha: 0.05),
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,7 +271,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               Container(
                                 width: 44, height: 44,
                                 decoration: BoxDecoration(
-                                  color: _colorFor(look).withOpacity(0.15),
+                                  color: _colorFor(look).withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Icon(_iconFor(look), color: _colorFor(look), size: 22),

@@ -183,7 +183,7 @@ class AuthService {
     } catch (_) {}
 
     try {
-      await ApiClient.dio.post('/auth/logout', data: {if (fcm != null) 'fcm_token': fcm});
+      await ApiClient.dio.post('/auth/logout', data: {'fcm_token': ?fcm});
     } catch (_) {}
 
     try {

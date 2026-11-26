@@ -12,9 +12,9 @@ class RouteImportService {
     try {
       final response = await ApiClient.dio.post('/rider/routes/import', data: {
         'url':            url,
-        if (motoId != null)       'moto_id':        motoId,
-        if (departureDate != null) 'departure_date': departureDate,
-        if (departureTime != null) 'departure_time': departureTime,
+        'moto_id':        ?motoId,
+        'departure_date': ?departureDate,
+        'departure_time': ?departureTime,
       });
       return {'result': response.data};
     } on DioException catch (e) {
@@ -33,8 +33,8 @@ class RouteImportService {
       final formData = FormData.fromMap({
         'file': await MultipartFile.fromFile(filePath, filename: fileName),
         if (motoId != null)        'moto_id':        motoId.toString(),
-        if (departureDate != null) 'departure_date': departureDate,
-        if (departureTime != null) 'departure_time': departureTime,
+        'departure_date': ?departureDate,
+        'departure_time': ?departureTime,
       });
       final response = await ApiClient.dio.post(
         '/rider/routes/import-gpx',

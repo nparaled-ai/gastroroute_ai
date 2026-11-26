@@ -41,7 +41,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               Container(
                 width: 96, height: 96,
                 decoration: BoxDecoration(
-                  color: AppColors.orange.withOpacity(0.15),
+                  color: AppColors.orange.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.mark_email_unread_outlined,
@@ -78,10 +78,10 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: (_isError ? AppColors.error : AppColors.cyan).withOpacity(0.1),
+                    color: (_isError ? AppColors.error : AppColors.cyan).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: (_isError ? AppColors.error : AppColors.cyan).withOpacity(0.3),
+                      color: (_isError ? AppColors.error : AppColors.cyan).withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(_msg!,

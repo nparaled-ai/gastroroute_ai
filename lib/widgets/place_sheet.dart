@@ -96,6 +96,8 @@ class _PlaceSheetState extends State<PlaceSheet> {
     }
 
     try {
+      if (!mounted) return;
+      final lang = context.locale.languageCode;
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 15)),
       );
@@ -104,7 +106,7 @@ class _PlaceSheetState extends State<PlaceSheet> {
           queryParameters: {
             'q': '${position.latitude},${position.longitude}',
             'reverse': '1',
-            'lang': context.locale.languageCode,
+            'lang': lang,
           });
 
       final data = response.data as List? ?? [];

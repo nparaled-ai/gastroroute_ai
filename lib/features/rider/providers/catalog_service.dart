@@ -53,9 +53,9 @@ class CatalogService {
     try {
       final r = await ApiClient.dio.post('/rider/catalog/routes/$id/rating', data: {
         'route_id': routeId,
-        if (stars != null) 'stars': stars,
-        if (wasOpen != null) 'was_open': wasOpen,
-        if (roadworks != null) 'roadworks': roadworks,
+        'stars': ?stars,
+        'was_open': ?wasOpen,
+        'roadworks': ?roadworks,
         if (comment != null && comment.trim().isNotEmpty) 'comment': comment.trim(),
       });
       return Map<String, dynamic>.from(r.data as Map);

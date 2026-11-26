@@ -107,7 +107,7 @@ class _Tile extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: danger ? AppColors.error.withOpacity(0.4) : AppColors.greyDark),
+            border: Border.all(color: danger ? AppColors.error.withValues(alpha: 0.4) : AppColors.greyDark),
           ),
           child: Row(children: [
             Icon(icon, color: danger ? AppColors.error : AppColors.orange),

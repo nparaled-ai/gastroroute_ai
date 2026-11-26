@@ -62,7 +62,7 @@ class _RouteMapImageState extends State<RouteMapImage> {
     Navigator.of(context).push(PageRouteBuilder(
       opaque: false,
       barrierColor: Colors.black87,
-      pageBuilder: (_, __, ___) => _FullScreenMap(image: image),
+      pageBuilder: (_, _, _) => _FullScreenMap(image: image),
     ));
   }
 

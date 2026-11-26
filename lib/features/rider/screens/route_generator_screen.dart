@@ -71,9 +71,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   bool _destinationInsisted = false;
   List<Map<String, dynamic>> _originSuggestions = [];
   List<Map<String, dynamic>> _destinationSuggestions = [];
-  List<List<Map<String, dynamic>>> _pointSuggestions = [];
-  List<bool> _pointValidated = [];
-  List<Map<String, double>?> _pointCoords = []; // lat/lng de cada punto
+  final List<List<Map<String, dynamic>>> _pointSuggestions = [];
+  final List<bool> _pointValidated = [];
+  final List<Map<String, double>?> _pointCoords = []; // lat/lng de cada punto
   double? _originLat;
   double? _originLng;
   String? _error;
@@ -120,12 +120,15 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       _suggestDinner      = data['suggest_dinner'] ?? false;
       _suggestGasStations = data['suggest_gas'] ?? false;
 
-      if ((data['departure_time'] ?? '').toString().isNotEmpty)
+      if ((data['departure_time'] ?? '').toString().isNotEmpty) {
         _departureTimeController.text = data['departure_time'];
-      if ((data['lunch_time'] ?? '').toString().isNotEmpty)
+      }
+      if ((data['lunch_time'] ?? '').toString().isNotEmpty) {
         _lunchTimeController.text = data['lunch_time'];
-      if ((data['dinner_time'] ?? '').toString().isNotEmpty)
+      }
+      if ((data['dinner_time'] ?? '').toString().isNotEmpty) {
         _dinnerTimeController.text = data['dinner_time'];
+      }
 
       // Restaurar fecha
       if (data['departure_date'] != null) {
@@ -143,7 +146,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
       }
 
       // Restaurar puntos obligatorios
-      for (final c in _customPointControllers) c.dispose();
+      for (final c in _customPointControllers) {
+        c.dispose();
+      }
       _customPointControllers.clear();
       _pointSuggestions.clear();
       _pointValidated.clear();
@@ -165,8 +170,12 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
     _departureTimeController.dispose();
     _lunchTimeController.dispose();
     _dinnerTimeController.dispose();
-    for (final c in _customPointControllers) c.dispose();
-    for (final t in _searchDebounce.values) t.cancel();
+    for (final c in _customPointControllers) {
+      c.dispose();
+    }
+    for (final t in _searchDebounce.values) {
+      t.cancel();
+    }
     super.dispose();
   }
 
@@ -431,14 +440,18 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
         if (permission == LocationPermission.denied) { setState(() => _detectingLocation = false); return; }
       }
       if (permission == LocationPermission.deniedForever) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('common.location_permission_hint'.tr()), backgroundColor: AppColors.error));
+        }
         setState(() => _detectingLocation = false); return;
       }
+      if (!mounted) return;
+      final lang = context.locale.languageCode;
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 15)));
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
-        'q': '${position.latitude},${position.longitude}', 'lang': context.locale.languageCode, 'reverse': '1',
+        'q': '${position.latitude},${position.longitude}', 'lang': lang, 'reverse': '1',
       });
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty && mounted) {
@@ -449,8 +462,10 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
         });
       }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('common.location_failed'.tr()), backgroundColor: AppColors.error));
+      }
     }
     if (mounted) setState(() => _detectingLocation = false);
   }
@@ -794,11 +809,11 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(colors: [
-                        AppColors.orange.withOpacity(0.2),
-                        AppColors.cyan.withOpacity(0.1),
+                        AppColors.orange.withValues(alpha: 0.2),
+                        AppColors.cyan.withValues(alpha: 0.1),
                       ]),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.orange.withOpacity(0.3)),
+                      border: Border.all(color: AppColors.orange.withValues(alpha: 0.3)),
                     ),
                     child: Row(children: [
                       const Icon(Icons.auto_awesome, color: AppColors.orange, size: 28),
@@ -831,7 +846,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     )
                   else
                     DropdownButtonFormField<int>(
-                      value: _selectedMotoId,
+                      // initialValue + key: la moto llega después de cargar el perfil y la lista tiene que enterarse.
+                      key: ValueKey(_selectedMotoId),
+                      initialValue: _selectedMotoId,
                       dropdownColor: AppColors.surface,
                       style: const TextStyle(color: AppColors.white),
                       decoration: InputDecoration(
@@ -862,9 +879,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.cyan.withOpacity(0.1),
+                            color: AppColors.cyan.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppColors.cyan.withOpacity(0.4)),
+                            border: Border.all(color: AppColors.cyan.withValues(alpha: 0.4)),
                           ),
                           child: Row(mainAxisSize: MainAxisSize.min, children: [
                             _detectingLocation
@@ -1079,7 +1096,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                             Container(
                               width: 24, height: 24,
                               decoration: BoxDecoration(
-                                color: AppColors.orange.withOpacity(0.15),
+                                color: AppColors.orange.withValues(alpha: 0.15),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: AppColors.orange),
                               ),
@@ -1177,9 +1194,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                                 margin: const EdgeInsets.only(top: 4, left: 32),
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
-                                  color: color.withOpacity(0.1),
+                                  color: color.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: color.withOpacity(0.4)),
+                                  border: Border.all(color: color.withValues(alpha: 0.4)),
                                 ),
                                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                   Row(children: [
@@ -1275,9 +1292,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                       margin: const EdgeInsets.only(top: 8),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.gold.withOpacity(0.1),
+                        color: AppColors.gold.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+                        border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
                       ),
                       child: Row(children: [
                         const Icon(Icons.auto_awesome, color: AppColors.gold, size: 16),
@@ -1435,9 +1452,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   _ToggleOption(
                     icon: Icons.local_gas_station,
                     label: 'planner.gas_stations'.tr(),
-                    subtitle: (_motoHasFuelData
+                    subtitle: '${_motoHasFuelData
                         ? 'planner.gas_stations_desc'.tr()
-                        : 'planner.gas_stations_no_data'.tr()) + ' (parada ~15 min)',
+                        : 'planner.gas_stations_no_data'.tr()} (parada ~15 min)',
                     value: _motoHasFuelData && _suggestGasStations,
                     enabled: _motoHasFuelData,
                     color: AppColors.gold,
@@ -1447,7 +1464,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   _ToggleOption(
                     icon: Icons.restaurant_outlined,
                     label: 'planner.lunch_stop'.tr(),
-                    subtitle: 'planner.lunch_desc'.tr() + ' (parada ~30 min)',
+                    subtitle: '${'planner.lunch_desc'.tr()} (parada ~30 min)',
                     value: _suggestLunch, enabled: true, color: AppColors.orange,
                     onChanged: (val) => setState(() => _suggestLunch = val),
                   ),
@@ -1464,7 +1481,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                   _ToggleOption(
                     icon: Icons.dinner_dining,
                     label: 'planner.dinner_stop'.tr(),
-                    subtitle: 'planner.dinner_desc'.tr() + ' ' + 'planner.stop_one_hour'.tr(),
+                    subtitle: '${'planner.dinner_desc'.tr()} ${'planner.stop_one_hour'.tr()}',
                     value: _suggestDinner, enabled: true, color: AppColors.cyan,
                     onChanged: (val) => setState(() => _suggestDinner = val),
                   ),
@@ -1484,9 +1501,9 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.error.withOpacity(0.1),
+                        color: AppColors.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
                       ),
                       child: Row(children: [
                         const Icon(Icons.error_outline, color: AppColors.error, size: 18),
@@ -1547,7 +1564,7 @@ class _DurationModeChip extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? color.withOpacity(0.15) : AppColors.surface,
+            color: selected ? color.withValues(alpha: 0.15) : AppColors.surface,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: selected ? color : AppColors.greyDark, width: selected ? 2 : 1),
           ),
@@ -1647,9 +1664,9 @@ class _ToggleOption extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: value ? color.withOpacity(0.1) : AppColors.surface,
+        color: value ? color.withValues(alpha: 0.1) : AppColors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: value ? color.withOpacity(0.4) : AppColors.greyDark),
+        border: Border.all(color: value ? color.withValues(alpha: 0.4) : AppColors.greyDark),
       ),
       child: Row(children: [
         Icon(icon, color: enabled ? color : AppColors.greyDark, size: 22),
@@ -1659,7 +1676,7 @@ class _ToggleOption extends StatelessWidget {
           Text(subtitle, style: TextStyle(color: enabled ? AppColors.grey : AppColors.greyText, fontSize: 11)),
         ])),
         Switch(value: value && enabled, onChanged: enabled ? onChanged : null,
-            activeColor: color, inactiveThumbColor: AppColors.greyDark, inactiveTrackColor: AppColors.surface),
+            activeThumbColor: color, inactiveThumbColor: AppColors.greyDark, inactiveTrackColor: AppColors.surface),
       ]),
     );
   }
@@ -1681,7 +1698,7 @@ class _OptionChip extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? AppColors.orange.withOpacity(0.15) : AppColors.surface,
+            color: selected ? AppColors.orange.withValues(alpha: 0.15) : AppColors.surface,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: selected ? AppColors.orange : AppColors.greyDark, width: selected ? 2 : 1),
           ),

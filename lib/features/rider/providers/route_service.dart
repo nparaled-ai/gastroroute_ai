@@ -201,8 +201,8 @@ class RouteService {
                   'estimated_arrival_time': w['estimated_arrival_time'],
                 })
             .toList(),
-        if (date != null) 'date': date,
-        if (time != null) 'time': time,
+        'date': ?date,
+        'time': ?time,
       });
       return List<dynamic>.from(response.data['weather'] ?? const []);
     } on DioException {
@@ -229,8 +229,8 @@ class RouteService {
     try {
       final r = await ApiClient.dio.post('/rider/eateries/$eateryId/rating', data: {
         'route_id': routeId,
-        if (stars != null) 'stars': stars,
-        if (parked != null) 'parked': parked,
+        'stars': ?stars,
+        'parked': ?parked,
         if (closed) 'closed': true,
         if (comment != null && comment.trim().isNotEmpty) 'comment': comment.trim(),
       });

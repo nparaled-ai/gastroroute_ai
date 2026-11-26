@@ -292,7 +292,7 @@ class _TabLabel extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
           decoration: BoxDecoration(
-            color: highlight ? AppColors.error : activeColor.withOpacity(0.3),
+            color: highlight ? AppColors.error : activeColor.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text('$count',
@@ -487,7 +487,7 @@ class _FilterChip extends StatelessWidget {
         margin: const EdgeInsets.only(right: 6),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: active ? color.withOpacity(0.2) : AppColors.surface,
+          color: active ? color.withValues(alpha: 0.2) : AppColors.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: active ? color : AppColors.greyDark),
         ),
@@ -599,10 +599,10 @@ class _RouteCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
               decoration: BoxDecoration(
-                color: AppColors.cyan.withOpacity(0.12),
+                color: AppColors.cyan.withValues(alpha: 0.12),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 border: Border(
-                    bottom: BorderSide(color: AppColors.cyan.withOpacity(0.25))),
+                    bottom: BorderSide(color: AppColors.cyan.withValues(alpha: 0.25))),
               ),
               child: Wrap(spacing: 12, runSpacing: 4, children: [
                 Row(mainAxisSize: MainAxisSize.min, children: [
@@ -661,9 +661,9 @@ class _RouteCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: _statusColor.withOpacity(0.12),
+                    color: _statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: _statusColor.withOpacity(0.35)),
+                    border: Border.all(color: _statusColor.withValues(alpha: 0.35)),
                   ),
                   child: Text(_statusLabel,
                       style: TextStyle(
@@ -698,7 +698,7 @@ class _RouteCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      '${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim() + ' · ${route['moto_info']['engine_cc']} cc',
+                      '${'${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim()} · ${route['moto_info']['engine_cc']} cc',
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: AppColors.grey, fontSize: 12),
                     ),
@@ -725,9 +725,9 @@ class _RouteCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: AppColors.cyan.withOpacity(0.1),
+                        color: AppColors.cyan.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.cyan.withOpacity(0.4)),
+                        border: Border.all(color: AppColors.cyan.withValues(alpha: 0.4)),
                       ),
                       child: const Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.map_outlined, color: AppColors.cyan, size: 13),
@@ -759,9 +759,9 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, color: color, size: 12),
@@ -1051,8 +1051,7 @@ class _RiddenListState extends State<_RiddenList> {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        '${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim()
-                            + ' · ${route['moto_info']['engine_cc']} cc',
+                        '${'${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim()} · ${route['moto_info']['engine_cc']} cc',
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: AppColors.grey, fontSize: 12),
                       ),

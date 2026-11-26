@@ -102,7 +102,7 @@ class _ReportDialogState extends State<_ReportDialog> {
           Text('report.intro'.tr(), style: const TextStyle(color: AppColors.greyText, fontSize: 13, height: 1.4)),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: _reason,
+            initialValue: _reason,
             isExpanded: true,
             dropdownColor: AppColors.surface,
             decoration: InputDecoration(labelText: 'report.reason_label'.tr()),

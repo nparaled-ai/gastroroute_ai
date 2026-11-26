@@ -33,11 +33,11 @@ class PlannerSelectionScreen extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
-                  AppColors.orange.withOpacity(0.2),
-                  AppColors.cyan.withOpacity(0.1),
+                  AppColors.orange.withValues(alpha: 0.2),
+                  AppColors.cyan.withValues(alpha: 0.1),
                 ]),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.orange.withOpacity(0.3)),
+                border: Border.all(color: AppColors.orange.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -133,10 +133,10 @@ class _PlanOption extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: available ? color.withOpacity(0.08) : AppColors.surface,
+          color: available ? color.withValues(alpha: 0.08) : AppColors.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: available ? color.withOpacity(0.5) : AppColors.greyDark,
+            color: available ? color.withValues(alpha: 0.5) : AppColors.greyDark,
             width: available ? 2 : 1,
           ),
         ),
@@ -148,8 +148,8 @@ class _PlanOption extends StatelessWidget {
               height: 72,
               decoration: BoxDecoration(
                 color: available
-                    ? color.withOpacity(0.15)
-                    : AppColors.greyDark.withOpacity(0.3),
+                    ? color.withValues(alpha: 0.15)
+                    : AppColors.greyDark.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
@@ -178,7 +178,7 @@ class _PlanOption extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppColors.greyDark.withOpacity(0.5),
+                            color: AppColors.greyDark.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(

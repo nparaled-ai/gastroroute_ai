@@ -60,7 +60,7 @@ class ModerationService {
   static Future<Map<String, dynamic>?> zones({String? country}) async {
     try {
       final r = await ApiClient.dio.get('/admin/moderation/zones',
-          queryParameters: {if (country != null) 'country': country});
+          queryParameters: {'country': ?country});
       return Map<String, dynamic>.from(r.data as Map);
     } on DioException {
       return null;
@@ -169,9 +169,9 @@ class ModerationService {
   static Future<String?> warnUser(int userId, {String? template, String? message, int? routeId}) async {
     try {
       await ApiClient.dio.post('/admin/moderation/users/$userId/warn', data: {
-        if (template != null) 'template': template,
-        if (message != null) 'message': message,
-        if (routeId != null) 'route_id': routeId,
+        'template': ?template,
+        'message': ?message,
+        'route_id': ?routeId,
       });
       return null;
     } on DioException catch (e) {
@@ -203,7 +203,7 @@ class ModerationService {
   /// Vuelve a publicar lo que se ocultó por una denuncia. null = hecho; si no, el fallo.
   static Future<String?> restoreReport(int id, {String? note}) async {
     try {
-      await ApiClient.dio.post('/admin/moderation/reports/$id/restore', data: {if (note != null) 'note': note});
+      await ApiClient.dio.post('/admin/moderation/reports/$id/restore', data: {'note': ?note});
       return null;
     } on DioException catch (e) {
       return e.response?.data is Map ? '${e.response?.data['message'] ?? 'error'}' : 'error';
@@ -215,7 +215,7 @@ class ModerationService {
     try {
       await ApiClient.dio.post('/admin/moderation/reports/$id/resolve', data: {
         'decision': decision,
-        if (reason != null) 'reason': reason,
+        'reason': ?reason,
       });
       return null;
     } on DioException catch (e) {

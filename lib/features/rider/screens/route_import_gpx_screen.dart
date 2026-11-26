@@ -118,15 +118,15 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.cyan.withOpacity(0.08),
+              color: AppColors.cyan.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.cyan.withOpacity(0.3)),
+              border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
             ),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Container(
                 width: 48, height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.cyan.withOpacity(0.15),
+                  color: AppColors.cyan.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.folder_open, color: AppColors.cyan, size: 26),
@@ -304,9 +304,9 @@ class _RouteImportGpxScreenState extends State<RouteImportGpxScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.1),
+                color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.error.withOpacity(0.4)),
+                border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
               ),
               child: Row(children: [
                 const Icon(Icons.error_outline, color: AppColors.error, size: 18),

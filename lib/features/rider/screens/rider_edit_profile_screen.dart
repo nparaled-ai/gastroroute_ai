@@ -281,6 +281,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
       return;
     }
     await AuthStorage.saveLanguage(_language);
+    if (!mounted) return;
     await context.setLocale(Locale(_language));
     if (!mounted) return;
     context.pop();
@@ -347,7 +348,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: AppColors.greyDark.withOpacity(0.3),
+                color: AppColors.greyDark.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.greyDark),
               ),
@@ -443,9 +444,9 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.cyan.withOpacity(0.1),
+                      color: AppColors.cyan.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.cyan.withOpacity(0.4)),
+                      border: Border.all(color: AppColors.cyan.withValues(alpha: 0.4)),
                     ),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
                       _detectingLocation
@@ -567,7 +568,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                       margin: const EdgeInsets.only(right: 8),
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
                       decoration: BoxDecoration(
-                        color: isSelected ? color.withOpacity(0.15) : AppColors.surface,
+                        color: isSelected ? color.withValues(alpha: 0.15) : AppColors.surface,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: isSelected ? color : AppColors.greyDark, width: isSelected ? 2 : 1),
                       ),
@@ -601,7 +602,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.orange.withOpacity(0.15) : AppColors.surface,
+                      color: isSelected ? AppColors.orange.withValues(alpha: 0.15) : AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: isSelected ? AppColors.orange : AppColors.greyDark, width: isSelected ? 2 : 1),
                     ),
@@ -641,7 +642,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                   ),
                   Switch(
                     value: _notifyPublicRoutes,
-                    activeColor: AppColors.orange,
+                    activeThumbColor: AppColors.orange,
                     onChanged: (v) => setState(() => _notifyPublicRoutes = v),
                   ),
                 ]),
@@ -657,7 +658,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.orange.withOpacity(0.15),
+                        color: AppColors.orange.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text('$_notificationRadius km',
@@ -696,9 +697,9 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                    color: AppColors.error.withOpacity(0.1),
+                    color: AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.error.withOpacity(0.3))),
+                    border: Border.all(color: AppColors.error.withValues(alpha: 0.3))),
                 child: Row(children: [
                   const Icon(Icons.error_outline, color: AppColors.error, size: 18),
                   const SizedBox(width: 8),
@@ -740,16 +741,16 @@ class _GenderChip extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
           decoration: BoxDecoration(
-            color: selected ? color.withOpacity(0.15) : AppColors.surface,
+            color: selected ? color.withValues(alpha: 0.15) : AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: selected ? color : AppColors.greyDark, width: selected ? 2 : 1),
-            boxShadow: selected ? [BoxShadow(color: color.withOpacity(0.2), blurRadius: 8, spreadRadius: 1)] : null,
+            boxShadow: selected ? [BoxShadow(color: color.withValues(alpha: 0.2), blurRadius: 8, spreadRadius: 1)] : null,
           ),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Container(
               width: 44, height: 44,
               decoration: BoxDecoration(
-                color: color.withOpacity(selected ? 0.2 : 0.08),
+                color: color.withValues(alpha: selected ? 0.2 : 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: selected ? color : AppColors.greyDark, size: 24),

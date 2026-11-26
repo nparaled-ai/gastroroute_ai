@@ -664,7 +664,7 @@ class _Tile extends StatelessWidget {
           Expanded(
               child: Text(text,
                   style: const TextStyle(color: AppColors.white, fontSize: 14))),
-          if (trailing != null) trailing!,
+          ?trailing,
         ]),
       );
 }
