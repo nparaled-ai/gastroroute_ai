@@ -90,7 +90,7 @@ class _MapPointPickerScreenState extends State<MapPointPickerScreen> {
 
       final position = await Geolocator.getCurrentPosition(
         locationSettings:
-            const LocationSettings(accuracy: LocationAccuracy.medium),
+            const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 15)),
       );
       if (!mounted) return;
 

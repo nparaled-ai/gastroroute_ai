@@ -446,7 +446,10 @@
         "pending_status": "Ausstehend",
         "search_hint": "Nach Name oder Nickname suchen…",
         "min_two_chars": "Gib mindestens 2 Zeichen ein",
-        "none_found": "Keine Biker gefunden"
+        "none_found": "Keine Biker gefunden",
+        "status_sent": "Gesendet",
+        "status_received": "Erhalten",
+        "request_sent": "Anfrage gesendet."
     },
     "create_route": {
         "title": "Route erstellen",

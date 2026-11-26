@@ -247,10 +247,12 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   }
 
   Future<void> _fetchOrigin(String query) async {
+    final seq = _nextSeq('origin');
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
         'q': query, 'lang': context.locale.languageCode,
       });
+      if (!mounted || seq != _searchSeq['origin'] || _originValidated) return;
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty && mounted) {
         setState(() {
@@ -272,6 +274,12 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   /// notaba al escribir y además Places Autocomplete es de lo más caro de la
   /// API. Ahora se espera a que el motero pare.
   final Map<String, Timer> _searchDebounce = {};
+
+  /// Número de la última búsqueda lanzada en cada campo. Una respuesta que
+  /// llega después de otra más nueva (o después de elegir sugerencia) se tira:
+  /// si no, «Zarag» podía pisar a «Zaragoza» y volver a abrir la lista.
+  final Map<String, int> _searchSeq = {};
+  int _nextSeq(String field) => _searchSeq[field] = (_searchSeq[field] ?? 0) + 1;
 
   void _debounced(String field, VoidCallback action) {
     _searchDebounce[field]?.cancel();
@@ -312,10 +320,12 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
   }
 
   Future<void> _fetchDestination(String query) async {
+    final seq = _nextSeq('destination');
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
         'q': query, 'lang': context.locale.languageCode,
       });
+      if (!mounted || seq != _searchSeq['destination'] || _destinationValidated) return;
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty && mounted) {
         setState(() {
@@ -363,10 +373,13 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
 
   Future<void> _fetchPoint(int index, String query) async {
     if (index >= _pointSuggestions.length) return;
+    final seq = _nextSeq('point$index');
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
         'q': query, 'lang': context.locale.languageCode, 'poi': '1',
       });
+      if (!mounted || seq != _searchSeq['point$index']) return;
+      if (index >= _pointSuggestions.length || _pointValidated[index]) return;
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty && mounted) {
         setState(() {
@@ -423,7 +436,7 @@ class _RouteGeneratorScreenState extends State<RouteGeneratorScreen> {
         setState(() => _detectingLocation = false); return;
       }
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium));
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 15)));
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
         'q': '${position.latitude},${position.longitude}', 'lang': context.locale.languageCode, 'reverse': '1',
       });

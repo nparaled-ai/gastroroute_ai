@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -80,6 +81,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     _nicknameController.dispose();
     _bioController.dispose();
     _provinceController.dispose();
+    _locationDebounce?.cancel();
     _locationFocusNode.dispose();
     super.dispose();
   }
@@ -141,15 +143,29 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
     if (mounted) setState(() => _detectingLocation = false);
   }
 
+  /// Número de la última búsqueda: una respuesta vieja que llega tarde no pisa a la nueva.
+  int _locationSeq = 0;
+
+  /// Se espera a que pare de escribir: antes salía una búsqueda por letra.
+  Timer? _locationDebounce;
+  void _onLocationChanged(String q) {
+    _locationDebounce?.cancel();
+    _locationDebounce = Timer(const Duration(milliseconds: 400), () {
+      if (mounted) _searchLocation(q);
+    });
+  }
+
   Future<void> _searchLocation(String query) async {
+    final seq = ++_locationSeq;
     setState(() { _locationValidated = false; _locationSuggestions = []; });
-    if (query.length < 3) return;
+    if (query.length < 3) { setState(() => _loadingLocation = false); return; }
     setState(() => _loadingLocation = true);
     try {
       final response = await ApiClient.dio.get('/location/search', queryParameters: {
         'q':    query,
         'lang': _language,
       });
+      if (!mounted || seq != _locationSeq || _locationValidated) return;
       final List data = response.data as List? ?? [];
       if (data.isNotEmpty) {
         setState(() {
@@ -160,7 +176,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
         });
       }
     } catch (_) {}
-    if (mounted) setState(() => _loadingLocation = false);
+    if (mounted && seq == _locationSeq) setState(() => _loadingLocation = false);
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -417,8 +433,11 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('profile.location'.tr(),
-                    style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                Flexible(
+                  child: Text('profile.location'.tr(),
+                      style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+                ),
+                const SizedBox(width: 8),
                 GestureDetector(
                   onTap: _detectingLocation ? null : _detectCurrentLocation,
                   child: Container(
@@ -434,8 +453,10 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                               child: CircularProgressIndicator(color: AppColors.cyan, strokeWidth: 2))
                           : const Icon(Icons.my_location, color: AppColors.cyan, size: 13),
                       const SizedBox(width: 4),
-                      Text('planner.use_my_location'.tr(),
-                          style: TextStyle(color: AppColors.cyan, fontSize: 11, fontWeight: FontWeight.w600)),
+                      Flexible(
+                        child: Text('planner.use_my_location'.tr(),
+                            style: TextStyle(color: AppColors.cyan, fontSize: 11, fontWeight: FontWeight.w600)),
+                      ),
                     ]),
                   ),
                 ),
@@ -446,7 +467,7 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
               controller: _provinceController,
               focusNode: _locationFocusNode,
               style: const TextStyle(color: AppColors.white),
-              onChanged: _searchLocation,
+              onChanged: _onLocationChanged,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.grey),
                 suffixIcon: _loadingLocation
@@ -544,16 +565,21 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       margin: const EdgeInsets.only(right: 8),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
                       decoration: BoxDecoration(
                         color: isSelected ? color.withOpacity(0.15) : AppColors.surface,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: isSelected ? color : AppColors.greyDark, width: isSelected ? 2 : 1),
                       ),
-                      child: Text(levelLabel(level),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: isSelected ? color : AppColors.grey,
-                              fontSize: 13, fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal)),
+                      // Una sola línea que encoge si no cabe: con letra grande partía «INTERMED / IATE».
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(levelLabel(level),
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: isSelected ? color : AppColors.grey,
+                                fontSize: 13, fontWeight: isSelected ? FontWeight.w700 : FontWeight.normal)),
+                      ),
                     ),
                   ),
                 );

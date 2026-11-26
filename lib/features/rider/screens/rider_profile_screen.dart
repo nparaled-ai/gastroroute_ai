@@ -157,8 +157,11 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                 children: [
                   const Icon(Icons.location_on_outlined, color: AppColors.orange, size: 20),
                   const SizedBox(width: 8),
-                  Text('${profile['province']}, ${profile['country'] ?? 'ES'}',
-                      style: const TextStyle(color: AppColors.white, fontSize: 14)),
+                  // Expanded: una ubicación larga (o letra grande) bajaba de línea fuera de la tarjeta.
+                  Expanded(
+                    child: Text('${profile['province']}, ${profile['country'] ?? 'ES'}',
+                        style: const TextStyle(color: AppColors.white, fontSize: 14)),
+                  ),
                 ],
               ),
             ),

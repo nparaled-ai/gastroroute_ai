@@ -446,7 +446,10 @@
         "pending_status": "In attesa",
         "search_hint": "Cerca per nome o nickname…",
         "min_two_chars": "Scrivi almeno 2 caratteri",
-        "none_found": "Nessun motociclista trovato"
+        "none_found": "Nessun motociclista trovato",
+        "status_sent": "Inviata",
+        "status_received": "Ricevuta",
+        "request_sent": "Richiesta inviata."
     },
     "create_route": {
         "title": "Crea percorso",

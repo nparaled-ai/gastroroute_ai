@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -43,11 +45,19 @@ class _PlaceSheetState extends State<PlaceSheet> {
   @override
   void dispose() {
     _controller.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
+  /// Número de la última búsqueda: una respuesta vieja que llega tarde no pisa a la nueva.
+  int _seq = 0;
+
+  /// Se espera a que pare de escribir: antes salía una búsqueda por letra.
+  Timer? _debounce;
+
   Future<void> _search(String query) async {
     if (query.trim().length < 3) return;
+    final seq = ++_seq;
     setState(() => _loading = true);
 
     try {
@@ -63,7 +73,7 @@ class _PlaceSheetState extends State<PlaceSheet> {
         if (_donde != null) 'lng': '${_donde!.longitude}',
       });
 
-      if (!mounted) return;
+      if (!mounted || seq != _seq) return;
       setState(() {
         _loading = false;
         _results = List<Map<String, dynamic>>.from(
@@ -75,7 +85,7 @@ class _PlaceSheetState extends State<PlaceSheet> {
                 }));
       });
     } catch (_) {
-      if (mounted) setState(() => _loading = false);
+      if (mounted && seq == _seq) setState(() => _loading = false);
     }
   }
 
@@ -87,7 +97,7 @@ class _PlaceSheetState extends State<PlaceSheet> {
 
     try {
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 15)),
       );
 
       final response = await ApiClient.dio.get('/location/search',
@@ -108,7 +118,13 @@ class _PlaceSheetState extends State<PlaceSheet> {
         'lat': position.latitude,
         'lng': position.longitude,
       });
-    } catch (_) {}
+    } catch (_) {
+      // Antes callaba: el motero tocaba y no pasaba nada.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('common.location_failed'.tr())));
+      }
+    }
   }
 
   /// Abrir el mapa para poner el punto a dedo.
@@ -183,7 +199,12 @@ class _PlaceSheetState extends State<PlaceSheet> {
                 autofocus: true,
                 onSubmitted: _search,
                 onChanged: (q) {
-                  if (q.trim().length >= 3) _search(q);
+                  _debounce?.cancel();
+                  if (q.trim().length >= 3) {
+                    _debounce = Timer(const Duration(milliseconds: 400), () {
+                      if (mounted) _search(q);
+                    });
+                  }
                 },
                 style: const TextStyle(color: AppColors.white, fontSize: 14),
                 decoration: InputDecoration(

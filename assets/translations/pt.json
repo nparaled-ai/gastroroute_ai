@@ -446,7 +446,10 @@
         "pending_status": "Pendente",
         "search_hint": "Procurar por nome ou nickname…",
         "min_two_chars": "Escreve pelo menos 2 caracteres",
-        "none_found": "Nenhum motard encontrado"
+        "none_found": "Nenhum motard encontrado",
+        "status_sent": "Enviada",
+        "status_received": "Recebida",
+        "request_sent": "Pedido enviado."
     },
     "create_route": {
         "title": "Criar rota",

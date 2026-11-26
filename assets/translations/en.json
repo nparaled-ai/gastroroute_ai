@@ -446,7 +446,10 @@
         "pending_status": "Pending",
         "search_hint": "Search by name or nickname…",
         "min_two_chars": "Type at least 2 characters",
-        "none_found": "No riders found"
+        "none_found": "No riders found",
+        "status_sent": "Sent",
+        "status_received": "Received",
+        "request_sent": "Request sent."
     },
     "create_route": {
         "title": "Create route",

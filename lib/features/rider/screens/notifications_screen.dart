@@ -148,7 +148,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final Map<String, dynamic> extra = data is Map ? Map<String, dynamic>.from(data) : {};
 
     if (type == 'friend_request' || type == 'friend_accepted' || type == 'friend_rejected') {
-      context.push('/rider/friends');
+      // Pedida → Recibidas (para aceptarla); aceptada → Amigos; rechazada → Enviadas (ya no está).
+      final tab = type == 'friend_request' ? 1 : (type == 'friend_rejected' ? 2 : 0);
+      context.push('/rider/friends', extra: {'tab': tab});
       return;
     }
 

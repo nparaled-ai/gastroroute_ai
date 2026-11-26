@@ -237,7 +237,9 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/rider/friends',
-      builder: (context, state) => const FriendsScreen(),
+      builder: (context, state) => FriendsScreen(
+        initialTab: (state.extra is Map ? (state.extra as Map)['tab'] as int? : null) ?? 0,
+      ),
     ),
     GoRoute(
       path: '/rider/friends/search',

@@ -446,7 +446,10 @@
         "pending_status": "Pendiente",
         "search_hint": "Buscar por nombre o nickname...",
         "min_two_chars": "Escribe al menos 2 caracteres",
-        "none_found": "No se encontraron moteros"
+        "none_found": "No se encontraron moteros",
+        "status_sent": "Enviada",
+        "status_received": "Recibida",
+        "request_sent": "Solicitud enviada."
     },
     "create_route": {
         "title": "Crear ruta",

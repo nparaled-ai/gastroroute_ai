@@ -69,7 +69,7 @@ class _RouteAssistantScreenState extends State<RouteAssistantScreen> {
       final position = await Geolocator.getLastKnownPosition() ??
           await Geolocator.getCurrentPosition(
             locationSettings: const LocationSettings(
-                accuracy: LocationAccuracy.low),
+                accuracy: LocationAccuracy.low, timeLimit: Duration(seconds: 15)),
           );
 
       _lat = position.latitude;

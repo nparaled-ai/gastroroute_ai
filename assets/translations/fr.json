@@ -446,7 +446,10 @@
         "pending_status": "En attente",
         "search_hint": "Rechercher par nom ou pseudo…",
         "min_two_chars": "Saisissez au moins 2 caractères",
-        "none_found": "Aucun motard trouvé"
+        "none_found": "Aucun motard trouvé",
+        "status_sent": "Envoyée",
+        "status_received": "Reçue",
+        "request_sent": "Demande envoyée."
     },
     "create_route": {
         "title": "Créer un itinéraire",

@@ -53,12 +53,16 @@ class _FriendsSearchScreenState extends State<FriendsSearchScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'] ?? 'Solicitud enviada.'), backgroundColor: Colors.green),
+        SnackBar(content: Text(result['message'] ?? 'friends_screen.request_sent'.tr()), backgroundColor: Colors.green),
       );
       // Actualizar estado local
       setState(() {
         final idx = _results.indexWhere((r) => r['user_id'] == userId);
-        if (idx != -1) _results[idx]['friendship_status'] = 'pending';
+        // Y la ha mandado ÉL: sin `is_requester` el botón decía «Recibida».
+        if (idx != -1) {
+          _results[idx]['friendship_status'] = 'pending';
+          _results[idx]['is_requester'] = true;
+        }
       });
     }
   }
@@ -201,7 +205,7 @@ class _SearchResultCard extends StatelessWidget {
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.schedule, color: AppColors.gold, size: 14),
           const SizedBox(width: 4),
-          Text(isRequester ? 'Enviada' : 'Recibida',
+          Text(isRequester ? 'friends_screen.status_sent'.tr() : 'friends_screen.status_received'.tr(),
               style: const TextStyle(color: AppColors.gold, fontSize: 12)),
         ]),
       );

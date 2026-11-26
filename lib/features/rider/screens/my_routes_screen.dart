@@ -401,7 +401,7 @@ class _RouteListState extends State<_RouteList> {
 
       // ── Chips de filtro ──
       SizedBox(
-        height: 44,
+        height: 16 + MediaQuery.textScalerOf(context).scale(28),
         child: ListView(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -604,24 +604,26 @@ class _RouteCard extends StatelessWidget {
                 border: Border(
                     bottom: BorderSide(color: AppColors.cyan.withOpacity(0.25))),
               ),
-              child: Row(children: [
-                const Icon(Icons.event, color: AppColors.cyan, size: 15),
-                const SizedBox(width: 7),
-                Text(_formatDate(context, date),
-                    style: const TextStyle(
-                        color: AppColors.cyan,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13)),
-                if (time != null && time.toString().isNotEmpty) ...[
-                  const SizedBox(width: 12),
-                  const Icon(Icons.schedule, color: AppColors.cyan, size: 14),
-                  const SizedBox(width: 4),
-                  Text('route_detail.departure_at'.tr(namedArgs: {'time': time}),
+              child: Wrap(spacing: 12, runSpacing: 4, children: [
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  const Icon(Icons.event, color: AppColors.cyan, size: 15),
+                  const SizedBox(width: 7),
+                  Text(_formatDate(context, date),
                       style: const TextStyle(
                           color: AppColors.cyan,
                           fontWeight: FontWeight.w700,
                           fontSize: 13)),
-                ],
+                ]),
+                if (time != null && time.toString().isNotEmpty)
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.schedule, color: AppColors.cyan, size: 14),
+                    const SizedBox(width: 4),
+                    Text('route_detail.departure_at'.tr(namedArgs: {'time': time}),
+                        style: const TextStyle(
+                            color: AppColors.cyan,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13)),
+                  ]),
               ]),
             ),
 
@@ -694,9 +696,12 @@ class _RouteCard extends StatelessWidget {
                 Row(children: [
                   const Icon(Icons.two_wheeler, color: AppColors.grey, size: 14),
                   const SizedBox(width: 4),
-                  Text(
-                    '${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim() + ' · ${route['moto_info']['engine_cc']} cc',
-                    style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                  Expanded(
+                    child: Text(
+                      '${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim() + ' · ${route['moto_info']['engine_cc']} cc',
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                    ),
                   ),
                 ]),
               const SizedBox(height: 6),
@@ -884,7 +889,7 @@ class _RiddenListState extends State<_RiddenList> {
       ),
 
       SizedBox(
-        height: 44,
+        height: 16 + MediaQuery.textScalerOf(context).scale(28),
         child: ListView(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),

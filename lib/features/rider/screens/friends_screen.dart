@@ -8,7 +8,10 @@ import '../../../widgets/rider_avatar.dart';
 import '../providers/friendship_service.dart';
 
 class FriendsScreen extends StatefulWidget {
-  const FriendsScreen({super.key});
+  const FriendsScreen({super.key, this.initialTab = 0});
+
+  /// 0 amigos, 1 recibidas, 2 enviadas. El aviso de «te ha pedido amistad» abre en Recibidas.
+  final int initialTab;
 
   @override
   State<FriendsScreen> createState() => _FriendsScreenState();
@@ -25,7 +28,7 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 3, vsync: this, initialIndex: widget.initialTab.clamp(0, 2));
     _loadAll();
   }
 

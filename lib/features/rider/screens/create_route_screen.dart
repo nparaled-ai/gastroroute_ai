@@ -196,14 +196,13 @@ class _OptionCard extends StatelessWidget {
 
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
+              Wrap(spacing: 8, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
                 Text(title,
                     style: TextStyle(
                         color: comingSoon ? AppColors.grey : AppColors.white,
                         fontSize: 17,
                         fontWeight: FontWeight.w800)),
                 if (comingSoon) ...[
-                  const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 2),
