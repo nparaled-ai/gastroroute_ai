@@ -13,7 +13,7 @@
         "yes": "Sì",
         "no": "No",
         "optional": "facoltativo",
-        "pace_easy": "Facile",
+        "pace_easy": "Tranquillo",
         "pace_moderate": "Moderato",
         "pace_hard": "Impegnativo",
         "manage": "Gestisci",
@@ -212,7 +212,7 @@
         "landscape": "🏔️ Paesaggio",
         "mixed": "⚖️ Misto",
         "difficulty": "Ritmo",
-        "easy": "😌 Facile",
+        "easy": "😌 Tranquillo",
         "moderate": "💪 Moderato",
         "hard": "🔥 Impegnativo",
         "avoid_highways": "Evita autostrade e superstrade",
@@ -330,7 +330,8 @@
         "regenerate_shorter": "Rigenera più corto",
         "refuel_km": "⛽ Fai rifornimento ai {km} km",
         "refuel_km_n": "⛽ Fai rifornimento ai {km} km ({n}/{total})",
-        "from_catalog": "Percorsi in moto · {source}"
+        "from_catalog": "Percorsi in moto · {source}",
+        "wind_only": "Vento {wind} m/s"
     },
     "verify_email": {
         "title": "Verifica la tua email!",
@@ -399,7 +400,7 @@
         "status_joined": "✅ Iscritto",
         "status_declined": "❌ Rifiutato",
         "status_pending": "📨 In attesa",
-        "filter_easy": "Facile",
+        "filter_easy": "Tranquillo",
         "filter_moderate": "Moderato",
         "filter_hard": "Impegnativo",
         "filter_circular": "Circolare",
@@ -612,7 +613,8 @@
         "special_desc_turista": "Visita 5 punti panoramici diversi.",
         "special_desc_explorador": "Completa un percorso fuori dalla tua provincia abituale.",
         "special_desc_en_grupo": "Completa un percorso insieme a un altro motociclista.",
-        "special_desc_coleccionista": "Visita 50 punti di interesse diversi."
+        "special_desc_coleccionista": "Visita 50 punti di interesse diversi.",
+        "keep_riding_hint": "Sei sulla buona strada: continua a guidare e il primo traguardo di ogni serie arriverà presto."
     },
     "repeat": {
         "title": "Ripeti percorso",
@@ -880,7 +882,7 @@
         "l_road": "Strada",
         "l_road_v": "curve · paesaggio · misto",
         "l_pace": "Ritmo",
-        "l_pace_v": "tranquilla · moderata · impegnativa",
+        "l_pace_v": "tranquillo · moderato · impegnativo",
         "l_stops": "Soste",
         "l_stops_v": "sosta per spuntino o pranzo",
         "l_start": "Partenza",
@@ -1260,7 +1262,9 @@
         "warn_far_severe": "L’inizio è a {km} km ({time}) dalla tua partenza: non è un percorso da fare in giornata partendo da casa.",
         "start_at_route": "Partire dall’inizio del percorso",
         "route_start": "Partenza del percorso",
-        "publish_removed": "Questo percorso è stato rimosso da Percorsi in moto dalla moderazione. Se pensi che sia un errore, scrivici: l’email è nell’Avviso legale."
+        "publish_removed": "Questo percorso è stato rimosso da Percorsi in moto dalla moderazione. Se pensi che sia un errore, scrivici: l’email è nell’Avviso legale.",
+        "clear_filters": "Togli i filtri",
+        "mod_curviness": "tortuosità {cat}"
     },
     "legal": {
         "terms": "Termini di utilizzo",
@@ -1322,5 +1326,25 @@
     "quota": {
         "title": "Percorsi IA esauriti",
         "ok": "Capito"
+    },
+    "route_tags": {
+        "montana": "Montagna",
+        "curvas": "Curve",
+        "agua": "Acqua",
+        "historia": "Storia",
+        "costa": "Costa",
+        "naturaleza": "Natura",
+        "paisaje": "Paesaggio",
+        "pueblos": "Borghi",
+        "gastronomia": "Gastronomia",
+        "puertos": "Passi",
+        "rio": "Fiume",
+        "embalse": "Lago artificiale",
+        "bosque": "Bosco",
+        "castillos": "Castelli",
+        "miradores": "Belvedere",
+        "desierto": "Deserto",
+        "llanura": "Pianura",
+        "tranquila": "Tranquillo"
     }
 }

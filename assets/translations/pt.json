@@ -13,7 +13,7 @@
         "yes": "Sim",
         "no": "Não",
         "optional": "opcional",
-        "pace_easy": "Fácil",
+        "pace_easy": "Tranquilo",
         "pace_moderate": "Moderado",
         "pace_hard": "Exigente",
         "manage": "Gerir",
@@ -212,7 +212,7 @@
         "landscape": "🏔️ Paisagem",
         "mixed": "⚖️ Misto",
         "difficulty": "Ritmo",
-        "easy": "😌 Fácil",
+        "easy": "😌 Tranquilo",
         "moderate": "💪 Moderado",
         "hard": "🔥 Exigente",
         "avoid_highways": "Evitar autoestradas e vias rápidas",
@@ -330,7 +330,8 @@
         "regenerate_shorter": "Regenerar mais curta",
         "refuel_km": "⛽ Abastecer aos {km} km",
         "refuel_km_n": "⛽ Abastecer aos {km} km ({n}/{total})",
-        "from_catalog": "Rotas de moto · {source}"
+        "from_catalog": "Rotas de moto · {source}",
+        "wind_only": "Vento {wind} m/s"
     },
     "verify_email": {
         "title": "Verifique o seu email!",
@@ -399,7 +400,7 @@
         "status_joined": "✅ Inscrito",
         "status_declined": "❌ Recusado",
         "status_pending": "📨 Pendente",
-        "filter_easy": "Fácil",
+        "filter_easy": "Tranquilo",
         "filter_moderate": "Moderado",
         "filter_hard": "Exigente",
         "filter_circular": "Circular",
@@ -612,7 +613,8 @@
         "special_desc_turista": "Visita 5 miradouros diferentes.",
         "special_desc_explorador": "Completa uma rota fora da tua província habitual.",
         "special_desc_en_grupo": "Completa uma rota acompanhado de outro motociclista.",
-        "special_desc_coleccionista": "Visita 50 pontos de interesse diferentes."
+        "special_desc_coleccionista": "Visita 50 pontos de interesse diferentes.",
+        "keep_riding_hint": "Vais bem: continua a andar e a primeira conquista de cada série chega em breve."
     },
     "repeat": {
         "title": "Repetir rota",
@@ -880,7 +882,7 @@
         "l_road": "Estrada",
         "l_road_v": "curvas · paisagem · misto",
         "l_pace": "Ritmo",
-        "l_pace_v": "tranquila · moderada · exigente",
+        "l_pace_v": "tranquilo · moderado · exigente",
         "l_stops": "Paragens",
         "l_stops_v": "parar para lanchar ou almoçar",
         "l_start": "Partida",
@@ -1260,7 +1262,9 @@
         "warn_far_severe": "O início fica a {km} km ({time}) da tua saída: não é um percurso para fazer num dia a partir de casa.",
         "start_at_route": "Começar na saída do percurso",
         "route_start": "Saída do percurso",
-        "publish_removed": "Esta rota foi retirada de Rotas de moto pela moderação. Se achas que é um engano, escreve-nos: o e-mail está no Aviso legal."
+        "publish_removed": "Esta rota foi retirada de Rotas de moto pela moderação. Se achas que é um engano, escreve-nos: o e-mail está no Aviso legal.",
+        "clear_filters": "Remover filtros",
+        "mod_curviness": "sinuosidade {cat}"
     },
     "legal": {
         "terms": "Termos de utilização",
@@ -1322,5 +1326,25 @@
     "quota": {
         "title": "Rotas com IA esgotadas",
         "ok": "Entendido"
+    },
+    "route_tags": {
+        "montana": "Montanha",
+        "curvas": "Curvas",
+        "agua": "Água",
+        "historia": "História",
+        "costa": "Costa",
+        "naturaleza": "Natureza",
+        "paisaje": "Paisagem",
+        "pueblos": "Aldeias",
+        "gastronomia": "Gastronomia",
+        "puertos": "Passos de montanha",
+        "rio": "Rio",
+        "embalse": "Albufeira",
+        "bosque": "Floresta",
+        "castillos": "Castelos",
+        "miradores": "Miradouros",
+        "desierto": "Deserto",
+        "llanura": "Planície",
+        "tranquila": "Tranquilo"
     }
 }

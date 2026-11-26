@@ -1,3 +1,4 @@
+import 'package:gastroroute_ai/core/labels.dart';
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -300,7 +301,7 @@ class _RouteTrackingScreenState extends State<RouteTrackingScreen> {
                       ? () => RouteTrackingManager.instance.debugForceArrival()
                       : null,
                   child: Column(children: [
-                    Text(_state.distanceKm.toStringAsFixed(1),
+                    Text(dec1(context, _state.distanceKm),
                         style: const TextStyle(
                             color: AppColors.orange, fontSize: 64, fontWeight: FontWeight.w700, height: 1)),
                     Text('tracking.km'.tr(),

@@ -100,7 +100,7 @@ class _RoutePublicationBlockState extends State<RoutePublicationBlock> {
     }
     final r = Map<String, dynamic>.from(result['route'] as Map? ?? {});
     setState(() => _status = '${r['publication_status'] ?? 'pending'}');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('catalog.publish_pending'.tr())));
+    // Sin barra abajo: el recuadro de la publicación ya lo dice, y la barra tapaba el mapa (salía dos veces).
   }
 
   Widget _box(Color color, IconData icon, String text) => Container(

@@ -1,3 +1,4 @@
+import 'package:gastroroute_ai/core/labels.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
@@ -477,7 +478,7 @@ class _MealStopRow extends StatelessWidget {
                   const Icon(Icons.star, color: AppColors.gold, size: 14),
                   const SizedBox(width: 3),
                   Text(
-                    '${(eatery!['rating'] as num).toStringAsFixed(1)} (${eatery!['votes'] ?? 0})',
+                    '${dec1(context, eatery!['rating'])} (${eatery!['votes'] ?? 0})',
                     style: const TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 ] else
@@ -680,7 +681,7 @@ class _OpinionsSheetState extends State<_OpinionsSheet> {
                           if (d['rating'] != null) ...[
                             const Icon(Icons.star, color: AppColors.gold, size: 18),
                             const SizedBox(width: 4),
-                            Text('${(d['rating'] as num).toStringAsFixed(1)} · '
+                            Text('${dec1(context, d['rating'])} · '
                                 '${'rating.votes'.tr(namedArgs: {'n': '${d['votes']}'})}'
                                 ' · ${'rating.comments_count'.tr(namedArgs: {'n': '${d['total_comments'] ?? comments.length}'})}',
                                 style: const TextStyle(color: AppColors.white, fontSize: 14)),

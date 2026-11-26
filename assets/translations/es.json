@@ -330,7 +330,8 @@
         "regenerate_shorter": "Regenerar más corta",
         "refuel_km": "⛽ Repostar a los {km} km",
         "refuel_km_n": "⛽ Repostar a los {km} km ({n}/{total})",
-        "from_catalog": "Rutas moteras · {source}"
+        "from_catalog": "Rutas moteras · {source}",
+        "wind_only": "Viento {wind} m/s"
     },
     "verify_email": {
         "title": "¡Verifica tu email!",
@@ -612,7 +613,8 @@
         "special_desc_turista": "Visita 5 miradores distintos.",
         "special_desc_explorador": "Completa una ruta fuera de tu provincia habitual.",
         "special_desc_en_grupo": "Completa una ruta acompañado de otro motero.",
-        "special_desc_coleccionista": "Visita 50 puntos de interés distintos."
+        "special_desc_coleccionista": "Visita 50 puntos de interés distintos.",
+        "keep_riding_hint": "Vas bien: sigue rodando y el primer logro de cada serie llegará pronto."
     },
     "repeat": {
         "title": "Repetir ruta",
@@ -1260,7 +1262,9 @@
         "warn_far_severe": "El inicio está a {km} km ({time}) de tu salida: no es una ruta para hacer en un día saliendo de casa.",
         "start_at_route": "Empezar en la salida de la ruta",
         "route_start": "Salida de la ruta",
-        "publish_removed": "Esta ruta fue retirada de Rutas moteras por moderación. Si crees que es un error, escríbenos: el correo está en el Aviso legal."
+        "publish_removed": "Esta ruta fue retirada de Rutas moteras por moderación. Si crees que es un error, escríbenos: el correo está en el Aviso legal.",
+        "clear_filters": "Quitar filtros",
+        "mod_curviness": "sinuosidad {cat}"
     },
     "legal": {
         "terms": "Términos de uso",
@@ -1322,5 +1326,25 @@
     "quota": {
         "title": "Rutas con IA agotadas",
         "ok": "Entendido"
+    },
+    "route_tags": {
+        "montana": "Montaña",
+        "curvas": "Curvas",
+        "agua": "Agua",
+        "historia": "Historia",
+        "costa": "Costa",
+        "naturaleza": "Naturaleza",
+        "paisaje": "Paisaje",
+        "pueblos": "Pueblos",
+        "gastronomia": "Gastronomía",
+        "puertos": "Puertos",
+        "rio": "Río",
+        "embalse": "Embalse",
+        "bosque": "Bosque",
+        "castillos": "Castillos",
+        "miradores": "Miradores",
+        "desierto": "Desierto",
+        "llanura": "Llanura",
+        "tranquila": "Tranquila"
     }
 }

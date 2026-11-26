@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 /// Los valores que manda el servidor, en el idioma del motero.
@@ -33,3 +34,33 @@ String levelLabel(dynamic valor) => switch ('$valor') {
       'intermedio' => 'profile.level_intermediate'.tr(),
       _ => 'profile.level_novice'.tr(),
     };
+
+/// Un número con un decimal en el idioma de la app: «22,9» en castellano o
+/// alemán, «22.9» en inglés. Antes `toStringAsFixed(1)` ponía punto en todos
+/// (visto en alemán el 25-11-2026).
+String dec1(BuildContext context, dynamic v) =>
+    NumberFormat('0.0', context.locale.toString()).format((v as num?) ?? 0);
+
+/// «Honda PCX125 · 2021 · 125 cc», saltándose lo que no esté puesto. Año y
+/// cilindrada no son obligatorios, y una moto sin ellos salía como
+/// «Honda PCX125 ·  · cc» (visto el 25-11-2026).
+String motoLabel(Map? m, {bool year = true}) {
+  if (m == null) return '';
+  String t(dynamic v) => v == null ? '' : '$v'.trim();
+  final partes = <String>[
+    '${t(m['brand'])} ${t(m['model'])}'.trim(),
+    if (year) t(m['year']),
+    if (t(m['engine_cc']).isNotEmpty && t(m['engine_cc']) != '0') '${t(m['engine_cc'])} cc',
+  ];
+  return partes.where((p) => p.isNotEmpty).join(' · ');
+}
+
+/// Las etiquetas de una ruta (`montana`, `curvas`…) viajan en castellano y sin
+/// tildes: son valores, no texto. Se pintaban tal cual («montana»). Las que no
+/// conocemos no se enseñan (y `importada` es una marca interna).
+String? tagLabel(dynamic tag) {
+  final k = 'route_tags.${'$tag'.trim().toLowerCase()}';
+  final t = k.tr();
+  return t == k ? null : t;
+}
+

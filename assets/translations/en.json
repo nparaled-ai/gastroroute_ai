@@ -13,9 +13,9 @@
         "yes": "Yes",
         "no": "No",
         "optional": "optional",
-        "pace_easy": "Easy",
+        "pace_easy": "Relaxed",
         "pace_moderate": "Moderate",
-        "pace_hard": "Challenging",
+        "pace_hard": "Demanding",
         "manage": "Manage",
         "add": "Add",
         "confirm": "Confirm",
@@ -212,9 +212,9 @@
         "landscape": "🏔️ Landscape",
         "mixed": "⚖️ Mixed",
         "difficulty": "Pace",
-        "easy": "😌 Easy",
+        "easy": "😌 Relaxed",
         "moderate": "💪 Moderate",
-        "hard": "🔥 Challenging",
+        "hard": "🔥 Demanding",
         "avoid_highways": "Avoid motorways and highways",
         "avoid_highways_desc": "Prioritize secondary and mountain roads",
         "extra_suggestions": "Additional suggestions",
@@ -330,7 +330,8 @@
         "regenerate_shorter": "Regenerate shorter",
         "refuel_km": "⛽ Refuel at {km} km",
         "refuel_km_n": "⛽ Refuel at {km} km ({n}/{total})",
-        "from_catalog": "Motorcycle routes · {source}"
+        "from_catalog": "Motorcycle routes · {source}",
+        "wind_only": "Wind {wind} m/s"
     },
     "verify_email": {
         "title": "Verify your email!",
@@ -399,7 +400,7 @@
         "status_joined": "✅ Joined",
         "status_declined": "❌ Declined",
         "status_pending": "📨 Pending",
-        "filter_easy": "Easy",
+        "filter_easy": "Relaxed",
         "filter_moderate": "Moderate",
         "filter_hard": "Demanding",
         "filter_circular": "Circular",
@@ -612,7 +613,8 @@
         "special_desc_turista": "Visit 5 different viewpoints.",
         "special_desc_explorador": "Complete a route outside your usual province.",
         "special_desc_en_grupo": "Complete a route together with another rider.",
-        "special_desc_coleccionista": "Visit 50 different points of interest."
+        "special_desc_coleccionista": "Visit 50 different points of interest.",
+        "keep_riding_hint": "You're on your way: keep riding and the first achievement of each series will come soon."
     },
     "repeat": {
         "title": "Repeat route",
@@ -1260,7 +1262,9 @@
         "warn_far_severe": "The start is {km} km ({time}) from where you set off: this is not a route for a day out from home.",
         "start_at_route": "Start at the route’s start",
         "route_start": "Route start",
-        "publish_removed": "This route was removed from Motorcycle routes by moderation. If you think this is a mistake, write to us: the email is in the Legal notice."
+        "publish_removed": "This route was removed from Motorcycle routes by moderation. If you think this is a mistake, write to us: the email is in the Legal notice.",
+        "clear_filters": "Clear filters",
+        "mod_curviness": "curviness {cat}"
     },
     "legal": {
         "terms": "Terms of use",
@@ -1322,5 +1326,25 @@
     "quota": {
         "title": "AI routes used up",
         "ok": "Got it"
+    },
+    "route_tags": {
+        "montana": "Mountains",
+        "curvas": "Bends",
+        "agua": "Water",
+        "historia": "History",
+        "costa": "Coast",
+        "naturaleza": "Nature",
+        "paisaje": "Scenery",
+        "pueblos": "Villages",
+        "gastronomia": "Food",
+        "puertos": "Mountain passes",
+        "rio": "River",
+        "embalse": "Reservoir",
+        "bosque": "Forest",
+        "castillos": "Castles",
+        "miradores": "Viewpoints",
+        "desierto": "Desert",
+        "llanura": "Plains",
+        "tranquila": "Relaxed"
     }
 }

@@ -1,3 +1,4 @@
+import 'package:gastroroute_ai/core/labels.dart';
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -548,8 +549,32 @@ class _CatalogScreenState extends State<CatalogScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_items.isEmpty) {
+      // Con un botón para quitar los filtros aquí mismo: antes había que abrir «Más filtros» y buscar «Limpiar».
+      // El país se queda: es dónde mira el motero, no un filtro que se le haya ido de las manos.
       return Center(
-        child: Text('catalog.empty'.tr(), style: const TextStyle(color: AppColors.greyText)),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text('catalog.empty'.tr(), style: const TextStyle(color: AppColors.greyText)),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _search.clear();
+                _zone = null;
+                _difficulty = null;
+                _categories.clear();
+                _kinds.clear();
+                _source = null;
+                _kmActive = false;
+                _km = const RangeValues(0, 600);
+                _openNow = false;
+                _minRating = null;
+                _near = false;
+              });
+              _load();
+            },
+            child: Text('catalog.clear_filters'.tr()),
+          ),
+        ]),
       );
     }
 
@@ -625,7 +650,7 @@ class _RouteCard extends StatelessWidget {
                 Icons.star,
                 rating == null
                     ? 'catalog.no_rating'.tr()
-                    : '${rating.toStringAsFixed(1)} · ${'catalog.votes'.tr(namedArgs: {'n': '$votes'})}',
+                    : '${dec1(context, rating)} · ${'catalog.votes'.tr(namedArgs: {'n': '$votes'})}',
                 color: rating == null ? AppColors.greyText : AppColors.gold,
               ),
             ]),

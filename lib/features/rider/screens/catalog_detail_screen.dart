@@ -1,3 +1,4 @@
+import 'package:gastroroute_ai/core/labels.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -179,7 +180,7 @@ class _CatalogDetailScreenState extends State<CatalogDetailScreen> {
           Text(
             rating == null
                 ? 'catalog.no_rating'.tr()
-                : '${rating.toStringAsFixed(1)} · ${'catalog.votes'.tr(namedArgs: {'n': '$votes'})}',
+                : '${dec1(context, rating)} · ${'catalog.votes'.tr(namedArgs: {'n': '$votes'})}',
             style: const TextStyle(color: AppColors.white, fontSize: 15),
           ),
         ]),

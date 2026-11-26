@@ -1,3 +1,4 @@
+import 'package:gastroroute_ai/core/labels.dart';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -505,13 +506,22 @@ class _RouteAssistantOptionsScreenState
           ],
         ),
       ),
+      // Generando, la espera va ENCIMA de la lista y no en su lugar: quitar la lista se llevaba el mapa, y al
+      // volver se creaba otro que salía en negro un instante (visto el 25-11-2026).
       body: _loading
           ? _busy('assistant.options_loading'.tr())
-          : _generating
-          ? _busy('assistant.options_generating'.tr())
           : _options.isEmpty
-          ? _empty()
-          : _list(),
+          ? (_generating ? _busy('assistant.options_generating'.tr()) : _empty())
+          : Stack(children: [
+              _list(),
+              if (_generating)
+                Positioned.fill(
+                  child: ColoredBox(
+                    color: AppColors.background.withValues(alpha: 0.92),
+                    child: _busy('assistant.options_generating'.tr()),
+                  ),
+                ),
+            ]),
     );
   }
 
@@ -789,7 +799,7 @@ class _RouteAssistantOptionsScreenState
 
     final hours = (option['minutes'] as num?) == null
         ? null
-        : ((option['minutes'] as num) / 60).toStringAsFixed(1);
+        : dec1(context, (option['minutes'] as num) / 60);
 
     // Tocar la tarjeta es lo mismo que "Ver en el mapa": es el gesto que sale
     // solo cuando estás comparando tres, y tener que apuntar al botón pequeño

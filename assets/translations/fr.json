@@ -13,9 +13,9 @@
         "yes": "Oui",
         "no": "Non",
         "optional": "facultatif",
-        "pace_easy": "Facile",
+        "pace_easy": "Tranquille",
         "pace_moderate": "Modéré",
-        "pace_hard": "Difficile",
+        "pace_hard": "Exigeant",
         "manage": "Gérer",
         "add": "Ajouter",
         "confirm": "Confirmer",
@@ -212,9 +212,9 @@
         "landscape": "🏔️ Paysage",
         "mixed": "⚖️ Mixte",
         "difficulty": "Rythme",
-        "easy": "😌 Facile",
+        "easy": "😌 Tranquille",
         "moderate": "💪 Modéré",
-        "hard": "🔥 Difficile",
+        "hard": "🔥 Exigeant",
         "avoid_highways": "Éviter voies rapides et autoroutes",
         "avoid_highways_desc": "Privilégie les routes secondaires et de montagne",
         "extra_suggestions": "Suggestions supplémentaires",
@@ -330,7 +330,8 @@
         "regenerate_shorter": "Régénérer plus court",
         "refuel_km": "⛽ Faire le plein à {km} km",
         "refuel_km_n": "⛽ Faire le plein à {km} km ({n}/{total})",
-        "from_catalog": "Routes moto · {source}"
+        "from_catalog": "Routes moto · {source}",
+        "wind_only": "Vent {wind} m/s"
     },
     "verify_email": {
         "title": "Vérifiez votre email !",
@@ -399,7 +400,7 @@
         "status_joined": "✅ Inscrit",
         "status_declined": "❌ Refusé",
         "status_pending": "📨 En attente",
-        "filter_easy": "Facile",
+        "filter_easy": "Tranquille",
         "filter_moderate": "Modéré",
         "filter_hard": "Exigeant",
         "filter_circular": "Circulaire",
@@ -612,7 +613,8 @@
         "special_desc_turista": "Visitez 5 points de vue différents.",
         "special_desc_explorador": "Terminez un itinéraire hors de votre province habituelle.",
         "special_desc_en_grupo": "Terminez un itinéraire accompagné d'un autre motard.",
-        "special_desc_coleccionista": "Visitez 50 points d'intérêt différents."
+        "special_desc_coleccionista": "Visitez 50 points d'intérêt différents.",
+        "keep_riding_hint": "Tu es sur la bonne voie : continue de rouler et le premier succès de chaque série arrivera bientôt."
     },
     "repeat": {
         "title": "Répéter l'itinéraire",
@@ -1260,7 +1262,9 @@
         "warn_far_severe": "Le début est à {km} km ({time}) de votre départ : ce n’est pas un parcours à faire dans la journée depuis chez vous.",
         "start_at_route": "Partir du début du parcours",
         "route_start": "Départ du parcours",
-        "publish_removed": "Cet itinéraire a été retiré de Routes moto par la modération. Si vous pensez qu’il s’agit d’une erreur, écrivez-nous : l’e-mail figure dans les Mentions légales."
+        "publish_removed": "Cet itinéraire a été retiré de Routes moto par la modération. Si vous pensez qu’il s’agit d’une erreur, écrivez-nous : l’e-mail figure dans les Mentions légales.",
+        "clear_filters": "Retirer les filtres",
+        "mod_curviness": "sinuosité {cat}"
     },
     "legal": {
         "terms": "Conditions d’utilisation",
@@ -1322,5 +1326,25 @@
     "quota": {
         "title": "Itinéraires IA épuisés",
         "ok": "Compris"
+    },
+    "route_tags": {
+        "montana": "Montagne",
+        "curvas": "Virages",
+        "agua": "Eau",
+        "historia": "Histoire",
+        "costa": "Côte",
+        "naturaleza": "Nature",
+        "paisaje": "Paysage",
+        "pueblos": "Villages",
+        "gastronomia": "Gastronomie",
+        "puertos": "Cols",
+        "rio": "Rivière",
+        "embalse": "Lac de barrage",
+        "bosque": "Forêt",
+        "castillos": "Châteaux",
+        "miradores": "Points de vue",
+        "desierto": "Désert",
+        "llanura": "Plaine",
+        "tranquila": "Tranquille"
     }
 }

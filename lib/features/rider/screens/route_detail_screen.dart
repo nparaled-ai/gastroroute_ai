@@ -915,8 +915,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     setState(() {
       _route!['publication_status'] = r['publication_status'] ?? 'pending';
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('catalog.publish_pending'.tr())));
+    // Sin barra abajo: el recuadro de la publicación ya lo dice, y la barra tapaba el mapa (salía dos veces).
   }
 
   /// El estado de la publicación en Rutas moteras, o el botón para pedirla.
@@ -1275,7 +1274,7 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                           const SizedBox(width: 8),
                           _Chip(
                               Icons.access_time,
-                              '${((_route!['duration_minutes'] ?? 0) / 60).toStringAsFixed(1)} h',
+                              '${dec1(context, (_route!['duration_minutes'] ?? 0) / 60)} h',
                               AppColors.cyan),
                           const SizedBox(width: 8),
                           _Chip(Icons.terrain, paceLabel(_route!['difficulty']),

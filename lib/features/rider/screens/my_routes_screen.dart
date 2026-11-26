@@ -681,7 +681,7 @@ class _RouteCard extends StatelessWidget {
                 children: [
                   _Chip(Icons.route, '${route['distance_km'] ?? '?'} km', AppColors.orange),
                   _Chip(Icons.access_time,
-                      '${(((route['duration_minutes'] ?? 0) as num) / 60).toStringAsFixed(1)} h',
+                      '${dec1(context, ((route['duration_minutes'] ?? 0) as num) / 60)} h',
                       AppColors.cyan),
                   _Chip(Icons.terrain, paceLabel(route['difficulty']), AppColors.gold),
                   // Origen de la ruta. Antes solo se pintaba en las GPX, así
@@ -698,7 +698,7 @@ class _RouteCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      '${'${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim()} · ${route['moto_info']['engine_cc']} cc',
+                      motoLabel(route['moto_info'] as Map?, year: false),
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: AppColors.grey, fontSize: 12),
                     ),
@@ -843,7 +843,7 @@ class _RiddenListState extends State<_RiddenList> {
 
   String _formatDate(String? iso) {
     final date = iso == null ? null : DateTime.tryParse(iso);
-    return date == null ? '' : DateFormat.yMMMd().add_Hm().format(date.toLocal());
+    return date == null ? '' : DateFormat.yMMMd(context.locale.toString()).add_Hm().format(date.toLocal());
   }
 
   String _formatDuration(int seconds) {
@@ -1037,7 +1037,7 @@ class _RiddenListState extends State<_RiddenList> {
                 const SizedBox(height: 10),
 
                 Wrap(spacing: 8, runSpacing: 8, children: [
-                  _Chip(Icons.route, '${km.toStringAsFixed(1)} km', AppColors.orange),
+                  _Chip(Icons.route, '${dec1(context, km)} km', AppColors.orange),
                   _Chip(Icons.access_time, _formatDuration(seconds), AppColors.cyan),
                   if (route['difficulty'] != null)
                     _Chip(Icons.terrain, paceLabel(route['difficulty']), AppColors.gold),
@@ -1051,7 +1051,7 @@ class _RiddenListState extends State<_RiddenList> {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        '${'${route['moto_info']['brand']} ${route['moto_info']['model'] ?? ''}'.trim()} · ${route['moto_info']['engine_cc']} cc',
+                        motoLabel(route['moto_info'] as Map?, year: false),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: AppColors.grey, fontSize: 12),
                       ),

@@ -268,7 +268,10 @@ class _CatalogPlanScreenState extends State<CatalogPlanScreen> {
             icon: _locating ? Icons.hourglass_top : Icons.my_location,
             text: _locating
                 ? 'catalog.locating'.tr()
-                : (_originName.isEmpty ? 'catalog.my_location'.tr() : _originName),
+                // Sin posición (permiso denegado o sin GPS) no se dice «Mi ubicación» como si la hubiera: que falta.
+                : _lat == null
+                    ? 'assistant.row_missing'.tr()
+                    : (_originName.isEmpty ? 'catalog.my_location'.tr() : _originName),
             trailing: TextButton(
               onPressed: _pickOrigin,
               child: Text('catalog.pick_on_map'.tr()),

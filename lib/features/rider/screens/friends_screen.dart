@@ -293,10 +293,13 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
         const SizedBox(height: 16),
         Text(text, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5)),
         const SizedBox(height: 24),
-        ElevatedButton.icon(
-          onPressed: () async { await context.push('/rider/friends/search'); _loadAll(); },
-          icon: const Icon(Icons.person_search_outlined, size: 18),
-          label: Text('friends_screen.search_riders'.tr()),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: ElevatedButton.icon(
+            onPressed: () async { await context.push('/rider/friends/search'); _loadAll(); },
+            icon: const Icon(Icons.person_search_outlined, size: 18),
+            label: Text('friends_screen.search_riders'.tr()),
+          ),
         ),
       ]),
     );

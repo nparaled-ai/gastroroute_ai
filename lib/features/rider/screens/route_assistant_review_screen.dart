@@ -467,6 +467,10 @@ class _RouteAssistantReviewScreenState
       'preference' => 'planner.${_prefKey(v)}'.tr(),
       'difficulty' => 'planner.${_diffKey(v)}'.tr(),
       'moto_id' => _motoName,
+      // La fecha como en el resto de pantallas («sáb 28 nov 2026»), no en ISO («2026-11-28»).
+      'departure_date' => DateTime.tryParse('$v') == null
+          ? '$v'
+          : DateFormat('EEE d MMM y', context.locale.languageCode).format(DateTime.parse('$v')),
       _ => '$v',
     };
   }

@@ -555,7 +555,7 @@ class _RouteReviewState extends State<_RouteReview> {
                       color: categoryColor(cat).withValues(alpha: 0.16),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text('${r['score']} · ${r['category_label'] ?? cat}',
+                    child: Text('${r['score']} · ${'catalog.mod_curviness'.tr(namedArgs: {'cat': '${r['category_label'] ?? cat}'.toLowerCase()})}',
                         style: TextStyle(
                             color: categoryColor(cat),
                             fontSize: 12,

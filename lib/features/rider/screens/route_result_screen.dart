@@ -181,11 +181,11 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       _SuggestionCard(
         icon: Icons.warning_amber_rounded,
         title: 'route_result.unpaved'.tr(args: [
-          km.toStringAsFixed(1),
+          dec1(context, km),
           tramos.length.toString(),
         ]),
         subtitle: 'route_result.unpaved_hint'.tr(args: [
-          mayor.toStringAsFixed(1),
+          dec1(context, mayor),
           (tramos.first['nombre'] ?? '').toString(),
         ]),
         color: AppColors.orange,
@@ -511,8 +511,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
     final color = critical ? AppColors.error : AppColors.gold;
     final icon  = critical ? Icons.warning_rounded : Icons.info_outline;
     final message = critical
-        ? 'route_result.warn_very_long'.tr(namedArgs: {'km': '${distKm.toInt()}', 'h': hours.toStringAsFixed(1)})
-        : 'route_result.warn_long'.tr(namedArgs: {'km': '${distKm.toInt()}', 'h': hours.toStringAsFixed(1)});
+        ? 'route_result.warn_very_long'.tr(namedArgs: {'km': '${distKm.toInt()}', 'h': dec1(context, hours)})
+        : 'route_result.warn_long'.tr(namedArgs: {'km': '${distKm.toInt()}', 'h': dec1(context, hours)});
 
     return Container(
       margin: const EdgeInsets.only(top: 12),
@@ -774,7 +774,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                 _StatBadge(icon: Icons.route, label: '${_route['distance_km']} km', color: AppColors.orange),
                 const SizedBox(width: 8),
                 _StatBadge(icon: Icons.access_time,
-                    label: '${((_route['duration_minutes'] ?? 0) / 60).toStringAsFixed(1)} h',
+                    label: '${dec1(context, (_route['duration_minutes'] ?? 0) / 60)} h',
                     color: AppColors.cyan),
                 const SizedBox(width: 8),
                 _StatBadge(icon: Icons.terrain, label: paceLabel(_route['difficulty']), color: AppColors.gold),
@@ -801,10 +801,12 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
                       Text('${_weather!['temp']?.toStringAsFixed(0)}°C · ${_weather!['description']}',
                           style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600)),
                       if (_weather!['humidity'] != null)
-                        Text('route_result.wind_humidity'.tr(namedArgs: {'wind': '${_weather!['wind_speed']}', 'hum': '${_weather!['humidity']}'}),
+                        Text('route_result.wind_humidity'.tr(namedArgs: {'wind': dec1(context, _weather!['wind_speed']), 'hum': '${_weather!['humidity']}'}),
                             style: const TextStyle(color: AppColors.grey, fontSize: 12))
                       else
-                        Text('route_result.wind_range'.tr(namedArgs: {'wind': '${_weather!['wind_speed']}', 'min': '${_weather!['temp_min']?.toStringAsFixed(0)}', 'max': '${_weather!['temp_max']?.toStringAsFixed(0)}'}),
+                        Text(_weather!['temp_min'] == null || _weather!['temp_max'] == null
+                            ? 'route_result.wind_only'.tr(namedArgs: {'wind': dec1(context, _weather!['wind_speed'])})
+                            : 'route_result.wind_range'.tr(namedArgs: {'wind': dec1(context, _weather!['wind_speed']), 'min': '${(_weather!['temp_min'] as num).round()}', 'max': '${(_weather!['temp_max'] as num).round()}'}),
                             style: const TextStyle(color: AppColors.grey, fontSize: 12)),
                     ])),
                     // Botón actualizar solo si la fecha está dentro de los próximos 5 días o no hay fecha
@@ -956,17 +958,17 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               ..._repeatedRoadNotice(),
 
               // Tags
-              if (_route['tags'] != null && (_route['tags'] as List).isNotEmpty) ...[
+              if ((_route['tags'] as List? ?? []).map(tagLabel).whereType<String>().isNotEmpty) ...[
                 Wrap(
                   spacing: 8, runSpacing: 8,
-                  children: (_route['tags'] as List).map((tag) => Container(
+                  children: (_route['tags'] as List).map(tagLabel).whereType<String>().map((tag) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
                       color: AppColors.cyan.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
                     ),
-                    child: Text(tag.toString(), style: const TextStyle(color: AppColors.cyan, fontSize: 12)),
+                    child: Text(tag, style: const TextStyle(color: AppColors.cyan, fontSize: 12)),
                   )).toList(),
                 ),
                 const SizedBox(height: 24),
@@ -1145,8 +1147,21 @@ const SizedBox(height: 16),
 if (_friends.isEmpty)
 Padding(
 padding: const EdgeInsets.all(16),
-child: Text('route_result.no_friends'.tr(),
-style: const TextStyle(color: AppColors.grey))
+child: Column(mainAxisSize: MainAxisSize.min, children: [
+Text('route_result.no_friends'.tr(),
+style: const TextStyle(color: AppColors.grey)),
+const SizedBox(height: 8),
+// Sin amigos no hay a quién mandarla: que pueda ir a buscarlos desde aquí.
+TextButton.icon(
+onPressed: () {
+final r = GoRouter.of(context);
+Navigator.pop(context);
+r.push('/rider/friends/search');
+},
+icon: const Icon(Icons.person_search_outlined, size: 18, color: AppColors.cyan),
+label: Text('friends_screen.search_riders'.tr(), style: const TextStyle(color: AppColors.cyan)),
+),
+]),
 )
 else
 SizedBox(

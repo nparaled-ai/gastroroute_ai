@@ -1,3 +1,4 @@
+import 'package:gastroroute_ai/core/labels.dart';
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -84,7 +85,10 @@ class _ActiveTrackingBarState extends State<ActiveTrackingBar> {
 
   String get _currentPath {
     try {
-      return router.routerDelegate.currentConfiguration.uri.path;
+      // La pantalla de ARRIBA, no la dirección de la base: «Ruta en curso» se abre con `push` y `uri` seguía
+      // diciendo la pantalla de debajo, así que la barra salía también encima de la propia ruta en curso.
+      final c = router.routerDelegate.currentConfiguration;
+      return c.isEmpty ? c.uri.path : c.last.matchedLocation;
     } catch (_) {
       return '';
     }
@@ -145,7 +149,7 @@ class _ActiveTrackingBarState extends State<ActiveTrackingBar> {
                     ),
                   ),
                   Text(
-                    '${_state.distanceKm.toStringAsFixed(1)} km · '
+                    '${dec1(context, _state.distanceKm)} km · '
                     '${_elapsed(_state.elapsed)}',
                     style: const TextStyle(color: AppColors.grey, fontSize: 12),
                   ),

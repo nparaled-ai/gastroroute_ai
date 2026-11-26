@@ -1,3 +1,4 @@
+import 'package:gastroroute_ai/core/labels.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -166,7 +167,7 @@ class _RiderMotosScreenState extends State<RiderMotosScreen> {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text('${moto['brand'] ?? ''} ${moto['model'] ?? ''} · ${moto['year'] ?? ''} · ${moto['engine_cc'] ?? ''}cc',
+                        Text(motoLabel(moto),
                             style: const TextStyle(color: AppColors.grey, fontSize: 12)),
                       ],
                     ),

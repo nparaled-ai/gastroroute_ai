@@ -149,7 +149,9 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 const Icon(Icons.emoji_events_outlined, color: AppColors.orange, size: 22),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text('achievements.empty_hint'.tr(),
+                  child: Text(((_data!['stats'] as Map?)?['routes'] as num? ?? 0) > 0
+                      ? 'achievements.keep_riding_hint'.tr()
+                      : 'achievements.empty_hint'.tr(),
                       style: const TextStyle(color: AppColors.white, fontSize: 12, height: 1.4)),
                 ),
               ]),
@@ -386,10 +388,10 @@ class _SpecialDetailSheet extends StatelessWidget {
 
   const _SpecialDetailSheet({required this.special});
 
-  String _formatDate(String? iso) {
+  String _formatDate(BuildContext context, String? iso) {
     if (iso == null) return '';
     final date = DateTime.tryParse(iso);
-    return date == null ? '' : DateFormat.yMMMMd().format(date);
+    return date == null ? '' : DateFormat.yMMMMd(context.locale.toString()).format(date);
   }
 
   @override
@@ -454,7 +456,7 @@ class _SpecialDetailSheet extends StatelessWidget {
                   child: Text(
                     unlocked
                         ? 'achievements.unlocked_on'.tr(namedArgs: {
-                            'date': _formatDate(special['unlocked_at'] as String?),
+                            'date': _formatDate(context, special['unlocked_at'] as String?),
                           })
                         : 'achievements.not_yet'.tr(),
                     style: TextStyle(color: color, fontSize: 12),
@@ -475,11 +477,11 @@ class _CategoryDetailSheet extends StatelessWidget {
 
   const _CategoryDetailSheet({required this.category});
 
-  String _formatDate(String? iso) {
+  String _formatDate(BuildContext context, String? iso) {
     if (iso == null) return '';
     final date = DateTime.tryParse(iso);
     if (date == null) return '';
-    return DateFormat.yMMMMd().format(date);
+    return DateFormat.yMMMMd(context.locale.toString()).format(date);
   }
 
   @override
@@ -609,7 +611,7 @@ class _CategoryDetailSheet extends StatelessWidget {
                         if (done)
                           Text(
                             'achievements.unlocked_on'.tr(
-                                namedArgs: {'date': _formatDate(t['unlocked_at'] as String?)}),
+                                namedArgs: {'date': _formatDate(context, t['unlocked_at'] as String?)}),
                             style: TextStyle(color: tierColor, fontSize: 12),
                           ),
                       ]),

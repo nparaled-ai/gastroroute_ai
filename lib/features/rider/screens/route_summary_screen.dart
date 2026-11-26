@@ -1,4 +1,5 @@
 
+import 'package:gastroroute_ai/core/labels.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -186,7 +187,7 @@ class _RouteSummaryScreenState extends State<RouteSummaryScreen> {
             // Kilómetros reales, el dato protagonista
             Center(
               child: Column(children: [
-                Text(km.toStringAsFixed(1),
+                Text(dec1(context, km),
                     style: const TextStyle(
                         color: AppColors.orange,
                         fontSize: 56,
