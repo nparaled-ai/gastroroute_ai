@@ -84,6 +84,8 @@ class RouteAssistantService {
       return {
         'options': const <Map<String, dynamic>>[],
         'error': e.response?.data?['message'] ?? 'common.connection_error'.tr(),
+        // 422: lo pedido no puede salir (salida que no existe, destino demasiado lejos). Reintentar no sirve.
+        'invalid': e.response?.statusCode == 422,
       };
     } catch (_) {
       return {

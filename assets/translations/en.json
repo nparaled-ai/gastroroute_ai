@@ -932,7 +932,8 @@
         "zone_far": "{zona} is {km} km away and this route reaches {alcance}. You will only clip its edge: riding there would take about {necesarios} km, or a closer starting point.",
         "destination_unknown": "We do not know where that destination is, so the route cannot be drawn. Go back and write it another way, with the province.",
         "lunch_kind_cafe": "A coffee",
-        "lunch_kind_almuerzo": "A proper bite"
+        "lunch_kind_almuerzo": "A proper bite",
+        "fix_data": "Change the details"
     },
     "errors": {
         "save": "Could not save.",

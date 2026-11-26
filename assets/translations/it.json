@@ -932,7 +932,8 @@
         "zone_far": "{zona} è a {km} km e questo percorso arriva a {alcance}. Ne sfiorerai solo il bordo: per girarci servirebbero circa {necesarios} km, o partire da più vicino.",
         "destination_unknown": "Non sappiamo dove si trova quella destinazione, quindi il percorso non si potrà tracciare. Torna indietro e scrivila in altro modo, con la provincia.",
         "lunch_kind_cafe": "Un caffè",
-        "lunch_kind_almuerzo": "Spuntino"
+        "lunch_kind_almuerzo": "Spuntino",
+        "fix_data": "Cambia i dati"
     },
     "errors": {
         "save": "Errore durante il salvataggio.",

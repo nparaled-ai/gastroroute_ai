@@ -932,7 +932,8 @@
         "zone_far": "{zona} queda a {km} km y esta ruta llega a {alcance}. Solo rozarás el borde: para rodar por allí harían falta unos {necesarios} km, o salir desde más cerca.",
         "destination_unknown": "No sabemos dónde está ese destino, así que la ruta no se podrá trazar. Vuelve atrás y escríbelo de otra forma, con la provincia.",
         "lunch_kind_cafe": "Un café",
-        "lunch_kind_almuerzo": "Almorzar"
+        "lunch_kind_almuerzo": "Almorzar",
+        "fix_data": "Cambiar los datos"
     },
     "errors": {
         "save": "Error al guardar.",

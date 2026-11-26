@@ -932,7 +932,8 @@
         "zone_far": "{zona} liegt {km} km entfernt, diese Route reicht bis {alcance}. Du streifst nur den Rand: dort zu fahren bräuchte rund {necesarios} km oder einen näheren Start.",
         "destination_unknown": "Wir wissen nicht, wo dieses Ziel liegt, also lässt sich die Route nicht berechnen. Geh zurück und schreib es anders, mit der Provinz.",
         "lunch_kind_cafe": "Ein Kaffee",
-        "lunch_kind_almuerzo": "Zweites Frühstück"
+        "lunch_kind_almuerzo": "Zweites Frühstück",
+        "fix_data": "Angaben ändern"
     },
     "errors": {
         "save": "Speichern fehlgeschlagen.",

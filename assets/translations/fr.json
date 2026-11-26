@@ -932,7 +932,8 @@
         "zone_far": "{zona} est à {km} km et cet itinéraire atteint {alcance}. Vous n’en frôlerez que le bord : y rouler demanderait environ {necesarios} km, ou un départ plus proche.",
         "destination_unknown": "Nous ne savons pas où se trouve cette destination, donc l’itinéraire ne pourra pas être tracé. Revenez en arrière et écrivez-la autrement, avec la province.",
         "lunch_kind_cafe": "Un café",
-        "lunch_kind_almuerzo": "Casse-croûte"
+        "lunch_kind_almuerzo": "Casse-croûte",
+        "fix_data": "Modifier les données"
     },
     "errors": {
         "save": "Échec de l’enregistrement.",

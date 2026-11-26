@@ -61,6 +61,9 @@ class _RouteAssistantOptionsScreenState
   /// propuesta, esperaba a que se generase la ruta y el error llegaba al final.
   bool _destinationUnknown = false;
 
+  /// Lo pedido no puede salir (422): en vez de «Generar» y «Otras», volver a cambiar los datos.
+  bool _invalid = false;
+
   String? _error;
 
   /// Dónde sale, para que el encuadre incluya la salida y no solo los hitos.
@@ -138,6 +141,7 @@ class _RouteAssistantOptionsScreenState
       _zoneFar = (result['zone_far'] as Map?)?.cast<String, dynamic>();
       _destinationUnknown = result['destination_unknown'] == true;
       _error = result['error'];
+      _invalid = result['invalid'] == true;
       _loading = false;
       _highlighted = 0;
       _origin = asPoint(origin);
@@ -562,9 +566,21 @@ class _RouteAssistantOptionsScreenState
             ),
           ),
           const SizedBox(height: 20),
+          if (_invalid)
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.orange,
+                minimumSize: const Size(220, 46),
+              ),
+              child: Text(
+                'assistant.fix_data'.tr(),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+              ),
+            ),
           // Que no haya propuestas no puede dejar al motero encerrado: la
           // ruta se genera igual, sin elegir zona.
-          ElevatedButton(
+          if (!_invalid) ElevatedButton(
             onPressed: () => _choose(null),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.orange,
@@ -578,7 +594,7 @@ class _RouteAssistantOptionsScreenState
               ),
             ),
           ),
-          TextButton(
+          if (!_invalid) TextButton(
             onPressed: _load,
             child: Text(
               'assistant.options_again'.tr(),
