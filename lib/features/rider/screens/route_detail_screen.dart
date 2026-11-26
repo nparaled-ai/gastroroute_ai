@@ -657,30 +657,6 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
     }
   }
 
-  Future<void> _leave() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text('route_detail.leave_title'.tr(),
-            style: const TextStyle(color: AppColors.white)),
-        content: Text('route_detail.leave_body'.tr(),
-            style: const TextStyle(color: AppColors.grey)),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false),
-              child: Text('common.cancel'.tr(),
-                  style: const TextStyle(color: AppColors.grey))),
-          TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: Text('route_detail.leave_confirm'.tr(),
-                  style: const TextStyle(color: AppColors.error))),
-        ],
-      ),
-    );
-    if (confirm != true) return;
-    await RouteShareService.leave(widget.routeId);
-    _loadRoute();
-  }
-
   Future<void> _openMaps() async {
     final uri = _mapsUri();
 
