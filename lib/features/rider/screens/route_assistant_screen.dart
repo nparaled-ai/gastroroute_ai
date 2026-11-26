@@ -116,6 +116,8 @@ class _RouteAssistantScreenState extends State<RouteAssistantScreen> {
       // defecto: el motero sabe qué ha pasado y qué puede hacer.
       setState(() => _error = switch (result['reason']) {
             'multi_day' => 'assistant.multi_day'.tr(),
+            // Destino que no existe o que no cabe en los km: el servidor manda el texto.
+            'bad_place' => result['message'] ?? 'assistant.unclear'.tr(),
             'unclear' => 'assistant.unclear'.tr(),
             _ => result['error'] ?? 'common.connection_error'.tr(),
           });

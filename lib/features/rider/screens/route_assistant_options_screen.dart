@@ -568,7 +568,8 @@ class _RouteAssistantOptionsScreenState
           const SizedBox(height: 20),
           if (_invalid)
             ElevatedButton(
-              onPressed: () => Navigator.pop(context),
+              // 'fix': la pantalla del paso 2 se cierra también y se queda en el paso 1.
+              onPressed: () => Navigator.pop(context, 'fix'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.orange,
                 minimumSize: const Size(220, 46),

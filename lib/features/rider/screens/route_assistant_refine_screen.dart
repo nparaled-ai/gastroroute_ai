@@ -1627,7 +1627,7 @@ class _RouteAssistantRefineScreenState
 
     if (!mounted) return;
 
-    await Navigator.of(context).push(
+    final r = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => RouteAssistantOptionsScreen(
           payload: payload,
@@ -1635,6 +1635,9 @@ class _RouteAssistantRefineScreenState
         ),
       ),
     );
+
+    // Datos imposibles (destino lejos, salida que no existe): se corrigen en el paso 1.
+    if (r == 'fix' && mounted) Navigator.of(context).pop();
   }
 
   /// Todo lo decidido, listo para el servidor.
