@@ -26,17 +26,43 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final result = await AppNotificationService.getNotifications();
     if (!mounted) return;
     setState(() {
-      _notifications = List<Map<String, dynamic>>.from(result['notifications'] ?? []);
+      _notifications = _agrupar(List<Map<String, dynamic>>.from(result['notifications'] ?? []));
       _loading = false;
     });
     await AppNotificationService.markAllRead();
   }
 
+  /// Los avisos seguidos de la MISMA persona sobre la MISMA ruta («se ha apuntado / no puede ir / se ha
+  /// apuntado») van en una sola fila: la más reciente, con «+2» al lado. Antes ocupaban tres.
+  static const _deRodada = {'route_join', 'route_declined'};
+
+  List<Map<String, dynamic>> _agrupar(List<Map<String, dynamic>> lista) {
+    final out = <Map<String, dynamic>>[];
+    for (final n in lista) {
+      final d = n['data'];
+      final prev = out.isEmpty ? null : out.last;
+      final pd = prev?['data'];
+      final mismo = prev != null &&
+          _deRodada.contains(n['type']) && _deRodada.contains(prev['type']) &&
+          d is Map && pd is Map &&
+          '${d['route_id']}' == '${pd['route_id']}' && '${d['user_id']}' == '${pd['user_id']}';
+      if (mismo) {
+        (prev['_ids'] as List).add(n['id']);
+        prev['_more'] = (prev['_more'] as int) + 1;
+      } else {
+        out.add({...n, '_ids': [n['id']], '_more': 0});
+      }
+    }
+    return out;
+  }
+
   Future<void> _deleteOne(int index) async {
     final n  = _notifications[index];
-    final id = n['id'] as int;
+    final ids = List<int>.from((n['_ids'] as List?) ?? [n['id']]);
     setState(() => _notifications.removeAt(index));
-    await AppNotificationService.deleteNotification(id);
+    for (final id in ids) {
+      await AppNotificationService.deleteNotification(id);
+    }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('notifications.deleted'.tr()),
@@ -212,10 +238,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           onPressed: () => context.pop(),
         ),
         actions: [
+          // Con texto: un icono suelto de papelera no decía qué iba a borrar. Pide confirmación (_deleteAll).
           if (_notifications.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.grey),
-              tooltip: 'notifications.delete_all'.tr(),
+            TextButton.icon(
+              icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.grey, size: 20),
+              label: Text('notifications.delete_all'.tr(),
+                  style: const TextStyle(color: AppColors.grey, fontSize: 13)),
               onPressed: _deleteAll,
             ),
         ],
@@ -294,6 +322,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                           ),
                                         ),
                                         const SizedBox(width: 8),
+                                        if ((n['_more'] as int? ?? 0) > 0)
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 6),
+                                            child: Text('+${n['_more']}',
+                                                style: const TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w700)),
+                                          ),
                                         Text(
                                           _timeAgo(n['created_at'] as String?),
                                           style: const TextStyle(color: AppColors.grey, fontSize: 11),

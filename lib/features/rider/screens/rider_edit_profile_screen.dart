@@ -423,6 +423,9 @@ class _RiderEditProfileScreenState extends State<RiderEditProfileScreen> {
               controller: _bioController,
               style: const TextStyle(color: AppColors.white),
               maxLines: 3, maxLength: 500,
+              // «Hecho» cierra el teclado: antes la tecla metía saltos de línea y no había forma de cerrarlo.
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.done,
               decoration: InputDecoration(
                   hintText: 'profile.about_me'.tr(),
                   counterStyle: const TextStyle(color: AppColors.grey)),

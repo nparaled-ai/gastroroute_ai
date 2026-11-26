@@ -162,10 +162,12 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 60),
 
-              // Logo
+              // Logo: el mismo que en el registro (antes solo salía allí).
               Center(
                 child: Column(
                   children: [
+                    Image.asset('assets/images/logo.png', width: 70),
+                    const SizedBox(height: 12),
                     RichText(
                       text: const TextSpan(
                         style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
